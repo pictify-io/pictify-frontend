@@ -94,7 +94,8 @@
 			bodyBg: '#0d1117',
 			cardBg: '#161b22',
 			textColor: '#c9d1d9',
-			prismThemeUrl: 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css'
+			prismThemeUrl:
+				'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css'
 		},
 		{
 			id: 'minimal-dark',
@@ -290,12 +291,20 @@ function generateImage(markdown) {
 			.markdown-body h1, .markdown-body h2, .markdown-body h3 { font-weight: 700; margin-top: 1.4em; }
 			.markdown-body h1 { font-size: 2em; }
 			.markdown-body h2 { font-size: 1.5em; }
-			.markdown-body blockquote { border-left: 4px solid ${t.type === 'dark' ? '#4a5568' : '#e2e8f0'}; padding: 0.5em 1em; margin: 1em 0; color: ${t.type === 'dark' ? '#a0aec0' : '#718096'}; }
-			.markdown-body code { background: ${t.type === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'}; padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
-			.markdown-body pre { background: ${t.type === 'dark' ? '#1e293b' : '#f1f5f9'}; padding: 1em; border-radius: 8px; overflow-x: auto; }
+			.markdown-body blockquote { border-left: 4px solid ${
+				t.type === 'dark' ? '#4a5568' : '#e2e8f0'
+			}; padding: 0.5em 1em; margin: 1em 0; color: ${t.type === 'dark' ? '#a0aec0' : '#718096'}; }
+			.markdown-body code { background: ${
+				t.type === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'
+			}; padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+			.markdown-body pre { background: ${
+				t.type === 'dark' ? '#1e293b' : '#f1f5f9'
+			}; padding: 1em; border-radius: 8px; overflow-x: auto; }
 			.markdown-body pre code { background: transparent; padding: 0; }
 			.markdown-body table { border-collapse: collapse; width: 100%; }
-			.markdown-body th, .markdown-body td { border: 1px solid ${t.type === 'dark' ? '#334155' : '#e2e8f0'}; padding: 0.5em 0.8em; text-align: left; }
+			.markdown-body th, .markdown-body td { border: 1px solid ${
+				t.type === 'dark' ? '#334155' : '#e2e8f0'
+			}; padding: 0.5em 0.8em; text-align: left; }
 			.markdown-body th { background: ${t.type === 'dark' ? '#1e293b' : '#f8fafc'}; font-weight: 600; }
 			.markdown-body a { color: ${t.type === 'dark' ? '#60a5fa' : '#2563eb'}; }
 			.markdown-body img { max-width: 100%; }
@@ -394,7 +403,11 @@ function generateImage(markdown) {
 		// Check guest limits via global store
 		if (limitReached) {
 			showUpgradePrompt = true;
-			toast.set({ message: 'Daily limit reached. Create a free account for more.', type: 'error', duration: 3000 });
+			toast.set({
+				message: 'Daily limit reached. Create a free account for more.',
+				type: 'error',
+				duration: 3000
+			});
 			return;
 		}
 
@@ -460,20 +473,23 @@ function generateImage(markdown) {
 
 	function copyToClipboard(text, label) {
 		if (!browser) return;
-		navigator.clipboard.writeText(text).then(() => {
-			toast.set({ message: `${label} copied to clipboard!`, type: 'success', duration: 2000 });
-		}).catch(() => {
-			// Fallback for insecure contexts
-			const textarea = document.createElement('textarea');
-			textarea.value = text;
-			textarea.style.position = 'fixed';
-			textarea.style.opacity = '0';
-			document.body.appendChild(textarea);
-			textarea.select();
-			document.execCommand('copy');
-			document.body.removeChild(textarea);
-			toast.set({ message: `${label} copied to clipboard!`, type: 'success', duration: 2000 });
-		});
+		navigator.clipboard
+			.writeText(text)
+			.then(() => {
+				toast.set({ message: `${label} copied to clipboard!`, type: 'success', duration: 2000 });
+			})
+			.catch(() => {
+				// Fallback for insecure contexts
+				const textarea = document.createElement('textarea');
+				textarea.value = text;
+				textarea.style.position = 'fixed';
+				textarea.style.opacity = '0';
+				document.body.appendChild(textarea);
+				textarea.select();
+				document.execCommand('copy');
+				document.body.removeChild(textarea);
+				toast.set({ message: `${label} copied to clipboard!`, type: 'success', duration: 2000 });
+			});
 	}
 
 	async function handleDownload() {
@@ -493,7 +509,9 @@ function generateImage(markdown) {
 				const parts = u.pathname.split('/').filter(Boolean);
 				if (parts.length >= 5 && parts[2] === 'blob') {
 					const [owner, repo, , branch, ...filePath] = parts;
-					return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${filePath.join('/')}`;
+					return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${filePath.join(
+						'/'
+					)}`;
 				}
 			}
 			return null;
@@ -507,7 +525,11 @@ function generateImage(markdown) {
 
 		const rawUrl = convertGithubUrl(githubUrl);
 		if (!rawUrl) {
-			toast.set({ message: 'Only GitHub URLs are supported (github.com or raw.githubusercontent.com)', type: 'error', duration: 3000 });
+			toast.set({
+				message: 'Only GitHub URLs are supported (github.com or raw.githubusercontent.com)',
+				type: 'error',
+				duration: 3000
+			});
 			return;
 		}
 
@@ -520,7 +542,14 @@ function generateImage(markdown) {
 			clearTimeout(timeout);
 
 			if (!res.ok) {
-				toast.set({ message: res.status === 404 ? 'File not found or private repository' : `GitHub returned ${res.status}`, type: 'error', duration: 3000 });
+				toast.set({
+					message:
+						res.status === 404
+							? 'File not found or private repository'
+							: `GitHub returned ${res.status}`,
+					type: 'error',
+					duration: 3000
+				});
 				return;
 			}
 
@@ -563,21 +592,26 @@ function generateImage(markdown) {
 <div class="max-w-5xl mx-auto px-4 mb-20">
 	<!-- GitHub Import -->
 	<div class="mb-6">
-		<div class="flex gap-2 items-center bg-white border-[3px] border-gray-900 rounded-xl p-3 shadow-brutal-lg">
-			<svg class="w-5 h-5 text-gray-500 ml-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.6.11.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+		<div class="flex gap-2 items-center bg-brand-paper border border-brand-ink rounded-xl p-3">
+			<svg
+				class="w-5 h-5 text-brand-mute ml-1 flex-shrink-0"
+				fill="currentColor"
+				viewBox="0 0 24 24"
+				><path
+					d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.6.11.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"
+				/></svg
+			>
 			<input
 				type="text"
 				bind:value={githubUrl}
 				placeholder="Paste GitHub file URL (e.g. github.com/user/repo/blob/main/README.md)"
-				class="flex-1 text-sm font-medium outline-none bg-transparent placeholder:text-gray-400"
+				class="flex-1 text-sm font-medium outline-none bg-transparent placeholder:text-brand-mute"
 				on:keydown={(e) => e.key === 'Enter' && fetchFromGithub()}
 			/>
 			<button
 				on:click={fetchFromGithub}
 				disabled={isFetchingGithub || !githubUrl.trim()}
-				class="px-5 py-2 bg-gray-900 text-white text-xs font-black uppercase tracking-wider rounded-lg border-[3px] border-gray-900
-					shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]
-					disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0"
+				class="px-5 py-2 bg-brand-ink text-white text-xs font-semibold tracking-wider rounded-lg border border-brand-ink disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0"
 			>
 				{isFetchingGithub ? 'Fetching...' : 'Fetch'}
 			</button>
@@ -587,9 +621,16 @@ function generateImage(markdown) {
 	<!-- Controls Bar -->
 	<div class="flex flex-wrap gap-3 mb-6">
 		<!-- Theme Selector -->
-		<div class="flex items-center gap-2 bg-white border-[3px] border-gray-900 rounded-xl px-4 py-2.5 shadow-brutal-lg">
-			<span class="text-xs font-black uppercase tracking-widest text-gray-500 whitespace-nowrap">Theme</span>
-			<select bind:value={themeId} class="text-sm font-bold bg-transparent outline-none cursor-pointer">
+		<div
+			class="flex items-center gap-2 bg-brand-paper border border-brand-ink rounded-xl px-4 py-2.5"
+		>
+			<span class="text-xs font-semibold tracking-widest text-brand-mute whitespace-nowrap"
+				>Theme</span
+			>
+			<select
+				bind:value={themeId}
+				class="text-sm font-bold bg-transparent outline-none cursor-pointer"
+			>
 				<optgroup label="Light">
 					{#each lightThemes as t}
 						<option value={t.id}>{t.name}</option>
@@ -604,9 +645,14 @@ function generateImage(markdown) {
 		</div>
 
 		<!-- Font Selector -->
-		<div class="flex items-center gap-2 bg-white border-[3px] border-gray-900 rounded-xl px-4 py-2.5 shadow-brutal-lg">
-			<span class="text-xs font-black uppercase tracking-widest text-gray-500">Font</span>
-			<select bind:value={fontId} class="text-sm font-bold bg-transparent outline-none cursor-pointer">
+		<div
+			class="flex items-center gap-2 bg-brand-paper border border-brand-ink rounded-xl px-4 py-2.5"
+		>
+			<span class="text-xs font-semibold tracking-widest text-brand-mute">Font</span>
+			<select
+				bind:value={fontId}
+				class="text-sm font-bold bg-transparent outline-none cursor-pointer"
+			>
 				{#each fonts as f}
 					<option value={f.id}>{f.name}</option>
 				{/each}
@@ -614,55 +660,82 @@ function generateImage(markdown) {
 		</div>
 
 		<!-- Dimensions -->
-		<div class="flex items-center gap-2 bg-white border-[3px] border-gray-900 rounded-xl px-4 py-2.5 shadow-brutal-lg">
-			<span class="text-xs font-black uppercase tracking-widest text-gray-500">Size</span>
-			<input type="number" bind:value={previewWidth} min="200" max="2400" class="w-16 text-sm font-bold bg-transparent outline-none text-center" />
-			<span class="text-gray-400 font-bold">x</span>
-			<input type="number" bind:value={previewHeight} min="200" max="2400" class="w-16 text-sm font-bold bg-transparent outline-none text-center" />
+		<div
+			class="flex items-center gap-2 bg-brand-paper border border-brand-ink rounded-xl px-4 py-2.5"
+		>
+			<span class="text-xs font-semibold tracking-widest text-brand-mute">Size</span>
+			<input
+				type="number"
+				bind:value={previewWidth}
+				min="200"
+				max="2400"
+				class="w-16 text-sm font-bold bg-transparent outline-none text-center"
+			/>
+			<span class="text-brand-mute font-bold">x</span>
+			<input
+				type="number"
+				bind:value={previewHeight}
+				min="200"
+				max="2400"
+				class="w-16 text-sm font-bold bg-transparent outline-none text-center"
+			/>
 		</div>
 	</div>
 
 	<!-- Editor + Preview Grid -->
 	<div class="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-6">
 		<!-- Textarea Panel -->
-		<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden flex flex-col max-h-[600px]">
-			<div class="bg-gray-50 border-b-[3px] border-gray-900 px-4 py-3 flex items-center justify-between flex-shrink-0">
+		<div
+			class="bg-brand-paper border border-brand-ink rounded-tile overflow-hidden flex flex-col max-h-[600px]"
+		>
+			<div
+				class="bg-brand-subtle border-b border-brand-ink px-4 py-3 flex items-center justify-between flex-shrink-0"
+			>
 				<div class="flex items-center gap-2">
-					<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
-					<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
-					<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-pink border border-brand-ink" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-field border border-brand-ink" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-proof border border-brand-ink" />
 				</div>
-				<span class="font-mono text-xs font-bold text-gray-500 uppercase tracking-widest">Markdown</span>
+				<span class="font-mono text-xs font-bold text-brand-mute tracking-widest">Markdown</span>
 			</div>
 			<textarea
 				bind:value={markdown}
 				on:input={handleInput}
 				maxlength="50000"
 				placeholder="Paste your markdown here..."
-				class="flex-1 w-full p-6 font-mono text-sm leading-relaxed resize-none outline-none bg-white text-gray-800 overflow-y-auto"
+				class="flex-1 w-full p-6 font-mono text-sm leading-relaxed resize-none outline-none bg-brand-paper text-brand-slate overflow-y-auto"
 				spellcheck="false"
 			/>
 		</div>
 
 		<!-- Preview Panel -->
-		<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden flex flex-col max-h-[600px]">
-			<div class="bg-gray-50 border-b-[3px] border-gray-900 px-4 py-3 flex items-center justify-between flex-shrink-0">
+		<div
+			class="bg-brand-paper border border-brand-ink rounded-tile overflow-hidden flex flex-col max-h-[600px]"
+		>
+			<div
+				class="bg-brand-subtle border-b border-brand-ink px-4 py-3 flex items-center justify-between flex-shrink-0"
+			>
 				<div class="flex items-center gap-2">
-					<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
-					<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
-					<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-pink border border-brand-ink" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-field border border-brand-ink" />
+					<div class="w-3.5 h-3.5 rounded-full bg-brand-proof border border-brand-ink" />
 				</div>
 				<div class="flex items-center gap-2">
-					<span class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-[10px] font-bold text-gray-700 uppercase tracking-wider">Live Preview</span>
-					<span class="font-mono text-xs font-bold text-gray-500">{previewWidth}x{previewHeight}</span>
+					<span
+						class="px-2 py-0.5 bg-brand-proof/20 border border-brand-proof rounded text-[10px] font-bold text-brand-slate tracking-wider"
+						>Live Preview</span
+					>
+					<span class="font-mono text-xs font-bold text-brand-mute"
+						>{previewWidth}x{previewHeight}</span
+					>
 				</div>
 			</div>
-			<div class="flex-1 overflow-y-auto bg-gray-100">
+			<div class="flex-1 overflow-y-auto bg-brand-subtle">
 				{#key srcdocKey}
 					<iframe
 						srcdoc={srcdocContent}
 						title="Markdown preview"
-						class="w-full border-0 bg-white"
+						class="w-full border-0 bg-brand-paper"
 						style="height: {Math.max(600, measuredHeight || 600)}px;"
 						sandbox="allow-scripts"
 					/>
@@ -677,9 +750,16 @@ function generateImage(markdown) {
 			<a
 				href="/signup?redirect=/tools/markdown"
 				on:click={handleSignupClick}
-				class="px-10 py-5 bg-brand-danger text-white border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl"
+				class="px-10 py-5 bg-brand-pink text-white border border-brand-ink font-semibold text-xl tracking-widest transition-all inline-flex items-center gap-3 rounded-tile"
 			>
-				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+					/></svg
+				>
 				Sign Up to Continue
 			</a>
 		{:else}
@@ -687,13 +767,33 @@ function generateImage(markdown) {
 				type="button"
 				on:click={handleGenerate}
 				disabled={isGenerating}
-				class="px-10 py-5 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+				class="px-10 py-5 bg-brand-proof text-brand-ink border border-brand-ink font-semibold text-xl tracking-widest transition-all inline-flex items-center gap-3 rounded-tile disabled:opacity-50 disabled:cursor-not-allowed"
 			>
 				{#if isGenerating}
-					<svg class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+					<svg class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24"
+						><circle
+							class="opacity-25"
+							cx="12"
+							cy="12"
+							r="10"
+							stroke="currentColor"
+							stroke-width="4"
+						/><path
+							class="opacity-75"
+							fill="currentColor"
+							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+						/></svg
+					>
 					Generating...
 				{:else}
-					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+						><path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+						/></svg
+					>
 					Generate Image
 				{/if}
 			</button>
@@ -702,7 +802,11 @@ function generateImage(markdown) {
 
 	<!-- Guest usage note -->
 	{#if !isUserLoggedIn}
-		<p class="text-center text-sm font-bold mt-4" class:text-gray-500={!limitReached} class:text-red-500={limitReached}>
+		<p
+			class="text-center text-sm font-bold mt-4"
+			class:text-brand-mute={!limitReached}
+			class:text-red-500={limitReached}
+		>
 			{#if limitReached}
 				Daily limit reached. Sign up for unlimited access.
 			{:else}
@@ -714,39 +818,76 @@ function generateImage(markdown) {
 	<!-- ── Generated Result ── -->
 	{#if generatedImageUrl}
 		<div class="mt-12">
-			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-brutal-2xl text-center relative overflow-hidden">
-				<div class="absolute top-0 right-0 w-40 h-40 bg-data-green/10 rounded-full -mr-10 -mt-10" />
+			<div
+				class="bg-brand-paper border border-brand-ink rounded-tile p-8 md:p-12 text-center relative overflow-hidden"
+			>
+				<div
+					class="absolute top-0 right-0 w-40 h-40 bg-brand-proof/10 rounded-full -mr-10 -mt-10"
+				/>
 
-				<span class="inline-block px-4 py-1.5 bg-data-green text-white border-[3px] border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-brutal-sm mb-6">Success</span>
+				<span
+					class="inline-block px-4 py-1.5 bg-brand-proof text-white border border-brand-ink rounded-full text-xs font-semibold tracking-widest mb-6"
+					>Success</span
+				>
 
-				<h3 class="text-2xl md:text-3xl font-black text-gray-900 uppercase tracking-tight mb-8">
+				<h3 class="text-2xl md:text-3xl font-semibold text-brand-ink tracking-tight mb-8">
 					Your image is ready
 				</h3>
 
-				<div class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-10">
-					<img loading="lazy" src={generatedImageUrl} alt="Generated markdown" class="max-w-full h-auto max-h-[400px]" />
+				<div class="inline-block bg-brand-paper border border-brand-ink p-2 rotate-1 mb-10">
+					<img
+						loading="lazy"
+						src={generatedImageUrl}
+						alt="Generated markdown"
+						class="max-w-full h-auto max-h-[400px]"
+					/>
 				</div>
 
 				<div class="flex flex-wrap justify-center gap-4">
 					<button
 						on:click={handleDownload}
-						class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+						class="px-6 py-3 bg-brand-ink text-white border border-brand-ink font-semibold tracking-wide transition-all rounded-xl flex items-center gap-2"
 					>
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+							/></svg
+						>
 						Download PNG
 					</button>
 					<button
 						on:click={() => copyToClipboard(generatedImageUrl, 'Link')}
-						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+						class="px-6 py-3 bg-brand-paper text-brand-ink border border-brand-ink font-semibold tracking-wide transition-all rounded-xl flex items-center gap-2"
 					>
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+							/></svg
+						>
 						Copy Link
 					</button>
 					<button
-						on:click={() => copyToClipboard(`<img loading="lazy" src="${generatedImageUrl}" alt="Markdown image" />`, 'HTML')}
-						class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+						on:click={() =>
+							copyToClipboard(
+								`<img loading="lazy" src="${generatedImageUrl}" alt="Markdown image" />`,
+								'HTML'
+							)}
+						class="px-6 py-3 bg-brand-paper text-brand-ink border border-brand-ink font-semibold tracking-wide transition-all rounded-xl flex items-center gap-2"
 					>
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+							/></svg
+						>
 						Copy HTML
 					</button>
 				</div>
@@ -754,15 +895,19 @@ function generateImage(markdown) {
 		</div>
 	{:else if generationError}
 		<div class="mt-8">
-			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-6 shadow-brutal-2xl flex items-center gap-4">
-				<div class="w-12 h-12 bg-brand-danger border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-white font-black shadow-brutal-md">!</div>
+			<div class="bg-brand-paper border border-brand-ink rounded-tile p-6 flex items-center gap-4">
+				<div
+					class="w-12 h-12 bg-brand-pink border border-brand-ink rounded-xl flex items-center justify-center text-white font-semibold"
+				>
+					!
+				</div>
 				<div class="flex-1">
-					<h4 class="font-black text-gray-900 uppercase tracking-wide">Generation Failed</h4>
-					<p class="text-gray-600 font-medium">{generationError}</p>
+					<h4 class="font-semibold text-brand-ink tracking-wide">Generation Failed</h4>
+					<p class="text-brand-slate font-medium">{generationError}</p>
 				</div>
 				<button
 					on:click={handleGenerate}
-					class="px-5 py-2.5 bg-brand-danger text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg text-sm"
+					class="px-5 py-2.5 bg-brand-pink text-white border border-brand-ink font-semibold tracking-wide transition-all rounded-lg text-sm"
 				>
 					Retry
 				</button>
@@ -773,33 +918,30 @@ function generateImage(markdown) {
 	<!-- Programmatic Usage Section -->
 	<section class="mt-20">
 		<div class="text-center mb-12">
-			<div class="inline-block bg-white border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform rotate-1 rounded-lg">
-				<span class="font-black uppercase tracking-widest text-sm">For Developers</span>
+			<div
+				class="inline-block bg-brand-paper border border-brand-ink px-4 py-1 mb-6 transform rotate-1 rounded-lg"
+			>
+				<span class="font-semibold tracking-widest text-sm">For Developers</span>
 			</div>
-			<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-				Automate with the <span class="text-brand-danger">API</span>
+			<h2 class="text-3xl md:text-5xl font-semibold text-brand-ink tracking-[-0.02em]">
+				Automate with the <span class="text-brand-pink">API</span>
 			</h2>
-			<p class="text-lg md:text-xl font-bold text-gray-700 mt-4 max-w-3xl mx-auto">
-				Generate markdown images programmatically. Render changelogs, README previews, and release notes as images in your CI/CD pipeline.
+			<p class="text-lg md:text-xl font-bold text-brand-slate mt-4 max-w-3xl mx-auto">
+				Generate markdown images programmatically. Render changelogs, README previews, and release
+				notes as images in your CI/CD pipeline.
 			</p>
 		</div>
 
 		<!-- Language Tabs -->
 		<div class="mb-6">
 			<div class="flex flex-wrap gap-2">
-				{#each [
-					{ id: 'javascript', label: 'JavaScript' },
-					{ id: 'python', label: 'Python' },
-					{ id: 'go', label: 'Go' },
-					{ id: 'ruby', label: 'Ruby' },
-					{ id: 'php', label: 'PHP' }
-				] as lang}
+				{#each [{ id: 'javascript', label: 'JavaScript' }, { id: 'python', label: 'Python' }, { id: 'go', label: 'Go' }, { id: 'ruby', label: 'Ruby' }, { id: 'php', label: 'PHP' }] as lang}
 					<button
 						on:click={() => (apiLang = lang.id)}
-						class="px-4 py-2 text-sm font-black border-[3px] transition-all rounded-lg uppercase tracking-wider
-							{apiLang === lang.id
-								? 'border-gray-900 bg-gray-900 text-white shadow-[3px_3px_0_0_#ffc480]'
-								: 'border-gray-900 bg-white text-gray-600 hover:bg-gray-50'}"
+						class="px-4 py-2 text-sm font-semibold border-[3px] transition-all rounded-lg tracking-wider {apiLang ===
+						lang.id
+							? 'border-gray-900 bg-brand-ink text-white'
+							: 'border-gray-900 bg-brand-paper text-brand-slate hover:bg-brand-subtle'}"
 					>
 						{lang.label}
 					</button>
@@ -808,83 +950,162 @@ function generateImage(markdown) {
 		</div>
 
 		<!-- Code Snippet -->
-		<div class="bg-[#1e1e1e] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
-			<div class="bg-[#2d2d2d] px-4 py-3 border-b-[3px] border-gray-900 flex items-center justify-between">
+		<div class="bg-[#1e1e1e] rounded-tile border border-brand-ink overflow-hidden">
+			<div
+				class="bg-[#2d2d2d] px-4 py-3 border-b border-brand-ink flex items-center justify-between"
+			>
 				<div class="flex items-center gap-2">
-					<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
-					<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]"></div>
-					<div class="w-3.5 h-3.5 rounded-full bg-[#27c93f]"></div>
+					<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]" />
+					<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]" />
+					<div class="w-3.5 h-3.5 rounded-full bg-[#27c93f]" />
 				</div>
-				<span class="text-xs text-gray-500 font-mono font-bold uppercase tracking-wider">
-					{apiLang === 'javascript' ? 'index.js' : apiLang === 'python' ? 'render.py' : apiLang === 'go' ? 'main.go' : apiLang === 'ruby' ? 'render.rb' : 'render.php'}
+				<span class="text-xs text-brand-mute font-mono font-bold tracking-wider">
+					{apiLang === 'javascript'
+						? 'index.js'
+						: apiLang === 'python'
+						? 'render.py'
+						: apiLang === 'go'
+						? 'main.go'
+						: apiLang === 'ruby'
+						? 'render.rb'
+						: 'render.php'}
 				</span>
 			</div>
-				<div class="p-6 overflow-x-auto">
-					{#if apiLang === 'javascript'}
-						<pre class="text-sm font-mono text-gray-300 leading-relaxed"><code><span class="text-[#c586c0]">import</span> {'{'} <span class="text-[#9cdcfe]">marked</span> {'}'} <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'marked'</span>;
-<span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]">fs</span> <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'fs'</span>;
+			<div class="p-6 overflow-x-auto">
+				{#if apiLang === 'javascript'}
+					<pre class="text-sm font-mono text-brand-rule leading-relaxed"><code
+							><span class="text-[#c586c0]">import</span> {'{'} <span class="text-[#9cdcfe]"
+								>marked</span
+							> {'}'} <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]"
+								>'marked'</span
+							>;
+<span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]">fs</span> <span
+								class="text-[#c586c0]">from</span
+							> <span class="text-[#ce9178]">'fs'</span>;
 
 <span class="text-[#6a9955]">// 1. Read markdown and convert to HTML</span>
-<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">markdown</span> = <span class="text-[#9cdcfe]">fs</span>.<span class="text-[#dcdcaa]">readFileSync</span>(<span class="text-[#ce9178]">'README.md'</span>, <span class="text-[#ce9178]">'utf-8'</span>);
-<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">htmlContent</span> = <span class="text-[#9cdcfe]">marked</span>.<span class="text-[#dcdcaa]">parse</span>(<span class="text-[#9cdcfe]">markdown</span>);
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">markdown</span> = <span
+								class="text-[#9cdcfe]">fs</span
+							>.<span class="text-[#dcdcaa]">readFileSync</span>(<span class="text-[#ce9178]"
+								>'README.md'</span
+							>, <span class="text-[#ce9178]">'utf-8'</span>);
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">htmlContent</span> = <span
+								class="text-[#9cdcfe]">marked</span
+							>.<span class="text-[#dcdcaa]">parse</span>(<span class="text-[#9cdcfe]"
+								>markdown</span
+							>);
 
 <span class="text-[#6a9955]">// 2. Wrap in styled template</span>
-<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">html</span> = <span class="text-[#ce9178]">`&lt;html&gt;&lt;head&gt;
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">html</span> = <span
+								class="text-[#ce9178]"
+								>`&lt;html&gt;&lt;head&gt;
   &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.css"&gt;
   &lt;style&gt;body{'{'} padding:48px; background:#fff {'}'} .markdown-body{'{'} max-width:800px; margin:auto {'}'}&lt;/style&gt;
-&lt;/head&gt;&lt;body&gt;&lt;div class="markdown-body"&gt;${'$'}{'{'}htmlContent{'}'}&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;`</span>;
+&lt;/head&gt;&lt;body&gt;&lt;div class="markdown-body"&gt;${'$'}{'{'}htmlContent{'}'}&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;`</span
+							>;
 
 <span class="text-[#6a9955]">// 3. Call Pictify API</span>
-<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">response</span> = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]">'https://api.pictify.io/image'</span>, {'{'}
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">response</span> = <span
+								class="text-[#c586c0]">await</span
+							> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]"
+								>'https://api.pictify.io/image'</span
+							>, {'{'}
   <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
   <span class="text-[#9cdcfe]">headers</span>: {'{'}
-    <span class="text-[#ce9178]">'Content-Type'</span>: <span class="text-[#ce9178]">'application/json'</span>,
-    <span class="text-[#ce9178]">'Authorization'</span>: <span class="text-[#ce9178]">`Bearer ${'$'}{'{'}YOUR_API_KEY{'}'}`</span>
+    <span class="text-[#ce9178]">'Content-Type'</span>: <span class="text-[#ce9178]"
+								>'application/json'</span
+							>,
+    <span class="text-[#ce9178]">'Authorization'</span>: <span class="text-[#ce9178]"
+								>`Bearer ${'$'}{'{'}YOUR_API_KEY{'}'}`</span
+							>
   {'}'},
-  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">stringify</span>({'{'}
-    <span class="text-[#9cdcfe]">html</span>, <span class="text-[#9cdcfe]">width</span>: <span class="text-[#b5cea8]">1200</span>, <span class="text-[#9cdcfe]">height</span>: <span class="text-[#b5cea8]">630</span>, <span class="text-[#9cdcfe]">fileExtension</span>: <span class="text-[#ce9178]">'png'</span>
+  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span
+								class="text-[#dcdcaa]">stringify</span
+							>({'{'}
+    <span class="text-[#9cdcfe]">html</span>, <span class="text-[#9cdcfe]">width</span>: <span
+								class="text-[#b5cea8]">1200</span
+							>, <span class="text-[#9cdcfe]">height</span>: <span class="text-[#b5cea8]">630</span
+							>, <span class="text-[#9cdcfe]">fileExtension</span>: <span class="text-[#ce9178]"
+								>'png'</span
+							>
   {'}'})
 {'}'});
 
-<span class="text-[#c586c0]">const</span> {'{'} <span class="text-[#9cdcfe]">image</span> {'}'} = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]">response</span>.<span class="text-[#dcdcaa]">json</span>();
-<span class="text-[#9cdcfe]">console</span>.<span class="text-[#dcdcaa]">log</span>(<span class="text-[#9cdcfe]">image</span>.<span class="text-[#9cdcfe]">url</span>); <span class="text-[#6a9955]">// https://cdn.pictify.io/img/abc123.png</span></code></pre>
-
-					{:else if apiLang === 'python'}
-						<pre class="text-sm font-mono text-gray-300 leading-relaxed"><code><span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]">requests</span>
+<span class="text-[#c586c0]">const</span> {'{'} <span class="text-[#9cdcfe]">image</span
+							> {'}'} = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]"
+								>response</span
+							>.<span class="text-[#dcdcaa]">json</span>();
+<span class="text-[#9cdcfe]">console</span>.<span class="text-[#dcdcaa]">log</span>(<span
+								class="text-[#9cdcfe]">image</span
+							>.<span class="text-[#9cdcfe]">url</span>); <span class="text-[#6a9955]"
+								>// https://cdn.pictify.io/img/abc123.png</span
+							></code
+						></pre>
+				{:else if apiLang === 'python'}
+					<pre class="text-sm font-mono text-brand-rule leading-relaxed"><code
+							><span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]"
+								>requests</span
+							>
 <span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]">markdown</span>
 
 <span class="text-[#6a9955]"># 1. Read markdown and convert to HTML</span>
-<span class="text-[#c586c0]">with</span> <span class="text-[#dcdcaa]">open</span>(<span class="text-[#ce9178]">"README.md"</span>) <span class="text-[#c586c0]">as</span> <span class="text-[#9cdcfe]">f</span>:
-    <span class="text-[#9cdcfe]">md_content</span> = <span class="text-[#9cdcfe]">f</span>.<span class="text-[#dcdcaa]">read</span>()
+<span class="text-[#c586c0]">with</span> <span class="text-[#dcdcaa]">open</span>(<span
+								class="text-[#ce9178]">"README.md"</span
+							>) <span class="text-[#c586c0]">as</span> <span class="text-[#9cdcfe]">f</span>:
+    <span class="text-[#9cdcfe]">md_content</span> = <span class="text-[#9cdcfe]">f</span>.<span
+								class="text-[#dcdcaa]">read</span
+							>()
 
-<span class="text-[#9cdcfe]">html_content</span> = <span class="text-[#9cdcfe]">markdown</span>.<span class="text-[#dcdcaa]">markdown</span>(<span class="text-[#9cdcfe]">md_content</span>, <span class="text-[#9cdcfe]">extensions</span>=[<span class="text-[#ce9178]">"fenced_code"</span>, <span class="text-[#ce9178]">"tables"</span>])
+<span class="text-[#9cdcfe]">html_content</span> = <span class="text-[#9cdcfe]">markdown</span
+							>.<span class="text-[#dcdcaa]">markdown</span>(<span class="text-[#9cdcfe]"
+								>md_content</span
+							>, <span class="text-[#9cdcfe]">extensions</span>=[<span class="text-[#ce9178]"
+								>"fenced_code"</span
+							>, <span class="text-[#ce9178]">"tables"</span>])
 
 <span class="text-[#6a9955]"># 2. Wrap in styled template</span>
-<span class="text-[#9cdcfe]">html</span> = <span class="text-[#ce9178]">f"""&lt;html&gt;&lt;head&gt;
+<span class="text-[#9cdcfe]">html</span> = <span class="text-[#ce9178]"
+								>f"""&lt;html&gt;&lt;head&gt;
   &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.css"&gt;
   &lt;style&gt;body{'{'} padding:48px; background:#fff {'}'} .markdown-body{'{'} max-width:800px; margin:auto {'}'}&lt;/style&gt;
-&lt;/head&gt;&lt;body&gt;&lt;div class="markdown-body"&gt;{'{'}html_content{'}'}&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;"""</span>
+&lt;/head&gt;&lt;body&gt;&lt;div class="markdown-body"&gt;{'{'}html_content{'}'}&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;"""</span
+							>
 
 <span class="text-[#6a9955]"># 3. Call Pictify API</span>
-<span class="text-[#9cdcfe]">response</span> = <span class="text-[#9cdcfe]">requests</span>.<span class="text-[#dcdcaa]">post</span>(
+<span class="text-[#9cdcfe]">response</span> = <span class="text-[#9cdcfe]">requests</span>.<span
+								class="text-[#dcdcaa]">post</span
+							>(
     <span class="text-[#ce9178]">"https://api.pictify.io/image"</span>,
     <span class="text-[#9cdcfe]">headers</span>={'{'}
-        <span class="text-[#ce9178]">"Content-Type"</span>: <span class="text-[#ce9178]">"application/json"</span>,
-        <span class="text-[#ce9178]">"Authorization"</span>: <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>
+        <span class="text-[#ce9178]">"Content-Type"</span>: <span class="text-[#ce9178]"
+								>"application/json"</span
+							>,
+        <span class="text-[#ce9178]">"Authorization"</span>: <span class="text-[#ce9178]"
+								>"Bearer YOUR_API_KEY"</span
+							>
     {'}'},
     <span class="text-[#9cdcfe]">json</span>={'{'}
         <span class="text-[#ce9178]">"html"</span>: <span class="text-[#9cdcfe]">html</span>,
         <span class="text-[#ce9178]">"width"</span>: <span class="text-[#b5cea8]">1200</span>,
         <span class="text-[#ce9178]">"height"</span>: <span class="text-[#b5cea8]">630</span>,
-        <span class="text-[#ce9178]">"fileExtension"</span>: <span class="text-[#ce9178]">"png"</span>
+        <span class="text-[#ce9178]">"fileExtension"</span>: <span class="text-[#ce9178]"
+								>"png"</span
+							>
     {'}'}
 )
 
-<span class="text-[#9cdcfe]">image_url</span> = <span class="text-[#9cdcfe]">response</span>.<span class="text-[#dcdcaa]">json</span>()[<span class="text-[#ce9178]">"image"</span>][<span class="text-[#ce9178]">"url"</span>]
-<span class="text-[#dcdcaa]">print</span>(<span class="text-[#9cdcfe]">image_url</span>)  <span class="text-[#6a9955]"># https://cdn.pictify.io/img/abc123.png</span></code></pre>
-
-					{:else if apiLang === 'go'}
-						<pre class="text-sm font-mono text-gray-300 leading-relaxed"><code><span class="text-[#c586c0]">package</span> <span class="text-[#9cdcfe]">main</span>
+<span class="text-[#9cdcfe]">image_url</span> = <span class="text-[#9cdcfe]">response</span>.<span
+								class="text-[#dcdcaa]">json</span
+							>()[<span class="text-[#ce9178]">"image"</span>][<span class="text-[#ce9178]"
+								>"url"</span
+							>]
+<span class="text-[#dcdcaa]">print</span>(<span class="text-[#9cdcfe]">image_url</span>)  <span
+								class="text-[#6a9955]"># https://cdn.pictify.io/img/abc123.png</span
+							></code
+						></pre>
+				{:else if apiLang === 'go'}
+					<pre class="text-sm font-mono text-brand-rule leading-relaxed"><code
+							><span class="text-[#c586c0]">package</span> <span class="text-[#9cdcfe]">main</span>
 
 <span class="text-[#c586c0]">import</span> (
     <span class="text-[#ce9178]">"bytes"</span>
@@ -898,94 +1119,212 @@ function generateImage(markdown) {
 
 <span class="text-[#c586c0]">func</span> <span class="text-[#dcdcaa]">main</span>() {'{'}
     <span class="text-[#6a9955]">// 1. Read markdown and convert to HTML</span>
-    <span class="text-[#9cdcfe]">md</span>, <span class="text-[#9cdcfe]">_</span> := <span class="text-[#9cdcfe]">os</span>.<span class="text-[#dcdcaa]">ReadFile</span>(<span class="text-[#ce9178]">"README.md"</span>)
-    <span class="text-[#9cdcfe]">htmlContent</span> := <span class="text-[#dcdcaa]">string</span>(<span class="text-[#9cdcfe]">markdown</span>.<span class="text-[#dcdcaa]">ToHTML</span>(<span class="text-[#9cdcfe]">md</span>, <span class="text-[#569cd6]">nil</span>, <span class="text-[#569cd6]">nil</span>))
+    <span class="text-[#9cdcfe]">md</span>, <span class="text-[#9cdcfe]">_</span> := <span
+								class="text-[#9cdcfe]">os</span
+							>.<span class="text-[#dcdcaa]">ReadFile</span>(<span class="text-[#ce9178]"
+								>"README.md"</span
+							>)
+    <span class="text-[#9cdcfe]">htmlContent</span> := <span class="text-[#dcdcaa]">string</span
+							>(<span class="text-[#9cdcfe]">markdown</span>.<span class="text-[#dcdcaa]"
+								>ToHTML</span
+							>(<span class="text-[#9cdcfe]">md</span>, <span class="text-[#569cd6]">nil</span
+							>, <span class="text-[#569cd6]">nil</span>))
 
     <span class="text-[#6a9955]">// 2. Wrap in styled template</span>
-    <span class="text-[#9cdcfe]">html</span> := <span class="text-[#9cdcfe]">fmt</span>.<span class="text-[#dcdcaa]">Sprintf</span>(<span class="text-[#ce9178]">`&lt;html&gt;&lt;head&gt;
+    <span class="text-[#9cdcfe]">html</span> := <span class="text-[#9cdcfe]">fmt</span>.<span
+								class="text-[#dcdcaa]">Sprintf</span
+							>(<span class="text-[#ce9178]"
+								>`&lt;html&gt;&lt;head&gt;
   &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.css"&gt;
-&lt;/head&gt;&lt;body&gt;&lt;div class="markdown-body" style="padding:48px"&gt;%s&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;`</span>, <span class="text-[#9cdcfe]">htmlContent</span>)
+&lt;/head&gt;&lt;body&gt;&lt;div class="markdown-body" style="padding:48px"&gt;%s&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;`</span
+							>, <span class="text-[#9cdcfe]">htmlContent</span>)
 
     <span class="text-[#6a9955]">// 3. Call Pictify API</span>
-    <span class="text-[#9cdcfe]">body</span>, <span class="text-[#9cdcfe]">_</span> := <span class="text-[#9cdcfe]">json</span>.<span class="text-[#dcdcaa]">Marshal</span>(<span class="text-[#c586c0]">map</span>[<span class="text-[#c586c0]">string</span>]<span class="text-[#c586c0]">any</span>{'{'}
-        <span class="text-[#ce9178]">"html"</span>: <span class="text-[#9cdcfe]">html</span>, <span class="text-[#ce9178]">"width"</span>: <span class="text-[#b5cea8]">1200</span>,
-        <span class="text-[#ce9178]">"height"</span>: <span class="text-[#b5cea8]">630</span>, <span class="text-[#ce9178]">"fileExtension"</span>: <span class="text-[#ce9178]">"png"</span>,
+    <span class="text-[#9cdcfe]">body</span>, <span class="text-[#9cdcfe]">_</span> := <span
+								class="text-[#9cdcfe]">json</span
+							>.<span class="text-[#dcdcaa]">Marshal</span>(<span class="text-[#c586c0]">map</span
+							>[<span class="text-[#c586c0]">string</span>]<span class="text-[#c586c0]">any</span
+							>{'{'}
+        <span class="text-[#ce9178]">"html"</span>: <span class="text-[#9cdcfe]">html</span>, <span
+								class="text-[#ce9178]">"width"</span
+							>: <span class="text-[#b5cea8]">1200</span>,
+        <span class="text-[#ce9178]">"height"</span>: <span class="text-[#b5cea8]">630</span>, <span
+								class="text-[#ce9178]">"fileExtension"</span
+							>: <span class="text-[#ce9178]">"png"</span>,
     {'}'})
 
-    <span class="text-[#9cdcfe]">req</span>, <span class="text-[#9cdcfe]">_</span> := <span class="text-[#9cdcfe]">http</span>.<span class="text-[#dcdcaa]">NewRequest</span>(<span class="text-[#ce9178]">"POST"</span>, <span class="text-[#ce9178]">"https://api.pictify.io/image"</span>, <span class="text-[#9cdcfe]">bytes</span>.<span class="text-[#dcdcaa]">NewBuffer</span>(<span class="text-[#9cdcfe]">body</span>))
-    <span class="text-[#9cdcfe]">req</span>.<span class="text-[#9cdcfe]">Header</span>.<span class="text-[#dcdcaa]">Set</span>(<span class="text-[#ce9178]">"Content-Type"</span>, <span class="text-[#ce9178]">"application/json"</span>)
-    <span class="text-[#9cdcfe]">req</span>.<span class="text-[#9cdcfe]">Header</span>.<span class="text-[#dcdcaa]">Set</span>(<span class="text-[#ce9178]">"Authorization"</span>, <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>)
+    <span class="text-[#9cdcfe]">req</span>, <span class="text-[#9cdcfe]">_</span> := <span
+								class="text-[#9cdcfe]">http</span
+							>.<span class="text-[#dcdcaa]">NewRequest</span>(<span class="text-[#ce9178]"
+								>"POST"</span
+							>, <span class="text-[#ce9178]">"https://api.pictify.io/image"</span>, <span
+								class="text-[#9cdcfe]">bytes</span
+							>.<span class="text-[#dcdcaa]">NewBuffer</span>(<span class="text-[#9cdcfe]"
+								>body</span
+							>))
+    <span class="text-[#9cdcfe]">req</span>.<span class="text-[#9cdcfe]">Header</span>.<span
+								class="text-[#dcdcaa]">Set</span
+							>(<span class="text-[#ce9178]">"Content-Type"</span>, <span class="text-[#ce9178]"
+								>"application/json"</span
+							>)
+    <span class="text-[#9cdcfe]">req</span>.<span class="text-[#9cdcfe]">Header</span>.<span
+								class="text-[#dcdcaa]">Set</span
+							>(<span class="text-[#ce9178]">"Authorization"</span>, <span class="text-[#ce9178]"
+								>"Bearer YOUR_API_KEY"</span
+							>)
 
-    <span class="text-[#9cdcfe]">resp</span>, <span class="text-[#9cdcfe]">_</span> := <span class="text-[#9cdcfe]">http</span>.<span class="text-[#9cdcfe]">DefaultClient</span>.<span class="text-[#dcdcaa]">Do</span>(<span class="text-[#9cdcfe]">req</span>)
-    <span class="text-[#c586c0]">defer</span> <span class="text-[#9cdcfe]">resp</span>.<span class="text-[#9cdcfe]">Body</span>.<span class="text-[#dcdcaa]">Close</span>()
+    <span class="text-[#9cdcfe]">resp</span>, <span class="text-[#9cdcfe]">_</span> := <span
+								class="text-[#9cdcfe]">http</span
+							>.<span class="text-[#9cdcfe]">DefaultClient</span>.<span class="text-[#dcdcaa]"
+								>Do</span
+							>(<span class="text-[#9cdcfe]">req</span>)
+    <span class="text-[#c586c0]">defer</span> <span class="text-[#9cdcfe]">resp</span>.<span
+								class="text-[#9cdcfe]">Body</span
+							>.<span class="text-[#dcdcaa]">Close</span>()
     <span class="text-[#6a9955]">// Parse response for image.url</span>
-{'}'}</code></pre>
-
-					{:else if apiLang === 'ruby'}
-						<pre class="text-sm font-mono text-gray-300 leading-relaxed"><code><span class="text-[#c586c0]">require</span> <span class="text-[#ce9178]">"net/http"</span>
+{'}'}</code
+						></pre>
+				{:else if apiLang === 'ruby'}
+					<pre class="text-sm font-mono text-brand-rule leading-relaxed"><code
+							><span class="text-[#c586c0]">require</span> <span class="text-[#ce9178]"
+								>"net/http"</span
+							>
 <span class="text-[#c586c0]">require</span> <span class="text-[#ce9178]">"json"</span>
 <span class="text-[#c586c0]">require</span> <span class="text-[#ce9178]">"redcarpet"</span>
 
 <span class="text-[#6a9955]"># 1. Read markdown and convert to HTML</span>
-<span class="text-[#9cdcfe]">md</span> = <span class="text-[#9cdcfe]">File</span>.<span class="text-[#dcdcaa]">read</span>(<span class="text-[#ce9178]">"README.md"</span>)
-<span class="text-[#9cdcfe]">renderer</span> = <span class="text-[#9cdcfe]">Redcarpet</span>::<span class="text-[#9cdcfe]">Markdown</span>.<span class="text-[#dcdcaa]">new</span>(<span class="text-[#9cdcfe]">Redcarpet</span>::<span class="text-[#9cdcfe]">Render</span>::<span class="text-[#9cdcfe]">HTML</span>, <span class="text-[#9cdcfe]">fenced_code_blocks</span>: <span class="text-[#569cd6]">true</span>, <span class="text-[#9cdcfe]">tables</span>: <span class="text-[#569cd6]">true</span>)
-<span class="text-[#9cdcfe]">html_content</span> = <span class="text-[#9cdcfe]">renderer</span>.<span class="text-[#dcdcaa]">render</span>(<span class="text-[#9cdcfe]">md</span>)
+<span class="text-[#9cdcfe]">md</span> = <span class="text-[#9cdcfe]">File</span>.<span
+								class="text-[#dcdcaa]">read</span
+							>(<span class="text-[#ce9178]">"README.md"</span>)
+<span class="text-[#9cdcfe]">renderer</span> = <span class="text-[#9cdcfe]">Redcarpet</span>::<span
+								class="text-[#9cdcfe]">Markdown</span
+							>.<span class="text-[#dcdcaa]">new</span>(<span class="text-[#9cdcfe]">Redcarpet</span
+							>::<span class="text-[#9cdcfe]">Render</span>::<span class="text-[#9cdcfe]">HTML</span
+							>, <span class="text-[#9cdcfe]">fenced_code_blocks</span>: <span
+								class="text-[#569cd6]">true</span
+							>, <span class="text-[#9cdcfe]">tables</span>: <span class="text-[#569cd6]">true</span
+							>)
+<span class="text-[#9cdcfe]">html_content</span> = <span class="text-[#9cdcfe]">renderer</span
+							>.<span class="text-[#dcdcaa]">render</span>(<span class="text-[#9cdcfe]">md</span>)
 
 <span class="text-[#6a9955]"># 2. Wrap in styled template</span>
-<span class="text-[#9cdcfe]">html</span> = <span class="text-[#ce9178]">%(&lt;html&gt;&lt;head&gt;
+<span class="text-[#9cdcfe]">html</span> = <span class="text-[#ce9178]"
+								>%(&lt;html&gt;&lt;head&gt;
   &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.css"&gt;
   &lt;style&gt;body{'{'} padding:48px; background:#fff {'}'}&lt;/style&gt;
-&lt;/head&gt;&lt;body&gt;&lt;div class="markdown-body"&gt;#{'{'}<span class="text-[#9cdcfe]">html_content</span>{'}'}&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;)</span>
+&lt;/head&gt;&lt;body&gt;&lt;div class="markdown-body"&gt;#{'{'}<span class="text-[#9cdcfe]"
+									>html_content</span
+								>{'}'}&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;)</span
+							>
 
 <span class="text-[#6a9955]"># 3. Call Pictify API</span>
-<span class="text-[#9cdcfe]">uri</span> = <span class="text-[#9cdcfe]">URI</span>(<span class="text-[#ce9178]">"https://api.pictify.io/image"</span>)
-<span class="text-[#9cdcfe]">req</span> = <span class="text-[#9cdcfe]">Net</span>::<span class="text-[#9cdcfe]">HTTP</span>::<span class="text-[#9cdcfe]">Post</span>.<span class="text-[#dcdcaa]">new</span>(<span class="text-[#9cdcfe]">uri</span>, {'{'}
-  <span class="text-[#ce9178]">"Content-Type"</span> => <span class="text-[#ce9178]">"application/json"</span>,
-  <span class="text-[#ce9178]">"Authorization"</span> => <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>
+<span class="text-[#9cdcfe]">uri</span> = <span class="text-[#9cdcfe]">URI</span>(<span
+								class="text-[#ce9178]">"https://api.pictify.io/image"</span
+							>)
+<span class="text-[#9cdcfe]">req</span> = <span class="text-[#9cdcfe]">Net</span>::<span
+								class="text-[#9cdcfe]">HTTP</span
+							>::<span class="text-[#9cdcfe]">Post</span>.<span class="text-[#dcdcaa]">new</span
+							>(<span class="text-[#9cdcfe]">uri</span>, {'{'}
+  <span class="text-[#ce9178]">"Content-Type"</span> => <span class="text-[#ce9178]"
+								>"application/json"</span
+							>,
+  <span class="text-[#ce9178]">"Authorization"</span> => <span class="text-[#ce9178]"
+								>"Bearer YOUR_API_KEY"</span
+							>
 {'}'})
-<span class="text-[#9cdcfe]">req</span>.<span class="text-[#9cdcfe]">body</span> = {'{'} <span class="text-[#9cdcfe]">html</span>: <span class="text-[#9cdcfe]">html</span>, <span class="text-[#9cdcfe]">width</span>: <span class="text-[#b5cea8]">1200</span>, <span class="text-[#9cdcfe]">height</span>: <span class="text-[#b5cea8]">630</span>, <span class="text-[#9cdcfe]">fileExtension</span>: <span class="text-[#ce9178]">"png"</span> {'}'}.<span class="text-[#dcdcaa]">to_json</span>
+<span class="text-[#9cdcfe]">req</span>.<span class="text-[#9cdcfe]">body</span> = {'{'} <span
+								class="text-[#9cdcfe]">html</span
+							>: <span class="text-[#9cdcfe]">html</span>, <span class="text-[#9cdcfe]">width</span
+							>: <span class="text-[#b5cea8]">1200</span>, <span class="text-[#9cdcfe]">height</span
+							>: <span class="text-[#b5cea8]">630</span>, <span class="text-[#9cdcfe]"
+								>fileExtension</span
+							>: <span class="text-[#ce9178]">"png"</span> {'}'}.<span class="text-[#dcdcaa]"
+								>to_json</span
+							>
 
-<span class="text-[#9cdcfe]">res</span> = <span class="text-[#9cdcfe]">Net</span>::<span class="text-[#9cdcfe]">HTTP</span>.<span class="text-[#dcdcaa]">start</span>(<span class="text-[#9cdcfe]">uri</span>.<span class="text-[#9cdcfe]">hostname</span>, <span class="text-[#9cdcfe]">uri</span>.<span class="text-[#9cdcfe]">port</span>, <span class="text-[#9cdcfe]">use_ssl</span>: <span class="text-[#569cd6]">true</span>) {'{'} |<span class="text-[#9cdcfe]">http</span>| <span class="text-[#9cdcfe]">http</span>.<span class="text-[#dcdcaa]">request</span>(<span class="text-[#9cdcfe]">req</span>) {'}'}
-<span class="text-[#9cdcfe]">image_url</span> = <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">parse</span>(<span class="text-[#9cdcfe]">res</span>.<span class="text-[#9cdcfe]">body</span>).<span class="text-[#dcdcaa]">dig</span>(<span class="text-[#ce9178]">"image"</span>, <span class="text-[#ce9178]">"url"</span>)
-<span class="text-[#dcdcaa]">puts</span> <span class="text-[#9cdcfe]">image_url</span> <span class="text-[#6a9955]"># https://cdn.pictify.io/img/abc123.png</span></code></pre>
-
-					{:else if apiLang === 'php'}
-						<pre class="text-sm font-mono text-gray-300 leading-relaxed"><code><span class="text-[#569cd6]">&lt;?php</span>
-<span class="text-[#c586c0]">use</span> <span class="text-[#9cdcfe]">League\CommonMark\CommonMarkConverter</span>;
+<span class="text-[#9cdcfe]">res</span> = <span class="text-[#9cdcfe]">Net</span>::<span
+								class="text-[#9cdcfe]">HTTP</span
+							>.<span class="text-[#dcdcaa]">start</span>(<span class="text-[#9cdcfe]">uri</span
+							>.<span class="text-[#9cdcfe]">hostname</span>, <span class="text-[#9cdcfe]">uri</span
+							>.<span class="text-[#9cdcfe]">port</span>, <span class="text-[#9cdcfe]">use_ssl</span
+							>: <span class="text-[#569cd6]">true</span>) {'{'} |<span class="text-[#9cdcfe]"
+								>http</span
+							>| <span class="text-[#9cdcfe]">http</span>.<span class="text-[#dcdcaa]">request</span
+							>(<span class="text-[#9cdcfe]">req</span>) {'}'}
+<span class="text-[#9cdcfe]">image_url</span> = <span class="text-[#9cdcfe]">JSON</span>.<span
+								class="text-[#dcdcaa]">parse</span
+							>(<span class="text-[#9cdcfe]">res</span>.<span class="text-[#9cdcfe]">body</span
+							>).<span class="text-[#dcdcaa]">dig</span>(<span class="text-[#ce9178]">"image"</span
+							>, <span class="text-[#ce9178]">"url"</span>)
+<span class="text-[#dcdcaa]">puts</span> <span class="text-[#9cdcfe]">image_url</span> <span
+								class="text-[#6a9955]"># https://cdn.pictify.io/img/abc123.png</span
+							></code
+						></pre>
+				{:else if apiLang === 'php'}
+					<pre class="text-sm font-mono text-brand-rule leading-relaxed"><code
+							><span class="text-[#569cd6]">&lt;?php</span>
+<span class="text-[#c586c0]">use</span> <span class="text-[#9cdcfe]"
+								>League\CommonMark\CommonMarkConverter</span
+							>;
 
 <span class="text-[#6a9955]">// 1. Read markdown and convert to HTML</span>
-<span class="text-[#9cdcfe]">$markdown</span> = <span class="text-[#dcdcaa]">file_get_contents</span>(<span class="text-[#ce9178]">"README.md"</span>);
-<span class="text-[#9cdcfe]">$converter</span> = <span class="text-[#c586c0]">new</span> <span class="text-[#dcdcaa]">CommonMarkConverter</span>();
-<span class="text-[#9cdcfe]">$htmlContent</span> = <span class="text-[#9cdcfe]">$converter</span>-><span class="text-[#dcdcaa]">convert</span>(<span class="text-[#9cdcfe]">$markdown</span>);
+<span class="text-[#9cdcfe]">$markdown</span> = <span class="text-[#dcdcaa]">file_get_contents</span
+							>(<span class="text-[#ce9178]">"README.md"</span>);
+<span class="text-[#9cdcfe]">$converter</span> = <span class="text-[#c586c0]">new</span> <span
+								class="text-[#dcdcaa]">CommonMarkConverter</span
+							>();
+<span class="text-[#9cdcfe]">$htmlContent</span> = <span class="text-[#9cdcfe]">$converter</span
+							>-><span class="text-[#dcdcaa]">convert</span>(<span class="text-[#9cdcfe]"
+								>$markdown</span
+							>);
 
 <span class="text-[#6a9955]">// 2. Wrap in styled template</span>
-<span class="text-[#9cdcfe]">$html</span> = <span class="text-[#ce9178]">"&lt;html&gt;&lt;head&gt;
+<span class="text-[#9cdcfe]">$html</span> = <span class="text-[#ce9178]"
+								>"&lt;html&gt;&lt;head&gt;
   &lt;link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.css'&gt;
   &lt;style&gt;body{'{'} padding:48px; background:#fff {'}'}&lt;/style&gt;
-&lt;/head&gt;&lt;body&gt;&lt;div class='markdown-body'&gt;{'{'}<span class="text-[#9cdcfe]">$htmlContent</span>{'}'}&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;"</span>;
+&lt;/head&gt;&lt;body&gt;&lt;div class='markdown-body'&gt;{'{'}<span class="text-[#9cdcfe]"
+									>$htmlContent</span
+								>{'}'}&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;"</span
+							>;
 
 <span class="text-[#6a9955]">// 3. Call Pictify API</span>
-<span class="text-[#9cdcfe]">$ch</span> = <span class="text-[#dcdcaa]">curl_init</span>(<span class="text-[#ce9178]">"https://api.pictify.io/image"</span>);
+<span class="text-[#9cdcfe]">$ch</span> = <span class="text-[#dcdcaa]">curl_init</span>(<span
+								class="text-[#ce9178]">"https://api.pictify.io/image"</span
+							>);
 <span class="text-[#dcdcaa]">curl_setopt_array</span>(<span class="text-[#9cdcfe]">$ch</span>, [
     <span class="text-[#9cdcfe]">CURLOPT_POST</span> => <span class="text-[#569cd6]">true</span>,
-    <span class="text-[#9cdcfe]">CURLOPT_RETURNTRANSFER</span> => <span class="text-[#569cd6]">true</span>,
+    <span class="text-[#9cdcfe]">CURLOPT_RETURNTRANSFER</span> => <span class="text-[#569cd6]"
+								>true</span
+							>,
     <span class="text-[#9cdcfe]">CURLOPT_HTTPHEADER</span> => [
         <span class="text-[#ce9178]">"Content-Type: application/json"</span>,
         <span class="text-[#ce9178]">"Authorization: Bearer YOUR_API_KEY"</span>
     ],
-    <span class="text-[#9cdcfe]">CURLOPT_POSTFIELDS</span> => <span class="text-[#dcdcaa]">json_encode</span>([
+    <span class="text-[#9cdcfe]">CURLOPT_POSTFIELDS</span> => <span class="text-[#dcdcaa]"
+								>json_encode</span
+							>([
         <span class="text-[#ce9178]">"html"</span> => <span class="text-[#9cdcfe]">$html</span>,
         <span class="text-[#ce9178]">"width"</span> => <span class="text-[#b5cea8]">1200</span>,
         <span class="text-[#ce9178]">"height"</span> => <span class="text-[#b5cea8]">630</span>,
-        <span class="text-[#ce9178]">"fileExtension"</span> => <span class="text-[#ce9178]">"png"</span>
+        <span class="text-[#ce9178]">"fileExtension"</span> => <span class="text-[#ce9178]"
+								>"png"</span
+							>
     ])
 ]);
 
-<span class="text-[#9cdcfe]">$response</span> = <span class="text-[#dcdcaa]">json_decode</span>(<span class="text-[#dcdcaa]">curl_exec</span>(<span class="text-[#9cdcfe]">$ch</span>), <span class="text-[#569cd6]">true</span>);
-<span class="text-[#dcdcaa]">echo</span> <span class="text-[#9cdcfe]">$response</span>[<span class="text-[#ce9178]">"image"</span>][<span class="text-[#ce9178]">"url"</span>]; <span class="text-[#6a9955]">// https://cdn.pictify.io/img/abc123.png</span></code></pre>
-					{/if}
-				</div>
+<span class="text-[#9cdcfe]">$response</span> = <span class="text-[#dcdcaa]">json_decode</span
+							>(<span class="text-[#dcdcaa]">curl_exec</span>(<span class="text-[#9cdcfe]">$ch</span
+							>), <span class="text-[#569cd6]">true</span>);
+<span class="text-[#dcdcaa]">echo</span> <span class="text-[#9cdcfe]">$response</span>[<span
+								class="text-[#ce9178]">"image"</span
+							>][<span class="text-[#ce9178]">"url"</span>]; <span class="text-[#6a9955]"
+								>// https://cdn.pictify.io/img/abc123.png</span
+							></code
+						></pre>
+				{/if}
 			</div>
+		</div>
 
 		<!-- CTA -->
 		<div class="text-center mt-12">
@@ -993,7 +1332,7 @@ function generateImage(markdown) {
 				<a
 					href="/signup"
 					on:click={handleSignupClick}
-					class="px-8 py-4 bg-gray-900 text-white font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-8 py-4 bg-brand-ink text-white font-semibold border border-brand-ink rounded-xl tracking-widest transition-all"
 				>
 					Get API Key
 				</a>
@@ -1001,7 +1340,7 @@ function generateImage(markdown) {
 					href="https://docs.pictify.io"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="px-8 py-4 bg-white text-gray-900 font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="px-8 py-4 bg-brand-paper text-brand-ink font-semibold border border-brand-ink rounded-xl tracking-widest transition-all"
 				>
 					Read API Docs
 				</a>
@@ -1011,45 +1350,45 @@ function generateImage(markdown) {
 
 	<!-- First Generation Prompt (Modal) -->
 	{#if showFirstGenerationPrompt && !isUserLoggedIn}
-		<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl">
-				<div class="bg-data-green px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
-					<h3 class="text-lg font-black text-black uppercase tracking-wider">
-						Great First Image!
-					</h3>
+		<div class="fixed inset-0 bg-brand-ink/60 flex items-center justify-center z-50 p-4">
+			<div class="bg-brand-paper border-[4px] border-black max-w-md w-full mx-auto">
+				<div
+					class="bg-brand-proof px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
+				>
+					<h3 class="text-lg font-semibold text-brand-ink tracking-wider">Great First Image!</h3>
 					<button
-						class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-brand-danger hover:text-white transition-colors"
+						class="w-8 h-8 bg-brand-paper border border-brand-ink flex items-center justify-center hover:bg-brand-pink hover:text-white transition-colors"
 						on:click={() => (showFirstGenerationPrompt = false)}
 					>
-						<span class="font-black">x</span>
+						<span class="font-semibold">x</span>
 					</button>
 				</div>
 				<div class="p-6">
-					<p class="text-black font-bold mb-4">Create a free account to unlock:</p>
+					<p class="text-brand-ink font-bold mb-4">Create a free account to unlock:</p>
 					<ul class="space-y-2 mb-6">
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-							<span class="font-black text-data-green">✓</span>
-							<span class="font-bold text-black text-sm">Unlimited image generations</span>
+						<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+							<span class="font-semibold text-brand-proof">✓</span>
+							<span class="font-bold text-brand-ink text-sm">Unlimited image generations</span>
 						</li>
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-							<span class="font-black text-data-green">✓</span>
-							<span class="font-bold text-black text-sm">No watermarks</span>
+						<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+							<span class="font-semibold text-brand-proof">✓</span>
+							<span class="font-bold text-brand-ink text-sm">No watermarks</span>
 						</li>
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-							<span class="font-black text-data-green">✓</span>
-							<span class="font-bold text-black text-sm">API Access</span>
+						<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+							<span class="font-semibold text-brand-proof">✓</span>
+							<span class="font-bold text-brand-ink text-sm">API Access</span>
 						</li>
 					</ul>
 					<div class="space-y-3">
 						<a
 							href="/signup?redirect=/tools/markdown"
 							on:click={handleSignupClick}
-							class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="block w-full py-3 px-6 border border-brand-ink font-semibold bg-brand-pink tracking-wide text-center text-white transition-all"
 						>
 							Create Free Account
 						</a>
 						<button
-							class="w-full py-3 px-6 font-bold text-black hover:text-brand-danger transition-colors uppercase tracking-wide"
+							class="w-full py-3 px-6 font-bold text-brand-ink hover:text-brand-pink transition-colors tracking-wide"
 							on:click={() => (showFirstGenerationPrompt = false)}
 						>
 							Continue as Guest
@@ -1062,51 +1401,54 @@ function generateImage(markdown) {
 
 	<!-- Upgrade Prompt (Modal) -->
 	{#if showUpgradePrompt && !isUserLoggedIn}
-		<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" style="margin-top: 0px;">
-			<div class="bg-white border-[4px] border-black max-w-md w-full mx-auto shadow-brutal-3xl">
-				<div class="bg-brand-danger px-6 py-3 border-b-[4px] border-black flex justify-between items-center">
-					<h3 class="text-lg font-black text-white uppercase tracking-wider">
-						Ready to Create More?
-					</h3>
+		<div
+			class="fixed inset-0 bg-brand-ink/60 flex items-center justify-center z-50 p-4"
+			style="margin-top: 0px;"
+		>
+			<div class="bg-brand-paper border-[4px] border-black max-w-md w-full mx-auto">
+				<div
+					class="bg-brand-pink px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
+				>
+					<h3 class="text-lg font-semibold text-white tracking-wider">Ready to Create More?</h3>
 					<button
-						class="w-8 h-8 bg-white border-[3px] border-black flex items-center justify-center hover:bg-black hover:text-white transition-colors"
+						class="w-8 h-8 bg-brand-paper border border-brand-ink flex items-center justify-center hover:bg-brand-ink hover:text-white transition-colors"
 						on:click={() => (showUpgradePrompt = false)}
 					>
-						<span class="font-black">x</span>
+						<span class="font-semibold">x</span>
 					</button>
 				</div>
 				<div class="p-6">
-					<p class="text-black font-bold mb-4">
+					<p class="text-brand-ink font-bold mb-4">
 						You've reached the guest limit. Sign up to unlock:
 					</p>
 					<ul class="space-y-2 mb-6">
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-							<span class="font-black text-brand-danger">✓</span>
-							<span class="font-bold text-black text-sm">Unlimited image generations</span>
+						<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+							<span class="font-semibold text-brand-pink">✓</span>
+							<span class="font-bold text-brand-ink text-sm">Unlimited image generations</span>
 						</li>
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-							<span class="font-black text-brand-danger">✓</span>
-							<span class="font-bold text-black text-sm">No watermarks</span>
+						<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+							<span class="font-semibold text-brand-pink">✓</span>
+							<span class="font-bold text-brand-ink text-sm">No watermarks</span>
 						</li>
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-							<span class="font-black text-brand-danger">✓</span>
-							<span class="font-bold text-black text-sm">API Access</span>
+						<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+							<span class="font-semibold text-brand-pink">✓</span>
+							<span class="font-bold text-brand-ink text-sm">API Access</span>
 						</li>
-						<li class="flex items-center gap-2 p-2 bg-[#f8f8f8] border-[2px] border-black">
-							<span class="font-black text-brand-danger">✓</span>
-							<span class="font-bold text-black text-sm">Priority support</span>
+						<li class="flex items-center gap-2 p-2 bg-brand-subtle border border-brand-ink">
+							<span class="font-semibold text-brand-pink">✓</span>
+							<span class="font-bold text-brand-ink text-sm">Priority support</span>
 						</li>
 					</ul>
 					<div class="space-y-3">
 						<a
 							href="/signup?redirect=/tools/markdown"
 							on:click={handleSignupClick}
-							class="block w-full py-3 px-6 border-[3px] border-black font-black bg-brand-danger uppercase tracking-wide text-center text-white shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="block w-full py-3 px-6 border border-brand-ink font-semibold bg-brand-pink tracking-wide text-center text-white transition-all"
 						>
 							Sign Up Free
 						</a>
 						<button
-							class="w-full py-3 px-6 font-bold text-black hover:text-brand-danger transition-colors uppercase tracking-wide"
+							class="w-full py-3 px-6 font-bold text-brand-ink hover:text-brand-pink transition-colors tracking-wide"
 							on:click={() => (showUpgradePrompt = false)}
 						>
 							Maybe Later
