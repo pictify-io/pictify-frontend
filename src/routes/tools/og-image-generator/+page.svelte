@@ -1,7 +1,18 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
+	/**
+	 * /tools/og-image-generator — the v2 tool page, column mode.
+	 *
+	 * SEO copy is frozen; the template picker, editor and NextSteps keep their
+	 * behaviour. The toolbar's quota ladder replaces GenerationLimitBanner, and
+	 * the in-editor Generate button moves into that toolbar so every tool page
+	 * has its primary action in the same place.
+	 */
 	import SEOHead from '$lib/seo/SEOHead.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
+	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
+	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
+	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
+	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
+	import LongformSection from '$lib/components/tools/v2/LongformSection.svelte';
 	import OgImageTemplate from '$lib/components/tools/OgImageTemplate.svelte';
 	import { getTemplate, getWebsiteInfo } from '../../../api/tools/og-image';
 	import { createImagePublic } from '../../../api/image.js';
@@ -22,8 +33,7 @@
 	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
 	import Toast from '$lib/components/Toast.svelte';
-	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
-	import { generationLimits } from '../../../store/generationLimits.store';
+	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/telemetry.js';
 	import { downloadFile } from '$lib/utils/download.js';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
@@ -567,7 +577,11 @@
 		const document = iframe?.contentWindow?.document;
 		if (!document?.documentElement) {
 			isImageGenerating = false;
-			toast.set({ message: 'Preview is still loading. Please try again.', type: 'error', duration: 3000 });
+			toast.set({
+				message: 'Preview is still loading. Please try again.',
+				type: 'error',
+				duration: 3000
+			});
 			return;
 		}
 		let html = document.documentElement.outerHTML;
@@ -770,6 +784,32 @@
 			{ '@type': 'ListItem', position: 3, name: 'OG Image Generator' }
 		]
 	};
+
+	const TOOL_NAME = 'og_image_generator';
+	const TOOL_PATH = '/tools/og-image-generator';
+
+	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+
+	const RELATED = [
+		{
+			title: 'LinkedIn banner',
+			meta: 'TEMPLATE → 1584×396',
+			href: '/tools/linkedin-banner-generator',
+			art: '/landing/tools/linkedin-banner.svg'
+		},
+		{
+			title: 'Tweet screenshot',
+			meta: 'TWEET URL → PNG',
+			href: '/tools/tweet-screenshot',
+			art: '/landing/tools/tweet-screenshot.svg'
+		},
+		{
+			title: 'HTML to image',
+			meta: 'HTML → PNG · JPG · WEBP',
+			href: '/tools/html-to-image',
+			art: '/landing/tools/html-to-image.svg'
+		}
+	];
 </script>
 
 {#if !isPlatform}
@@ -792,114 +832,39 @@
 	/>
 {/if}
 
-<section class="w-full min-h-screen bg-brand-bg relative overflow-x-hidden font-['Manrope']">
-	<Nav />
+<ToolPageShell
+	toolName={TOOL_NAME}
+	toolPath={TOOL_PATH}
+	breadcrumb={isPlatform ? `OG IMAGE · ${platformLabel.toUpperCase()}` : 'OG IMAGE GENERATOR'}
+	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · 1200×630"
+	related={RELATED}
+	loggedIn={isUserLoggedIn}
+	hasResult={!!imageUrl}
+	longform="column"
+>
+	<h1
+		slot="h1"
+		class="font-display text-[38px] font-extrabold leading-[1.04] tracking-[-0.02em] text-brand-ink lg:text-[52px] lg:leading-[56px]"
+	>
+		<span>OG IMAGE</span>
+		<span>GENERATOR</span>
+		{#if isPlatform}
+			<span class="whitespace-nowrap">for {platformLabel}</span>
+		{/if}
+	</h1>
 
-	<!-- Background Elements -->
-	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
-	/>
-	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
-	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
-	/>
+	<p
+		slot="hero-sub"
+		class="max-w-[640px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
+	>
+		Create stunning <span class="font-medium">Open Graph images</span> for your website.
+		<span class="text-brand-slate">Boost social media engagement with custom social cards</span>
+	</p>
 
-	<main class="w-full max-w-7xl mx-auto px-6 pt-12 pb-20 md:pt-24 md:pb-32 relative z-10">
-		<!-- Breadcrumb -->
-		<nav class="mb-12 flex justify-center">
-			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
-			>
-				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
-				<li class="text-gray-300">/</li>
-				<li>
-					<a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a>
-				</li>
-				<li class="text-gray-300">/</li>
-				<li class="text-gray-900">OG Image Generator</li>
-			</ol>
-		</nav>
-
-		<!-- Hero Section -->
-		<div
-			class="relative flex flex-col items-center justify-center text-center mb-8 sm:mb-12 lg:mb-16 pt-4 sm:pt-10"
-		>
-			<!-- Badge -->
-			<div
-				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
-			>
-				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-				>
-					★ Free Tool
-				</div>
-			</div>
-
-			<!-- Main Title -->
-			<h1
-				class="relative z-10 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-tight mb-4 sm:mb-8"
-			>
-				<span class="block sm:inline">OG IMAGE</span>
-				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
-					<span class="relative z-10 px-2 sm:px-3 md:px-4">GENERATOR</span>
-					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
-					/>
-				</span>
-				{#if isPlatform}
-					<span class="block mt-2 sm:mt-4">
-						<span
-							class="text-lg sm:text-2xl md:text-3xl lg:text-4xl text-gray-900 bg-white border-[2px] sm:border-[3px] border-black px-2 sm:px-3 py-1 shadow-brutal-md sm:shadow-brutal-lg"
-						>
-							for {platformLabel}
-						</span>
-					</span>
-				{/if}
-			</h1>
-
-			<!-- Description -->
-			<div class="max-w-2xl mx-auto px-2">
-				<p
-					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
-				>
-					Create stunning <span
-						class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
-						>Open Graph images</span
-					>
-					for your website.
-					<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
-						>Boost social media engagement with custom social cards</span
-					>
-				</p>
-			</div>
-		</div>
-
-		<!-- Creation Mode Selector -->
-		<div class="w-full max-w-5xl mx-auto mb-16 relative px-2 md:px-0">
-			<div
-				class="absolute inset-0 bg-black translate-x-3 translate-y-3 hidden md:block border-[3px] border-black"
-			/>
-
-			<div class="relative border-[3px] md:border-[4px] border-black bg-white">
-				<!-- Window Header -->
-				<div
-					class="bg-black text-white px-4 py-3 flex justify-between items-center border-b-[3px] md:border-b-[4px] border-black"
-				>
-					<h3
-						class="font-bold font-mono tracking-widest text-xs md:text-sm uppercase flex items-center gap-2"
-					>
-						<span class="animate-pulse">_</span> SELECT_MODE
-					</h3>
-					<div class="flex gap-2">
-						<div class="w-3 h-3 bg-brand-danger border border-black" />
-						<div class="w-3 h-3 bg-brand-accent border border-black" />
-						<div class="w-3 h-3 bg-data-green border border-black" />
-					</div>
-				</div>
-
-				<div class="p-6 md:p-8 bg-[#f8f9fa]">
+	<div slot="tool">
+		<ToolCard>
+			<div class="flex flex-col gap-6 p-5 lg:p-7">
+				<div class="p-6 md:p-8 bg-brand-subtle">
 					<!-- Mode Toggle -->
 					<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
 						<button
@@ -910,12 +875,12 @@
 							}}
 						>
 							<div
-								class={`px-6 py-5 border-[3px] border-black transition-all duration-200 flex flex-col items-center gap-2
-                ${
-									creationMode === 'website'
-										? 'bg-data-green shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
-										: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-brutal-lg'
-								}`}
+								class={`px-6 py-5 border border-brand-ink transition-all duration-200 flex flex-col items-center gap-2
+				                ${
+													creationMode === 'website'
+														? 'bg-brand-ink text-white'
+														: 'bg-brand-paper hover:bg-brand-subtle hover:'
+												}`}
 							>
 								<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
@@ -925,8 +890,8 @@
 										d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
 									/></svg
 								>
-								<span class="font-black text-lg uppercase tracking-tight">From Website</span>
-								<span class="text-xs font-bold text-gray-500">Extract info automatically</span>
+								<span class="font-semibold text-lg tracking-tight">From Website</span>
+								<span class="text-xs font-bold text-brand-mute">Extract info automatically</span>
 							</div>
 						</button>
 						<button
@@ -937,12 +902,12 @@
 							}}
 						>
 							<div
-								class={`px-6 py-5 border-[3px] border-black transition-all duration-200 flex flex-col items-center gap-2
-                ${
-									creationMode === 'direct'
-										? 'bg-data-green shadow-brutal-lg translate-x-[-2px] translate-y-[-2px]'
-										: 'bg-white hover:bg-gray-50 shadow-[4px_4px_0_0_#ccc] hover:shadow-brutal-lg'
-								}`}
+								class={`px-6 py-5 border border-brand-ink transition-all duration-200 flex flex-col items-center gap-2
+				                ${
+													creationMode === 'direct'
+														? 'bg-brand-ink text-white'
+														: 'bg-brand-paper hover:bg-brand-subtle hover:'
+												}`}
 							>
 								<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path
@@ -952,8 +917,8 @@
 										d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
 									/></svg
 								>
-								<span class="font-black text-lg uppercase tracking-tight">Create Directly</span>
-								<span class="text-xs font-bold text-gray-500">Design from scratch</span>
+								<span class="font-semibold text-lg tracking-tight">Create Directly</span>
+								<span class="text-xs font-bold text-brand-mute">Design from scratch</span>
 							</div>
 						</button>
 					</div>
@@ -961,9 +926,9 @@
 					{#if creationMode === 'website'}
 						<!-- Website URL Input -->
 						<div class="border-t-[3px] border-dashed border-gray-300 pt-8">
-							<h4 class="font-black text-lg mb-4 uppercase tracking-tight flex items-center gap-3">
+							<h4 class="font-semibold text-lg mb-4 tracking-tight flex items-center gap-3">
 								<span
-									class="w-8 h-8 bg-black text-white flex items-center justify-center text-sm font-bold border-[2px] border-black shadow-[3px_3px_0_0_#9ca3af]"
+									class="w-8 h-8 bg-brand-ink text-white flex items-center justify-center text-sm font-bold border border-brand-ink"
 									>01</span
 								>
 								Enter Website URL
@@ -973,14 +938,14 @@
 									bind:value={url}
 									on:input={handleFirstInput}
 									type="text"
-									class="flex-1 border-[3px] border-black placeholder-gray-400 text-lg font-bold focus:outline-none focus:shadow-brutal-accent py-4 px-5 transition-all bg-white"
+									class="flex-1 border border-brand-ink placeholder-gray-400 text-lg font-bold focus:outline-none py-4 px-5 transition-all bg-brand-paper"
 									placeholder="https://yourwebsite.com"
 									on:keydown={(e) => e.key === 'Enter' && submitUrl(url)}
 								/>
 								<button
 									on:click={() => submitUrl(url)}
 									disabled={isFetchingWebsiteInfo}
-									class="py-4 px-8 bg-brand-accent border-[3px] border-black font-black uppercase tracking-wide text-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+									class="py-4 px-8 bg-brand-field border border-brand-ink font-semibold tracking-wide text-brand-ink transition-all disabled:opacity-50 flex items-center justify-center gap-2"
 								>
 									{#if isFetchingWebsiteInfo}
 										<svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -1013,7 +978,7 @@
 							</div>
 							{#if error}
 								<div
-									class="mt-4 p-4 bg-brand-danger/10 border-[3px] border-brand-danger text-brand-danger font-bold flex items-center gap-2"
+									class="mt-4 p-4 bg-brand-pink/10 border-[3px] border-brand-danger text-brand-pink font-bold flex items-center gap-2"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
@@ -1029,406 +994,377 @@
 						</div>
 					{:else}
 						<div class="border-t-[3px] border-dashed border-gray-300 pt-8">
-							<div class="bg-data-green/10 border-[3px] border-data-green p-6 text-center">
-								<p class="text-black font-bold text-lg">
+							<div class="bg-brand-proof/10 border-[3px] border-brand-proof p-6 text-center">
+								<p class="text-brand-ink font-bold text-lg">
 									✓ Select a template below to start designing
 								</p>
 							</div>
 						</div>
 					{/if}
 				</div>
-			</div>
-		</div>
-
-		<!-- Generation Limit Banner -->
-		<GenerationLimitBanner toolName="og_image_generator" />
-
-		<!-- Editor Section -->
-		{#if websiteInfo && selectedTemplate}
-			<div
-				class="w-full max-w-5xl mx-auto mb-20 relative px-2 md:px-0"
-				bind:this={ogImageTemplateWrapper}
-			>
-				<div class="border-[3px] md:border-[4px] border-black bg-white shadow-brutal-2xl">
-					<!-- Editor Header -->
+				{#if websiteInfo && selectedTemplate}
 					<div
-						class="bg-black text-white px-4 py-3 flex justify-between items-center border-b-[3px] md:border-b-[4px] border-black"
+						class="w-full max-w-5xl mx-auto mb-20 relative px-2 md:px-0"
+						bind:this={ogImageTemplateWrapper}
 					>
-						<h3 class="font-bold font-mono tracking-widest text-xs md:text-sm uppercase">
-							/// CUSTOMIZE_IMAGE
-						</h3>
-						<div class="flex gap-2">
-							<div class="w-3 h-3 bg-brand-danger border border-white/20" />
-							<div class="w-3 h-3 bg-brand-accent border border-white/20" />
-							<div class="w-3 h-3 bg-data-green border border-white/20" />
-						</div>
-					</div>
-
-					<!-- Preview Section -->
-					<div class="p-6 md:p-8 bg-gray-100 border-b-[3px] border-black">
-						<div class="flex justify-center items-center">
-							<div class="border-[3px] border-black shadow-brutal-xl overflow-hidden bg-white">
-								<OgImageTemplate
-									html={typeof selectedTemplate === 'string'
-										? selectedTemplate
-										: selectedTemplate.html}
-									width={1200}
-									height={630}
-									scale={0.5}
-								/>
-							</div>
-						</div>
-					</div>
-
-					<!-- Editor Controls -->
-					<div class="p-6 md:p-8">
-						<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-							<!-- Logo Section -->
-							<div class="space-y-4">
-								<h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
-									<span
-										class="w-8 h-8 bg-brand-accent flex items-center justify-center border-[2px] border-black shadow-brutal-sm"
-									>
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-											/></svg
-										>
-									</span>
-									Logo
-								</h4>
-								<div class="p-4 bg-gray-50 border-[3px] border-gray-200 space-y-4">
-									{#if websiteInfo.logo}
-										<div class="bg-white p-4 border-[2px] border-gray-200 flex justify-center">
-											{#if websiteInfo.logo.startsWith('<svg')}
-												<div style="width: 120px;">{@html websiteInfo.logo}</div>
-											{:else}
-												<img
-													loading="lazy"
-													src={websiteInfo.logo}
-													style="width: 120px;"
-													alt="Logo"
-													class="object-contain"
-												/>
-											{/if}
-										</div>
-									{/if}
-									<input
-										type="file"
-										class="hidden"
-										id="logoInput"
-										accept="image/*"
-										on:change={updateLogo}
-									/>
-									<label
-										for="logoInput"
-										class="block w-full px-4 py-3 bg-white border-[3px] border-black text-black font-bold cursor-pointer hover:bg-gray-50 hover:shadow-brutal-lg transition-all text-center uppercase tracking-wide"
-									>
-										Upload Logo
-									</label>
-									<div class="space-y-2">
-										<span class="text-xs font-bold text-gray-500 uppercase"
-											>Logo Width: {logoWidth}px</span
-										>
-										<input
-											type="range"
-											min="50"
-											max="400"
-											class="w-full h-2 bg-gray-200 appearance-none cursor-pointer accent-brand-danger"
-											value={logoWidth}
-											on:input={updateLogoWidth}
-										/>
-									</div>
-								</div>
-							</div>
-
-							<!-- Content Section -->
-							<div class="space-y-4">
-								<h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
-									<span
-										class="w-8 h-8 bg-brand-danger text-white flex items-center justify-center border-[2px] border-black shadow-brutal-sm"
-									>
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-											/></svg
-										>
-									</span>
-									Content
-								</h4>
-								<div class="space-y-4">
-									<div>
-										<label
-											for="og-heading"
-											class="text-xs font-bold text-gray-500 uppercase block mb-2">Heading</label
-										>
-										<input
-											id="og-heading"
-											type="text"
-											class="w-full border-[3px] border-gray-200 text-lg font-bold focus:outline-none focus:border-black focus:shadow-brutal-accent py-3 px-4 transition-all"
-											placeholder="Enter heading"
-											value={websiteInfo.heading}
-											on:input={updateHeading}
-										/>
-									</div>
-									<div>
-										<label
-											for="og-description"
-											class="text-xs font-bold text-gray-500 uppercase block mb-2"
-											>Description</label
-										>
-										<textarea
-											id="og-description"
-											class="w-full border-[3px] border-gray-200 text-base font-medium focus:outline-none focus:border-black focus:shadow-brutal-accent py-3 px-4 transition-all resize-none"
-											rows="3"
-											value={websiteInfo.subHeading}
-											on:input={updateSubHeading}
-										/>
-									</div>
-								</div>
-							</div>
-
-							<!-- Style Section -->
-							<div class="space-y-4 lg:col-span-2">
-								<h4 class="font-black text-lg uppercase tracking-tight flex items-center gap-3">
-									<span
-										class="w-8 h-8 bg-data-green flex items-center justify-center border-[2px] border-black shadow-brutal-sm"
-									>
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-											/></svg
-										>
-									</span>
-									Style
-								</h4>
-								<div class="p-4 bg-gray-50 border-[3px] border-gray-200">
-									<div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-										<div>
-											<label
-												for="og-font"
-												class="text-xs font-bold text-gray-500 uppercase block mb-2">Font</label
-											>
-											<select
-												id="og-font"
-												class="w-full border-[3px] border-gray-200 text-base font-bold focus:outline-none focus:border-black py-3 px-4 bg-white appearance-none cursor-pointer"
-												on:change={(e) => updateFont(combinedFonts[e.target.selectedIndex])}
-											>
-												{#each combinedFonts as font}
-													<option value={font.id}>{font.name}</option>
-												{/each}
-											</select>
-										</div>
-										<div>
-											<div class="text-xs font-bold text-gray-500 uppercase block mb-2">
-												Background
-											</div>
-											<div class="color-picker-wrapper">
-												<ColorPicker
-													bind:rgb={backgroundColorRgb}
-													isDialog={true}
-													on:input={updateBackgroundColor}
-												/>
-											</div>
-										</div>
-										<div>
-											<div class="text-xs font-bold text-gray-500 uppercase block mb-2">
-												Text Color
-											</div>
-											<div class="color-picker-wrapper">
-												<ColorPicker
-													bind:rgb={headingColorRgb}
-													isDialog={true}
-													on:input={updateHeadingColor}
-												/>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Generated Image Result -->
-					{#if imageUrl}
-						<div class="border-t-[3px] border-black">
-							<!-- Image preview -->
-							<div class="p-4 md:p-6 bg-white">
-								<div class="border-[3px] border-black bg-white p-2">
-									<img loading="lazy" src={imageUrl} alt="Generated OG" class="w-full" />
-								</div>
-							</div>
-							<!-- Action bar -->
+						<div class="border border-brand-ink bg-brand-paper">
+							<!-- Editor Header -->
 							<div
-								class="bg-data-green border-t-[3px] border-black px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3"
+								class="bg-brand-ink text-white px-4 py-3 flex justify-between items-center border-b border-brand-ink"
 							>
-								<span
-									class="font-black text-xs sm:text-sm uppercase tracking-widest text-black flex items-center gap-2"
-								>
-									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="3"
-											d="M5 13l4 4L19 7"
-										/></svg
-									>
-									Image generated
-								</span>
-								<div class="flex items-center gap-2">
-									<button
-										on:click={() => copyToClipboard(imageUrl)}
-										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-black text-white font-bold uppercase text-xs border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-									>
-										Copy URL
-									</button>
-									<button
-										on:click={() =>
-											downloadFile(imageUrl, 'og-image.png', {
-												tool_name: 'og_image_generator'
-											})}
-										class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-black font-bold uppercase text-xs border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-									>
-										Download
-									</button>
+								<h3 class="font-bold font-mono tracking-widest text-xs md:text-sm">
+									/// CUSTOMIZE_IMAGE
+								</h3>
+								<div class="flex gap-2">
+									<div class="w-3 h-3 bg-brand-pink border border-white/20" />
+									<div class="w-3 h-3 bg-brand-field border border-white/20" />
+									<div class="w-3 h-3 bg-brand-proof border border-white/20" />
 								</div>
 							</div>
-						</div>
-					{/if}
 
-					<!-- Generate Button (hidden once image is generated) -->
-					{#if !imageUrl}
-						<div
-							class="p-6 md:p-8 border-t-[3px] border-black bg-gradient-to-br from-brand-bg to-[#fff5e6]"
-						>
-							<button
-								on:click={generateImage}
-								disabled={isImageGenerating}
-								class="relative w-full max-w-md mx-auto block py-4 md:py-5 bg-brand-danger border-[3px] md:border-[4px] border-black shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
-							>
-								<div class="flex items-center justify-center gap-3 md:gap-4">
-									{#if isImageGenerating}
-										<svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
-											><circle
-												class="opacity-25"
-												cx="12"
-												cy="12"
-												r="10"
-												stroke="currentColor"
-												stroke-width="4"
-											/><path
-												class="opacity-75"
-												fill="currentColor"
-												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-											/></svg
-										>
-										<span class="font-black text-lg md:text-2xl text-white uppercase tracking-tight"
-											>Generating...</span
-										>
-									{:else}
-										<span
-											class="font-black text-lg md:text-2xl text-white uppercase tracking-tight group-hover:scale-105 transition-transform"
-											>Generate Image</span
-										>
-										<svg
-											class="w-5 h-5 md:w-6 md:h-6 text-white group-hover:translate-x-1 transition-transform"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="3"
-												d="M13 7l5 5m0 0l-5 5m5-5H6"
-											/></svg
-										>
-									{/if}
+							<!-- Preview Section -->
+							<div class="p-6 md:p-8 bg-brand-subtle border-b border-brand-ink">
+								<div class="flex justify-center items-center">
+									<div class="border border-brand-ink overflow-hidden bg-brand-paper">
+										<OgImageTemplate
+											html={typeof selectedTemplate === 'string'
+												? selectedTemplate
+												: selectedTemplate.html}
+											width={1200}
+											height={630}
+											scale={0.5}
+										/>
+									</div>
 								</div>
-							</button>
+							</div>
+
+							<!-- Editor Controls -->
+							<div class="p-6 md:p-8">
+								<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+									<!-- Logo Section -->
+									<div class="space-y-4">
+										<h4 class="font-semibold text-lg tracking-tight flex items-center gap-3">
+											<span
+												class="w-8 h-8 bg-brand-field flex items-center justify-center border border-brand-ink"
+											>
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+													><path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+													/></svg
+												>
+											</span>
+											Logo
+										</h4>
+										<div class="p-4 bg-brand-subtle border-[3px] border-gray-200 space-y-4">
+											{#if websiteInfo.logo}
+												<div
+													class="bg-brand-paper p-4 border-[2px] border-gray-200 flex justify-center"
+												>
+													{#if websiteInfo.logo.startsWith('<svg')}
+														<div style="width: 120px;">{@html websiteInfo.logo}</div>
+													{:else}
+														<img
+															loading="lazy"
+															src={websiteInfo.logo}
+															style="width: 120px;"
+															alt="Logo"
+															class="object-contain"
+														/>
+													{/if}
+												</div>
+											{/if}
+											<input
+												type="file"
+												class="hidden"
+												id="logoInput"
+												accept="image/*"
+												on:change={updateLogo}
+											/>
+											<label
+												for="logoInput"
+												class="block w-full px-4 py-3 bg-brand-paper border border-brand-ink text-brand-ink font-bold cursor-pointer hover:bg-brand-subtle transition-all text-center tracking-wide"
+											>
+												Upload Logo
+											</label>
+											<div class="space-y-2">
+												<span class="text-xs font-bold text-brand-mute"
+													>Logo Width: {logoWidth}px</span
+												>
+												<input
+													type="range"
+													min="50"
+													max="400"
+													class="w-full h-2 bg-brand-rule appearance-none cursor-pointer accent-brand-danger"
+													value={logoWidth}
+													on:input={updateLogoWidth}
+												/>
+											</div>
+										</div>
+									</div>
+
+									<!-- Content Section -->
+									<div class="space-y-4">
+										<h4 class="font-semibold text-lg tracking-tight flex items-center gap-3">
+											<span
+												class="w-8 h-8 bg-brand-pink text-white flex items-center justify-center border border-brand-ink"
+											>
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+													><path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+													/></svg
+												>
+											</span>
+											Content
+										</h4>
+										<div class="space-y-4">
+											<div>
+												<label for="og-heading" class="text-xs font-bold text-brand-mute block mb-2"
+													>Heading</label
+												>
+												<input
+													id="og-heading"
+													type="text"
+													class="w-full border-[3px] border-gray-200 text-lg font-bold focus:outline-none focus:border-black py-3 px-4 transition-all"
+													placeholder="Enter heading"
+													value={websiteInfo.heading}
+													on:input={updateHeading}
+												/>
+											</div>
+											<div>
+												<label
+													for="og-description"
+													class="text-xs font-bold text-brand-mute block mb-2">Description</label
+												>
+												<textarea
+													id="og-description"
+													class="w-full border-[3px] border-gray-200 text-base font-medium focus:outline-none focus:border-black py-3 px-4 transition-all resize-none"
+													rows="3"
+													value={websiteInfo.subHeading}
+													on:input={updateSubHeading}
+												/>
+											</div>
+										</div>
+									</div>
+
+									<!-- Style Section -->
+									<div class="space-y-4 lg:col-span-2">
+										<h4 class="font-semibold text-lg tracking-tight flex items-center gap-3">
+											<span
+												class="w-8 h-8 bg-brand-proof flex items-center justify-center border border-brand-ink"
+											>
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+													><path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+													/></svg
+												>
+											</span>
+											Style
+										</h4>
+										<div class="p-4 bg-brand-subtle border-[3px] border-gray-200">
+											<div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+												<div>
+													<label for="og-font" class="text-xs font-bold text-brand-mute block mb-2"
+														>Font</label
+													>
+													<select
+														id="og-font"
+														class="w-full border-[3px] border-gray-200 text-base font-bold focus:outline-none focus:border-black py-3 px-4 bg-brand-paper appearance-none cursor-pointer"
+														on:change={(e) => updateFont(combinedFonts[e.target.selectedIndex])}
+													>
+														{#each combinedFonts as font}
+															<option value={font.id}>{font.name}</option>
+														{/each}
+													</select>
+												</div>
+												<div>
+													<div class="text-xs font-bold text-brand-mute block mb-2">Background</div>
+													<div class="color-picker-wrapper">
+														<ColorPicker
+															bind:rgb={backgroundColorRgb}
+															isDialog={true}
+															on:input={updateBackgroundColor}
+														/>
+													</div>
+												</div>
+												<div>
+													<div class="text-xs font-bold text-brand-mute block mb-2">Text Color</div>
+													<div class="color-picker-wrapper">
+														<ColorPicker
+															bind:rgb={headingColorRgb}
+															isDialog={true}
+															on:input={updateHeadingColor}
+														/>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Generated Image Result -->
+							{#if imageUrl}
+								<div class="border-t border-brand-ink">
+									<!-- Image preview -->
+									<div class="p-4 md:p-6 bg-brand-paper">
+										<div class="border border-brand-ink bg-brand-paper p-2">
+											<img loading="lazy" src={imageUrl} alt="Generated OG" class="w-full" />
+										</div>
+									</div>
+									<!-- Action bar -->
+									<div
+										class="bg-brand-proof border-t border-brand-ink px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3"
+									>
+										<span
+											class="font-semibold text-xs sm:text-sm tracking-widest text-brand-ink flex items-center gap-2"
+										>
+											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+												><path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="3"
+													d="M5 13l4 4L19 7"
+												/></svg
+											>
+											Image generated
+										</span>
+										<div class="flex items-center gap-2">
+											<button
+												on:click={() => copyToClipboard(imageUrl)}
+												class="px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-ink text-white font-bold text-xs border border-brand-ink transition-all"
+											>
+												Copy URL
+											</button>
+											<button
+												on:click={() =>
+													downloadFile(imageUrl, 'og-image.png', {
+														tool_name: 'og_image_generator'
+													})}
+												class="px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-paper text-brand-ink font-bold text-xs border border-brand-ink transition-all"
+											>
+												Download
+											</button>
+										</div>
+									</div>
+								</div>
+							{/if}
 						</div>
-					{/if}
-				</div>
-			</div>
-
-			{#if imageUrl}
-				<NextSteps
-					heading="Next steps"
-					description="Copy the API request, save this as a reusable template background, and batch render variants."
-					curlSnippet={nextStepsCurlSnippet}
-					templateDraft={nextStepsTemplateDraft}
-					generatedUrl={imageUrl}
-					toolName="OG Image Generator"
-				/>
-			{/if}
-		{/if}
-
-		<!-- Templates Grid -->
-		<div class="w-full max-w-5xl mx-auto mb-20">
-			<div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4 px-2 md:px-0">
-				<h2 class="text-3xl md:text-4xl font-black text-black uppercase tracking-tighter">
-					{isPlatform ? `Templates for ${platformLabel}` : 'Choose Template'}
-				</h2>
-				{#if !isUserLoggedIn}
-					<a
-						href="/signup"
-						on:click={() =>
-							analytics.track('tool_signup_click', {
-								tool_name: 'og_image_generator',
-								cta_location: 'view_all_templates'
-							})}
-						class="font-bold text-black hover:text-brand-danger transition-colors flex items-center gap-1 uppercase tracking-wide text-sm border-b-[2px] border-black pb-1"
-					>
-						View All Templates →
-					</a>
+					</div>
 				{/if}
 			</div>
 
-			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2 md:px-0">
-				{#each templates.slice(0, 6) as template, i}
-					<div
-						class="group bg-white border-[3px] border-black overflow-hidden shadow-brutal-lg hover:-translate-y-1 hover:shadow-brutal-xl transition-all duration-200 cursor-pointer"
-						on:click={() => selectTemplate(template)}
-						on:keydown={(e) => e.key === 'Enter' && selectTemplate(template)}
-						role="button"
-						tabindex="0"
-					>
-						<div class="p-2 bg-gray-100 border-b-[3px] border-black flex gap-1.5">
-							<div class="w-2.5 h-2.5 bg-brand-danger border border-black" />
-							<div class="w-2.5 h-2.5 bg-brand-accent border border-black" />
-							<div class="w-2.5 h-2.5 bg-data-green border border-black" />
-						</div>
-						<div class="relative bg-white overflow-hidden" style="height: 180px;">
-							<OgImageTemplate
-								html={typeof template === 'string' ? template : template.html}
-								width={1200}
-								height={630}
-								scale={0.3}
-							/>
+			<svelte:fragment slot="toolbar-left">
+				<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">
+					TITLE · LOGO → 1200×630
+				</span>
+			</svelte:fragment>
 
-							<!-- Hover Overlay -->
-							<div
-								class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center"
-							>
-								<span
-									class="px-5 py-2 bg-white text-black font-black uppercase text-sm border-[3px] border-black shadow-[3px_3px_0_0_#ff6b6b]"
+			<svelte:fragment slot="toolbar-right">
+				<QuotaMeter
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+				/>
+				<GenerateButton
+					label="Generate Image"
+					loading={isImageGenerating}
+					ready={!!(websiteInfo && selectedTemplate)}
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+					on:generate={generateImage}
+				/>
+			</svelte:fragment>
+		</ToolCard>
+	</div>
+
+	<div slot="result">
+		{#if imageUrl}
+			<NextSteps
+				heading="Next steps"
+				description="Copy the API request, save this as a reusable template background, and batch render variants."
+				curlSnippet={nextStepsCurlSnippet}
+				templateDraft={nextStepsTemplateDraft}
+				generatedUrl={imageUrl}
+				toolName="OG Image Generator"
+			/>
+		{/if}
+	</div>
+
+	<svelte:fragment slot="longform">
+		<LongformSection index="01" id="templates" first>
+			<h2
+				slot="heading"
+				class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink"
+			>
+				{isPlatform ? `Templates for ${platformLabel}` : 'Choose Template'}
+			</h2>
+			<div class="w-full max-w-5xl mx-auto mb-20">
+				<div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4 px-2 md:px-0">
+					{#if !isUserLoggedIn}
+						<a
+							href="/signup"
+							on:click={() =>
+								analytics.track('tool_signup_click', {
+									tool_name: 'og_image_generator',
+									cta_location: 'view_all_templates'
+								})}
+							class="font-bold text-brand-ink hover:text-brand-pink transition-colors flex items-center gap-1 tracking-wide text-sm border-b-[2px] border-black pb-1"
+						>
+							View All Templates →
+						</a>
+					{/if}
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2 md:px-0">
+					{#each templates.slice(0, 6) as template, i}
+						<div
+							class="group bg-brand-paper border border-brand-ink overflow-hidden hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+							on:click={() => selectTemplate(template)}
+							on:keydown={(e) => e.key === 'Enter' && selectTemplate(template)}
+							role="button"
+							tabindex="0"
+						>
+							<div class="p-2 bg-brand-subtle border-b border-brand-ink flex gap-1.5">
+								<div class="w-2.5 h-2.5 bg-brand-pink border border-black" />
+								<div class="w-2.5 h-2.5 bg-brand-field border border-black" />
+								<div class="w-2.5 h-2.5 bg-brand-proof border border-brand-ink" />
+							</div>
+							<div class="relative bg-brand-paper overflow-hidden" style="height: 180px;">
+								<OgImageTemplate
+									html={typeof template === 'string' ? template : template.html}
+									width={1200}
+									height={630}
+									scale={0.3}
+								/>
+
+								<!-- Hover Overlay -->
+								<div
+									class="absolute inset-0 bg-brand-ink/80 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center"
 								>
-									Use This
-								</span>
+									<span
+										class="px-5 py-2 bg-brand-paper text-brand-ink font-semibold text-sm border border-brand-ink"
+									>
+										Use This
+									</span>
+								</div>
 							</div>
 						</div>
-					</div>
-				{/each}
+					{/each}
+				</div>
 			</div>
-		</div>
+		</LongformSection>
 
 		<!-- API Section -->
 		<section class="mb-16 max-w-5xl mx-auto">
@@ -1446,13 +1382,12 @@
 			/>
 		</section>
 
-		<!-- Info Sections -->
 		<div class="max-w-5xl mx-auto px-2 md:px-0">
 			<!-- What is OG Image -->
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-				<div class="border-[3px] border-black bg-white p-6 md:p-8 shadow-[6px_6px_0_0_#9ca3af]">
+				<div class="border border-brand-ink bg-brand-paper p-6 md:p-8">
 					<div
-						class="w-12 h-12 bg-brand-accent border-[3px] border-black flex items-center justify-center mb-6 shadow-brutal-md"
+						class="w-12 h-12 bg-brand-field border border-brand-ink flex items-center justify-center mb-6"
 					>
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -1463,16 +1398,16 @@
 							/></svg
 						>
 					</div>
-					<h3 class="text-2xl font-black mb-4 text-black uppercase">What is an OG Image?</h3>
-					<p class="text-black font-medium leading-relaxed">
+					<h3 class="text-2xl font-semibold mb-4 text-brand-ink">What is an OG Image?</h3>
+					<p class="text-brand-ink font-medium leading-relaxed">
 						An OG (Open Graph) image is the preview that appears when your content is shared on
 						social media. It's your first impression. Make it count with professional designs.
 					</p>
 				</div>
 
-				<div class="border-[3px] border-black bg-white p-6 md:p-8 shadow-[6px_6px_0_0_#9ca3af]">
+				<div class="border border-brand-ink bg-brand-paper p-6 md:p-8">
 					<div
-						class="w-12 h-12 bg-brand-danger border-[3px] border-black flex items-center justify-center mb-6 shadow-brutal-md"
+						class="w-12 h-12 bg-brand-pink border border-brand-ink flex items-center justify-center mb-6"
 					>
 						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -1483,18 +1418,18 @@
 							/></svg
 						>
 					</div>
-					<h3 class="text-2xl font-black mb-4 text-black uppercase">Why Use This Tool?</h3>
+					<h3 class="text-2xl font-semibold mb-4 text-brand-ink">Why Use This Tool?</h3>
 					<ul class="space-y-3">
-						<li class="flex items-center gap-3 font-bold text-black">
-							<div class="w-2 h-2 bg-black" />
+						<li class="flex items-center gap-3 font-bold text-brand-ink">
+							<div class="w-2 h-2 bg-brand-ink" />
 							Create pro images in minutes
 						</li>
-						<li class="flex items-center gap-3 font-bold text-black">
-							<div class="w-2 h-2 bg-black" />
+						<li class="flex items-center gap-3 font-bold text-brand-ink">
+							<div class="w-2 h-2 bg-brand-ink" />
 							Match your brand perfectly
 						</li>
-						<li class="flex items-center gap-3 font-bold text-black">
-							<div class="w-2 h-2 bg-black" />
+						<li class="flex items-center gap-3 font-bold text-brand-ink">
+							<div class="w-2 h-2 bg-brand-ink" />
 							Boost CTR by up to 40%
 						</li>
 					</ul>
@@ -1502,18 +1437,16 @@
 			</div>
 
 			<!-- FAQ Section -->
-			<div class="border-[3px] border-black bg-white p-6 md:p-8 shadow-[8px_8px_0_0_#9ca3af] mb-16">
-				<h2 class="text-3xl font-black mb-8 text-black uppercase">FAQ</h2>
+			<div class="border border-brand-ink bg-brand-paper p-6 md:p-8 mb-16">
+				<h2 class="text-3xl font-semibold mb-8 text-brand-ink">FAQ</h2>
 				<div class="space-y-4">
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
 						>
-							<span class="font-black text-lg text-gray-900 uppercase"
-								>How do I add an OG image?</span
-							>
+							<span class="font-semibold text-lg text-brand-ink">How do I add an OG image?</span>
 							<span
-								class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors"
+								class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
 							>
 								<svg
 									class="h-4 w-4 group-open:rotate-180 transition-transform"
@@ -1528,21 +1461,20 @@
 							</span>
 						</summary>
 						<div
-							class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium"
+							class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
 						>
-							Add the <code class="bg-gray-200 px-2 py-1 font-mono text-sm">og:image</code> meta tag
+							Add the <code class="bg-brand-rule px-2 py-1 font-mono text-sm">og:image</code> meta tag
 							in your page's &lt;head&gt; section with the absolute URL of your image.
 						</div>
 					</details>
 
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
 						>
-							<span class="font-black text-lg text-gray-900 uppercase">What size should it be?</span
-							>
+							<span class="font-semibold text-lg text-brand-ink">What size should it be?</span>
 							<span
-								class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors"
+								class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
 							>
 								<svg
 									class="h-4 w-4 group-open:rotate-180 transition-transform"
@@ -1557,7 +1489,7 @@
 							</span>
 						</summary>
 						<div
-							class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium"
+							class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
 						>
 							The recommended size is <strong>1200×630 pixels</strong> (1.91:1 ratio) for optimal display
 							on Facebook, Twitter, and LinkedIn.
@@ -1566,11 +1498,11 @@
 
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
 						>
-							<span class="font-black text-lg text-gray-900 uppercase">Is there an API?</span>
+							<span class="font-semibold text-lg text-brand-ink">Is there an API?</span>
 							<span
-								class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors"
+								class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
 							>
 								<svg
 									class="h-4 w-4 group-open:rotate-180 transition-transform"
@@ -1585,7 +1517,7 @@
 							</span>
 						</summary>
 						<div
-							class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium"
+							class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
 						>
 							Yes! Use our REST API to generate OG images programmatically. Perfect for blogs,
 							e-commerce, and SaaS platforms.
@@ -1594,37 +1526,13 @@
 				</div>
 			</div>
 		</div>
-	</main>
-	<RelatedTools
-		tools={['youtube-thumbnail', 'linkedin-banner', 'twitter-header', 'responsive-image-generator']}
-	/>
-	<Footer />
-	<Toast />
-</section>
+	</svelte:fragment>
 
-<style>
-	.color-picker-wrapper {
-		position: relative;
-		border: 3px solid #e5e7eb;
-		background: white;
-	}
-
-	.color-picker-wrapper :global(.color-picker) {
-		width: 100% !important;
-	}
-
-	.color-picker-wrapper :global(.picker-wrapper) {
-		position: relative !important;
-	}
-
-	:global(.color-picker-dialog),
-	:global(.picker-dialog) {
-		z-index: 9999 !important;
-		position: fixed !important;
-	}
-
-	:global(.color-picker),
-	:global(.picker-indicator) {
-		z-index: 100 !important;
-	}
-</style>
+	<svelte:fragment slot="footer-links">
+		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
+			<RelatedTools
+				tools={['youtube-thumbnail', 'linkedin-banner', 'twitter-header', 'responsive-images']}
+			/>
+		</div>
+	</svelte:fragment>
+</ToolPageShell>
