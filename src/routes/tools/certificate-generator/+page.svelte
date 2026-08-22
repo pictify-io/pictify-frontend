@@ -136,8 +136,8 @@
 			a: 'Yes! Pictify works as a bulk certificate generator for events, training programs, and courses. Upload a CSV in a workflow (one row per attendee) and every row renders its own certificate. Or use the API to batch generate up to 500 certificates per call. Perfect for course completions, event attendance, and employee recognition programs.'
 		},
 		{
-			q: 'Can I email certificates to recipients automatically?',
-			a: "Yes, this is what makes Pictify different from other certificate makers. A workflow run renders each row's certificate AND emails it to that recipient from an isolated sending domain (not your Gmail, so no 500/day cap). The run screen shows delivered, bounced, or suppressed per person, and a bounced address can be corrected and re-sent as a single row."
+			q: 'Can I generate certificates in bulk automatically?',
+			a: 'Yes, this is what makes Pictify different from other certificate makers. A batch run renders every row of your CSV against the same template in one job, and hands back a CDN link per certificate plus a per-row status you can poll. A webhook fires when the run finishes, so your own system can pick the files up without anyone watching a progress bar.'
 		},
 		{
 			q: 'Can I generate certificates from Google Sheets?',
@@ -257,7 +257,7 @@
 				'@type': 'HowToStep',
 				position: 6,
 				name: 'Download',
-				text: 'Download your certificate, or start a workflow run to generate and email them in bulk.'
+				text: 'Download your certificate, or start a batch run to render them in bulk from a CSV.'
 			}
 		]
 	});
@@ -927,7 +927,7 @@
 					How to Make a Certificate Online in 6 Steps
 				</h3>
 				<div class="space-y-4">
-					{#each [{ num: '1', text: 'Choose a certificate template from the gallery above' }, { num: '2', text: 'Enter the recipient name, organization, date, and achievement' }, { num: '3', text: 'Preview your certificate in the interactive live preview' }, { num: '4', text: 'Watch the live preview update as you type' }, { num: '5', text: 'Click "Generate Certificate" to create a high-resolution PNG' }, { num: '6', text: 'Download your certificate, or start a workflow run to email them in bulk' }] as step}
+					{#each [{ num: '1', text: 'Choose a certificate template from the gallery above' }, { num: '2', text: 'Enter the recipient name, organization, date, and achievement' }, { num: '3', text: 'Preview your certificate in the interactive live preview' }, { num: '4', text: 'Watch the live preview update as you type' }, { num: '5', text: 'Click "Generate Certificate" to create a high-resolution PNG' }, { num: '6', text: 'Download your certificate, or start a batch run to render them in bulk' }] as step}
 						<div class="flex items-start gap-4">
 							<span
 								class="bg-data-sky text-white w-8 h-8 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
@@ -962,8 +962,9 @@
 					Bulk Certificate Generator for Events: Delivered, Not Downloaded
 				</h3>
 				<p class="text-sm sm:text-base text-brand-rule leading-relaxed font-medium mb-6">
-					Generating 300 certificates was never the hard part. Getting 300 certificates into 300
-					inboxes before the deadline is. Every other path stops one step short of the send:
+					Generating one certificate was never the hard part. Generating 300 of them, on brand, with
+					links your own system can fetch, before the deadline is. Every other path stops one step
+					short:
 				</p>
 				<div class="grid sm:grid-cols-3 gap-4 mb-6">
 					<a
@@ -982,28 +983,27 @@
 					>
 						<h4 class="font-semibold text-brand-ink text-sm mb-1">Canva Bulk Create</h4>
 						<p class="text-xs text-brand-slate leading-relaxed">
-							Makes beautiful variants, then stops at download. No email delivery of any kind; the
-							zip file is your problem. →
+							Makes beautiful variants, then stops at download. No API, no per-row links; the zip
+							file is your problem. →
 						</p>
 					</a>
 					<a
-						href="/solutions/mail-merge-with-attachments"
+						href="/alternatives"
 						class="block bg-brand-paper border border-brand-ink p-4 transition-all"
 					>
 						<h4 class="font-semibold text-brand-ink text-sm mb-1">Mail merge</h4>
 						<p class="text-xs text-brand-slate leading-relaxed">
-							Word can't attach the file. Gmail caps at 500–1,500 a day and locks you out mid-batch.
-							→
+							Merges text into a letter. It cannot render a designed certificate, and there is no
+							API behind it. →
 						</p>
 					</a>
 				</div>
 				<p class="text-sm sm:text-base text-brand-rule leading-relaxed font-medium">
-					A Pictify workflow run does the whole job: upload the attendee CSV, every row renders its
-					own certificate, and every certificate emails itself to its recipient from an isolated
-					sending domain. You watch <span class="text-brand-proof font-semibold"
-						>delivered / bounced / suppressed per person</span
-					>, and re-send any single row with a corrected address. That's the difference between
-					"sent" and "delivered".
+					A Pictify batch run does the whole job: upload the attendee CSV, every row renders its own
+					certificate against the same template, and each one comes back as a
+					<span class="text-brand-proof font-semibold">CDN link with a per-row status</span>, with a
+					webhook when the run finishes. Re-run any single row on its own if a value was wrong.
+					That's the difference between a design tool and a render API.
 				</p>
 			</section>
 
@@ -1177,11 +1177,11 @@
 					at once from a spreadsheet or database.
 				</p>
 				<p class="text-sm sm:text-base text-brand-slate leading-relaxed font-medium">
-					Every template here is plain HTML and CSS, the same template a Pictify workflow renders at
-					scale. Connect a CSV, webhook, Zapier, or Make.com flow and each row becomes its own
-					certificate, emailed to its recipient. That's the difference between a one-off certificate
-					generator and a programmable certificate builder: the fast free tool today, delivery-grade
-					automation when you're ready to scale.
+					Every template here is plain HTML and CSS, the same template a Pictify batch run renders
+					at scale. Connect a CSV, webhook, Zapier, or Make.com flow and each row becomes its own
+					certificate on a CDN link your system can fetch. That's the difference between a one-off
+					certificate generator and a programmable certificate builder: the fast free tool today,
+					production-grade automation when you're ready to scale.
 				</p>
 			</section>
 

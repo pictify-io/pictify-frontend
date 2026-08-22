@@ -286,8 +286,8 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 			a: "Yes, that is this tool's specialty. Every row renders as its own formatted document page: the first column becomes the document title and every column becomes a labeled field. With a free account you can go further and use branded templates (certificates, letters, reports) instead of the default layout."
 		},
 		{
-			q: "Can I email each row's PDF to a different recipient?",
-			a: "Yes, with a Pictify workflow. If your CSV has an email column, a workflow run renders each row's document AND emails it to that recipient, with delivered/bounced status per person. That is the part no converter, spreadsheet, or mail-merge add-on does."
+			q: 'Can I render a whole sheet at once instead of row by row?',
+			a: 'Yes, with a Pictify batch run. Point it at the same CSV and every row renders against your template in one job: a CDN link per document, a per-row status you can poll, and a webhook when the batch finishes. That is the part no converter or spreadsheet add-on does.'
 		},
 		{
 			q: 'Is there a row limit?',
@@ -341,7 +341,7 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 	<title>CSV to PDF Converter: Free, Every Row Becomes a Document | Pictify</title>
 	<meta
 		name="description"
-		content="Convert CSV to PDF free in your browser. Render the sheet as a clean table PDF, or turn every row into its own document and email each one with Pictify workflows."
+		content="Convert CSV to PDF free in your browser. Render the sheet as a clean table PDF, or turn every row into its own document, then batch render the whole file through the Pictify API."
 	/>
 	<meta
 		name="keywords"
@@ -611,14 +611,12 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 				own formatted page, with the first column as the title and every column as a labeled field.
 			</p>
 			<p class="text-sm sm:text-base text-brand-slate leading-relaxed font-medium">
-				And when the documents need to reach the people in the rows, a
-				<a href="/solutions/mail-merge-with-attachments" class="underline font-semibold"
-					>Pictify workflow</a
-				>
+				And when the sheet is longer than the free cap, a
+				<a href="/docs" class="underline font-semibold">Pictify batch run</a>
 				takes the same CSV, renders each row against a branded template (certificate, letter, report,
 				or one the
-				<span class="font-semibold">AI Template Maker</span> writes from your description), and emails
-				every document to its recipient with per-person delivery status.
+				<span class="font-semibold">AI Template Maker</span> writes from your description), and hands
+				back a CDN link per document with a webhook when the run finishes.
 			</p>
 		</LongformSection>
 
