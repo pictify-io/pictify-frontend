@@ -1,17 +1,27 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
+	/**
+	 * /tools/url-to-image-generator — the v2 tool page, column mode.
+	 *
+	 * The capture board and preview become the tool card; the quota ladder and
+	 * Capture move to its toolbar. SEO copy is frozen.
+	 *
+	 * GenerationLimitBanner, StickySignupBar and PostSignupWelcome are retired
+	 * here: the ladder and the result surface say the same things in place. The
+	 * tool-signup-cta-v2 flag still resolves, so the running experiment keeps
+	 * its arms; its inline arm renders inside the result block as before.
+	 */
 	import SEOHead from '$lib/seo/SEOHead.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
 	import Toast from '$lib/components/Toast.svelte';
-	import ApiCodeSection from '$lib/components/tools/ApiCodeSection.svelte';
-	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
-	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';
-	import PostSignupWelcome from '$lib/components/tools/PostSignupWelcome.svelte';
+	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
+	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
+	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
+	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
+	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
 	import { onMount, onDestroy, tick } from 'svelte';
 	import { browser } from '$app/environment';
 	import { toast } from '../../../store/toast.store';
 	import { user } from '../../../store/user.store';
-	import { generationLimits } from '../../../store/generationLimits.store';
+	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { getWebsiteHTML } from '../../../api/tools/url-to-image.js';
 	import { createImagePublic } from '../../../api/image.js';
 	import { saveLastRender } from '$lib/lastRender.js';
@@ -505,7 +515,8 @@
 						status: null
 					});
 					toast.set({
-						message: 'Preview is slow to render. Capture still works: we fetch the page on our servers.',
+						message:
+							'Preview is slow to render. Capture still works: we fetch the page on our servers.',
 						type: 'warning',
 						duration: 5000
 					});
@@ -526,9 +537,7 @@
 				// maybeHandleQuota already opened the upgrade modal for
 				// quota_exceeded; only plain rate limits need a message here.
 				message =
-					code === 'quota_exceeded'
-						? ''
-						: 'Too many requests. Please wait a moment and try again.';
+					code === 'quota_exceeded' ? '' : 'Too many requests. Please wait a moment and try again.';
 			} else if (status >= 500) {
 				message = 'Our renderer is struggling right now. Please retry in a moment.';
 			} else if (status >= 400) {
@@ -753,6 +762,32 @@
 		selector = '';
 		toast.set({ message: 'Selector cleared', type: 'success', duration: 1500 });
 	}
+
+	const TOOL_NAME = 'url_to_image_generator';
+	const TOOL_PATH = '/tools/url-to-image-generator';
+
+	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+
+	const RELATED = [
+		{
+			title: 'HTML to image',
+			meta: 'HTML → PNG · JPG · WEBP',
+			href: '/tools/html-to-image',
+			art: '/landing/tools/html-to-image.svg'
+		},
+		{
+			title: 'OG image generator',
+			meta: 'TITLE · LOGO → 1200×630',
+			href: '/tools/og-image-generator',
+			art: '/landing/tools/og-image-generator.svg'
+		},
+		{
+			title: 'Code to image',
+			meta: 'SNIPPET → PNG',
+			href: '/tools/code-to-image',
+			art: '/landing/tools/code-to-image.svg'
+		}
+	];
 </script>
 
 <SEOHead
@@ -795,415 +830,387 @@
 	]}
 />
 
-<div
-	class="min-h-screen bg-brand-bg relative overflow-hidden font-sans text-gray-900 selection:bg-brand-danger selection:text-white"
+<ToolPageShell
+	toolName={TOOL_NAME}
+	toolPath={TOOL_PATH}
+	breadcrumb="URL TO IMAGE"
+	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · ANY PUBLIC URL"
+	related={RELATED}
+	loggedIn={isUserLoggedIn}
+	hasResult={!!imageUrl}
+	longform="column"
 >
-	<!-- Background Pattern -->
-	<div
-		class="fixed inset-0 pointer-events-none opacity-[0.03]"
-		style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 24px 24px;"
-	/>
-
-	<Nav />
-
-	<main
-		class="z-10 w-full py-16 md:px-0 px-6 flex flex-col items-center justify-center space-y-8 max-w-7xl mx-auto relative"
+	<h1
+		slot="h1"
+		class="font-display text-[38px] font-extrabold leading-[1.04] tracking-[-0.02em] text-brand-ink lg:text-[52px] lg:leading-[56px]"
 	>
-		<!-- Breadcrumb -->
-		<nav class="mb-12 flex justify-center">
-			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
-			>
-				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
-				<li class="text-gray-300">/</li>
-				<li>
-					<a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a>
-				</li>
-				<li class="text-gray-300">/</li>
-				<li class="text-gray-900">URL to Image</li>
-			</ol>
-		</nav>
+		<span>URL TO</span>
+		<span>IMAGE</span>
+	</h1>
 
-		<!-- Hero Section -->
-		<div
-			class="relative flex flex-col items-center justify-center text-center mb-8 sm:mb-12 lg:mb-16 pt-4 sm:pt-10"
-		>
-			<!-- Badge -->
-			<div
-				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
-			>
-				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-				>
-					★ Free Tool
-				</div>
-			</div>
+	<p
+		slot="hero-sub"
+		class="max-w-[640px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
+	>
+		Convert any webpage URL into a high-quality <span class="font-medium">screenshot</span>
+		instantly.
+		<span class="text-brand-slate">Perfect for archiving, thumbnails, and social previews</span>
+	</p>
 
-			<!-- Main Title -->
-			<h1
-				class="relative z-10 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-tight mb-4 sm:mb-8"
-			>
-				<span class="block sm:inline">URL TO</span>
-				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
-					<span class="relative z-10 px-2 sm:px-3 md:px-4">IMAGE</span>
-					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
-					/>
-				</span>
-			</h1>
-
-			<!-- Description -->
-			<div class="max-w-2xl mx-auto px-2">
-				<p
-					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
-				>
-					Convert any webpage URL into a high-quality <span
-						class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black">image</span
+	<div slot="tool">
+		<ToolCard>
+			<div class="flex flex-col gap-6 p-5 lg:p-7">
+				<div class="relative overflow-hidden border border-brand-ink bg-brand-paper">
+					<!-- Panel header. The v1 window chrome is gone; the card is the window now. -->
+					<div
+						class="flex items-center justify-between border-b border-brand-ink bg-brand-press px-4 py-2.5"
 					>
-					instantly.
-					<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
-						>Perfect for archiving, thumbnails, and social previews</span
+						<span class="font-mono text-xs tracking-[0.06em] text-white">CAPTURE</span>
+						<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">
+							SERVER-SIDE · NO EXTENSION
+						</span>
+					</div>
+
+					<!-- Content -->
+					<div
+						class="p-6 md:p-8 bg-brand-paper"
+						style="background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 10px 10px;"
 					>
-				</p>
-			</div>
-		</div>
-
-		<!-- Post-signup welcome with API key -->
-		<PostSignupWelcome toolName="url_to_image_generator" />
-
-		<!-- Generation Limit Banner -->
-		<GenerationLimitBanner toolName="url_to_image_generator" />
-
-		<div class="w-full max-w-5xl mx-auto mb-16 relative px-2 md:px-0 z-20">
-			<!-- Control Board -->
-			<div class="bg-white border-[3px] border-black shadow-brutal-2xl relative">
-				<!-- Header/Window Bar -->
-				<div
-					class="bg-black text-white px-4 py-2 flex justify-between items-center border-b-[3px] border-black"
-				>
-					<div class="flex gap-2">
-						<div class="w-3 h-3 rounded-full bg-brand-danger border border-white" />
-						<div class="w-3 h-3 rounded-full bg-brand-accent border border-white" />
-						<div class="w-3 h-3 rounded-full bg-data-green border border-white" />
-					</div>
-					<div class="font-mono font-bold tracking-widest text-sm uppercase">
-						SYSTEM_INPUT_TERMINAL
-					</div>
-					<div class="w-16 flex justify-end">
-						<div class="space-y-1">
-							<div class="w-4 h-0.5 bg-white" />
-							<div class="w-4 h-0.5 bg-white" />
-						</div>
-					</div>
-				</div>
-
-				<!-- Content -->
-				<div
-					class="p-6 md:p-8 bg-white"
-					style="background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 10px 10px;"
-				>
-					<div class="w-full flex flex-col gap-6 md:flex-row items-stretch">
-						<div class="flex-grow group relative">
-							<div
-								class="absolute -top-3 left-4 bg-black text-white px-2 py-0.5 text-xs font-bold uppercase tracking-wider"
-							>
-								Target URL
+						<div class="w-full flex flex-col gap-6 md:flex-row items-stretch">
+							<div class="flex-grow group relative">
+								<div
+									class="absolute -top-3 left-4 bg-brand-ink text-white px-2 py-0.5 text-xs font-bold tracking-wider"
+								>
+									Target URL
+								</div>
+								<input
+									bind:value={url}
+									on:input={handleFirstInput}
+									type="url"
+									inputmode="url"
+									autocomplete="url"
+									spellcheck="false"
+									aria-invalid={urlError ? 'true' : undefined}
+									class="w-full h-full border border-brand-ink bg-brand-paper placeholder-gray-400 text-lg font-bold font-mono focus:outline-none transition-all px-6 py-4"
+									placeholder="https://example.com"
+								/>
 							</div>
-							<input
-								bind:value={url}
-								on:input={handleFirstInput}
-								type="url"
-								inputmode="url"
-								autocomplete="url"
-								spellcheck="false"
-								aria-invalid={urlError ? 'true' : undefined}
-								class="w-full h-full border-[3px] border-black bg-white placeholder-gray-400 text-lg font-bold font-mono focus:outline-none focus:shadow-[4px_4px_0_0_#ff6b6b] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all px-6 py-4"
-								placeholder="https://example.com"
-							/>
+							<div class="md:w-auto w-full">
+								<button
+									on:click={handleLoadPreviewClick}
+									disabled={isLoading || !url}
+									class="w-full h-full px-8 py-4 bg-brand-field text-brand-ink border border-brand-ink text-xl font-semibold tracking-wide hover:bg-[#ffb050] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
+								>
+									{#if isLoading}Loading...{:else}Load Preview{/if}
+								</button>
+							</div>
 						</div>
-						<div class="md:w-auto w-full">
-							<button
-								on:click={handleLoadPreviewClick}
-								disabled={isLoading || !url}
-								class="w-full h-full px-8 py-4 bg-brand-accent text-black border-[3px] border-black text-xl font-black uppercase tracking-wide shadow-brutal-lg hover:bg-[#ffb050] hover:shadow-brutal-xl hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
+
+						{#if urlError}
+							<p class="mt-3 text-sm font-bold text-brand-alarm" role="alert">{urlError}</p>
+						{:else if url}
+							{#if isLoading}
+								<p class="mt-3 text-sm font-bold text-brand-mute flex items-center gap-2">
+									<span
+										class="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"
+									/>
+									Loading preview… the Capture button unlocks once it's ready.
+								</p>
+							{:else if !isPreviewLoaded}
+								<p class="mt-3 text-sm font-bold text-brand-mute">
+									Load the preview first; then the green
+									<span class="text-brand-proof font-semibold">Capture</span> button activates below.
+								</p>
+							{/if}
+						{/if}
+
+						<!-- Capture Settings -->
+						<div class="mt-6 border-t border-brand-ink pt-6">
+							<div class="flex items-center gap-2 mb-4">
+								<div class="bg-brand-ink text-white px-2 py-0.5 text-xs font-bold tracking-wider">
+									Capture Settings
+								</div>
+							</div>
+
+							<div class="flex flex-col md:flex-row gap-6">
+								<!-- Device Presets -->
+								<div>
+									<span class="block text-xs font-semibold tracking-wider mb-2 text-brand-mute"
+										>Device</span
+									>
+									<div class="flex gap-2">
+										{#each devicePresets as preset}
+											<button
+												on:click={() => selectPreset(preset)}
+												class="px-3 py-2 border border-brand-ink font-bold text-sm transition-all flex items-center gap-1.5 {activePreset ===
+												preset.id
+													? 'bg-brand-ink text-white shadow-none'
+													: 'bg-brand-paper text-brand-ink hover:'}"
+											>
+												{#if preset.id === 'desktop'}
+													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+														><path
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="2"
+															d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+														/></svg
+													>
+												{:else if preset.id === 'tablet'}
+													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+														><path
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="2"
+															d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+														/></svg
+													>
+												{:else}
+													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+														><path
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="2"
+															d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+														/></svg
+													>
+												{/if}
+												{preset.label}
+											</button>
+										{/each}
+									</div>
+								</div>
+
+								<!-- Custom Size -->
+								<div>
+									<span class="block text-xs font-semibold tracking-wider mb-2 text-brand-mute"
+										>Size (px)</span
+									>
+									<div class="flex items-center gap-1">
+										<input
+											type="number"
+											bind:value={captureWidth}
+											on:input={handleDimensionInput}
+											min="1"
+											max="4000"
+											class="w-20 border border-brand-ink px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-brand-danger"
+										/>
+										<span class="font-semibold text-brand-mute">×</span>
+										<input
+											type="number"
+											bind:value={captureHeight}
+											on:input={handleDimensionInput}
+											min="1"
+											max="4000"
+											class="w-20 border border-brand-ink px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-brand-danger"
+										/>
+									</div>
+								</div>
+
+								<!-- Format -->
+								<div>
+									<span class="block text-xs font-semibold tracking-wider mb-2 text-brand-mute"
+										>Format</span
+									>
+									<div class="flex gap-0">
+										{#each ['png', 'jpg', 'webp'] as fmt}
+											<button
+												on:click={() => (fileFormat = fmt)}
+												class="px-4 py-2 border border-brand-ink font-semibold text-sm transition-all -ml-[3px] first:ml-0 {fileFormat ===
+												fmt
+													? 'bg-brand-ink text-white z-10'
+													: 'bg-brand-paper text-brand-ink hover:bg-brand-subtle'}"
+											>
+												{fmt}
+											</button>
+										{/each}
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- CORS Disclaimer -->
+						<div
+							class="mt-6 text-xs md:text-sm font-bold text-brand-ink bg-[#fff] border border-brand-ink p-4 flex items-start gap-3"
+						>
+							<span class="text-xl">⚠️</span>
+							<p>
+								Due to CORS policies, live previews may be restricted for some domains. The capture
+								engine operates server-side and will bypass these limitations.
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="mt-8 w-full max-w-5xl mx-auto">
+					<h3 class="text-4xl font-semibold mb-6 text-center md:text-left drop-shadow-sm">
+						<span class="bg-brand-ink text-white px-2 py-1 transform -rotate-1 inline-block"
+							>Visual</span
+						>
+						Confirmation
+					</h3>
+					<div
+						bind:this={iframeWrapper}
+						class="border-[4px] border-black bg-brand-paper p-2 relative cursor-crosshair mx-auto"
+						style="height: 600px; transition: max-width 0.3s ease;"
+					>
+						{#if isLoading}
+							<div
+								class="absolute inset-0 flex items-center justify-center bg-brand-subtle bg-opacity-75"
 							>
-								{#if isLoading}Loading...{:else}Load Preview{/if}
+								<div class="loader" />
+							</div>
+						{/if}
+						<iframe
+							bind:this={iframeElement}
+							on:load={handleIframeLoad}
+							title="URL Preview"
+							width="100%"
+							height="100%"
+							scale="0.7"
+							frameborder="0"
+							sandbox="allow-scripts"
+						/>
+						<!-- No allow-same-origin: this frame executes a stranger's fetched
+						     page, which must not run in the pictify.io origin (cookies,
+						     localStorage, parent DOM). The element-selector bridge only
+						     uses postMessage with '*', which works across the opaque
+						     origin; nothing reads contentDocument. -->
+					</div>
+					<!-- Element Selector Bar -->
+					<div
+						class="bg-brand-subtle border-[3px] border-t-0 border-black p-4 flex flex-col md:flex-row gap-4 items-center"
+					>
+						<div class="flex-grow w-full">
+							<span class="block font-semibold text-xs mb-1 tracking-wider"
+								>Element Selector (Optional)</span
+							>
+							<div class="flex">
+								<div
+									class="bg-brand-ink text-white px-3 py-2 font-mono text-sm flex items-center justify-center border-y-[3px] border-l border-brand-rule"
+								>
+									&gt;_
+								</div>
+								<input
+									bind:value={selector}
+									type="text"
+									class="w-full border border-brand-ink placeholder-gray-500 text-sm font-mono focus:outline-none py-2 px-4"
+									placeholder="Click element in preview or type selector..."
+								/>
+								<button
+									on:click={clearSelector}
+									class="bg-brand-paper border-y-[3px] border-r border-brand-rule px-3 hover:bg-brand-rule transition-colors"
+									title="Clear Selector"
+								>
+									<svg
+										class="w-4 h-4 text-brand-ink"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="3"
+											d="M6 6l12 12M18 6L6 18"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+						<div class="w-full md:w-auto flex-shrink-0 pt-5">
+							<button
+								id="capture-button"
+								on:click={generateImage}
+								disabled={captureDisabled}
+								class="w-full md:w-auto px-8 py-3 bg-brand-proof text-brand-ink border border-brand-ink font-semibold tracking-wide transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center justify-center gap-2"
+							>
+								{#if isImageGenerating}
+									<svg
+										class="animate-spin h-5 w-5 text-brand-ink"
+										xmlns="http://www.w3.org/2000/svg"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<circle
+											class="opacity-25"
+											cx="12"
+											cy="12"
+											r="10"
+											stroke="currentColor"
+											stroke-width="4"
+										/>
+										<path
+											class="opacity-75"
+											fill="currentColor"
+											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+										/>
+									</svg>
+									Rendering...
+								{:else}
+									<span
+										>{hasAutoCaptured ? 'Re-capture' : 'Capture'}
+										{fileFormat.toUpperCase()}</span
+									>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+										><path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="3"
+											d="M14 5l7 7m0 0l-7 7m7-7H3"
+										/></svg
+									>
+								{/if}
 							</button>
 						</div>
 					</div>
-
-					{#if urlError}
-						<p class="mt-3 text-sm font-bold text-red-600" role="alert">{urlError}</p>
-					{:else if url}
-						{#if isLoading}
-							<p class="mt-3 text-sm font-bold text-gray-500 flex items-center gap-2">
-								<span
-									class="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"
-								/>
-								Loading preview… the Capture button unlocks once it's ready.
-							</p>
-						{:else if !isPreviewLoaded}
-							<p class="mt-3 text-sm font-bold text-gray-500">
-								Load the preview first; then the green
-								<span class="text-data-green font-black">Capture</span> button activates below.
-							</p>
-						{/if}
-					{/if}
-
-					<!-- Capture Settings -->
-					<div class="mt-6 border-t-[3px] border-black pt-6">
-						<div class="flex items-center gap-2 mb-4">
-							<div
-								class="bg-black text-white px-2 py-0.5 text-xs font-bold uppercase tracking-wider"
-							>
-								Capture Settings
-							</div>
-						</div>
-
-						<div class="flex flex-col md:flex-row gap-6">
-							<!-- Device Presets -->
-							<div>
-								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500"
-									>Device</span
-								>
-								<div class="flex gap-2">
-									{#each devicePresets as preset}
-										<button
-											on:click={() => selectPreset(preset)}
-											class="px-3 py-2 border-[3px] border-black font-bold text-sm transition-all flex items-center gap-1.5
-												{activePreset === preset.id
-												? 'bg-black text-white shadow-none'
-												: 'bg-white text-black shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'}"
-										>
-											{#if preset.id === 'desktop'}
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-													/></svg
-												>
-											{:else if preset.id === 'tablet'}
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-													/></svg
-												>
-											{:else}
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-													/></svg
-												>
-											{/if}
-											{preset.label}
-										</button>
-									{/each}
-								</div>
-							</div>
-
-							<!-- Custom Size -->
-							<div>
-								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500"
-									>Size (px)</span
-								>
-								<div class="flex items-center gap-1">
-									<input
-										type="number"
-										bind:value={captureWidth}
-										on:input={handleDimensionInput}
-										min="1"
-										max="4000"
-										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-brand-danger"
-									/>
-									<span class="font-black text-gray-400">×</span>
-									<input
-										type="number"
-										bind:value={captureHeight}
-										on:input={handleDimensionInput}
-										min="1"
-										max="4000"
-										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-brand-danger"
-									/>
-								</div>
-							</div>
-
-							<!-- Format -->
-							<div>
-								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500"
-									>Format</span
-								>
-								<div class="flex gap-0">
-									{#each ['png', 'jpg', 'webp'] as fmt}
-										<button
-											on:click={() => (fileFormat = fmt)}
-											class="px-4 py-2 border-[3px] border-black font-black text-sm uppercase transition-all -ml-[3px] first:ml-0
-												{fileFormat === fmt ? 'bg-black text-white z-10' : 'bg-white text-black hover:bg-gray-50'}"
-										>
-											{fmt}
-										</button>
-									{/each}
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- CORS Disclaimer -->
-					<div
-						class="mt-6 text-xs md:text-sm font-bold text-black bg-[#fff] border-[2px] border-black p-4 shadow-[4px_4px_0_0_#ccc] flex items-start gap-3"
-					>
-						<span class="text-xl">⚠️</span>
-						<p>
-							Due to CORS policies, live previews may be restricted for some domains. The capture
-							engine operates server-side and will bypass these limitations.
-						</p>
-					</div>
 				</div>
 			</div>
-		</div>
 
-		<div class="mt-8 w-full max-w-5xl mx-auto">
-			<h3 class="text-4xl font-black mb-6 uppercase text-center md:text-left drop-shadow-sm">
-				<span class="bg-black text-white px-2 py-1 transform -rotate-1 inline-block">Visual</span>
-				Confirmation
-			</h3>
-			<div
-				bind:this={iframeWrapper}
-				class="border-[4px] border-black bg-white p-2 shadow-brutal-3xl relative cursor-crosshair mx-auto"
-				style="height: 600px; transition: max-width 0.3s ease;"
-			>
-				{#if isLoading}
-					<div class="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75">
-						<div class="loader" />
-					</div>
-				{/if}
-				<iframe
-					bind:this={iframeElement}
-					on:load={handleIframeLoad}
-					title="URL Preview"
-					width="100%"
-					height="100%"
-					scale="0.7"
-					frameborder="0"
-					sandbox="allow-scripts"
+			<svelte:fragment slot="toolbar-left">
+				<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">
+					ANY URL → SCREENSHOT
+				</span>
+			</svelte:fragment>
+
+			<svelte:fragment slot="toolbar-right">
+				<QuotaMeter
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
 				/>
-				<!-- No allow-same-origin: this frame executes a stranger's fetched
-				     page, which must not run in the pictify.io origin (cookies,
-				     localStorage, parent DOM). The element-selector bridge only
-				     uses postMessage with '*', which works across the opaque
-				     origin; nothing reads contentDocument. -->
+				<GenerateButton
+					label="Capture Screenshot"
+					loading={isImageGenerating}
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+					on:generate={generateImage}
+				/>
+			</svelte:fragment>
+		</ToolCard>
+	</div>
 
-			</div>
-			<!-- Element Selector Bar -->
-			<div
-				class="bg-gray-100 border-[3px] border-t-0 border-black p-4 flex flex-col md:flex-row gap-4 items-center"
-			>
-				<div class="flex-grow w-full">
-					<span class="block font-black uppercase text-xs mb-1 tracking-wider"
-						>Element Selector (Optional)</span
-					>
-					<div class="flex">
-						<div
-							class="bg-black text-white px-3 py-2 font-mono text-sm flex items-center justify-center border-y-[3px] border-l-[3px] border-black"
-						>
-							&gt;_
-						</div>
-						<input
-							bind:value={selector}
-							type="text"
-							class="w-full border-[3px] border-black placeholder-gray-500 text-sm font-mono focus:outline-none py-2 px-4"
-							placeholder="Click element in preview or type selector..."
-						/>
-						<button
-							on:click={clearSelector}
-							class="bg-white border-y-[3px] border-r-[3px] border-black px-3 hover:bg-gray-200 transition-colors"
-							title="Clear Selector"
-						>
-							<svg class="w-4 h-4 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M6 6l12 12M18 6L6 18"
-								/>
-							</svg>
-						</button>
-					</div>
-				</div>
-				<div class="w-full md:w-auto flex-shrink-0 pt-5">
-					<button
-						id="capture-button"
-						on:click={generateImage}
-						disabled={captureDisabled}
-						class="w-full md:w-auto px-8 py-3 bg-data-green text-black border-[3px] border-black font-black uppercase tracking-wide shadow-brutal-lg hover:translate-y-[-2px] hover:translate-x-[-2px] hover:shadow-brutal-xl active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center justify-center gap-2"
-					>
-						{#if isImageGenerating}
-							<svg
-								class="animate-spin h-5 w-5 text-black"
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-							>
-								<circle
-									class="opacity-25"
-									cx="12"
-									cy="12"
-									r="10"
-									stroke="currentColor"
-									stroke-width="4"
-								/>
-								<path
-									class="opacity-75"
-									fill="currentColor"
-									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-								/>
-							</svg>
-							Rendering...
-						{:else}
-							<span
-								>{hasAutoCaptured ? 'Re-capture' : 'Capture'}
-								{fileFormat.toUpperCase()}</span
-							>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-5 w-5"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M14 5l7 7m0 0l-7 7m7-7H3"
-								/></svg
-							>
-						{/if}
-					</button>
-				</div>
-			</div>
-		</div>
-
+	<div slot="result">
 		{#if imageUrl}
 			<div class="max-w-4xl mx-auto px-4 mb-20 mt-16">
 				<div
-					class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
+					class="bg-brand-proof/10 border-[3px] border-brand-proof rounded-tile p-8 text-center relative overflow-hidden"
 				>
-					<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
+					<div class="absolute top-0 right-0 w-32 h-32 bg-brand-proof/20 rounded-full blur-2xl" />
 
-					<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
+					<h3 class="text-2xl font-semibold text-brand-ink tracking-tight mb-6">
 						Screenshot Captured!
 					</h3>
 
-					<div
-						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
-					>
+					<div class="inline-block bg-brand-paper border border-brand-ink p-2 rotate-1 mb-8">
 						<a href={imageUrl} target="_blank" rel="noopener noreferrer">
 							<img
 								loading="lazy"
@@ -1220,7 +1227,7 @@
 								downloadFile(imageUrl, `pictify-screenshot.${fileFormat}`, {
 									tool_name: 'url_to_image_generator'
 								})}
-							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+							class="px-6 py-3 bg-brand-paper text-brand-ink border border-brand-ink font-bold tracking-wide transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -1234,7 +1241,7 @@
 						</button>
 						<button
 							on:click={() => copyToClipboard(imageUrl)}
-							class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
+							class="px-6 py-3 bg-brand-ink text-white border border-brand-ink font-bold tracking-wide hover:-sm transition-all rounded-xl flex items-center gap-2"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 								><path
@@ -1253,19 +1260,19 @@
 						 the fixed StickySignupBar (below); control renders neither. -->
 					{#if !isUserLoggedIn && ctaVariant === 'inline-value-prop'}
 						<div
-							class="mt-8 border-[3px] border-black bg-brand-accent/20 p-6 flex flex-col items-center text-center gap-3"
+							class="mt-8 border border-brand-ink bg-brand-field/20 p-6 flex flex-col items-center text-center gap-3"
 						>
-							<p class="font-black text-gray-900 text-base uppercase tracking-wide">
+							<p class="font-semibold text-brand-ink text-base tracking-wide">
 								Like it? Automate it.
 							</p>
-							<p class="text-sm font-bold text-gray-600 max-w-md">
-								Sign up to get your API key and capture unlimited screenshots programmatically:
-								same quality, zero daily limits.
+							<p class="text-sm font-bold text-brand-slate max-w-md">
+								Sign up to get your API key and capture unlimited screenshots programmatically: same
+								quality, zero daily limits.
 							</p>
 							<a
 								href="/signup?redirect=/tools/url-to-image-generator"
 								on:click={() => trackSignupClick('post_generation_value_prop')}
-								class="mt-1 px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								class="mt-1 px-6 py-3 bg-brand-ink text-white border border-brand-ink font-semibold text-sm tracking-wide hover:-sm transition-all"
 							>
 								Get Your API Key (Free)
 							</a>
@@ -1274,20 +1281,30 @@
 				</div>
 			</div>
 		{/if}
+	</div>
 
-		<!-- Live API Request Builder -->
+	<AutomateSection
+		slot="automate"
+		title="Automate with the"
+		titleHighlight="API"
+		toolName={TOOL_NAME}
+		description="Convert any URL to an image programmatically. Generate screenshots for link previews, monitoring, and archives from your own code."
+		codeExamples={urlToImageExamples}
+	/>
+
+	<svelte:fragment slot="longform">
 		<section class="w-full max-w-5xl mx-auto px-2 md:px-0 mt-16 mb-8">
-			<div class="border-[3px] border-black shadow-brutal-2xl overflow-hidden">
-				<div class="bg-black px-4 py-3 flex items-center justify-between">
+			<div class="border border-brand-ink overflow-hidden">
+				<div class="bg-brand-ink px-4 py-3 flex items-center justify-between">
 					<div class="flex items-center gap-3">
-						<span class="text-xs font-black uppercase tracking-widest text-brand-accent"
+						<span class="text-xs font-semibold tracking-widest text-brand-accent"
 							>Your API Request</span
 						>
-						<span class="text-xs text-gray-500 font-mono">updates as you change settings</span>
+						<span class="text-xs text-brand-mute font-mono">updates as you change settings</span>
 					</div>
 					<button
 						on:click={() => copyToClipboard(liveCurlSnippet, 'code')}
-						class="px-3 py-1 bg-brand-accent text-black border-[2px] border-brand-accent font-black text-xs uppercase tracking-wider hover:bg-[#ffb050] transition-colors rounded"
+						class="px-3 py-1 bg-brand-field text-brand-ink border-[2px] border-brand-accent font-semibold text-xs tracking-wider hover:bg-[#ffb050] transition-colors rounded"
 					>
 						Copy
 					</button>
@@ -1297,66 +1314,57 @@
 						<div class="w-3 h-3 rounded-full bg-[#ff5f56]" />
 						<div class="w-3 h-3 rounded-full bg-[#ffbd2e]" />
 						<div class="w-3 h-3 rounded-full bg-[#27c93f]" />
-						<span class="ml-auto text-xs text-gray-500 font-mono font-bold uppercase tracking-wider"
+						<span class="ml-auto text-xs text-brand-mute font-mono font-bold tracking-wider"
 							>BASH</span
 						>
 					</div>
 					<div class="p-6 overflow-x-auto">
 						<pre
-							class="font-mono text-sm leading-relaxed text-gray-300">{@html highlightedCurl}</pre>
+							class="font-mono text-sm leading-relaxed text-brand-rule">{@html highlightedCurl}</pre>
 					</div>
 				</div>
 			</div>
 		</section>
 
-		<ApiCodeSection
-			title="Automate with the"
-			titleHighlight="API"
-			toolName="url_to_image_generator"
-			description="Convert any URL to an image programmatically. Generate screenshots, link previews, and image URLs in your CI/CD pipeline."
-			codeExamples={urlToImageExamples}
-		/>
-
-		<!-- URL to Image Use Cases -->
 		<section class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-16">
-			<h2 class="text-3xl font-black mb-8 text-black uppercase text-center">What You Can Build</h2>
+			<h2 class="text-3xl font-semibold mb-8 text-brand-ink text-center">What You Can Build</h2>
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-				<div class="border-[3px] border-black p-6 bg-white shadow-brutal-accent">
-					<h3 class="font-black text-lg mb-2">Link Preview Images</h3>
-					<p class="text-gray-600 font-medium text-sm">
+				<div class="border border-brand-ink p-6 bg-brand-paper">
+					<h3 class="font-semibold text-lg mb-2">Link Preview Images</h3>
+					<p class="text-brand-slate font-medium text-sm">
 						Auto-generate thumbnail images from any URL for link previews, bookmarks, and content
 						cards.
 					</p>
 				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#4ade80]">
-					<h3 class="font-black text-lg mb-2">Visual QA Monitoring</h3>
-					<p class="text-gray-600 font-medium text-sm">
+				<div class="border border-brand-ink p-6 bg-brand-paper">
+					<h3 class="font-semibold text-lg mb-2">Visual QA Monitoring</h3>
+					<p class="text-brand-slate font-medium text-sm">
 						Schedule periodic screenshots of your pages to catch visual regressions before users do.
 					</p>
 				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#ff6b6b]">
-					<h3 class="font-black text-lg mb-2">Photo URL Generator</h3>
-					<p class="text-gray-600 font-medium text-sm">
+				<div class="border border-brand-ink p-6 bg-brand-paper">
+					<h3 class="font-semibold text-lg mb-2">Photo URL Generator</h3>
+					<p class="text-brand-slate font-medium text-sm">
 						Turn any webpage into a hosted image URL. Share as a picture link on social media or
 						embed in emails.
 					</p>
 				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-brutal-lg">
-					<h3 class="font-black text-lg mb-2">OG Image Fallbacks</h3>
-					<p class="text-gray-600 font-medium text-sm">
+				<div class="border border-brand-ink p-6 bg-brand-paper">
+					<h3 class="font-semibold text-lg mb-2">OG Image Fallbacks</h3>
+					<p class="text-brand-slate font-medium text-sm">
 						Generate Open Graph images on-the-fly for pages that don't have custom social previews.
 					</p>
 				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-brutal-accent">
-					<h3 class="font-black text-lg mb-2">Web Archiving</h3>
-					<p class="text-gray-600 font-medium text-sm">
+				<div class="border border-brand-ink p-6 bg-brand-paper">
+					<h3 class="font-semibold text-lg mb-2">Web Archiving</h3>
+					<p class="text-brand-slate font-medium text-sm">
 						Capture and store visual snapshots of competitor pages, legal evidence, or content for
 						compliance.
 					</p>
 				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#4ade80]">
-					<h3 class="font-black text-lg mb-2">Image Link Converter</h3>
-					<p class="text-gray-600 font-medium text-sm">
+				<div class="border border-brand-ink p-6 bg-brand-paper">
+					<h3 class="font-semibold text-lg mb-2">Image Link Converter</h3>
+					<p class="text-brand-slate font-medium text-sm">
 						Convert any URL to a picture URL that can be embedded anywhere: Notion, Confluence,
 						Slack, or email.
 					</p>
@@ -1366,16 +1374,16 @@
 
 		<!-- FAQ Section -->
 		<section class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-16">
-			<div class="border-[3px] border-black p-6 md:p-8 bg-white shadow-[8px_8px_0_0_#9ca3af]">
-				<h2 class="text-3xl font-black mb-8 text-black uppercase">FAQ</h2>
+			<div class="border border-brand-ink p-6 md:p-8 bg-brand-paper">
+				<h2 class="text-3xl font-semibold mb-8 text-brand-ink">FAQ</h2>
 				<div class="space-y-4 w-full">
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
 						>
-							<span class="font-black text-lg text-gray-900 uppercase">What is URL to Image?</span>
+							<span class="font-semibold text-lg text-brand-ink">What is URL to Image?</span>
 							<span
-								class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors"
+								class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -1391,7 +1399,7 @@
 							</span>
 						</summary>
 						<div
-							class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium"
+							class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
 						>
 							A tool that captures a webpage and saves it as an image file (JPG/PNG). Useful for
 							archives, thumbnails, and proofs.
@@ -1399,11 +1407,11 @@
 					</details>
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
 						>
-							<span class="font-black text-lg text-gray-900 uppercase">How does it work?</span>
+							<span class="font-semibold text-lg text-brand-ink">How does it work?</span>
 							<span
-								class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors"
+								class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -1419,7 +1427,7 @@
 							</span>
 						</summary>
 						<div
-							class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium"
+							class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
 						>
 							We spawn a headless browser in the cloud, navigate to your URL, wait for assets to
 							load, and take a high-fidelity screenshot.
@@ -1427,11 +1435,11 @@
 					</details>
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
 						>
-							<span class="font-black text-lg text-gray-900 uppercase">Can I customize it?</span>
+							<span class="font-semibold text-lg text-brand-ink">Can I customize it?</span>
 							<span
-								class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors"
+								class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -1447,7 +1455,7 @@
 							</span>
 						</summary>
 						<div
-							class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium"
+							class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
 						>
 							Yes! You can select specific elements, set custom viewport sizes, and handle cookie
 							banners via our API.
@@ -1455,11 +1463,11 @@
 					</details>
 					<details class="group">
 						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
+							class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
 						>
-							<span class="font-black text-lg text-gray-900 uppercase">Privacy?</span>
+							<span class="font-semibold text-lg text-brand-ink">Privacy?</span>
 							<span
-								class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors"
+								class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -1475,7 +1483,7 @@
 							</span>
 						</summary>
 						<div
-							class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium"
+							class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
 						>
 							We do not store your URLs or generated images. All processing is done on-the-fly and
 							images are cached temporarily on our CDN for performance.
@@ -1485,14 +1493,13 @@
 			</div>
 		</section>
 
-		<!-- Content Grid -->
 		<div class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-20 grid grid-cols-1 md:grid-cols-2 gap-8">
 			<!-- Learn More -->
-			<section class="border-[3px] border-black p-6 md:p-8 bg-white shadow-brutal-2xl">
-				<h3 class="text-2xl font-black mb-6 uppercase">Why Use This Tool?</h3>
+			<section class="border border-brand-ink p-6 md:p-8 bg-brand-paper">
+				<h3 class="text-2xl font-semibold mb-6">Why Use This Tool?</h3>
 				<ul class="space-y-4">
 					<li class="flex gap-4 items-start">
-						<div class="bg-black text-white p-1 mt-1">
+						<div class="bg-brand-ink text-white p-1 mt-1">
 							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
 								><path
 									stroke-linecap="round"
@@ -1505,7 +1512,7 @@
 						<span class="font-bold text-lg">Instant Archiving of web pages</span>
 					</li>
 					<li class="flex gap-4 items-start">
-						<div class="bg-black text-white p-1 mt-1">
+						<div class="bg-brand-ink text-white p-1 mt-1">
 							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
 								><path
 									stroke-linecap="round"
@@ -1518,7 +1525,7 @@
 						<span class="font-bold text-lg">Generate OG Images for social media</span>
 					</li>
 					<li class="flex gap-4 items-start">
-						<div class="bg-black text-white p-1 mt-1">
+						<div class="bg-brand-ink text-white p-1 mt-1">
 							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
 								><path
 									stroke-linecap="round"
@@ -1534,19 +1541,19 @@
 			</section>
 
 			<!-- Best Practices -->
-			<section class="border-[3px] border-black p-6 md:p-8 bg-brand-bg shadow-brutal-2xl">
-				<h3 class="text-2xl font-black mb-6 uppercase">Pro Tips</h3>
+			<section class="border border-brand-ink p-6 md:p-8 bg-brand-subtle">
+				<h3 class="text-2xl font-semibold mb-6">Pro Tips</h3>
 				<ul class="space-y-4">
 					<li class="flex gap-4 items-start">
-						<span class="font-black text-brand-danger text-xl">01.</span>
+						<span class="font-semibold text-brand-pink text-xl">01.</span>
 						<span class="font-bold text-lg">Ensure the URL is publicly accessible.</span>
 					</li>
 					<li class="flex gap-4 items-start">
-						<span class="font-black text-brand-accent text-xl">02.</span>
+						<span class="font-semibold text-brand-accent text-xl">02.</span>
 						<span class="font-bold text-lg">Use the selector to remove ads/navbars.</span>
 					</li>
 					<li class="flex gap-4 items-start">
-						<span class="font-black text-data-green text-xl">03.</span>
+						<span class="font-semibold text-brand-proof text-xl">03.</span>
 						<span class="font-bold text-lg">Check mobile viewports for responsive sites.</span>
 					</li>
 				</ul>
@@ -1555,39 +1562,39 @@
 
 		<!-- Screenshot API comparisons + related guide -->
 		<div class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-20">
-			<section class="border-[3px] border-black p-6 md:p-8 bg-white shadow-brutal-2xl">
-				<h3 class="text-2xl font-black mb-6 uppercase">Comparing Screenshot APIs?</h3>
-				<p class="font-medium text-gray-600 mb-6">
+			<section class="border border-brand-ink p-6 md:p-8 bg-brand-paper">
+				<h3 class="text-2xl font-semibold mb-6">Comparing Screenshot APIs?</h3>
+				<p class="font-medium text-brand-slate mb-6">
 					This tool is API-backed. See how it stacks up against the other screenshot/rendering APIs
 					developers usually compare it to.
 				</p>
 				<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
 					<a
 						href="/alternatives/screenshotone"
-						class="p-4 bg-brand-bg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-center font-bold"
+						class="p-4 bg-brand-subtle border border-brand-ink transition-all text-center font-bold"
 						>vs ScreenshotOne</a
 					>
 					<a
 						href="/alternatives/screenshotapi"
-						class="p-4 bg-brand-bg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-center font-bold"
+						class="p-4 bg-brand-subtle border border-brand-ink transition-all text-center font-bold"
 						>vs ScreenshotAPI</a
 					>
 					<a
 						href="/alternatives/screenshot-machine"
-						class="p-4 bg-brand-bg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-center font-bold"
+						class="p-4 bg-brand-subtle border border-brand-ink transition-all text-center font-bold"
 						>vs Screenshot Machine</a
 					>
 					<a
 						href="/alternatives/apiflash"
-						class="p-4 bg-brand-bg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-center font-bold"
+						class="p-4 bg-brand-subtle border border-brand-ink transition-all text-center font-bold"
 						>vs APIFlash</a
 					>
 				</div>
-				<p class="font-medium text-gray-600">
+				<p class="font-medium text-brand-slate">
 					Have HTML instead of a live URL? Read the
 					<a
 						href="/blogs/html-to-image-the-complete-developer-guide-2026"
-						class="underline font-bold text-gray-900 hover:text-brand-danger"
+						class="underline font-bold text-brand-ink hover:text-brand-pink"
 					>
 						HTML to Image API developer guide</a
 					> instead.
@@ -1596,10 +1603,10 @@
 		</div>
 
 		<div class="mt-8 mb-20 w-full max-w-5xl mx-auto px-2 md:px-0 text-center">
-			<p class="font-bold text-gray-500 uppercase tracking-widest mb-6">Spread the word</p>
+			<p class="font-bold text-brand-mute tracking-widest mb-6">Spread the word</p>
 			<div class="flex flex-col md:flex-row justify-center md:space-x-6">
 				<button
-					class="flex items-center justify-center px-8 py-4 bg-[#1DA1F2] text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-[#1DA1F2] transition-all shadow-brutal-lg mb-4 md:mb-0"
+					class="flex items-center justify-center px-8 py-4 bg-[#1DA1F2] text-white font-semibold tracking-wide border border-brand-ink hover:bg-brand-paper hover:text-[#1DA1F2] transition-all mb-4 md:mb-0"
 					on:click={() => sharePage('twitter')}
 				>
 					<svg
@@ -1615,7 +1622,7 @@
 					Share on Twitter
 				</button>
 				<button
-					class="flex items-center justify-center px-8 py-4 bg-[#0A66C2] text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-[#0A66C2] transition-all shadow-brutal-lg"
+					class="flex items-center justify-center px-8 py-4 bg-[#0A66C2] text-white font-semibold tracking-wide border border-brand-ink hover:bg-brand-paper hover:text-[#0A66C2] transition-all"
 					on:click={() => sharePage('linkedin')}
 				>
 					<svg
@@ -1632,49 +1639,19 @@
 				</button>
 			</div>
 		</div>
+	</svelte:fragment>
 
-		<RelatedTools
-			tools={[
-				'html-email',
-				'blog-featured-image',
-				'og-image-generator',
-				'code-to-image',
-				'html-to-png'
-			]}
-		/>
-
-		<Toast />
-		<Footer />
-	</main>
-
-	<StickySignupBar bind:this={stickyBar} toolName="url_to_image_generator" variant={ctaVariant} />
-</div>
-
-<style>
-	@keyframes loading {
-		0% {
-			width: 0%;
-		}
-		100% {
-			width: 100%;
-		}
-	}
-
-	.loader {
-		border: 5px solid #f3f3f3;
-		border-top: 5px solid #3498db;
-		border-radius: 50%;
-		width: 50px;
-		height: 50px;
-		animation: spin 1s linear infinite;
-	}
-
-	@keyframes spin {
-		0% {
-			transform: rotate(0deg);
-		}
-		100% {
-			transform: rotate(360deg);
-		}
-	}
-</style>
+	<svelte:fragment slot="footer-links">
+		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
+			<RelatedTools
+				tools={[
+					'html-email',
+					'blog-featured-image',
+					'og-image-generator',
+					'code-to-image',
+					'html-to-png'
+				]}
+			/>
+		</div>
+	</svelte:fragment>
+</ToolPageShell>
