@@ -1,15 +1,23 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
+	/**
+	 * /tools/online-invoice-generator — the v2 tool page, column mode.
+	 *
+	 * Form and preview become the tool card's two columns; the quota ladder and
+	 * Generate move into its toolbar. SEO copy is frozen.
+	 */
 	import InvoiceTemplate from '$lib/components/tools/InvoiceTemplate.svelte';
 	import NextSteps from '$lib/components/tools/NextSteps.svelte';
-	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
+	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
+	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
+	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
+	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
+	import LongformSection from '$lib/components/tools/v2/LongformSection.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { getTemplates, getTemplate } from '../../../api/tools/invoice.js';
 	import { onMount } from 'svelte';
 	import { toast } from '../../../store/toast.store';
 	import { user } from '../../../store/user.store';
-	import { generationLimits } from '../../../store/generationLimits.store';
+	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { createImagePublic } from '../../../api/image.js';
 	import { page } from '$app/stores';
 	import { analytics } from '$lib/telemetry.js';
@@ -234,7 +242,11 @@
 		const doc = iframe?.contentWindow?.document;
 		if (!doc?.documentElement) {
 			isImageGenerating = false;
-			toast.set({ message: 'Preview is still loading. Please try again.', type: 'error', duration: 3000 });
+			toast.set({
+				message: 'Preview is still loading. Please try again.',
+				type: 'error',
+				duration: 3000
+			});
 			return;
 		}
 		let html = doc.documentElement.outerHTML;
@@ -337,11 +349,38 @@
 		const totalElement = document.querySelector('#total-amount');
 		if (totalElement) totalElement.innerHTML = `$${total.toFixed(2)}`;
 		if (taxAmount) taxAmount.innerHTML = `$${tax.toFixed(2)}`;
-		if (subtotal) subtotal.innerHTML = `$${invoiceData.items
-			.reduce((total, item) => total + item.quantity * item.price, 0)
-			.toFixed(2)}`;
+		if (subtotal)
+			subtotal.innerHTML = `$${invoiceData.items
+				.reduce((total, item) => total + item.quantity * item.price, 0)
+				.toFixed(2)}`;
 		html = document.documentElement.outerHTML;
 	}
+
+	const TOOL_NAME = 'online_invoice_generator';
+	const TOOL_PATH = '/tools/online-invoice-generator';
+
+	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+
+	const RELATED = [
+		{
+			title: 'CSV to PDF',
+			meta: 'CSV → PDF',
+			href: '/tools/csv-to-pdf',
+			art: '/landing/tools/csv-to-pdf.svg'
+		},
+		{
+			title: 'Table to image',
+			meta: 'CSV · HTML → PNG',
+			href: '/tools/table',
+			art: '/landing/tools/table-to-image.svg'
+		},
+		{
+			title: 'Membership card',
+			meta: 'MEMBER → PNG',
+			href: '/tools/membership-card',
+			art: '/landing/tools/membership-card.svg'
+		}
+	];
 </script>
 
 <svelte:head>
@@ -372,485 +411,399 @@
 	{@html `<script type="application/ld+json">${breadcrumbSchemaJson}</script>`}
 </svelte:head>
 
-<svelte:window bind:innerWidth={windowWidth} />
-
-<section class="w-full min-h-screen bg-brand-bg relative overflow-x-hidden font-['Manrope']">
-	<Nav />
-
-	<!-- Background Elements -->
-	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
-	/>
-	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
-	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
-	/>
-
-	<main
-		class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-24 md:pb-32 relative z-10"
+<ToolPageShell
+	toolName={TOOL_NAME}
+	toolPath={TOOL_PATH}
+	breadcrumb="INVOICE GENERATOR"
+	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · PNG OR PDF"
+	related={RELATED}
+	loggedIn={isUserLoggedIn}
+	hasResult={!!imageUrl}
+	longform="column"
+>
+	<h1
+		slot="h1"
+		class="font-display text-[38px] font-extrabold leading-[1.04] tracking-[-0.02em] text-brand-ink lg:text-[52px] lg:leading-[56px]"
 	>
-		<!-- Breadcrumb -->
-		<nav class="mb-12 flex justify-center">
-			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
-			>
-				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
-				<li class="text-gray-300">/</li>
-				<li>
-					<a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a>
-				</li>
-				<li class="text-gray-300">/</li>
-				<li class="text-gray-900">Invoice Generator</li>
-			</ol>
-		</nav>
+		<span>INVOICE</span>
+		<span>GENERATOR</span>
+	</h1>
 
-		<!-- Hero Section -->
-		<div
-			class="relative flex flex-col items-center justify-center text-center mb-8 sm:mb-12 lg:mb-16 pt-4 sm:pt-10"
-		>
-			<!-- Badge -->
-			<div
-				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
-			>
-				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-				>
-					★ Free Tool
-				</div>
-			</div>
+	<p
+		slot="hero-sub"
+		class="max-w-[640px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
+	>
+		Create <span class="font-medium">professional invoices</span> for your business.
+		<span class="text-brand-slate">Free, customizable templates with real-time preview</span>
+	</p>
 
-			<!-- Main Title -->
-			<h1
-				class="relative z-10 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-tight mb-4 sm:mb-8"
-			>
-				<span class="block sm:inline">INVOICE</span>
-				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
-					<span class="relative z-10 px-2 sm:px-3 md:px-4">GENERATOR</span>
-					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
-					/>
-				</span>
-			</h1>
-
-			<!-- Description -->
-			<div class="max-w-2xl mx-auto px-2">
-				<p
-					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
-				>
-					Create <span class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
-						>professional invoices</span
-					>
-					for your business.
-					<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
-						>Free, customizable templates with real-time preview</span
-					>
-				</p>
-			</div>
-		</div>
-
-		<!-- Generation Limit Banner -->
-		<GenerationLimitBanner toolName="online_invoice_generator" />
-
-		<!-- Main Editor Grid -->
-		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-			<!-- Left Column: Form -->
-			<div
-				class="bg-white border-[3px] border-black shadow-brutal-xl sm:shadow-brutal-2xl overflow-hidden"
-			>
-				<!-- Terminal Header -->
-				<div
-					class="bg-black text-white px-4 py-3 flex justify-between items-center border-b-[3px] border-black"
-				>
-					<h2 class="font-bold font-mono tracking-widest text-xs uppercase flex items-center gap-2">
+	<div slot="tool">
+		<ToolCard>
+			<div class="grid grid-cols-1 items-start gap-6 p-5 lg:grid-cols-2 lg:gap-8 lg:p-7">
+				<div class="bg-brand-paper border border-brand-ink overflow-hidden">
+					<!-- Panel header: keeps the frozen H2, drops the v1 window chrome. -->
+				<div class="flex items-center gap-2 border-b border-brand-ink bg-brand-press px-4 py-2.5">
+					<h2 class="font-mono text-xs tracking-[0.06em] text-white">
 						<span class="animate-pulse">_</span> INVOICE DETAILS
 					</h2>
-					<div class="flex gap-2">
-						<div class="w-3 h-3 bg-brand-danger border border-black" />
-						<div class="w-3 h-3 bg-brand-accent border border-black" />
-						<div class="w-3 h-3 bg-data-green border border-black" />
-					</div>
 				</div>
-
-				<div class="p-4 sm:p-6 space-y-4">
-					<!-- Company Section -->
-					<div class="space-y-3">
-						<h3
-							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
-						>
-							<span
-								class="w-6 h-6 bg-brand-accent border-[2px] border-black flex items-center justify-center text-xs"
-								>1</span
-							>
-							Your Company
-						</h3>
-						<input
-							bind:value={invoiceData.companyName}
-							type="text"
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
-							placeholder="Company Name"
-							on:input={updateHTML(selectedTemplate)}
-						/>
-						<div class="relative">
-							<input
-								type="file"
-								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md file:mr-4 file:py-1 file:px-3 file:border-[2px] file:border-black file:bg-brand-accent file:font-bold file:text-black file:text-xs file:uppercase cursor-pointer"
-								accept="image/*"
-								on:change={updateLogo}
-							/>
-						</div>
-						<textarea
-							bind:value={invoiceData.companyAddress}
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none resize-none"
-							placeholder="Company Address"
-							rows="2"
-							on:input={updateHTML(selectedTemplate)}
-						/>
 					</div>
 
-					<!-- Client Section -->
-					<div class="space-y-3">
-						<h3
-							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
-						>
-							<span
-								class="w-6 h-6 bg-data-sky border-[2px] border-black flex items-center justify-center text-xs text-white"
-								>2</span
+					<div class="p-4 sm:p-6 space-y-4">
+						<!-- Company Section -->
+						<div class="space-y-3">
+							<h3
+								class="text-xs font-semibold text-brand-ink tracking-wider flex items-center gap-2"
 							>
-							Client Info
-						</h3>
-						<input
-							bind:value={invoiceData.clientName}
-							type="text"
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
-							placeholder="Client Name"
-							on:input={updateHTML(selectedTemplate)}
-						/>
-						<textarea
-							bind:value={invoiceData.clientAddress}
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none resize-none"
-							placeholder="Client Address"
-							rows="2"
-							on:input={updateHTML(selectedTemplate)}
-						/>
-					</div>
-
-					<!-- Invoice Details -->
-					<div class="space-y-3">
-						<h3
-							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
-						>
-							<span
-								class="w-6 h-6 bg-data-violet border-[2px] border-black flex items-center justify-center text-xs text-white"
-								>3</span
-							>
-							Invoice Details
-						</h3>
-						<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+								<span
+									class="w-6 h-6 bg-brand-field border border-brand-ink flex items-center justify-center text-xs"
+									>1</span
+								>
+								Your Company
+							</h3>
 							<input
-								bind:value={invoiceData.invoiceNumber}
+								bind:value={invoiceData.companyName}
 								type="text"
-								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
-								placeholder="Invoice #"
+								class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none"
+								placeholder="Company Name"
 								on:input={updateHTML(selectedTemplate)}
 							/>
-							<input
-								bind:value={invoiceData.invoiceDate}
-								type="date"
-								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
-								on:input={updateHTML(selectedTemplate)}
-							/>
-							<input
-								bind:value={invoiceData.dueDate}
-								type="date"
-								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
+							<div class="relative">
+								<input
+									type="file"
+									class="w-full border border-brand-ink p-3 font-bold text-sm file:mr-4 file:py-1 file:px-3 file:border-[2px] file:border-black file:bg-brand-field file:font-bold file:text-brand-ink file:text-xs file: cursor-pointer"
+									accept="image/*"
+									on:change={updateLogo}
+								/>
+							</div>
+							<textarea
+								bind:value={invoiceData.companyAddress}
+								class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none resize-none"
+								placeholder="Company Address"
+								rows="2"
 								on:input={updateHTML(selectedTemplate)}
 							/>
 						</div>
-					</div>
 
-					<!-- Line Items -->
-					<div class="space-y-3">
-						<h3
-							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
-						>
-							<span
-								class="w-6 h-6 bg-brand-danger border-[2px] border-black flex items-center justify-center text-xs text-white"
-								>4</span
+						<!-- Client Section -->
+						<div class="space-y-3">
+							<h3
+								class="text-xs font-semibold text-brand-ink tracking-wider flex items-center gap-2"
 							>
-							Line Items
-						</h3>
-						{#each invoiceData.items as item, index}
-							<div class="flex flex-wrap gap-2">
-								<input
-									bind:value={item.description}
-									type="text"
-									class="flex-grow min-w-[120px] border-[3px] border-black p-2 font-bold text-sm shadow-brutal-sm focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
-									placeholder="Description"
-									on:input={updateHTML(selectedTemplate)}
-								/>
-								<input
-									bind:value={item.quantity}
-									type="number"
-									class="w-16 border-[3px] border-black p-2 font-bold text-sm text-center shadow-brutal-sm focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
-									placeholder="Qty"
-									on:input={updateHTML(selectedTemplate)}
-								/>
-								<input
-									bind:value={item.price}
-									type="number"
-									class="w-20 border-[3px] border-black p-2 font-bold text-sm text-center shadow-brutal-sm focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
-									placeholder="Price"
-									on:input={updateHTML(selectedTemplate)}
-								/>
-								<button
-									on:click={() => removeItem(index)}
-									class="w-10 h-10 bg-brand-danger border-[3px] border-black text-white font-black flex items-center justify-center shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+								<span
+									class="w-6 h-6 bg-data-sky border border-brand-ink flex items-center justify-center text-xs text-white"
+									>2</span
 								>
-									×
-								</button>
-							</div>
-						{/each}
-						<button
-							on:click={addItem}
-							class="px-4 py-2 bg-black text-white border-[3px] border-black font-bold text-xs uppercase tracking-wider shadow-[3px_3px_0_0_#666] hover:shadow-[1px_1px_0_0_#666] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2"
-						>
-							<span>+</span> Add Item
-						</button>
-					</div>
-
-					<!-- Tax & Notes -->
-					<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-						<div>
-							<label class="block text-xs font-black text-black uppercase tracking-wider mb-2"
-								>Tax Rate (%)</label
-							>
+								Client Info
+							</h3>
 							<input
-								bind:value={invoiceData.taxRate}
-								type="number"
-								class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none"
-								placeholder="0"
+								bind:value={invoiceData.clientName}
+								type="text"
+								class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none"
+								placeholder="Client Name"
+								on:input={updateHTML(selectedTemplate)}
+							/>
+							<textarea
+								bind:value={invoiceData.clientAddress}
+								class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none resize-none"
+								placeholder="Client Address"
+								rows="2"
 								on:input={updateHTML(selectedTemplate)}
 							/>
 						</div>
-						<div class="flex items-end">
-							<div class="w-full p-4 bg-brand-danger text-white border-[3px] border-black">
-								<span class="text-xs font-black uppercase tracking-wider block">Total</span>
-								<span class="text-2xl font-black">${total.toFixed(2)}</span>
+
+						<!-- Invoice Details -->
+						<div class="space-y-3">
+							<h3
+								class="text-xs font-semibold text-brand-ink tracking-wider flex items-center gap-2"
+							>
+								<span
+									class="w-6 h-6 bg-data-violet border border-brand-ink flex items-center justify-center text-xs text-white"
+									>3</span
+								>
+								Invoice Details
+							</h3>
+							<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+								<input
+									bind:value={invoiceData.invoiceNumber}
+									type="text"
+									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none"
+									placeholder="Invoice #"
+									on:input={updateHTML(selectedTemplate)}
+								/>
+								<input
+									bind:value={invoiceData.invoiceDate}
+									type="date"
+									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none"
+									on:input={updateHTML(selectedTemplate)}
+								/>
+								<input
+									bind:value={invoiceData.dueDate}
+									type="date"
+									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none"
+									on:input={updateHTML(selectedTemplate)}
+								/>
 							</div>
 						</div>
-					</div>
 
-					<textarea
-						bind:value={invoiceData.notes}
-						class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none resize-none"
-						placeholder="Additional Notes..."
-						rows="2"
-						on:input={updateHTML(selectedTemplate)}
-					/>
-				</div>
-			</div>
-
-			<!-- Right Column: Preview -->
-			<div class="space-y-4 sm:space-y-6">
-				<div
-					class="bg-white border-[3px] border-black shadow-brutal-xl sm:shadow-brutal-2xl overflow-hidden"
-				>
-					<!-- Preview Header -->
-					<div
-						class="bg-[#e5e7eb] px-4 py-2 border-b-[3px] border-black flex items-center justify-between"
-					>
-						<span class="font-mono text-xs font-bold uppercase tracking-wider">LIVE PREVIEW</span>
-						<div class="flex gap-1">
-							<div class="w-2 h-2 bg-black" />
-							<div class="w-2 h-2 bg-black" />
-							<div class="w-2 h-2 bg-black" />
+						<!-- Line Items -->
+						<div class="space-y-3">
+							<h3
+								class="text-xs font-semibold text-brand-ink tracking-wider flex items-center gap-2"
+							>
+								<span
+									class="w-6 h-6 bg-brand-pink border border-brand-ink flex items-center justify-center text-xs text-white"
+									>4</span
+								>
+								Line Items
+							</h3>
+							{#each invoiceData.items as item, index}
+								<div class="flex flex-wrap gap-2">
+									<input
+										bind:value={item.description}
+										type="text"
+										class="flex-grow min-w-[120px] border border-brand-ink p-2 font-bold text-sm transition-all outline-none"
+										placeholder="Description"
+										on:input={updateHTML(selectedTemplate)}
+									/>
+									<input
+										bind:value={item.quantity}
+										type="number"
+										class="w-16 border border-brand-ink p-2 font-bold text-sm text-center transition-all outline-none"
+										placeholder="Qty"
+										on:input={updateHTML(selectedTemplate)}
+									/>
+									<input
+										bind:value={item.price}
+										type="number"
+										class="w-20 border border-brand-ink p-2 font-bold text-sm text-center transition-all outline-none"
+										placeholder="Price"
+										on:input={updateHTML(selectedTemplate)}
+									/>
+									<button
+										on:click={() => removeItem(index)}
+										class="w-10 h-10 bg-brand-pink border border-brand-ink text-white font-semibold flex items-center justify-center transition-all"
+									>
+										×
+									</button>
+								</div>
+							{/each}
+							<button
+								on:click={addItem}
+								class="px-4 py-2 bg-brand-ink text-white border border-brand-ink font-bold text-xs tracking-wider transition-all flex items-center gap-2"
+							>
+								<span>+</span> Add Item
+							</button>
 						</div>
-					</div>
-					<div
-						bind:this={invoiceTemplateWrapper}
-						bind:clientWidth={previewContainerWidth}
-						class="overflow-hidden bg-white flex justify-center"
-					>
-						<InvoiceTemplate
-							html={selectedTemplate}
-							width={800}
-							height={1200}
-							scale={iframeScale}
+
+						<!-- Tax & Notes -->
+						<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							<div>
+								<label class="block text-xs font-semibold text-brand-ink tracking-wider mb-2"
+									>Tax Rate (%)</label
+								>
+								<input
+									bind:value={invoiceData.taxRate}
+									type="number"
+									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none"
+									placeholder="0"
+									on:input={updateHTML(selectedTemplate)}
+								/>
+							</div>
+							<div class="flex items-end">
+								<div class="w-full p-4 bg-brand-pink text-white border border-brand-ink">
+									<span class="text-xs font-semibold tracking-wider block">Total</span>
+									<span class="text-2xl font-semibold">${total.toFixed(2)}</span>
+								</div>
+							</div>
+						</div>
+
+						<textarea
+							bind:value={invoiceData.notes}
+							class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none resize-none"
+							placeholder="Additional Notes..."
+							rows="2"
+							on:input={updateHTML(selectedTemplate)}
 						/>
 					</div>
 				</div>
-
-				<!-- Generate Button -->
-				<button
-					on:click={generateInvoice}
-					disabled={isImageGenerating}
-					class="w-full bg-brand-danger hover:bg-data-red text-white px-6 py-4 border-[3px] border-black shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
-				>
-					{#if isImageGenerating}
-						<svg
-							class="animate-spin h-5 w-5"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-						>
-							<circle
-								class="opacity-25"
-								cx="12"
-								cy="12"
-								r="10"
-								stroke="currentColor"
-								stroke-width="4"
-							/>
-							<path
-								class="opacity-75"
-								fill="currentColor"
-								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-							/>
-						</svg>
-						GENERATING...
-					{:else}
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-							/></svg
-						>
-						GENERATE INVOICE
-					{/if}
-				</button>
-
-				<!-- Generated Image Result -->
-				{#if isImageGenerating}
-					<div class="bg-white border-[3px] border-black p-4 shadow-brutal-lg">
-						<p class="text-center font-bold mb-3">Generating Image...</p>
-						<div class="w-full bg-gray-200 border-[2px] border-black h-4">
-							<div class="bg-black h-full loading-bar" />
-						</div>
-					</div>
-				{/if}
-
-				{#if imageUrl}
-					<div class="bg-white border-[3px] border-black shadow-brutal-xl overflow-hidden">
+				<div class="flex flex-col gap-4">
+					<div class="bg-brand-paper border border-brand-ink overflow-hidden">
+						<!-- Preview Header -->
 						<div
-							class="bg-data-green px-4 py-3 border-b-[3px] border-black flex items-center justify-between"
+							class="bg-[#e5e7eb] px-4 py-2 border-b border-brand-ink flex items-center justify-between"
 						>
-							<span class="font-black uppercase tracking-wider text-sm text-black"
-								>✓ Invoice Generated</span
-							>
-							<div class="flex items-center gap-2">
-								<button
-									on:click={() => copyToClipboard(imageUrl)}
-									class="px-3 py-1 bg-black text-white border-[2px] border-black font-bold text-xs uppercase shadow-[2px_2px_0_0_#fff] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-								>
-									Copy URL
-								</button>
-								<a
-									href={imageUrl}
-									target="_blank"
-									class="px-3 py-1 bg-white text-black border-[2px] border-black font-bold text-xs uppercase shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-								>
-									Open in Tab
-								</a>
+							<span class="font-mono text-xs font-bold tracking-wider">LIVE PREVIEW</span>
+							<div class="flex gap-1">
+								<div class="w-2 h-2 bg-brand-ink" />
+								<div class="w-2 h-2 bg-brand-ink" />
+								<div class="w-2 h-2 bg-brand-ink" />
 							</div>
 						</div>
-						<div class="p-4">
-							<img
-								loading="lazy"
-								src={imageUrl}
-								alt="Invoice"
-								class="w-full h-auto border-[3px] border-black shadow-brutal-lg"
+						<div
+							bind:this={invoiceTemplateWrapper}
+							bind:clientWidth={previewContainerWidth}
+							class="overflow-hidden bg-brand-paper flex justify-center"
+						>
+							<InvoiceTemplate
+								html={selectedTemplate}
+								width={800}
+								height={1200}
+								scale={iframeScale}
 							/>
 						</div>
 					</div>
-
-					<NextSteps
-						heading="Next steps"
-						description="Copy the API request, save this invoice as a template background, and batch render variants."
-						curlSnippet={nextStepsCurlSnippet}
-						templateDraft={nextStepsTemplateDraft}
-						generatedUrl={imageUrl}
-						toolName="Invoice Generator"
-					/>
-				{/if}
+					{#if isImageGenerating}
+						<div class="bg-brand-paper border border-brand-ink p-4">
+							<p class="text-center font-bold mb-3">Generating Image...</p>
+							<div class="w-full bg-brand-rule border border-brand-ink h-4">
+								<div class="bg-brand-ink h-full loading-bar" />
+							</div>
+						</div>
+					{/if}
+				</div>
 			</div>
-		</div>
 
-		<!-- Templates Section -->
-		<div class="mt-12 sm:mt-16">
-			<h2 class="text-xl sm:text-2xl font-black mb-6 flex items-center gap-3">
-				<span
-					class="w-8 h-8 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-brutal-sm"
+			<svelte:fragment slot="toolbar-left">
+				<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">LINE ITEMS → PNG</span>
+			</svelte:fragment>
+
+			<svelte:fragment slot="toolbar-right">
+				<QuotaMeter
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+				/>
+				<GenerateButton
+					label="Generate Invoice"
+					loading={isImageGenerating}
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+					on:generate={generateInvoice}
+				/>
+			</svelte:fragment>
+		</ToolCard>
+	</div>
+
+	<div slot="result">
+		{#if imageUrl}
+			<div class="bg-brand-paper border border-brand-ink overflow-hidden">
+				<div
+					class="bg-brand-proof px-4 py-3 border-b border-brand-ink flex items-center justify-between"
 				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
-						/></svg
+					<span class="font-semibold tracking-wider text-sm text-brand-ink"
+						>✓ Invoice Generated</span
 					>
-				</span>
+					<div class="flex items-center gap-2">
+						<button
+							on:click={() => copyToClipboard(imageUrl)}
+							class="px-3 py-1 bg-brand-ink text-white border border-brand-ink font-bold text-xs transition-all"
+						>
+							Copy URL
+						</button>
+						<a
+							href={imageUrl}
+							target="_blank"
+							class="px-3 py-1 bg-brand-paper text-brand-ink border border-brand-ink font-bold text-xs transition-all"
+						>
+							Open in Tab
+						</a>
+					</div>
+				</div>
+				<div class="p-4">
+					<img
+						loading="lazy"
+						src={imageUrl}
+						alt="Invoice"
+						class="w-full h-auto border border-brand-ink"
+					/>
+				</div>
+			</div>
+
+			<NextSteps
+				heading="Next steps"
+				description="Copy the API request, save this invoice as a template background, and batch render variants."
+				curlSnippet={nextStepsCurlSnippet}
+				templateDraft={nextStepsTemplateDraft}
+				generatedUrl={imageUrl}
+				toolName="Invoice Generator"
+			/>
+		{/if}
+	</div>
+
+	<svelte:fragment slot="longform">
+		<LongformSection index="01" id="templates" first>
+			<h2
+				slot="heading"
+				class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink"
+			>
 				INVOICE TEMPLATES
 			</h2>
-
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-				{#each templates as template}
-					<button
-						class="relative bg-white border-[3px] {selectedTemplate === template
-							? 'border-brand-danger shadow-[6px_6px_0_0_#ff6b6b]'
-							: 'border-black shadow-brutal-lg'} p-3 overflow-hidden hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer"
-						on:click={() => updateTemplate(template)}
-					>
-						{#if selectedTemplate === template}
-							<div
-								class="absolute top-2 right-2 z-10 w-6 h-6 bg-brand-danger border-[2px] border-black flex items-center justify-center"
-							>
-								<span class="text-white font-black text-sm">✓</span>
+			<div class="mt-12 sm:mt-16">
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+					{#each templates as template}
+						<button
+							class="relative bg-brand-paper border-[3px] {selectedTemplate === template
+								? 'border-brand-danger'
+								: 'border-black'} p-3 overflow-hidden transition-all cursor-pointer"
+							on:click={() => updateTemplate(template)}
+						>
+							{#if selectedTemplate === template}
+								<div
+									class="absolute top-2 right-2 z-10 w-6 h-6 bg-brand-pink border border-brand-ink flex items-center justify-center"
+								>
+									<span class="text-white font-semibold text-sm">✓</span>
+								</div>
+							{/if}
+							<div class="pointer-events-none">
+								<InvoiceTemplate
+									html={template}
+									width={800}
+									height={800}
+									scale={iframeScale * 0.5}
+								/>
 							</div>
-						{/if}
-						<div class="pointer-events-none">
-							<InvoiceTemplate html={template} width={800} height={800} scale={iframeScale * 0.5} />
-						</div>
-					</button>
-				{/each}
+						</button>
+					{/each}
+				</div>
 			</div>
-		</div>
+		</LongformSection>
 
-		<!-- SEO Content Sections -->
 		<div class="max-w-5xl mx-auto mt-16 sm:mt-20">
 			<!-- Separator -->
 			<div class="border-t-[3px] sm:border-t-[4px] border-black relative mb-8 sm:mb-12 lg:mb-16">
-				<div class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-brand-bg px-4 sm:px-6">
+				<div
+					class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-brand-subtle px-4 sm:px-6"
+				>
 					<div
-						class="w-8 h-8 sm:w-10 sm:h-10 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-brutal-sm sm:shadow-brutal-md"
+						class="w-8 h-8 sm:w-10 sm:h-10 bg-brand-field border border-brand-ink flex items-center justify-center"
 					>
-						<span class="font-black text-sm sm:text-lg">?</span>
+						<span class="font-semibold text-sm sm:text-lg">?</span>
 					</div>
 				</div>
 			</div>
 
 			<h2
-				class="text-2xl sm:text-3xl md:text-5xl font-black mb-8 sm:mb-12 text-center text-gray-900 tracking-tighter px-2"
+				class="text-2xl sm:text-3xl md:text-5xl font-semibold mb-8 sm:mb-12 text-center text-brand-ink tracking-[-0.02em] px-2"
 			>
 				LEARN MORE ABOUT <br class="md:hidden" />
 				<span class="relative inline-block text-white mt-2">
 					<span class="relative z-10 px-2 sm:px-4">INVOICING</span>
 					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-2 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
+						class="absolute inset-0 bg-brand-pink transform -skew-x-2 border border-brand-ink -z-0"
 					/>
 				</span>
 			</h2>
 
 			<!-- What is Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-accent border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-field border border-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -863,11 +816,11 @@
 					Overview
 				</div>
 				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
+					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
 				>
 					What is an Online Invoice Generator?
 				</h3>
-				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
+				<p class="text-sm sm:text-base text-brand-slate leading-relaxed font-medium">
 					An online invoice generator is a powerful tool that allows businesses and freelancers to
 					create professional invoices quickly and easily. It streamlines the billing process, helps
 					maintain accurate financial records, and presents a polished image to clients.
@@ -876,10 +829,10 @@
 
 			<!-- Benefits Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-proof border border-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -892,17 +845,17 @@
 					Benefits
 				</div>
 				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
+					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
 				>
 					Benefits of Using Our Invoice Generator
 				</h3>
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 					{#each ['Create professional invoices in minutes', 'Customize templates to match your brand', 'Automate calculations for taxes and totals', 'Save time on billing and bookkeeping', 'Access your invoices from anywhere', 'Improve cash flow with accurate billing'] as benefit}
 						<div
-							class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-center gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="bg-brand-subtle border border-brand-ink p-3 flex items-center gap-3 transition-all"
 						>
-							<span class="font-black text-data-green">✓</span>
-							<span class="font-bold text-black text-sm">{benefit}</span>
+							<span class="font-semibold text-brand-proof">✓</span>
+							<span class="font-bold text-brand-ink text-sm">{benefit}</span>
 						</div>
 					{/each}
 				</div>
@@ -910,10 +863,10 @@
 
 			<!-- How to Use Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-sky border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-sky border border-brand-ink text-white text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -931,7 +884,7 @@
 					Guide
 				</div>
 				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
+					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
 				>
 					How to Use Our Invoice Generator
 				</h3>
@@ -939,10 +892,10 @@
 					{#each [{ num: '1', text: 'Enter your company and client details' }, { num: '2', text: 'Choose from our professional invoice templates' }, { num: '3', text: 'Add line items for products or services' }, { num: '4', text: 'Set tax rates and discounts if applicable' }, { num: '5', text: 'Preview your invoice in real-time' }, { num: '6', text: 'Generate and download your custom invoice' }] as step}
 						<div class="flex items-start gap-4">
 							<span
-								class="bg-data-sky text-white w-8 h-8 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-sm"
+								class="bg-data-sky text-white w-8 h-8 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
 								>{step.num}</span
 							>
-							<span class="font-bold text-black text-sm pt-1">{step.text}</span>
+							<span class="font-bold text-brand-ink text-sm pt-1">{step.text}</span>
 						</div>
 					{/each}
 				</div>
@@ -950,10 +903,10 @@
 
 			<!-- FAQ Section -->
 			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
 			>
 				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-danger border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
+					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-pink border border-brand-ink text-white text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
 				>
 					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -966,22 +919,22 @@
 					FAQ
 				</div>
 				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
+					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
 				>
 					Frequently Asked Questions
 				</h3>
 				<div class="space-y-3">
 					{#each invoiceFaqs as faq}
 						<details
-							class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
 						>
 							<summary
-								class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none text-sm"
+								class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none text-sm"
 							>
 								<span>{faq.q}</span>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
-									class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300"
+									class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300"
 									viewBox="0 0 20 20"
 									fill="currentColor"
 								>
@@ -992,7 +945,9 @@
 									/>
 								</svg>
 							</summary>
-							<div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
+							<div
+								class="p-4 pt-0 text-brand-slate border-t border-brand-ink bg-brand-paper text-sm"
+							>
 								{faq.a}
 							</div>
 						</details>
@@ -1003,7 +958,7 @@
 			<!-- Share Buttons -->
 			<div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-12">
 				<button
-					class="px-6 py-3 bg-black text-white border-[3px] border-black font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#444] hover:shadow-[2px_2px_0_0_#444] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2"
+					class="px-6 py-3 bg-brand-ink text-white border border-brand-ink font-bold tracking-wide transition-all flex items-center justify-center gap-2"
 					on:click={() => sharePage('twitter')}
 				>
 					<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -1014,7 +969,7 @@
 					Share on X
 				</button>
 				<button
-					class="px-6 py-3 bg-[#0A66C2] text-white border-[3px] border-black font-bold uppercase tracking-wide shadow-[4px_4px_0_0_#084c94] hover:shadow-[2px_2px_0_0_#084c94] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2"
+					class="px-6 py-3 bg-[#0A66C2] text-white border border-brand-ink font-bold tracking-wide transition-all flex items-center justify-center gap-2"
 					on:click={() => sharePage('linkedin')}
 				>
 					<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -1026,26 +981,11 @@
 				</button>
 			</div>
 		</div>
-	</main>
+	</svelte:fragment>
 
-	<RelatedTools tools={['receipt', 'certificate', 'membership-card', 'event-ticket']} />
-
-	<Toast />
-	<Footer />
-</section>
-
-<style>
-	@keyframes loading {
-		0% {
-			width: 0%;
-		}
-		100% {
-			width: 100%;
-		}
-	}
-
-	.loading-bar {
-		width: 0%;
-		animation: loading 3s forwards;
-	}
-</style>
+	<svelte:fragment slot="footer-links">
+		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
+			<RelatedTools tools={['receipt', 'certificate', 'membership-card', 'event-ticket']} />
+		</div>
+	</svelte:fragment>
+</ToolPageShell>

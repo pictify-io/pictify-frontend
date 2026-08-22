@@ -12,7 +12,6 @@
 		{ label: 'Tools', href: '/tools' },
 		{ label: 'Docs', href: '/docs' },
 		{ label: 'Pricing', href: '/pricing' },
-		{ label: 'Changelog', href: '/changelog' },
 		{ label: 'Blog', href: '/blogs' }
 	];
 

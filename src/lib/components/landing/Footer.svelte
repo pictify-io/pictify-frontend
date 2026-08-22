@@ -33,7 +33,6 @@
 			title: 'Company',
 			links: [
 				['Blog', '/blogs'],
-				['Changelog', '/changelog'],
 				['Terms', '/terms'],
 				['Privacy', '/privacy']
 			]
