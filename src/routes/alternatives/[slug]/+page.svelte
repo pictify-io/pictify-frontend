@@ -1,9 +1,31 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
+	/**
+	 * /alternatives/[slug] — one template, every competitor.
+	 *
+	 * Headings come from the route and the data and stay byte-identical: the
+	 * H1, "Why Switch from X?", "Pricing Comparison", "Switching is Easy",
+	 * "Frequently Asked Questions", "Ready to Switch?" and the
+	 * Choose/Stay pair. Everything the design adds — the hero's mono line, the
+	 * score footnote, the honesty line, the band eyebrow — is non-heading copy.
+	 *
+	 * The Pictify pricing ladder reads plan-features.js rather than the strings
+	 * in the comparison data, so a price change lands here without a data edit.
+	 */
+	import Nav from '$lib/components/landing/Nav.svelte';
+	import Footer from '$lib/components/landing/Footer.svelte';
+	import PixelCluster from '$lib/components/landing/PixelCluster.svelte';
 	import { page } from '$app/stores';
 	import { alternatives } from '$lib/pseo/comparisons.js';
 	import { brandIcons } from '$lib/config/brandIcons.js';
+	import { featureLabel } from '$lib/pseo/feature-labels.js';
+	import { analytics } from '$lib/telemetry.js';
+	import {
+		PLANS,
+		PLAN_DISPLAY_NAMES,
+		PLAN_PRICING,
+		PLAN_FEATURES,
+		FEATURES
+	} from '../../../config/plan-features.js';
 
 	// Unknown slugs are redirected server-side in +page.js before this renders.
 	export let data;
@@ -106,6 +128,98 @@
 				}
 		  ]
 		: null;
+
+	const numberFormatter = new Intl.NumberFormat('en-US');
+	const NOW = new Date();
+	const CURRENT_YEAR = NOW.getFullYear();
+	const CURRENT_MONTH = NOW.toLocaleString('en-US', { month: 'long' }).toUpperCase();
+
+	/**
+	 * When the competitor's public pricing was last read. Data may carry
+	 * `pricingCheckedAt`; otherwise say the month this build shipped rather than
+	 * implying a freshness nobody checked.
+	 */
+	$: PRICING_CHECKED_AT = (
+		alt?.comparison?.pricingCheckedAt ? new Date(alt.comparison.pricingCheckedAt) : NOW
+	)
+		.toLocaleString('en-US', { month: 'short', year: 'numeric' })
+		.toUpperCase();
+
+	const heroCluster = [
+		[0, 2, 'blue'],
+		[1, 0, 'blue'],
+		[1, 3, 'pink'],
+		[2, 1, 'blue'],
+		[2, 2, 'ink'],
+		[2, 4, 'sky'],
+		[3, 0, 'ink'],
+		[3, 2, 'blue'],
+		[3, 3, 'blue'],
+		[4, 1, 'blue'],
+		[4, 2, 'ink'],
+		[4, 3, 'ink'],
+		[4, 4, 'blue'],
+		[5, 0, 'ink'],
+		[5, 1, 'ink'],
+		[5, 2, 'blue'],
+		[5, 3, 'ink'],
+		[5, 4, 'ink']
+	];
+	const baselineRun = [
+		[0, 0, 'blue'],
+		[2, 0, 'ink'],
+		[3, 1, 'blue'],
+		[5, 0, 'sky'],
+		[6, 1, 'blue'],
+		[8, 0, 'pink'],
+		[9, 1, 'blue']
+	];
+
+	/** Capability scores, 1–5 a side, in the order the data lists them. */
+	$: scoreRows = Object.entries(alt?.comparison?.features || {}).map(([key, score]) => ({
+		key,
+		label: featureLabel(key),
+		pictify: Number(score?.pictify) || 0,
+		competitor: Number(score?.competitor) || 0
+	}));
+
+	/**
+	 * Pictify's ladder comes from config: the plan name, its render count and
+	 * the annual price. The competitor's ladder is their published tiers as the
+	 * data records them.
+	 */
+	const PICTIFY_LADDER = [PLANS.STARTER, PLANS.BASIC, PLANS.STANDARD, PLANS.BUSINESS].map(
+		(plan) => ({
+			tier:
+				plan === PLANS.STARTER
+					? 'Free'
+					: `${PLAN_DISPLAY_NAMES[plan]} · ${numberFormatter.format(
+							PLAN_FEATURES[plan][FEATURES.RENDERS]
+					  )} renders`,
+			value:
+				plan === PLANS.STARTER
+					? `${PLAN_FEATURES[plan][FEATURES.RENDERS]} images / mo`
+					: `$${PLAN_PRICING[plan].annual} / mo`
+		})
+	);
+
+	$: pricingLadders = {
+		pictify: PICTIFY_LADDER,
+		competitor: Object.entries(alt?.comparison?.pricing?.competitor || {}).map(([tier, value]) => ({
+			tier: tier.charAt(0).toUpperCase() + tier.slice(1),
+			value
+		}))
+	};
+
+	/** Competitor-specific migration guides don't exist yet; send readers to the API quickstart. */
+	const migrationGuideUrl = '/docs';
+
+	function trackCta(location) {
+		analytics.track('alternative_cta_click', {
+			competitor: alt?.competitor,
+			cta_location: location
+		});
+	}
 </script>
 
 <svelte:head>
@@ -141,377 +255,476 @@
 	{/if}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
-	<Nav />
+{#if validAlt}
+	<div class="landing-v2 flex min-h-screen w-full flex-col bg-brand-canvas">
+		<Nav />
 
-	<!-- Background Elements -->
-	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
-	/>
-	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-data-green/10 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
+		<!-- ── Hero ──────────────────────────────────────────────────── -->
+		<section class="relative w-full overflow-hidden bg-brand-field">
+			<PixelCluster
+				cells={heroCluster}
+				cell={22}
+				origin="e"
+				delay={320}
+				cycle={3}
+				class="right-0 top-4 hidden lg:block"
+			/>
+			<PixelCluster
+				cells={baselineRun}
+				cell={14}
+				origin="w"
+				delay={520}
+				class="-bottom-3 left-[32%] hidden lg:block"
+			/>
 
-	<main
-		class="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-20 md:pb-32 relative z-10"
-	>
-		{#if validAlt}
-			<!-- Breadcrumb -->
-			<nav class="mb-8">
-				<ol class="flex items-center gap-2 text-sm font-bold">
-					<li><a href="/" class="text-gray-500 hover:text-gray-900">Home</a></li>
-					<li class="text-gray-400">/</li>
-					<li>
-						<a href="/alternatives" class="text-gray-500 hover:text-gray-900">Alternatives</a>
-					</li>
-					<li class="text-gray-400">/</li>
-					<li class="text-gray-900">{alt.competitor}</li>
-				</ol>
-			</nav>
-
-			<!-- Hero Section -->
 			<div
-				class="relative flex flex-col items-center justify-center text-center mb-12 pt-4 sm:pt-8"
+				class="relative mx-auto flex w-full max-w-page flex-col gap-3 px-5 py-10 lg:px-10 lg:py-14"
 			>
-				<!-- Badge -->
-				<div
-					class="inline-flex transform -rotate-1 hover:rotate-0 transition-transform duration-300 cursor-default mb-6"
-				>
-					<div
-						class="px-5 py-2 bg-data-green border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-brutal-lg rounded-lg"
-					>
-						{alt.competitor} Alternative · 2026
-					</div>
-				</div>
+				<nav aria-label="Breadcrumb">
+					<ol class="flex items-center gap-2.5 font-mono text-[11px] tracking-[0.06em]">
+						<li>
+							<a href="/alternatives" class="text-brand-royal hover:underline">ALTERNATIVES</a>
+						</li>
+						<li class="text-brand-mute" aria-hidden="true">/</li>
+						<li class="text-brand-ink" aria-current="page">{alt.competitor.toUpperCase()}</li>
+					</ol>
+				</nav>
 
-				<!-- Title: primary keyword "{Competitor} alternative" in <h1>. -->
 				<h1
-					class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-4"
+					class="max-w-[18ch] font-display text-[34px] font-extrabold leading-[1.06] tracking-[-0.02em] text-brand-ink lg:text-[44px] lg:leading-[50px]"
 				>
 					The Best {alt.competitor} Alternative
-					<span class="block text-data-green"
-						>{alt.comparison.audienceLabel || 'for Developers'}</span
-					>
+					<span>{alt.comparison.audienceLabel || 'for Developers'}</span>
 				</h1>
 
-				<!-- Supporting subhead: repeats the keyword + adds long-tail variants. -->
-				<p class="text-lg sm:text-xl text-gray-600 font-bold leading-relaxed max-w-2xl mb-6">
+				<p class="max-w-[620px] font-sans text-base leading-[25px] text-[#2A2C1E]">
 					{alt.comparison.subhead ||
 						`Looking for a free ${alt.competitor.toLowerCase()} alternative? Pictify is the programmable image engine teams switch to when ${
 							alt.competitor
 						} falls short.`}
 				</p>
 
-				<!-- TL;DR -->
-				<div
-					class="bg-white border-[3px] border-gray-900 rounded-xl p-6 shadow-brutal-accent max-w-3xl"
-				>
-					<p class="text-gray-700 font-bold leading-relaxed">
-						<span class="text-brand-danger font-black">TL;DR:</span>
-						{alt.comparison.tldr}
-					</p>
+				<p class="font-mono text-[11px] tracking-[0.06em] text-brand-ink">
+					{alt.competitor.toUpperCase()} ALTERNATIVE · {CURRENT_YEAR} · UPDATED {CURRENT_MONTH}
+				</p>
+
+				<!-- TL;DR + lockup -->
+				<div class="mt-4 flex flex-col gap-5 lg:flex-row">
+					<div
+						class="flex flex-1 flex-col gap-4 rounded-card border-[1.5px] border-brand-ink bg-brand-paper p-6 shadow-[4px_4px_0_0_#000000]"
+					>
+						<p class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">TL;DR</p>
+						<p class="font-sans text-[15px] leading-[23px] text-brand-ink">
+							{alt.comparison.tldr}
+						</p>
+						<div class="flex flex-wrap gap-2.5">
+							<a
+								href="/signup?redirect=/dashboard"
+								on:click={() => trackCta('alt_hero')}
+								class="flex items-center rounded-lg bg-brand-ink px-5 py-2.5 font-sans text-sm font-semibold text-white transition-opacity hover:opacity-90"
+							>
+								Start on Free
+							</a>
+							<a
+								href={migrationGuideUrl}
+								class="flex items-center rounded-lg border-[1.5px] border-brand-ink px-5 py-2.5 font-sans text-sm font-semibold text-brand-ink transition-colors hover:bg-brand-subtle"
+							>
+								Read the migration guide
+							</a>
+						</div>
+					</div>
+
+					<div
+						class="flex flex-col justify-center gap-3 rounded-card border-[1.5px] border-brand-ink bg-brand-paper p-6 lg:w-[300px] lg:flex-shrink-0"
+					>
+						<div class="flex flex-wrap items-center gap-2.5">
+							<span
+								class="flex items-center gap-2 rounded bg-brand-ink px-2.5 py-1.5 font-sans text-sm font-semibold text-white"
+							>
+								<span class="h-2.5 w-2.5 bg-brand-pink" aria-hidden="true" />
+								Pictify
+							</span>
+							<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">VS</span>
+							<span
+								class="flex items-center gap-2 rounded border border-brand-ink px-2.5 py-1.5 font-sans text-sm font-semibold text-brand-ink"
+							>
+								{#if icon?.type === 'url'}
+									<img src={icon.url} alt="" aria-hidden="true" class="h-3.5 w-3.5" />
+								{:else if icon?.text}
+									<span
+										class="font-mono text-[10px] leading-none"
+										style="color: {icon.color}"
+										aria-hidden="true">{icon.text}</span
+									>
+								{:else}
+									<span class="h-2.5 w-2.5 border border-brand-ink" aria-hidden="true" />
+								{/if}
+								{alt.competitor}
+							</span>
+						</div>
+						{#if alt.comparison.competitorDescription}
+							<p class="font-sans text-sm leading-5 text-brand-slate">
+								{alt.comparison.competitorDescription}
+							</p>
+						{/if}
+					</div>
 				</div>
 			</div>
+		</section>
 
-			<!-- Why Switch Section -->
-			<section class="mb-12">
-				<h2 class="text-2xl font-black text-gray-900 mb-6">Why Switch from {alt.competitor}?</h2>
-				<div class="grid md:grid-cols-2 gap-4">
-					{#each alt.comparison.advantages as advantage, i}
+		<main class="w-full">
+			<!-- ── 01 Why switch ─────────────────────────────────────── -->
+			<section class="mx-auto w-full max-w-page px-5 pt-14 lg:px-10">
+				<div class="flex items-baseline gap-3 border-t-2 border-brand-ink pt-8">
+					<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">01</span>
+					<h2
+						class="font-display text-[26px] font-bold leading-8 tracking-[-0.02em] text-brand-ink lg:text-[32px] lg:leading-[42px]"
+					>
+						Why Switch from {alt.competitor}?
+					</h2>
+				</div>
+
+				{#if scoreRows.length}
+					<!-- Scores scroll inside their own box; the page never scrolls sideways. -->
+					<div
+						class="mt-6 overflow-x-auto rounded-card border-[1.5px] border-brand-ink bg-brand-paper"
+					>
+						<div class="min-w-[720px]">
+							<div
+								class="grid grid-cols-[1fr_200px_200px] items-center gap-6 border-b border-brand-ink px-6 py-3"
+							>
+								<p class="font-mono text-[10px] tracking-[0.06em] text-brand-mute">
+									CAPABILITY · SCORED 1–5
+								</p>
+								<p
+									class="flex items-center justify-center gap-2 font-sans text-sm font-semibold text-brand-ink"
+								>
+									<span class="h-2.5 w-2.5 bg-brand-pink" aria-hidden="true" />
+									Pictify
+								</p>
+								<p
+									class="flex items-center justify-center gap-2 font-sans text-sm font-semibold text-brand-ink"
+								>
+									<span class="h-2.5 w-2.5 border border-brand-ink" aria-hidden="true" />
+									{alt.competitor}
+								</p>
+							</div>
+
+							{#each scoreRows as row (row.key)}
+								<div
+									class="grid grid-cols-[1fr_200px_200px] items-center gap-6 border-b border-brand-rule px-6 py-3 last:border-b-0"
+								>
+									<p class="font-sans text-sm text-brand-ink">{row.label}</p>
+									{#each [row.pictify, row.competitor] as score}
+										<div
+											class="flex items-center justify-center gap-1"
+											role="img"
+											aria-label="{score} out of 5"
+										>
+											{#each Array(5) as _, i}
+												<span
+													class="h-3 w-3 {i < score ? 'bg-brand-ink' : 'border border-brand-rule'}"
+												/>
+											{/each}
+										</div>
+									{/each}
+								</div>
+							{/each}
+						</div>
+					</div>
+					<p class="mt-3 font-mono text-[10px] tracking-[0.06em] text-brand-mute">
+						SCORES ARE OUR ASSESSMENT, {CURRENT_MONTH}
+						{CURRENT_YEAR} · CORRECTIONS WELCOME AT HELLO@PICTIFY.IO
+					</p>
+				{/if}
+
+				<!-- Choose / stay -->
+				<div class="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
+					<div
+						class="flex flex-col gap-4 rounded-card border-[1.5px] border-brand-ink bg-brand-ink p-7 shadow-[6px_6px_0_0_#FF48B0]"
+					>
+						<h3 class="font-display text-[22px] font-bold tracking-[-0.015em] text-white">
+							Choose Pictify if...
+						</h3>
+						<p class="font-sans text-sm leading-5 text-brand-press-text">
+							{alt.comparison.bestFor.pictify}
+						</p>
+						<ul class="flex flex-col gap-2.5">
+							{#each alt.comparison.advantages.slice(0, 5) as adv (adv)}
+								<li class="flex gap-2.5">
+									<span class="mt-1.5 h-2 w-2 flex-shrink-0 bg-brand-field" aria-hidden="true" />
+									<span class="font-sans text-sm leading-5 text-white">{adv}</span>
+								</li>
+							{/each}
+						</ul>
+					</div>
+
+					<div
+						class="flex flex-col gap-4 rounded-card border-[1.5px] border-brand-ink bg-brand-paper p-7"
+					>
+						<h3 class="font-display text-[22px] font-bold tracking-[-0.015em] text-brand-ink">
+							Stay with {alt.competitor} if...
+						</h3>
+						<p class="font-sans text-sm leading-5 text-brand-slate">
+							{alt.comparison.bestFor.competitor}
+						</p>
+						<ul class="flex flex-col gap-2.5">
+							{#each alt.comparison.competitorAdvantages.slice(0, 5) as adv (adv)}
+								<li class="flex gap-2.5">
+									<span
+										class="mt-1.5 h-2 w-2 flex-shrink-0 border border-brand-ink"
+										aria-hidden="true"
+									/>
+									<span class="font-sans text-sm leading-5 text-brand-slate">{adv}</span>
+								</li>
+							{/each}
+						</ul>
+						<p class="mt-auto font-mono text-[10px] tracking-[0.06em] text-brand-mute">
+							WE'D RATHER YOU PICKED THE RIGHT TOOL THAN PICKED US
+						</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- ── 02 Pricing ────────────────────────────────────────── -->
+			{#if pricingLadders.pictify.length || pricingLadders.competitor.length}
+				<section class="mx-auto w-full max-w-page px-5 pt-14 lg:px-10">
+					<div class="flex items-baseline gap-3 border-t-2 border-brand-ink pt-8">
+						<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">02</span>
+						<h2
+							class="font-display text-[26px] font-bold leading-8 tracking-[-0.02em] text-brand-ink lg:text-[32px] lg:leading-[42px]"
+						>
+							Pricing Comparison
+						</h2>
+					</div>
+
+					<div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
 						<div
-							class="flex items-start gap-3 bg-white border-[2px] border-gray-200 rounded-xl p-4"
+							class="overflow-hidden rounded-card border-[1.5px] border-brand-ink bg-brand-paper"
 						>
 							<div
-								class="w-8 h-8 bg-data-green border-[2px] border-gray-900 rounded-lg flex items-center justify-center font-black text-gray-900 text-sm flex-shrink-0"
+								class="flex items-center justify-between gap-3 border-b border-brand-ink bg-brand-field px-5 py-3"
 							>
-								{i + 1}
+								<span
+									class="flex items-center gap-2 font-sans text-sm font-semibold text-brand-ink"
+								>
+									<span class="h-2.5 w-2.5 bg-brand-pink" aria-hidden="true" />
+									Pictify
+								</span>
+								<span class="font-mono text-[10px] tracking-[0.06em] text-brand-ink">ANNUAL</span>
 							</div>
-							<span class="text-gray-800 font-medium">{advantage}</span>
-						</div>
-					{/each}
-				</div>
-			</section>
-
-			<!-- Comparison Cards -->
-			<section class="grid md:grid-cols-2 gap-6 mb-12">
-				<!-- Pictify Card -->
-				<div
-					class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 shadow-[6px_6px_0_0_#4ade80]"
-				>
-					<div class="flex items-center gap-4 mb-6">
-						<div
-							class="w-14 h-14 bg-gray-900 border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#ffc480]"
-						>
-							<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M13 10V3L4 14h7v7l9-11h-7z"
-								/>
-							</svg>
-						</div>
-						<h3 class="text-2xl font-black text-gray-900">Choose Pictify if...</h3>
-					</div>
-					<p class="text-gray-700 font-medium mb-6 leading-relaxed">
-						{alt.comparison.bestFor.pictify}
-					</p>
-					<ul class="space-y-3">
-						{#each alt.comparison.advantages.slice(0, 4) as adv}
-							<li class="flex items-start gap-3">
+							{#each pricingLadders.pictify as row (row.tier)}
 								<div
-									class="w-6 h-6 rounded-full bg-data-green border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 mt-0.5"
+									class="flex items-center justify-between gap-4 border-b border-brand-rule px-5 py-2.5 last:border-b-0"
 								>
-									<svg
-										class="w-3 h-3 text-gray-900 font-bold"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="4"
-											d="M5 13l4 4L19 7"
-										/>
-									</svg>
+									<span class="font-sans text-sm text-brand-ink">{row.tier}</span>
+									<span class="font-sans text-sm font-medium text-brand-ink">{row.value}</span>
 								</div>
-								<span class="text-gray-900 font-bold">{adv}</span>
-							</li>
-						{/each}
-					</ul>
-				</div>
-
-				<!-- Competitor Card -->
-				<div class="bg-gray-50 border-[3px] border-dashed border-gray-400 rounded-2xl p-8">
-					<div class="flex items-center gap-4 mb-6">
-						<div
-							class="w-14 h-14 bg-white border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#9ca3af]"
-							style="color: {icon.color || '#1f2937'}"
-						>
-							{#if icon.type === 'url'}
-								<img loading="lazy" src={icon.url} alt={alt.competitor} class="w-8 h-8" />
-							{:else if icon.type === 'text'}
-								<span class="text-lg font-black" style="color: {icon.color}">{icon.text}</span>
-							{:else if icon.type === 'svg'}
-								<svg class="w-8 h-8" fill="currentColor" viewBox={icon.viewBox}>
-									<path d={icon.path} />
-								</svg>
-							{:else}
-								<span class="text-xl font-black text-gray-600">{alt.competitor.charAt(0)}</span>
-							{/if}
+							{/each}
 						</div>
-						<h3 class="text-2xl font-black text-gray-500">Stay with {alt.competitor} if...</h3>
-					</div>
-					<p class="text-gray-500 font-medium mb-6 leading-relaxed">
-						{alt.comparison.bestFor.competitor}
-					</p>
-					<ul class="space-y-3">
-						{#each alt.comparison.competitorAdvantages.slice(0, 4) as adv}
-							<li class="flex items-start gap-3">
-								<div
-									class="w-6 h-6 rounded-full bg-gray-200 border-[2px] border-gray-400 flex items-center justify-center flex-shrink-0 mt-0.5"
-								>
-									<svg
-										class="w-3 h-3 text-gray-500"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="4"
-											d="M5 13l4 4L19 7"
-										/>
-									</svg>
-								</div>
-								<span class="text-gray-500 font-medium">{adv}</span>
-							</li>
-						{/each}
-					</ul>
-				</div>
-			</section>
 
-			<!-- Pricing Comparison -->
-			{#if alt.comparison.pricing}
-				<section class="mb-12">
-					<h2 class="text-2xl font-black text-gray-900 mb-6">Pricing Comparison</h2>
-					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-brutal-xl"
-					>
-						<table class="w-full">
-							<thead class="bg-gray-900 text-white">
-								<tr>
-									<th class="px-6 py-4 text-left font-black uppercase tracking-wide text-sm"
-										>Plan</th
-									>
-									<th class="px-6 py-4 text-left font-black uppercase tracking-wide text-sm"
-										>Pictify</th
-									>
-									<th class="px-6 py-4 text-left font-black uppercase tracking-wide text-sm"
-										>{alt.competitor}</th
-									>
-								</tr>
-							</thead>
-							<tbody class="divide-y divide-gray-200">
-								{#each pricingRows as row, i}
-									<tr class={i % 2 === 1 ? 'bg-gray-50' : ''}>
-										<td class="px-6 py-4 font-bold text-gray-900 capitalize">{row.tier}</td>
-										<td class="px-6 py-4 font-medium text-data-green">{row.pictify}</td>
-										<td class="px-6 py-4 font-medium text-gray-600">{row.competitor}</td>
-									</tr>
-								{/each}
-							</tbody>
-						</table>
+						<div
+							class="overflow-hidden rounded-card border-[1.5px] border-brand-ink bg-brand-paper"
+						>
+							<div
+								class="flex items-center justify-between gap-3 border-b border-brand-ink bg-brand-subtle px-5 py-3"
+							>
+								<span
+									class="flex items-center gap-2 font-sans text-sm font-semibold text-brand-ink"
+								>
+									<span class="h-2.5 w-2.5 border border-brand-ink" aria-hidden="true" />
+									{alt.competitor}
+								</span>
+								<span class="font-mono text-[10px] tracking-[0.06em] text-brand-mute">
+									PUBLIC PRICING, {PRICING_CHECKED_AT}
+								</span>
+							</div>
+							{#each pricingLadders.competitor as row (row.tier)}
+								<div
+									class="flex items-center justify-between gap-4 border-b border-brand-rule px-5 py-2.5 last:border-b-0"
+								>
+									<span class="font-sans text-sm text-brand-ink">{row.tier}</span>
+									<span class="font-sans text-sm font-medium text-brand-slate">{row.value}</span>
+								</div>
+							{/each}
+						</div>
 					</div>
 				</section>
 			{/if}
 
-			<!-- Migration Section -->
+			<!-- ── 03 Switching ──────────────────────────────────────── -->
 			{#if alt.comparison.migration && alt.comparison.migration.difficulty !== 'N/A'}
-				<section class="mb-12">
-					<h2 class="text-2xl font-black text-gray-900 mb-6">Switching is Easy</h2>
+				<section class="mx-auto w-full max-w-page px-5 pt-14 lg:px-10">
 					<div
-						class="bg-white border-[3px] border-gray-900 rounded-2xl p-6 shadow-[4px_4px_0_0_#4ade80]"
+						class="flex flex-wrap items-baseline justify-between gap-4 border-t-2 border-brand-ink pt-8"
 					>
-						<div class="flex flex-wrap gap-6 mb-6">
-							<div>
-								<span class="text-sm font-bold text-gray-500 uppercase">Difficulty</span>
-								<p class="text-xl font-black text-data-green">
-									{alt.comparison.migration.difficulty}
-								</p>
-							</div>
-							<div>
-								<span class="text-sm font-bold text-gray-500 uppercase">Time Estimate</span>
-								<p class="text-xl font-black text-gray-900">
-									{alt.comparison.migration.timeEstimate}
-								</p>
-							</div>
-						</div>
-						<div>
-							<span class="text-sm font-bold text-gray-500 uppercase mb-3 block"
-								>Migration Steps</span
+						<div class="flex items-baseline gap-3">
+							<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">03</span>
+							<h2
+								class="font-display text-[26px] font-bold leading-8 tracking-[-0.02em] text-brand-ink lg:text-[32px] lg:leading-[42px]"
 							>
-							<ol class="space-y-2">
-								{#each alt.comparison.migration.steps as step, i}
-									<li class="flex items-center gap-3">
-										<span
-											class="w-6 h-6 bg-gray-900 rounded-full flex items-center justify-center text-white text-xs font-bold"
-											>{i + 1}</span
-										>
-										<span class="text-gray-700 font-medium">{step}</span>
-									</li>
-								{/each}
-							</ol>
+								Switching is Easy
+							</h2>
+						</div>
+						<div class="flex gap-2">
+							<span
+								class="border border-brand-ink bg-brand-field px-2.5 py-1 font-mono text-[10px] tracking-[0.06em] text-brand-ink"
+							>
+								DIFFICULTY · {alt.comparison.migration.difficulty.toUpperCase()}
+							</span>
+							<span
+								class="border border-brand-ink px-2.5 py-1 font-mono text-[10px] tracking-[0.06em] text-brand-ink"
+							>
+								ABOUT {alt.comparison.migration.timeEstimate.toUpperCase()}
+							</span>
 						</div>
 					</div>
-				</section>
-			{/if}
 
-			<!-- FAQs -->
-			{#if alt.comparison.faqs && alt.comparison.faqs.length > 0}
-				<section class="mb-12">
-					<h2 class="text-2xl font-black text-gray-900 mb-6">Frequently Asked Questions</h2>
-					<div class="space-y-4">
-						{#each alt.comparison.faqs as faq}
-							<div class="bg-white border-[3px] border-gray-200 rounded-xl p-6">
-								<h3 class="text-lg font-black text-gray-900 mb-2">{faq.q}</h3>
-								<p class="text-gray-600 font-medium">{faq.a}</p>
+					<div
+						class="mt-6 grid grid-cols-1 divide-y divide-brand-rule overflow-hidden rounded-card border-[1.5px] border-brand-ink bg-brand-paper md:grid-cols-3 md:divide-x md:divide-y-0"
+					>
+						{#each alt.comparison.migration.steps as step, i (step)}
+							<div class="flex flex-col gap-2.5 p-6">
+								<span
+									class="flex h-6 w-6 items-center justify-center bg-brand-ink font-mono text-xs text-white"
+								>
+									{i + 1}
+								</span>
+								<p class="font-sans text-[15px] font-medium leading-5 text-brand-ink">{step}</p>
 							</div>
 						{/each}
 					</div>
 				</section>
 			{/if}
 
-			<!-- CTA Section -->
-			<section
-				class="mb-12 bg-gray-900 border-[4px] border-gray-900 rounded-2xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#4ade80]"
+			<!-- ── 04 FAQ ────────────────────────────────────────────── -->
+			{#if alt.comparison.faqs && alt.comparison.faqs.length}
+				<section class="mx-auto w-full max-w-page px-5 pt-14 lg:px-10">
+					<div class="max-w-[760px]">
+						<div class="flex items-baseline gap-3 border-t-2 border-brand-ink pt-8">
+							<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">04</span>
+							<h2
+								class="font-display text-[26px] font-bold leading-8 tracking-[-0.02em] text-brand-ink lg:text-[32px] lg:leading-[42px]"
+							>
+								Frequently Asked Questions
+							</h2>
+						</div>
+
+						<div class="mt-6 flex flex-col gap-3">
+							{#each alt.comparison.faqs as faq (faq.q)}
+								<details class="group border border-brand-ink bg-brand-paper">
+									<summary
+										class="flex cursor-pointer items-center justify-between gap-4 p-4 font-sans text-[15px] font-medium text-brand-ink"
+									>
+										<h3 class="font-sans text-[15px] font-medium">{faq.q}</h3>
+										<span
+											class="font-mono text-lg text-brand-mute transition-transform group-open:rotate-45"
+											aria-hidden="true">+</span
+										>
+									</summary>
+									<p
+										class="border-t border-brand-rule p-4 font-sans text-[15px] leading-[23px] text-brand-slate"
+									>
+										{faq.a}
+									</p>
+								</details>
+							{/each}
+						</div>
+					</div>
+				</section>
+			{/if}
+		</main>
+
+		<!-- ── Closing band ──────────────────────────────────────────── -->
+		<section class="mt-16 w-full bg-brand-press-deep px-5 py-14 lg:px-10 lg:py-20">
+			<div
+				class="mx-auto flex w-full max-w-page flex-col gap-8 lg:flex-row lg:items-end lg:justify-between"
 			>
-				<h2 class="text-3xl md:text-4xl font-black text-white mb-4">Ready to Switch?</h2>
-				<p class="text-gray-400 font-bold mb-8 max-w-xl mx-auto">
-					Join teams who've already made the move. Your first run takes minutes.
-				</p>
-				<div class="flex flex-wrap justify-center gap-4">
-					<a
-						href="/signup"
-						class="px-8 py-4 bg-data-green text-gray-900 border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+				<div class="flex flex-col gap-3.5 lg:max-w-[640px]">
+					<p class="font-mono text-xs tracking-[0.06em] text-brand-field">
+						SAME HTML IN. BETTER THINGS OUT.
+					</p>
+					<h2
+						class="font-display text-[32px] font-bold leading-[1.08] tracking-[-0.02em] text-white lg:text-[44px] lg:leading-[50px]"
 					>
-						{alt.cta}
+						Ready to Switch?
+					</h2>
+					<p class="font-sans text-base leading-[25px] text-brand-press-text">
+						50 renders a month free, no card. Your first {alt.competitor} template is a paste away.
+					</p>
+				</div>
+
+				<div class="flex flex-col items-start gap-2.5 lg:items-end">
+					<a
+						href="/signup?redirect=/dashboard"
+						on:click={() => trackCta('alt_band')}
+						class="rounded-lg bg-brand-field px-7 py-4 font-sans text-base font-semibold text-brand-ink shadow-[3px_3px_0_0_#FF48B0] transition-opacity hover:opacity-90"
+					>
+						Start on Free
 					</a>
 					<a
-						href="/pricing"
-						class="px-8 py-4 bg-transparent text-white border-[3px] border-white font-black uppercase tracking-wide hover:bg-white hover:text-gray-900 transition-all rounded-xl"
+						href={migrationGuideUrl}
+						class="font-mono text-[11px] tracking-[0.06em] text-brand-press-text hover:text-white"
 					>
-						See Pricing
+						OR READ THE MIGRATION GUIDE →
 					</a>
 				</div>
-			</section>
+			</div>
+		</section>
 
-			<!-- Other Alternatives -->
-			<section>
-				<h2 class="text-xl font-black uppercase tracking-wide text-gray-400 mb-6 text-center">
+		<!-- ── Other alternatives ────────────────────────────────────── -->
+		<section class="mx-auto w-full max-w-page px-5 py-14 lg:px-10">
+			<div class="flex items-baseline justify-between gap-4">
+				<!-- Stays an <h2> with its live wording: the heading outline is frozen. -->
+				<h2 class="font-display text-[22px] font-bold tracking-[-0.02em] text-brand-ink">
 					Other Alternatives
 				</h2>
-				<div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-					{#each otherAlts as other}
-						{@const otherIcon = brandIcons[other.slug] || brandIcons.default}
-						<a
-							href="/alternatives/{other.slug}"
-							class="bg-white border-[3px] border-gray-900 p-4 rounded-xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-data-green transition-all group"
-						>
-							<div class="flex items-center gap-3">
-								<div
-									class="w-8 h-8 bg-white border-[2px] border-gray-900 rounded-lg flex items-center justify-center"
-									style="color: {otherIcon.color || '#1f2937'}"
-								>
-									{#if otherIcon.type === 'url'}
-										<img
-											loading="lazy"
-											src={otherIcon.url}
-											alt={other.competitor}
-											class="w-4 h-4"
-										/>
-									{:else if otherIcon.type === 'text'}
-										<span class="text-xs font-black" style="color: {otherIcon.color}"
-											>{otherIcon.text}</span
-										>
-									{:else if otherIcon.type === 'svg'}
-										<svg class="w-4 h-4" fill="currentColor" viewBox={otherIcon.viewBox}>
-											<path d={otherIcon.path} />
-										</svg>
-									{:else}
-										<span class="text-xs font-black">{other.competitor.charAt(0)}</span>
-									{/if}
-								</div>
-								<span class="font-black text-gray-900 text-sm">{other.competitor}</span>
-							</div>
-						</a>
-					{/each}
-				</div>
-			</section>
-		{:else}
-			<!-- Not Found State -->
-			<div
-				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
-			>
-				<div
-					class="w-24 h-24 bg-data-green rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-gray-900 shadow-brutal-2xl"
-				>
-					?
-				</div>
-				<h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-gray-900">
-					Alternative not found
-				</h1>
 				<a
 					href="/alternatives"
-					class="px-8 py-4 bg-data-green border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="font-mono text-[11px] tracking-[0.06em] text-brand-royal hover:underline"
 				>
-					View All Alternatives
+					ALL {alternatives.length} COMPARISONS →
 				</a>
 			</div>
-		{/if}
-	</main>
 
-	<Footer />
-</section>
+			<div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 min-[1200px]:grid-cols-4">
+				{#each otherAlts as other (other.slug)}
+					<a
+						href={`/alternatives/${other.slug}`}
+						class="group flex flex-col gap-1.5 rounded-card border-[1.5px] border-brand-ink bg-brand-paper p-5 transition-[transform,box-shadow] duration-150 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[4px_4px_0_0_#000000] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-royal motion-reduce:transition-none"
+					>
+						<span class="font-mono text-[10px] tracking-[0.06em] text-brand-mute">PICTIFY VS</span>
+						<span
+							class="font-display text-[19px] font-bold leading-6 tracking-[-0.015em] text-brand-ink group-hover:underline"
+						>
+							{other.competitor}
+						</span>
+						{#if other.comparison?.competitorDescription}
+							<span class="font-sans text-sm leading-5 text-brand-slate">
+								{other.comparison.competitorDescription}
+							</span>
+						{/if}
+					</a>
+				{/each}
+			</div>
+		</section>
+
+		<Footer />
+	</div>
+{:else}
+	<div class="landing-v2 flex min-h-screen w-full flex-col bg-brand-canvas">
+		<Nav />
+		<main class="flex flex-1 flex-col items-center justify-center gap-5 px-5 py-24 text-center">
+			<h1 class="font-display text-[38px] font-extrabold tracking-[-0.02em] text-brand-ink">
+				Comparison not found
+			</h1>
+			<a
+				href="/alternatives"
+				class="rounded-lg border-[1.5px] border-brand-ink px-6 py-3 font-sans text-[15px] font-semibold text-brand-ink transition-colors hover:bg-brand-subtle"
+			>
+				See all comparisons
+			</a>
+		</main>
+		<Footer />
+	</div>
+{/if}

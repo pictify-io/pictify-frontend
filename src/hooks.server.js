@@ -259,7 +259,10 @@ export async function handleFetch({ event, request, fetch }) {
  * Handle errors
  */
 export function handleError({ error, event }) {
-	// Log error for monitoring
+	// Log for monitoring. Without this a server-side render error reaches the
+	// browser as a bare "An error occurred" with no stack anywhere, which is
+	// how a broken page can look identical to a working one in the logs.
+	console.error(`[500] ${event?.url?.pathname ?? 'unknown path'}:`, error);
 
 	// Return generic error to client
 	return {
