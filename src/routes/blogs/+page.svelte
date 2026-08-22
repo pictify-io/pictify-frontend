@@ -112,7 +112,9 @@
 	<meta property="og:site_name" content="Pictify.io" />
 </svelte:head>
 
-<div class="flex min-h-screen w-full flex-col bg-brand-paper">
+<!-- .landing-v2 opts this page out of the app-wide root font-size down-scale (see app.css),
+     so the rem-based rhythm lands on the 16px root the board was drawn against. -->
+<div class="landing-v2 flex min-h-screen w-full flex-col bg-brand-paper">
 	<Nav />
 
 	<!-- ── Hero ──────────────────────────────────────────────────────── -->

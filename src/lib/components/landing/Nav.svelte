@@ -6,16 +6,18 @@
 
 	let open = false;
 
+	// Blog lives in the footer, not here: the nav carries the five surfaces a
+	// buyer moves between, and Tools is one of them.
 	const links = [
 		{ label: 'Formats', href: '/formats' },
-		{ label: 'Blog', href: '/blogs' },
 		{ label: 'Docs', href: '/docs' },
 		{ label: 'Pricing', href: '/pricing' },
-		{ label: 'Changelog', href: '/changelog' }
+		{ label: 'Changelog', href: '/changelog' },
+		{ label: 'Tools', href: '/tools' }
 	];
 
-	// Prefix match, so a post at /blogs/<slug> keeps Blog lit. Anchored with a
-	// boundary check so a future /blogsomething cannot claim it.
+	// Prefix match, so a page at /tools/<slug> keeps Tools lit. Anchored with a
+	// boundary check so a future /toolsomething cannot claim it.
 	$: current = $page?.url?.pathname || '';
 	$: isActive = (href) => current === href || current.startsWith(`${href}/`);
 </script>
@@ -66,9 +68,19 @@
 			>
 				<svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
 					{#if open}
-						<path d="M4 4 L18 18 M18 4 L4 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+						<path
+							d="M4 4 L18 18 M18 4 L4 18"
+							stroke="currentColor"
+							stroke-width="2.2"
+							stroke-linecap="round"
+						/>
 					{:else}
-						<path d="M2 6 H20 M2 11 H20 M2 16 H20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+						<path
+							d="M2 6 H20 M2 11 H20 M2 16 H20"
+							stroke="currentColor"
+							stroke-width="2.2"
+							stroke-linecap="round"
+						/>
 					{/if}
 				</svg>
 			</button>
@@ -85,7 +97,8 @@
 				</li>
 			{/each}
 			<li>
-				<a href="/login" class="block py-2 font-sans text-lg font-medium text-brand-slate">Log in</a>
+				<a href="/login" class="block py-2 font-sans text-lg font-medium text-brand-slate">Log in</a
+				>
 			</li>
 		</ul>
 	{/if}

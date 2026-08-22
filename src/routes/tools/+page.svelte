@@ -1,143 +1,231 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
-	import SignUpButton from '$lib/components/landingPage/SignUpButton.svelte';
-	import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
-	import { useCases, useCaseDetails } from '$lib/pseo/config.js';
+	/**
+	 * /tools — the open counter.
+	 *
+	 * A hub, not a sales page: eighteen tools laid out as a shop counter, each
+	 * one a face on the render API. No form in the hero — the work happens on
+	 * the tool pages, and this surface's only job is to route.
+	 *
+	 * Card art is hand-built SVG exported from the design file to
+	 * static/landing/tools/<slug>.svg. It is decoration, never content, so it
+	 * ships as an aria-hidden <img> with an empty alt.
+	 */
+	import Nav from '$lib/components/landing/Nav.svelte';
+	import Footer from '$lib/components/landing/Footer.svelte';
 
-	// Category filter state
-	const tools = [
+	// The two wedge tools. They carry a colour-offset shadow and a full-height
+	// art pane; nothing else on the page does.
+	const wedge = [
 		{
-			name: 'Workflow Runs',
-			description:
-				'Turn a spreadsheet or webhook into branded certificates, badges, tickets, rendered and delivered.',
-			url: '/signup',
-			icon: 'fa-solid fa-bolt'
+			title: 'CSV to PDF',
+			href: '/tools/csv-to-pdf',
+			badge: 'MOST USED',
+			badgeClass: 'bg-brand-field',
+			blurb: 'A spreadsheet in, one polished PDF out. Or one document per row, when you sign in.',
+			meta: 'CSV → PDF',
+			art: '/landing/tools/csv-to-pdf.svg',
+			// Literal shadow classes: Tailwind scans this file as text, so the
+			// utilities have to appear spelled out somewhere in it.
+			shadow: 'shadow-[4px_4px_0_0_#0054A6] hover:shadow-[6px_6px_0_0_#0054A6]'
 		},
 		{
-			name: 'HTML to Image',
-			description: 'Convert HTML & CSS to PNG, JPG, or WebP. Free converter with API access.',
-			url: '/tools/html-to-image',
-			icon: 'fa-solid fa-file-code'
-		},
-		{
-			name: 'HTML to PNG',
-			description: 'Paste HTML + CSS and export a high-quality PNG in one click.',
-			url: '/tools/html-to-png',
-			icon: 'fa-solid fa-image'
-		},
-		{
-			name: 'Code to Image',
-			description: 'Turn code snippets into beautiful images with themes and fonts.',
-			url: '/tools/code-to-image',
-			icon: 'fa-solid fa-code'
-		},
-		{
-			name: 'Markdown to Image',
-			description: 'Convert markdown to beautiful, shareable images with themes and fonts.',
-			url: '/tools/markdown',
-			icon: 'fa-brands fa-markdown'
-		},
-		{
-			name: 'Table to Image',
-			description: 'Turn CSV data or HTML tables into polished, shareable table images.',
-			url: '/tools/table',
-			icon: 'fa-solid fa-table'
-		},
-		{
-			name: 'OG Image Generator',
-			description: 'Create custom Open Graph images for improved social media engagement and SEO.',
-			url: '/tools/og-image-generator',
-			icon: 'fa-solid fa-image'
-		},
-		{
-			name: 'Template Gallery',
-			description: 'Start from ready-made templates and presets, then automate variants via API.',
-			url: '/templates',
-			icon: 'fa-solid fa-layer-group'
-		},
-		{
-			name: 'HTML to JPG',
-			description: 'Convert HTML to high-quality JPG images with our free online tool.',
-			url: '/tools/html-to-jpg',
-			icon: 'fa-solid fa-file-image'
-		},
-		{
-			name: 'Invoice Generator',
-			description: 'Create professional invoices quickly and easily with our free online tool.',
-			url: '/tools/online-invoice-generator',
-			icon: 'fa-solid fa-file-invoice-dollar'
-		},
-		{
-			name: 'Certificate Generator',
-			description:
-				'Create professional certificates with 5 beautiful templates. Customize and download for free.',
-			url: '/tools/certificate-generator',
-			icon: 'fa-solid fa-certificate'
-		},
-		{
-			name: 'CSV to PDF',
-			description:
-				'Turn a spreadsheet into documents: the whole sheet as a table, or one PDF page per row.',
-			url: '/tools/csv-to-pdf',
-			icon: 'fa-solid fa-file-csv'
-		},
-		{
-			name: 'Tweet Screenshot Generator',
-			description:
-				'Paste any tweet URL, customize every field, download a clean PNG. No Twitter API key required.',
-			url: '/tools/tweet-screenshot',
-			icon: 'fa-brands fa-x-twitter'
-		},
-		{
-			name: 'URL to Image',
-			description: 'Generate images from any URL with our free online tool.',
-			url: '/tools/url-to-image-generator',
-			icon: 'fa-solid fa-camera'
-		},
-		{
-			name: 'LinkedIn Banner Generator',
-			description:
-				'Create professional LinkedIn banners with 20+ templates for developers, marketers, and more.',
-			url: '/tools/linkedin-banner-generator',
-			icon: 'fa-brands fa-linkedin'
+			title: 'Certificate generator',
+			href: '/tools/certificate-generator',
+			badge: 'BATCH READY',
+			badgeClass: 'bg-brand-powder',
+			blurb:
+				'Five templates, live preview, clean PNG. Point a sheet at it and every attendee gets theirs.',
+			meta: 'NAMES → CERTIFICATES',
+			art: '/landing/tools/certificate-generator.svg',
+			shadow: 'shadow-[4px_4px_0_0_#FF48B0] hover:shadow-[6px_6px_0_0_#FF48B0]'
 		}
+	];
+
+	// Four labelled shelves, four tools each. `desc` is not rendered — it is the
+	// description carried into the ItemList structured data.
+	const sections = [
+		{
+			label: 'MARKUP → IMAGE',
+			tools: [
+				{
+					title: 'HTML to image',
+					meta: 'HTML → PNG · JPG · WEBP',
+					href: '/tools/html-to-image',
+					art: '/landing/tools/html-to-image.svg',
+					desc: 'Convert HTML & CSS to PNG, JPG, or WebP. Free converter with API access.'
+				},
+				{
+					title: 'Code to image',
+					meta: 'SNIPPET → PNG',
+					href: '/tools/code-to-image',
+					art: '/landing/tools/code-to-image.svg',
+					desc: 'Turn code snippets into beautiful images with themes and fonts.'
+				},
+				{
+					title: 'Markdown to image',
+					meta: 'MD → PNG',
+					href: '/tools/markdown',
+					art: '/landing/tools/markdown-to-image.svg',
+					desc: 'Convert markdown to shareable images with themes and fonts.'
+				},
+				{
+					title: 'Table to image',
+					meta: 'CSV · HTML → PNG',
+					href: '/tools/table',
+					art: '/landing/tools/table-to-image.svg',
+					desc: 'Turn CSV data or HTML tables into polished, shareable table images.'
+				}
+			]
+		},
+		{
+			label: 'SOCIAL & OG',
+			tools: [
+				{
+					title: 'OG image generator',
+					meta: 'TITLE · LOGO → 1200×630',
+					href: '/tools/og-image-generator',
+					art: '/landing/tools/og-image-generator.svg',
+					desc: 'Create custom Open Graph images for social sharing and search previews.'
+				},
+				{
+					title: 'Tweet screenshot',
+					meta: 'TWEET URL → PNG',
+					href: '/tools/tweet-screenshot',
+					art: '/landing/tools/tweet-screenshot.svg',
+					desc: 'Paste any tweet URL, edit every field, download a clean PNG. No API key needed.'
+				},
+				{
+					title: 'LinkedIn banner',
+					meta: 'TEMPLATE → 1584×396',
+					href: '/tools/linkedin-banner-generator',
+					art: '/landing/tools/linkedin-banner.svg',
+					desc: 'Create LinkedIn banners from 20+ templates for developers, marketers, and more.'
+				},
+				{
+					title: 'Social proof card',
+					meta: 'REVIEW → PNG',
+					href: '/tools/social-proof-card',
+					art: '/landing/tools/social-proof-card.svg',
+					desc: 'Turn a review or testimonial into a branded card image.'
+				}
+			]
+		},
+		{
+			label: 'CAPTURE & DOCUMENTS',
+			tools: [
+				{
+					title: 'URL to image',
+					meta: 'ANY URL → SCREENSHOT',
+					href: '/tools/url-to-image-generator',
+					art: '/landing/tools/url-to-image.svg',
+					desc: 'Screenshot any URL at any size, straight from the browser or the API.'
+				},
+				{
+					title: 'Invoice generator',
+					meta: 'LINE ITEMS → PNG',
+					href: '/tools/online-invoice-generator',
+					art: '/landing/tools/invoice-generator.svg',
+					desc: 'Create professional invoices quickly with a free online generator.'
+				},
+				{
+					title: 'Email header',
+					meta: 'TEXT · BRAND → PNG',
+					href: '/tools/email-header',
+					art: '/landing/tools/email-header.svg',
+					desc: 'Generate branded email header images for campaigns and newsletters.'
+				},
+				{
+					title: 'Barcode & QR',
+					meta: 'VALUE → PNG',
+					href: '/tools/barcode-generator',
+					art: '/landing/tools/barcode-qr.svg',
+					desc: 'Render barcodes and QR codes as images from any value.'
+				}
+			]
+		},
+		{
+			label: 'WIDGETS & CARDS',
+			tools: [
+				{
+					title: 'Badge maker',
+					meta: 'TEXT → PNG',
+					href: '/tools/badge',
+					art: '/landing/tools/badge-maker.svg',
+					desc: 'Build status and achievement badges as images.'
+				},
+				{
+					title: 'Leaderboard',
+					meta: 'ROWS → PNG',
+					href: '/tools/leaderboard',
+					art: '/landing/tools/leaderboard.svg',
+					desc: 'Turn ranked rows into a shareable leaderboard card.'
+				},
+				{
+					title: 'Membership card',
+					meta: 'MEMBER → PNG',
+					href: '/tools/membership-card',
+					art: '/landing/tools/membership-card.svg',
+					desc: 'Generate membership and loyalty cards for every member on file.'
+				},
+				{
+					title: 'Portfolio card',
+					meta: 'PROFILE → PNG',
+					href: '/tools/portfolio-card',
+					art: '/landing/tools/portfolio-card.svg',
+					desc: 'Render profile and portfolio cards from a template.'
+				}
+			]
+		}
+	];
+
+	const allTools = [
+		...wedge.map((t) => ({ name: t.title, url: t.href, description: t.blurb })),
+		...sections.flatMap((s) =>
+			s.tools.map((t) => ({ name: t.title, url: t.href, description: t.desc }))
+		)
 	];
 
 	const itemListStructuredData = {
 		'@context': 'https://schema.org',
 		'@type': 'ItemList',
-		name: 'Pictify.io Free Tools for Programmatic Media',
+		name: 'Pictify.io free tools',
 		description:
-			'Free tools powered by Pictify: design templates and generate images programmatically at scale.',
-		itemListElement: tools.map((tool, index) => ({
+			'Free browser tools built on the Pictify render API: spreadsheets to PDF, HTML and markdown to image, screenshots, certificates, badges and cards.',
+		itemListElement: allTools.map((tool, index) => ({
 			'@type': 'ListItem',
 			position: index + 1,
 			item: {
 				'@type': 'WebApplication',
 				name: tool.name,
 				url: `https://pictify.io${tool.url}`,
-				description: tool.description
+				description: tool.description,
+				applicationCategory: 'DesignApplication',
+				offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
 			}
 		}))
 	};
+
+	// Whole-card link. Shared by both card shapes so the lift, the focus ring
+	// and the ink border stay in step.
+	const cardBase =
+		'group block overflow-hidden rounded-tile border border-brand-ink bg-brand-paper transition-[transform,box-shadow] duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-royal motion-reduce:transition-none';
 </script>
 
 <svelte:head>
-	<title>Free Tools for Programmatic Media | Pictify.io</title>
+	<title>Free tools: render images, PDFs and cards | Pictify.io</title>
 	<meta
 		name="description"
-		content="Explore Pictify.io's free tools to generate images from HTML, URLs, and templates. Design once, render variants via API, the infrastructure layer for programmatic media."
+		content="Eighteen free tools built on the Pictify render API. Spreadsheets to PDF, HTML and markdown to image, screenshots, certificates, badges and cards. No signup to try."
 	/>
 	<meta
 		name="keywords"
-		content="image generation, OG image generator, HTML to JPG converter, free tools, Pictify.io"
+		content="free tools, CSV to PDF, certificate generator, HTML to image, OG image generator, screenshot API, Pictify.io"
 	/>
 	<link rel="canonical" href="https://pictify.io/tools" />
-	<meta property="og:title" content="Free Tools for Programmatic Media | Pictify.io" />
+	<meta property="og:title" content="Free tools: render images, PDFs and cards | Pictify.io" />
 	<meta
 		property="og:description"
-		content="Free tools powered by Pictify: design templates and render images at scale via API."
+		content="Eighteen free tools built on the Pictify render API. Every one of them is one API call underneath."
 	/>
 	<meta property="og:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
 	<meta property="og:url" content="https://pictify.io/tools" />
@@ -146,296 +234,278 @@
 	{@html `<script type="application/ld+json">${JSON.stringify(itemListStructuredData)}</script>`}
 </svelte:head>
 
-<div
-	class="bg-brand-bg min-h-screen flex flex-col font-sans text-gray-900 selection:bg-brand-accent selection:text-black"
->
+<!-- .landing-v2 opts this page out of the app-wide root font-size down-scale (see app.css),
+     so the rem-based rhythm lands on the 16px root the board was drawn against. -->
+<div class="landing-v2 flex min-h-screen w-full flex-col bg-brand-canvas">
 	<Nav />
 
-	<main class="flex-grow">
-		<!-- Hero Section -->
-		<div class="w-full py-20 px-6 flex flex-col items-center justify-center max-w-6xl mx-auto">
-			<div
-				class="relative w-full mx-auto flex flex-col justify-center items-center text-center space-y-6"
+	<!-- ── Hero ──────────────────────────────────────────────────────── -->
+	<section class="relative w-full overflow-hidden bg-brand-field">
+		<div
+			class="relative mx-auto flex w-full max-w-page flex-col gap-[18px] px-5 py-12 lg:px-10 lg:py-[72px]"
+		>
+			<span class="font-mono text-[12px] font-medium uppercase tracking-[0.08em] text-brand-ink">
+				Open counter · No signup
+			</span>
+			<h1
+				class="font-display text-[44px] font-extrabold leading-[0.92] tracking-[-0.02em] text-brand-ink lg:text-[72px] lg:leading-[74px]"
 			>
+				Free tools
+			</h1>
+			<p
+				class="max-w-[620px] font-sans text-[17px] leading-[26px] text-[#2A2C1E] lg:text-[19px] lg:leading-[28px]"
+			>
+				Every tool here is the Pictify render API with a face on it. Five free renders a day, no
+				account, and the files are yours.
+			</p>
+
+			<!--
+				Print-shop deco: two riso pills, a stamped tool mark, and a CMYK
+				registration run. Decorative only, so it is hidden from assistive
+				tech and dropped below the desktop column where it would collide
+				with the copy.
+			-->
+			<div aria-hidden="true" class="pointer-events-none absolute inset-0 hidden lg:block">
 				<div
-					class="inline-block bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-4 transform -rotate-2"
+					class="absolute right-[70px] top-16 h-[52px] w-[210px] -rotate-[14deg] rounded-full bg-brand-sky"
+				/>
+				<div
+					class="absolute right-[30px] top-[130px] h-[44px] w-[150px] -rotate-[14deg] rounded-full bg-brand-royal"
+				/>
+				<div
+					class="absolute right-4 top-11 flex h-11 w-11 rotate-[8deg] items-center justify-center rounded-full border-[1.5px] border-brand-ink bg-brand-paper font-mono text-[13px] font-bold text-brand-ink"
 				>
-					<span class="font-black uppercase tracking-widest text-sm">Dev Tools</span>
+					⚒
 				</div>
-
-				<h1
-					class="text-4xl sm:text-5xl md:text-6xl 2xl:text-7xl font-black tracking-tighter mb-4 uppercase leading-none"
-				>
-					Free Tools for<br />Programmatic Media
-				</h1>
-
-				<p class="text-xl md:text-2xl font-bold max-w-3xl leading-relaxed text-gray-700">
-					Design templates once, render variants in seconds. <br class="hidden md:block" />
-					Try our free tools, then automate at scale with the Pictify API.
-				</p>
-				<p class="text-sm md:text-base font-bold text-gray-600 max-w-3xl">
-					Free to try. Guest limits may apply; create a free account to unlock higher limits and
-					remove watermarks.
-				</p>
-			</div>
-
-			<!-- Tools Grid -->
-			<div class="w-full grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20">
-				{#each tools as tool}
-					<a href={tool.url} class="block group relative h-full">
-						<div
-							class="h-full bg-white border-[3px] border-gray-900 p-8 rounded-xl shadow-brutal-2xl transition-all duration-200 group-hover:-translate-y-2 group-hover:shadow-brutal-3xl flex flex-col items-start relative overflow-hidden"
-						>
-							<!-- Background Pattern -->
-							<div
-								class="absolute top-0 right-0 w-32 h-32 bg-brand-accent opacity-10 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500"
-							/>
-
-							<div
-								class="w-16 h-16 bg-brand-bg border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-2xl mb-6 shadow-brutal-lg group-hover:bg-brand-accent transition-colors duration-200 text-gray-900"
-							>
-								<i class={tool.icon} />
-							</div>
-
-							<h3
-								class="text-2xl font-black uppercase tracking-wide mb-3 group-hover:underline decoration-4 decoration-brand-accent underline-offset-4"
-							>
-								{tool.name}
-							</h3>
-
-							<p class="text-lg font-medium text-gray-600 leading-relaxed">
-								{tool.description}
-							</p>
-
-							<div
-								class="mt-auto pt-6 flex items-center text-sm font-black uppercase tracking-widest text-gray-900 group-hover:translate-x-2 transition-transform duration-200"
-							>
-								Try Tool <i class="fa fa-arrow-right ml-2" />
-							</div>
-						</div>
-					</a>
-				{/each}
+				<div class="absolute bottom-[26px] right-[340px] flex gap-[7px]">
+					<span class="h-[10px] w-[10px] bg-brand-blue" />
+					<span class="h-[10px] w-[10px] bg-brand-ink" />
+					<span class="h-[10px] w-[10px] bg-brand-pink" />
+				</div>
 			</div>
 		</div>
+	</section>
 
-		<SectionSeparator icon="star" />
-
-		<!-- Workflows (Use cases) -->
-		<div id="workflows" class="w-full py-20 px-6 max-w-6xl mx-auto scroll-mt-24">
-			<div class="text-center space-y-4 mb-12">
-				<div
-					class="inline-block bg-white border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-2 transform rotate-1"
-				>
-					<span class="font-black uppercase tracking-widest text-sm">Workflows</span>
-				</div>
-				<h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter">
-					Ready-to-use <span class="text-brand-danger">automation</span> recipes
-				</h2>
-				<p class="text-lg md:text-xl font-bold text-gray-700 max-w-3xl mx-auto">
-					These pages come with a starter template, recommended sizes, and a prefilled API snippet.
-				</p>
-			</div>
-
-			<div class="grid md:grid-cols-2 gap-6">
-				{#each useCases as uc}
+	<main class="w-full">
+		<!-- ── Wedge row ─────────────────────────────────────────────── -->
+		<div class="mx-auto w-full max-w-page px-5 pt-8 lg:px-10 lg:pt-12">
+			<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+				{#each wedge as tool (tool.href)}
 					<a
-						href={`/tools/${uc.id}`}
-						class="bg-white border-[3px] border-gray-900 p-6 rounded-xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all group"
+						href={tool.href}
+						class="{cardBase} {tool.shadow} flex flex-col-reverse rounded-card hover:-translate-x-[2px] hover:-translate-y-[2px] lg:flex-row"
 					>
-						<div class="flex items-start justify-between gap-4">
-							<div>
-								<div class="text-xs font-black uppercase tracking-widest text-gray-500">
-									Workflow
-								</div>
-								<div
-									class="text-2xl font-black mt-1 group-hover:underline underline-offset-4 decoration-4 decoration-brand-accent"
-								>
-									{useCaseDetails[uc.id]?.label || uc.label}
-								</div>
-								<p class="text-gray-600 font-medium mt-2">
-									{useCaseDetails[uc.id]?.description ||
-										'Generate media from templates with one API call.'}
-								</p>
-							</div>
-							<div class="flex flex-col items-end gap-2 flex-shrink-0">
-								<span
-									class="px-4 py-2 bg-data-green text-white border-[3px] border-gray-900 font-black uppercase tracking-wide shadow-brutal-md group-hover:shadow-[1px_1px_0_0_#1f2937] group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all text-xs flex items-center gap-2"
-								>
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-										/>
-									</svg>
-									Try Now
-								</span>
-							</div>
+						<div class="flex flex-1 flex-col gap-2.5 px-[30px] py-7">
+							<span
+								class="{tool.badgeClass} self-start rounded-full border border-brand-ink px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase leading-[12px] tracking-[0.06em] text-brand-ink"
+							>
+								{tool.badge}
+							</span>
+							<h2
+								class="font-display text-[26px] font-extrabold leading-[31px] tracking-[-0.015em] text-brand-ink group-hover:underline"
+							>
+								{tool.title}
+							</h2>
+							<p class="font-sans text-sm leading-[21px] text-brand-slate">{tool.blurb}</p>
+							<span class="font-mono text-[11px] leading-[14px] tracking-[0.04em] text-brand-mute"
+								>{tool.meta}</span
+							>
+						</div>
+						<div
+							class="flex-shrink-0 overflow-hidden border-b border-brand-ink lg:w-[190px] lg:border-b-0 lg:border-l"
+						>
+							<img
+								src={tool.art}
+								alt=""
+								aria-hidden="true"
+								loading="lazy"
+								class="h-[140px] w-full object-cover lg:h-full"
+							/>
 						</div>
 					</a>
 				{/each}
 			</div>
 		</div>
 
-		<!-- Feature Section -->
-		<div class="py-24 bg-brand-accent border-y-[3px] border-gray-900 pattern-grid">
-			<div class="max-w-6xl mx-auto px-6">
-				<div
-					class="bg-white border-[3px] border-gray-900 shadow-brutal-3xl rounded-2xl overflow-hidden"
+		<!-- ── Shelves ───────────────────────────────────────────────── -->
+		{#each sections as section (section.label)}
+			<section class="mx-auto w-full max-w-page px-5 pt-10 lg:px-10 lg:pt-11">
+				<h2
+					class="font-mono text-[11px] font-bold uppercase leading-[14px] tracking-[0.08em] text-brand-ink"
 				>
-					<div class="p-8 md:p-12 border-b-[3px] border-gray-900 bg-gray-50">
-						<h2 class="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-6">
-							Best HTML to Image API 🚀
-						</h2>
-						<p class="text-xl font-bold text-gray-700 leading-relaxed max-w-3xl">
-							Scale your media creation with Pictify.io's HTML to Image API. Convert HTML to image
-							or gif with a simple API call. Be it certificates, social sharing card, or
-							personalized images for email campaigns.
-						</p>
-					</div>
-
-					<div class="p-8 md:p-12 bg-white">
-						<ul class="grid md:grid-cols-2 gap-6">
-							<li
-								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-1 transition-all"
-							>
-								<div class="mr-4 text-2xl">⚡️</div>
-								<p class="font-bold text-lg">
-									Fastest HTML to Image/Gif API. All other alternatives fall behind us.
-								</p>
-							</li>
-							<li
-								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-1 transition-all"
-							>
-								<div class="mr-4 text-2xl">🌏</div>
-								<p class="font-bold text-lg">
-									Images generated are served via global CDN by default.
-								</p>
-							</li>
-							<li
-								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-1 transition-all"
-							>
-								<div class="mr-4 text-2xl">🔄</div>
-								<p class="font-bold text-lg">
-									Access the image instantly. No queues and rate limits.
-								</p>
-							</li>
-							<li
-								class="flex items-start p-6 border-[3px] border-gray-900 rounded-xl bg-brand-bg shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-1 transition-all"
-							>
-								<div class="mr-4 text-2xl">📸</div>
-								<p class="font-bold text-lg">
-									Images are smart cropped. No whitespace outside the content.
-								</p>
-							</li>
-						</ul>
-
-						<div class="mt-10 flex justify-center">
-							<div class="inline-block transform hover:scale-105 transition-transform duration-200">
-								<SignUpButton />
+					{section.label}
+				</h2>
+				<div class="mt-3.5 grid grid-cols-1 gap-4 md:grid-cols-2 min-[1200px]:grid-cols-4">
+					{#each section.tools as tool (tool.href)}
+						<a
+							href={tool.href}
+							class="{cardBase} hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[4px_4px_0_0_#000000]"
+						>
+							<div class="overflow-hidden border-b border-brand-ink">
+								<img
+									src={tool.art}
+									alt=""
+									aria-hidden="true"
+									loading="lazy"
+									class="h-[116px] w-full object-cover"
+								/>
 							</div>
-						</div>
+							<div class="flex flex-col gap-[3px] px-4 py-3.5">
+								<h3
+									class="font-display text-[17px] font-bold leading-[22px] text-brand-ink group-hover:underline"
+								>
+									{tool.title}
+								</h3>
+								<span class="font-mono text-[10px] leading-[12px] tracking-[0.04em] text-brand-mute"
+									>{tool.meta}</span
+								>
+							</div>
+						</a>
+					{/each}
+				</div>
+			</section>
+		{/each}
+
+		<!-- ── Closing CTA ───────────────────────────────────────────── -->
+		<div class="mx-auto w-full max-w-page px-5 pt-16 lg:px-10 lg:pt-28">
+			<div
+				class="relative mx-auto flex max-w-[960px] flex-col items-start gap-6 overflow-hidden rounded-card border border-brand-ink bg-brand-paper px-6 py-7 shadow-[4px_4px_0_0_#0054A6] lg:flex-row lg:items-center lg:justify-between lg:py-7 lg:pl-11 lg:pr-9"
+			>
+				<div class="flex max-w-[420px] flex-col gap-1.5">
+					<h2
+						class="font-display text-[26px] font-extrabold leading-[32px] tracking-[-0.015em] text-brand-ink lg:text-[28px] lg:leading-[34px]"
+					>
+						This, but on autopilot.
+					</h2>
+					<p class="font-sans text-[15px] leading-[22px] text-brand-slate">
+						Every tool on this page is one API call. Free tier: 50 renders a month, no card, no
+						watermark.
+					</p>
+				</div>
+
+				<div class="flex flex-shrink-0 flex-wrap items-center gap-2.5">
+					<a
+						href="/signup"
+						class="flex h-12 items-center whitespace-nowrap rounded-lg bg-brand-ink px-[22px] font-sans text-[15px] font-semibold text-white shadow-[2px_2px_0_0_#FF48B0] transition-opacity hover:opacity-90"
+					>
+						Start rendering
+					</a>
+					<a
+						href="/docs"
+						class="flex h-12 items-center whitespace-nowrap rounded-lg border border-brand-ink bg-brand-paper px-[22px] font-sans text-[15px] font-semibold text-brand-ink transition-colors hover:bg-brand-subtle"
+					>
+						Read the docs
+					</a>
+				</div>
+
+				<!-- The stack: one PDF, one PNG, one MP4, fanned like proofs off a press. -->
+				<div
+					aria-hidden="true"
+					class="hidden flex-shrink-0 items-center justify-center lg:flex lg:w-[230px]"
+				>
+					<svg
+						width="220"
+						height="170"
+						viewBox="0 0 220 170"
+						xmlns="http://www.w3.org/2000/svg"
+						class="-my-2.5 flex-shrink-0"
+					>
+						<g transform="rotate(-7 60 96)">
+							<rect
+								x="18"
+								y="46"
+								width="88"
+								height="104"
+								rx="6"
+								fill="#FFD3E8"
+								stroke="#000000"
+								stroke-width="1.5"
+							/>
+							<rect x="28" y="58" width="46" height="8" rx="2" fill="#000000" />
+							<rect x="28" y="74" width="66" height="4" rx="2" fill="rgb(0 0 0 / 45%)" />
+							<rect x="28" y="83" width="58" height="4" rx="2" fill="rgb(0 0 0 / 45%)" />
+							<rect x="28" y="122" width="34" height="14" rx="7" fill="#000000" />
+							<text
+								x="34"
+								y="132"
+								font-family="JetBrains Mono, ui-monospace, monospace"
+								font-size="9"
+								font-weight="700"
+								fill="#FFD3E8">PDF</text
+							>
+						</g>
+						<g transform="rotate(3 118 90)">
+							<rect
+								x="72"
+								y="30"
+								width="92"
+								height="112"
+								rx="6"
+								fill="#FFFFFF"
+								stroke="#000000"
+								stroke-width="1.5"
+							/>
+							<rect x="82" y="40" width="72" height="52" rx="4" fill="#0078BF" />
+							<rect x="90" y="56" width="38" height="9" rx="2" fill="#FFFFFF" />
+							<rect x="90" y="70" width="26" height="5" rx="2" fill="#A9D7F2" />
+							<rect x="82" y="102" width="52" height="5" rx="2" fill="rgb(0 0 0 / 45%)" />
+							<rect x="82" y="120" width="34" height="14" rx="7" fill="#000000" />
+							<text
+								x="88"
+								y="130"
+								font-family="JetBrains Mono, ui-monospace, monospace"
+								font-size="9"
+								font-weight="700"
+								fill="#D8F34A">PNG</text
+							>
+						</g>
+						<g transform="rotate(12 172 92)">
+							<rect
+								x="132"
+								y="44"
+								width="76"
+								height="98"
+								rx="6"
+								fill="#131417"
+								stroke="#000000"
+								stroke-width="1.5"
+							/>
+							<circle cx="170" cy="82" r="17" fill="#D8F34A" stroke="#000000" stroke-width="1.5" />
+							<path d="M165 74l12 8-12 8v-16z" fill="#131417" />
+							<rect x="142" y="114" width="34" height="14" rx="7" fill="#D8F34A" />
+							<text
+								x="147"
+								y="124"
+								font-family="JetBrains Mono, ui-monospace, monospace"
+								font-size="9"
+								font-weight="700"
+								fill="#131417">MP4</text
+							>
+						</g>
+						<rect x="6" y="20" width="9" height="9" fill="#0078BF" />
+						<rect x="15" y="11" width="9" height="9" fill="#000000" />
+						<rect x="196" y="18" width="9" height="9" fill="#FF48B0" />
+						<rect x="204" y="150" width="9" height="9" fill="#D8F34A" stroke="#000000" />
+					</svg>
+				</div>
+
+				<!-- Registration marks, cut by the card edges. -->
+				<div aria-hidden="true" class="pointer-events-none absolute inset-0 hidden lg:block">
+					<div class="absolute left-[340px] top-4 flex gap-1.5">
+						<span class="h-[9px] w-[9px] border border-brand-ink bg-brand-field" />
+						<span class="h-[9px] w-[9px] border border-brand-ink bg-brand-field opacity-55" />
+					</div>
+					<div class="absolute bottom-[18px] right-[230px] flex gap-1.5">
+						<span class="h-[9px] w-[9px] border border-brand-ink bg-brand-field opacity-40" />
+						<span class="h-[9px] w-[9px] border border-brand-ink bg-brand-field" />
+						<span class="h-[9px] w-[9px] border border-brand-ink bg-brand-field opacity-70" />
 					</div>
 				</div>
-			</div>
-		</div>
-
-		<SectionSeparator icon="arrow" />
-
-		<!-- FAQ Section -->
-		<div class="w-full max-w-4xl mx-auto px-6 py-24">
-			<div class="flex items-center justify-center mb-12">
-				<h2
-					class="text-4xl md:text-5xl font-black uppercase tracking-tighter text-center bg-white px-6 py-2 border-[3px] border-gray-900 shadow-brutal-xl transform -rotate-1 inline-block"
-				>
-					Frequently Asked Questions
-				</h2>
-			</div>
-
-			<div class="space-y-6">
-				<details
-					class="group bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden transition-all duration-200 open:shadow-brutal-2xl open:-translate-y-1"
-				>
-					<summary
-						class="flex items-center justify-between p-6 cursor-pointer list-none bg-brand-bg hover:bg-gray-50 transition-colors"
-					>
-						<span class="font-black text-xl uppercase tracking-wide">What is Pictify.io?</span>
-						<span
-							class="transform transition-transform duration-200 group-open:rotate-180 bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 group-hover:bg-brand-accent group-hover:text-black"
-						>
-							<i class="fa fa-chevron-down" />
-						</span>
-					</summary>
-					<div class="p-6 pt-0 border-t-[3px] border-gray-900 bg-white">
-						<p class="text-lg font-medium text-gray-700 leading-relaxed mt-4">
-							Pictify is the infrastructure layer for programmatic media. Design templates (HTML/CSS
-							or our editor), inject variables, and render images/GIFs at scale via API, with fast,
-							predictable output.
-						</p>
-					</div>
-				</details>
-
-				<details
-					class="group bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden transition-all duration-200 open:shadow-brutal-2xl open:-translate-y-1"
-				>
-					<summary
-						class="flex items-center justify-between p-6 cursor-pointer list-none bg-brand-bg hover:bg-gray-50 transition-colors"
-					>
-						<span class="font-black text-xl uppercase tracking-wide"
-							>Are these tools really free?</span
-						>
-						<span
-							class="transform transition-transform duration-200 group-open:rotate-180 bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 group-hover:bg-brand-accent group-hover:text-black"
-						>
-							<i class="fa fa-chevron-down" />
-						</span>
-					</summary>
-					<div class="p-6 pt-0 border-t-[3px] border-gray-900 bg-white">
-						<p class="text-lg font-medium text-gray-700 leading-relaxed mt-4">
-							Yes, these tools are free to try. Some tools enforce a daily guest limit and may add
-							a watermark after a few generations. Creating a free account unlocks higher limits and
-							removes watermarks. For production workloads and high volume, use our API plans.
-						</p>
-					</div>
-				</details>
-
-				<details
-					class="group bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl overflow-hidden transition-all duration-200 open:shadow-brutal-2xl open:-translate-y-1"
-				>
-					<summary
-						class="flex items-center justify-between p-6 cursor-pointer list-none bg-brand-bg hover:bg-gray-50 transition-colors"
-					>
-						<span class="font-black text-xl uppercase tracking-wide"
-							>Can I use these tools for commercial projects?</span
-						>
-						<span
-							class="transform transition-transform duration-200 group-open:rotate-180 bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 group-hover:bg-brand-accent group-hover:text-black"
-						>
-							<i class="fa fa-chevron-down" />
-						</span>
-					</summary>
-					<div class="p-6 pt-0 border-t-[3px] border-gray-900 bg-white">
-						<p class="text-lg font-medium text-gray-700 leading-relaxed mt-4">
-							Absolutely! You're welcome to use our free tools for both personal and commercial
-							projects. However, please note that there may be usage limits on the free tier. For
-							high-volume or mission-critical applications, we recommend checking out our paid API
-							plans.
-						</p>
-					</div>
-				</details>
 			</div>
 		</div>
 	</main>
 
-	<Footer />
+	<div class="mt-16">
+		<Footer />
+	</div>
 </div>
-
-<style>
-	/* No additional styles needed as Tailwind covers it, 
-     but keeping the block for potential future custom styles */
-	.pattern-grid {
-		background-image: radial-gradient(#1f2937 1px, transparent 1px);
-		background-size: 20px 20px;
-	}
-</style>
