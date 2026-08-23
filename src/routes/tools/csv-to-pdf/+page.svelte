@@ -263,8 +263,10 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 
 		for (let i = 0; i < generatedImages.length; i++) {
 			if (i > 0) pdf.addPage();
-			// Fetch the rendered PNG and embed as data URL (CDN allows CORS-less fetch → blob)
-			const blob = await fetch(generatedImages[i].url).then((r) => r.blob());
+			// Fetch through the same-origin asset proxy: media.pictify.io serves a
+			// malformed duplicate CORS header, so a direct cross-origin fetch fails.
+			const proxied = `/api/asset?url=${encodeURIComponent(generatedImages[i].url)}`;
+			const blob = await fetch(proxied).then((r) => r.blob());
 			const dataUrl = await new Promise((resolve) => {
 				const reader = new FileReader();
 				reader.onload = () => resolve(reader.result);
