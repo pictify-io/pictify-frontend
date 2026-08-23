@@ -20,7 +20,6 @@
 	import { toast } from '../../../../store/toast.store';
 	import { downloadFile } from '$lib/utils/download.js';
 	import { getApiToken, createApiToken } from '../../../../api/user';
-	import ShareResultButton from '../ShareResultButton.svelte';
 
 	export let imageUrl = '';
 	/** Display name of the output, e.g. "PNG". Used in every headline. */
@@ -99,6 +98,16 @@
 			tool_name: toolName,
 			content_type: 'image'
 		});
+	}
+
+	let copiedUrl = false;
+	async function copyUrl() {
+		if (!imageUrl) return;
+		try {
+			await navigator.clipboard.writeText(imageUrl);
+			copiedUrl = true;
+			setTimeout(() => (copiedUrl = false), 2000);
+		} catch {}
 	}
 
 	async function copyApiRequest() {
@@ -208,20 +217,18 @@
 			</p>
 			<p class="font-sans text-sm leading-5 text-brand-slate">
 				{#if monthlyRemaining != null}{monthlyRemaining} of {monthlyLimit} left this month ·
-				{/if}Same call from your code:
+				{/if}Your link stays live:
 			</p>
 			<div
-				class="mt-1 flex items-center gap-2 overflow-hidden rounded bg-brand-press px-3 py-2 font-mono text-[11px] text-[#ADB9C6]"
+				class="mt-1 flex items-center gap-2 rounded bg-brand-press px-3 py-2 font-mono text-[11px] text-[#ADB9C6]"
 			>
-				<span class="truncate"
-					>curl -H "Authorization: Bearer <span class="text-brand-field">{maskedKey}</span>" …</span
-				>
+				<span class="min-w-0 flex-1 select-all break-all text-brand-field">{imageUrl}</span>
 				<button
 					type="button"
-					on:click={copyApiRequest}
+					on:click={copyUrl}
 					class="ml-auto flex-shrink-0 border border-[#383A42] px-2 py-0.5 font-mono text-[10px] tracking-[0.04em] text-white hover:bg-[#383A42]"
 				>
-					{copiedApi ? 'COPIED' : 'COPY'}
+					{copiedUrl ? 'COPIED' : 'COPY'}
 				</button>
 			</div>
 		{:else}
@@ -312,18 +319,6 @@
 			>
 				Download {formatLabel}
 			</button>
-		{/if}
-		{#if imageUrl && state !== 'limit'}
-			<ShareResultButton
-				assetUrl={imageUrl}
-				contentType="image"
-				{width}
-				{height}
-				format={fileExtension}
-				source="tool"
-				{toolName}
-				variant="small"
-			/>
 		{/if}
 	</div>
 	</div>
