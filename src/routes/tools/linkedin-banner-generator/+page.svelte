@@ -425,22 +425,7 @@
 		}
 		let html = doc.documentElement.outerHTML;
 
-		// Add watermark for non-logged in users after 2 generations
-		if (!isUserLoggedIn && generationCount > 2) {
-			const watermarkDiv = `
-        <div style="position: fixed; bottom: 16px; right: 16px; background: rgba(0,0,0,0.85);
-                    padding: 10px 18px; border-radius: 6px; font-size: 16px; z-index: 9999;
-                    font-family: system-ui, -apple-system, sans-serif; font-weight: 700;
-                    color: #ffffff; display: flex; align-items: center; gap: 8px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1);">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2.5">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-          </svg>
-          <span>Made with <span style="color: #ff6b6b; font-weight: 800;">pictify.io</span></span>
-        </div>
-      `;
-			html = html.replace('</body>', `${watermarkDiv}</body>`);
-		}
+		// No guest watermark: the toolbar promises NO WATERMARK.
 
 		try {
 			const { image } = await createImagePublic({

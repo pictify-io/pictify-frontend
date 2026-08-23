@@ -726,18 +726,7 @@
 
 		let html = buildSrcDoc();
 
-		// Add watermark for ALL non-logged in users
-		if (!isUserLoggedIn) {
-			const watermarkDiv = `
-        <div style="position: fixed; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9);
-                    padding: 4px 8px; border-radius: 4px; font-size: 12px; z-index: 9999;
-                    font-family: system-ui, -apple-system, sans-serif; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-          Created with <a href="https://pictify.io" style="color: #ff6b6b; text-decoration: none; font-weight: 600;">pictify.io</a>
-        </div>
-      `;
-
-			html = html.replace('</body>', `${watermarkDiv}</body>`);
-		}
+		// No guest watermark: the toolbar promises NO WATERMARK.
 
 		const width = previewFrame
 			? parseInt(getComputedStyle(previewFrame).width.replace('px', ''))
