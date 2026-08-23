@@ -31,7 +31,8 @@
 		parseSize
 	} from '$lib/pseo/config.js';
 	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
-	import NextSteps from '$lib/components/tools/NextSteps.svelte';
+	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
+	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/telemetry.js';
@@ -510,23 +511,6 @@
 		}
 	}
 
-	$: nextStepsCurlSnippet = buildCurlSnippetFromHtml(
-		getCurrentOgHtml(),
-		previewWidth,
-		previewHeight
-	);
-	$: nextStepsTemplateDraft = imageUrl
-		? {
-				version: 1,
-				name: isPlatform ? `OG template (${platformLabel})` : 'OG template',
-				type: 'og-image',
-				width: previewWidth,
-				height: previewHeight,
-				backgroundImageUrl: imageUrl,
-				source: 'og-image-generator'
-		  }
-		: null;
-
 	const updateFont = (font) => {
 		selectedFont = font;
 		updateHTML(selectedTemplate);
@@ -777,6 +761,49 @@
 	const TOOL_PATH = '/tools/og-image-generator';
 
 	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+	$: lastFreeRender = !isUserLoggedIn && guestRemaining <= 1;
+
+	const ogImageExamples = [
+		{
+			id: 'javascript',
+			label: 'JavaScript',
+			fileName: 'og-image.js',
+			code: `<span class="text-[#6a9955]">// Render a 1200x630 Open Graph image from HTML</span>
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">html</span> = <span class="text-[#ce9178]">\`&lt;div style="width:1200px;height:630px;display:flex;align-items:center;justify-content:center;background:#0054A6;color:#fff;font:700 64px sans-serif"&gt;\${title}&lt;/div&gt;\`</span>;
+
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">response</span> = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]">'https://api.pictify.io/image'</span>, {
+  <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
+  <span class="text-[#9cdcfe]">headers</span>: { <span class="text-[#ce9178]">'Content-Type'</span>: <span class="text-[#ce9178]">'application/json'</span>, <span class="text-[#ce9178]">'Authorization'</span>: <span class="text-[#ce9178]">'Bearer YOUR_API_KEY'</span> },
+  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">stringify</span>({ <span class="text-[#9cdcfe]">html</span>, <span class="text-[#9cdcfe]">width</span>: <span class="text-[#b5cea8]">1200</span>, <span class="text-[#9cdcfe]">height</span>: <span class="text-[#b5cea8]">630</span> })
+});
+
+<span class="text-[#c586c0]">const</span> { <span class="text-[#9cdcfe]">image</span> } = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]">response</span>.<span class="text-[#dcdcaa]">json</span>();
+<span class="text-[#9cdcfe]">console</span>.<span class="text-[#dcdcaa]">log</span>(<span class="text-[#9cdcfe]">image</span>.<span class="text-[#9cdcfe]">url</span>); <span class="text-[#6a9955]">// drop straight into og:image</span>`
+		},
+		{
+			id: 'python',
+			label: 'Python',
+			fileName: 'og_image.py',
+			code: `<span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]">requests</span>
+
+<span class="text-[#9cdcfe]">html</span> = <span class="text-[#ce9178]">'&lt;div style="width:1200px;height:630px;display:flex;align-items:center;justify-content:center;background:#0054A6;color:#fff;font:700 64px sans-serif"&gt;New blog post&lt;/div&gt;'</span>
+
+<span class="text-[#9cdcfe]">resp</span> = <span class="text-[#9cdcfe]">requests</span>.<span class="text-[#dcdcaa]">post</span>(<span class="text-[#ce9178]">"https://api.pictify.io/image"</span>,
+    <span class="text-[#9cdcfe]">headers</span>={<span class="text-[#ce9178]">"Authorization"</span>: <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>},
+    <span class="text-[#9cdcfe]">json</span>={<span class="text-[#ce9178]">"html"</span>: <span class="text-[#9cdcfe]">html</span>, <span class="text-[#ce9178]">"width"</span>: <span class="text-[#b5cea8]">1200</span>, <span class="text-[#ce9178]">"height"</span>: <span class="text-[#b5cea8]">630</span>})
+
+<span class="text-[#dcdcaa]">print</span>(<span class="text-[#9cdcfe]">resp</span>.<span class="text-[#dcdcaa]">json</span>()[<span class="text-[#ce9178]">"url"</span>])`
+		},
+		{
+			id: 'curl',
+			label: 'cURL',
+			fileName: 'og-image.sh',
+			code: `<span class="text-[#dcdcaa]">curl</span> -X POST <span class="text-[#ce9178]">https://api.pictify.io/image</span> \\
+  -H <span class="text-[#ce9178]">"Content-Type: application/json"</span> \\
+  -H <span class="text-[#ce9178]">"Authorization: Bearer YOUR_API_KEY"</span> \\
+  -d <span class="text-[#ce9178]">'{"html":"&lt;div style=\\"width:1200px;height:630px\\"&gt;...&lt;/div&gt;","width":1200,"height":630}'</span>`
+		}
+	];
 
 	const RELATED = [
 		{
@@ -1279,16 +1306,28 @@
 
 	<div slot="result">
 		{#if imageUrl}
-			<NextSteps
-				heading="Next steps"
-				description="Copy the API request, save this as a reusable template background, and batch render variants."
-				curlSnippet={nextStepsCurlSnippet}
-				templateDraft={nextStepsTemplateDraft}
-				generatedUrl={imageUrl}
-				toolName="OG Image Generator"
+			<ResultCard
+				{imageUrl}
+				formatLabel="PNG"
+				fileExtension="png"
+				width={1200}
+				height={630}
+				loggedIn={isUserLoggedIn}
+				lastFree={lastFreeRender}
+				toolName={TOOL_NAME}
+				toolPath={TOOL_PATH}
 			/>
 		{/if}
 	</div>
+
+	<AutomateSection
+		slot="automate"
+		title="Automate with the"
+		titleHighlight="API"
+		toolName={TOOL_NAME}
+		description="Generate Open Graph images programmatically. Render a 1200×630 card from HTML with one POST — perfect for per-post og:image at publish time."
+		codeExamples={ogImageExamples}
+	/>
 
 	<svelte:fragment slot="longform">
 		<LongformSection index="01" id="templates" first>
