@@ -17,6 +17,7 @@
 	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
 	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
 	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
+	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
 	import { onMount, onDestroy, tick } from 'svelte';
 	import { browser } from '$app/environment';
 	import { toast } from '../../../store/toast.store';
@@ -27,7 +28,6 @@
 	import { saveLastRender } from '$lib/lastRender.js';
 	import { analytics } from '$lib/telemetry.js';
 	import { downloadFile } from '$lib/utils/download.js';
-	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import posthog from 'posthog-js';
 
 	let stickyBar;
@@ -135,6 +135,7 @@
 
 	// User login state
 	let isUserLoggedIn = false;
+	$: lastFreeRender = !isUserLoggedIn && guestRemaining <= 1;
 	user.subscribe((userData) => {
 		isUserLoggedIn = !!userData?.email;
 	});
@@ -859,206 +860,133 @@
 
 	<div slot="tool">
 		<ToolCard>
-			<div class="flex flex-col gap-6 p-5 lg:p-7">
-				<div class="relative overflow-hidden border border-brand-ink bg-brand-paper">
-					<!-- Panel header. The v1 window chrome is gone; the card is the window now. -->
-					<div
-						class="flex items-center justify-between border-b border-brand-ink bg-brand-press px-4 py-2.5"
-					>
-						<span class="font-mono text-xs tracking-[0.06em] text-white">CAPTURE</span>
-						<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">
-							SERVER-SIDE · NO EXTENSION
-						</span>
+			<!-- Two-pane split like the html-to-image editor, adapted for a screenshot
+			     tool: controls on the left, live preview on the right. -->
+			<div class="flex w-full flex-col lg:h-[520px] lg:flex-row">
+				<!-- Controls pane -->
+				<div class="flex min-w-0 flex-1 flex-col gap-5 overflow-y-auto bg-brand-paper p-5 lg:p-6">
+					<div class="flex flex-col gap-2">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">TARGET URL</span>
+						<div class="flex gap-2">
+							<input
+								bind:value={url}
+								on:input={handleFirstInput}
+								type="url"
+								inputmode="url"
+								autocomplete="url"
+								spellcheck="false"
+								aria-invalid={urlError ? 'true' : undefined}
+								class="h-11 min-w-0 flex-1 rounded-lg border-[1.5px] border-brand-ink bg-white px-3 font-mono text-sm text-brand-ink placeholder-brand-mute focus:outline-none focus:ring-2 focus:ring-brand-royal"
+								placeholder="https://example.com"
+							/>
+							<button
+								on:click={handleLoadPreviewClick}
+								disabled={isLoading || !url}
+								class="h-11 flex-shrink-0 rounded-lg border-[1.5px] border-brand-ink bg-brand-paper px-4 font-sans text-sm font-semibold text-brand-ink transition-colors hover:bg-brand-field disabled:opacity-50"
+							>
+								{#if isLoading}Loading…{:else}Load preview{/if}
+							</button>
+						</div>
+						{#if urlError}
+							<p class="text-sm font-medium text-brand-alarm" role="alert">{urlError}</p>
+						{/if}
 					</div>
 
-					<!-- Content -->
-					<div
-						class="p-6 md:p-8 bg-brand-paper"
-						style="background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 10px 10px;"
-					>
-						<div class="w-full flex flex-col gap-6 md:flex-row items-stretch">
-							<div class="flex-grow group relative">
-								<div
-									class="absolute -top-3 left-4 bg-brand-ink text-white px-2 py-0.5 text-xs font-bold tracking-wider"
+					<div class="flex flex-col gap-2">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">DEVICE</span>
+						<div class="flex flex-wrap gap-1.5">
+							{#each devicePresets as preset}
+								<button
+									on:click={() => selectPreset(preset)}
+									class="rounded-full border px-3 py-1.5 font-mono text-[11px] tracking-[0.04em] transition-colors {activePreset === preset.id
+										? 'border-brand-ink bg-brand-ink text-white'
+										: 'border-brand-rule bg-brand-paper text-brand-ink hover:bg-brand-subtle'}"
 								>
-									Target URL
-								</div>
+									{preset.label.toUpperCase()}
+								</button>
+							{/each}
+						</div>
+					</div>
+
+					<div class="flex flex-wrap gap-x-8 gap-y-4">
+						<div class="flex flex-col gap-2">
+							<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">SIZE (PX)</span>
+							<div class="flex items-center gap-1.5">
 								<input
-									bind:value={url}
-									on:input={handleFirstInput}
-									type="url"
-									inputmode="url"
-									autocomplete="url"
-									spellcheck="false"
-									aria-invalid={urlError ? 'true' : undefined}
-									class="w-full h-full border border-brand-ink bg-brand-paper placeholder-gray-400 text-lg font-bold font-mono focus:outline-none transition-all px-6 py-4"
-									placeholder="https://example.com"
+									type="number"
+									bind:value={captureWidth}
+									on:input={handleDimensionInput}
+									min="1"
+									max="4000"
+									class="h-9 w-20 rounded border-[1.5px] border-brand-ink bg-white px-2 text-center font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-royal"
+								/>
+								<span class="font-mono text-sm text-brand-mute">×</span>
+								<input
+									type="number"
+									bind:value={captureHeight}
+									on:input={handleDimensionInput}
+									min="1"
+									max="4000"
+									class="h-9 w-20 rounded border-[1.5px] border-brand-ink bg-white px-2 text-center font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-royal"
 								/>
 							</div>
-							<div class="md:w-auto w-full">
-								<button
-									on:click={handleLoadPreviewClick}
-									disabled={isLoading || !url}
-									class="w-full h-full px-8 py-4 bg-brand-field text-brand-ink border border-brand-ink text-xl font-semibold tracking-wide hover:bg-[#ffb050] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
-								>
-									{#if isLoading}Loading...{:else}Load Preview{/if}
-								</button>
-							</div>
 						</div>
-
-						{#if urlError}
-							<p class="mt-3 text-sm font-bold text-brand-alarm" role="alert">{urlError}</p>
-						{:else if url}
-							{#if isLoading}
-								<p class="mt-3 text-sm font-bold text-brand-mute flex items-center gap-2">
-									<span
-										class="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"
-									/>
-									Loading preview… the Capture button unlocks once it's ready.
-								</p>
-							{:else if !isPreviewLoaded}
-								<p class="mt-3 text-sm font-bold text-brand-mute">
-									Load the preview first; then the green
-									<span class="text-brand-proof font-semibold">Capture</span> button activates below.
-								</p>
-							{/if}
-						{/if}
-
-						<!-- Capture Settings -->
-						<div class="mt-6 border-t border-brand-ink pt-6">
-							<div class="flex items-center gap-2 mb-4">
-								<div class="bg-brand-ink text-white px-2 py-0.5 text-xs font-bold tracking-wider">
-									Capture Settings
-								</div>
+						<div class="flex flex-col gap-2">
+							<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">FORMAT</span>
+							<div class="flex items-center gap-1.5">
+								{#each ['png', 'jpg', 'webp'] as fmt}
+									<button
+										on:click={() => (fileFormat = fmt)}
+										class="rounded-full border px-3 py-1.5 font-mono text-[11px] tracking-[0.04em] transition-colors {fileFormat === fmt
+											? 'border-brand-ink bg-brand-ink text-white'
+											: 'border-brand-rule bg-brand-paper text-brand-ink hover:bg-brand-subtle'}"
+									>{fmt.toUpperCase()}</button>
+								{/each}
 							</div>
-
-							<div class="flex flex-col md:flex-row gap-6">
-								<!-- Device Presets -->
-								<div>
-									<span class="block text-xs font-semibold tracking-wider mb-2 text-brand-mute"
-										>Device</span
-									>
-									<div class="flex gap-2">
-										{#each devicePresets as preset}
-											<button
-												on:click={() => selectPreset(preset)}
-												class="px-3 py-2 border border-brand-ink font-bold text-sm transition-all flex items-center gap-1.5 {activePreset ===
-												preset.id
-													? 'bg-brand-ink text-white shadow-none'
-													: 'bg-brand-paper text-brand-ink hover:'}"
-											>
-												{#if preset.id === 'desktop'}
-													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-														><path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="2"
-															d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-														/></svg
-													>
-												{:else if preset.id === 'tablet'}
-													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-														><path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="2"
-															d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-														/></svg
-													>
-												{:else}
-													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-														><path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="2"
-															d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-														/></svg
-													>
-												{/if}
-												{preset.label}
-											</button>
-										{/each}
-									</div>
-								</div>
-
-								<!-- Custom Size -->
-								<div>
-									<span class="block text-xs font-semibold tracking-wider mb-2 text-brand-mute"
-										>Size (px)</span
-									>
-									<div class="flex items-center gap-1">
-										<input
-											type="number"
-											bind:value={captureWidth}
-											on:input={handleDimensionInput}
-											min="1"
-											max="4000"
-											class="w-20 border border-brand-ink px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-brand-danger"
-										/>
-										<span class="font-semibold text-brand-mute">×</span>
-										<input
-											type="number"
-											bind:value={captureHeight}
-											on:input={handleDimensionInput}
-											min="1"
-											max="4000"
-											class="w-20 border border-brand-ink px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-brand-danger"
-										/>
-									</div>
-								</div>
-
-								<!-- Format -->
-								<div>
-									<span class="block text-xs font-semibold tracking-wider mb-2 text-brand-mute"
-										>Format</span
-									>
-									<div class="flex gap-0">
-										{#each ['png', 'jpg', 'webp'] as fmt}
-											<button
-												on:click={() => (fileFormat = fmt)}
-												class="px-4 py-2 border border-brand-ink font-semibold text-sm transition-all -ml-[3px] first:ml-0 {fileFormat ===
-												fmt
-													? 'bg-brand-ink text-white z-10'
-													: 'bg-brand-paper text-brand-ink hover:bg-brand-subtle'}"
-											>
-												{fmt}
-											</button>
-										{/each}
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<!-- CORS Disclaimer -->
-						<div
-							class="mt-6 text-xs md:text-sm font-bold text-brand-ink bg-[#fff] border border-brand-ink p-4 flex items-start gap-3"
-						>
-							<span class="text-xl">⚠️</span>
-							<p>
-								Due to CORS policies, live previews may be restricted for some domains. The capture
-								engine operates server-side and will bypass these limitations.
-							</p>
 						</div>
 					</div>
+
+					<div class="flex flex-col gap-2">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">ELEMENT SELECTOR (OPTIONAL)</span>
+						<div class="flex items-center gap-2">
+							<input
+								bind:value={selector}
+								type="text"
+								class="h-9 min-w-0 flex-1 rounded border-[1.5px] border-brand-ink bg-white px-3 font-mono text-sm placeholder-brand-mute focus:outline-none focus:ring-2 focus:ring-brand-royal"
+								placeholder="Click an element in the preview, or type a CSS selector"
+							/>
+							{#if selector}
+								<button
+									on:click={clearSelector}
+									class="h-9 flex-shrink-0 rounded border-[1.5px] border-brand-ink bg-brand-paper px-3 font-mono text-[11px] text-brand-ink hover:bg-brand-subtle"
+									title="Clear selector">CLEAR</button>
+							{/if}
+						</div>
+					</div>
+
+					<p class="mt-auto font-sans text-xs leading-[18px] text-brand-mute">
+						The preview may be blocked by some sites' CORS rules — capture always runs server-side and works regardless.
+					</p>
 				</div>
 
-				<div class="mt-8 w-full max-w-5xl mx-auto">
-					<h3 class="text-4xl font-semibold mb-6 text-center md:text-left drop-shadow-sm">
-						<span class="bg-brand-ink text-white px-2 py-1 transform -rotate-1 inline-block"
-							>Visual</span
-						>
-						Confirmation
-					</h3>
+				<!-- Preview pane -->
+				<div class="flex min-h-[320px] flex-1 flex-col gap-2 border-t-[1.5px] border-brand-ink bg-brand-subtle p-4 lg:min-h-0 lg:border-l-[1.5px] lg:border-t-0">
+					<div class="flex items-center justify-between">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">LIVE PREVIEW</span>
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">{captureWidth} × {captureHeight}</span>
+					</div>
 					<div
 						bind:this={iframeWrapper}
-						class="border-[4px] border-black bg-brand-paper p-2 relative cursor-crosshair mx-auto"
-						style="height: 600px; transition: max-width 0.3s ease;"
+						class="relative flex-1 cursor-crosshair overflow-hidden border-[1.5px] border-brand-ink bg-white shadow-[4px_4px_0_0_#000]"
 					>
 						{#if isLoading}
-							<div
-								class="absolute inset-0 flex items-center justify-center bg-brand-subtle bg-opacity-75"
-							>
+							<div class="absolute inset-0 z-10 flex items-center justify-center bg-brand-subtle/75">
 								<div class="loader" />
+							</div>
+						{/if}
+						{#if !isPreviewLoaded && !isLoading}
+							<div class="absolute inset-0 flex items-center justify-center px-6 text-center">
+								<span class="font-sans text-sm text-brand-mute">Enter a URL and press Load preview to see it here.</span>
 							</div>
 						{/if}
 						<iframe
@@ -1067,107 +995,10 @@
 							title="URL Preview"
 							width="100%"
 							height="100%"
-							scale="0.7"
 							frameborder="0"
 							sandbox="allow-scripts"
+							class="h-full w-full"
 						/>
-						<!-- No allow-same-origin: this frame executes a stranger's fetched
-						     page, which must not run in the pictify.io origin (cookies,
-						     localStorage, parent DOM). The element-selector bridge only
-						     uses postMessage with '*', which works across the opaque
-						     origin; nothing reads contentDocument. -->
-					</div>
-					<!-- Element Selector Bar -->
-					<div
-						class="bg-brand-subtle border-[3px] border-t-0 border-black p-4 flex flex-col md:flex-row gap-4 items-center"
-					>
-						<div class="flex-grow w-full">
-							<span class="block font-semibold text-xs mb-1 tracking-wider"
-								>Element Selector (Optional)</span
-							>
-							<div class="flex">
-								<div
-									class="bg-brand-ink text-white px-3 py-2 font-mono text-sm flex items-center justify-center border-y-[3px] border-l border-brand-rule"
-								>
-									&gt;_
-								</div>
-								<input
-									bind:value={selector}
-									type="text"
-									class="w-full border border-brand-ink placeholder-gray-500 text-sm font-mono focus:outline-none py-2 px-4"
-									placeholder="Click element in preview or type selector..."
-								/>
-								<button
-									on:click={clearSelector}
-									class="bg-brand-paper border-y-[3px] border-r border-brand-rule px-3 hover:bg-brand-rule transition-colors"
-									title="Clear Selector"
-								>
-									<svg
-										class="w-4 h-4 text-brand-ink"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="3"
-											d="M6 6l12 12M18 6L6 18"
-										/>
-									</svg>
-								</button>
-							</div>
-						</div>
-						<div class="w-full md:w-auto flex-shrink-0 pt-5">
-							<button
-								id="capture-button"
-								on:click={generateImage}
-								disabled={captureDisabled}
-								class="w-full md:w-auto px-8 py-3 bg-brand-proof text-brand-ink border border-brand-ink font-semibold tracking-wide transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center justify-center gap-2"
-							>
-								{#if isImageGenerating}
-									<svg
-										class="animate-spin h-5 w-5 text-brand-ink"
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 24 24"
-									>
-										<circle
-											class="opacity-25"
-											cx="12"
-											cy="12"
-											r="10"
-											stroke="currentColor"
-											stroke-width="4"
-										/>
-										<path
-											class="opacity-75"
-											fill="currentColor"
-											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-										/>
-									</svg>
-									Rendering...
-								{:else}
-									<span
-										>{hasAutoCaptured ? 'Re-capture' : 'Capture'}
-										{fileFormat.toUpperCase()}</span
-									>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-5 w-5"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="3"
-											d="M14 5l7 7m0 0l-7 7m7-7H3"
-										/></svg
-									>
-								{/if}
-							</button>
-						</div>
 					</div>
 				</div>
 			</div>
@@ -1200,86 +1031,17 @@
 
 	<div slot="result">
 		{#if imageUrl}
-			<div class="max-w-4xl mx-auto px-4 mb-20 mt-16">
-				<div
-					class="bg-brand-proof/10 border-[3px] border-brand-proof rounded-tile p-8 text-center relative overflow-hidden"
-				>
-					<div class="absolute top-0 right-0 w-32 h-32 bg-brand-proof/20 rounded-full blur-2xl" />
-
-					<h3 class="text-2xl font-semibold text-brand-ink tracking-tight mb-6">
-						Screenshot Captured!
-					</h3>
-
-					<div class="inline-block bg-brand-paper border border-brand-ink p-2 rotate-1 mb-8">
-						<a href={imageUrl} target="_blank" rel="noopener noreferrer">
-							<img
-								loading="lazy"
-								src={imageUrl}
-								alt="Generated screenshot"
-								class="max-w-full h-auto max-h-[400px]"
-							/>
-						</a>
-					</div>
-
-					<div class="flex flex-wrap justify-center gap-4">
-						<button
-							on:click={() =>
-								downloadFile(imageUrl, `pictify-screenshot.${fileFormat}`, {
-									tool_name: 'url_to_image_generator'
-								})}
-							class="px-6 py-3 bg-brand-paper text-brand-ink border border-brand-ink font-bold tracking-wide transition-all rounded-xl flex items-center gap-2"
-						>
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-								/></svg
-							>
-							Download {fileFormat.toUpperCase()}
-						</button>
-						<button
-							on:click={() => copyToClipboard(imageUrl)}
-							class="px-6 py-3 bg-brand-ink text-white border border-brand-ink font-bold tracking-wide hover:-sm transition-all rounded-xl flex items-center gap-2"
-						>
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-								/></svg
-							>
-							Copy URL
-						</button>
-					</div>
-
-					<!-- Experiment: Post-generation signup CTA -->
-					<!-- Experiment tool-signup-cta-v2: inline-value-prop arm. The sticky-bar arm renders
-						 the fixed StickySignupBar (below); control renders neither. -->
-					{#if !isUserLoggedIn && ctaVariant === 'inline-value-prop'}
-						<div
-							class="mt-8 border border-brand-ink bg-brand-field/20 p-6 flex flex-col items-center text-center gap-3"
-						>
-							<p class="font-semibold text-brand-ink text-base tracking-wide">
-								Like it? Automate it.
-							</p>
-							<p class="text-sm font-bold text-brand-slate max-w-md">
-								Sign up to get your API key and capture unlimited screenshots programmatically: same
-								quality, zero daily limits.
-							</p>
-							<a
-								href="/signup?redirect=/tools/url-to-image-generator"
-								on:click={() => trackSignupClick('post_generation_value_prop')}
-								class="mt-1 px-6 py-3 bg-brand-ink text-white border border-brand-ink font-semibold text-sm tracking-wide hover:-sm transition-all"
-							>
-								Get Your API Key (Free)
-							</a>
-						</div>
-					{/if}
-				</div>
-			</div>
+			<ResultCard
+				{imageUrl}
+				formatLabel={fileFormat.toUpperCase()}
+				fileExtension={fileFormat}
+				width={captureWidth}
+				height={captureHeight}
+				loggedIn={isUserLoggedIn}
+				lastFree={lastFreeRender}
+				toolName={TOOL_NAME}
+				toolPath={TOOL_PATH}
+			/>
 		{/if}
 	</div>
 
@@ -1641,17 +1403,4 @@
 		</div>
 	</svelte:fragment>
 
-	<svelte:fragment slot="footer-links">
-		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
-			<RelatedTools
-				tools={[
-					'html-email',
-					'blog-featured-image',
-					'og-image-generator',
-					'code-to-image',
-					'html-to-png'
-				]}
-			/>
-		</div>
-	</svelte:fragment>
 </ToolPageShell>
