@@ -156,17 +156,17 @@
 </script>
 
 <div
-	class="flex w-full flex-col gap-5 rounded-tile border-[1.5px] bg-brand-paper px-5 py-4 lg:flex-row lg:items-center lg:gap-5 lg:px-6 lg:py-[18px] {state ===
+	class="flex w-full flex-col gap-5 rounded-tile border-[1.5px] bg-brand-paper p-5 lg:flex-row lg:items-stretch lg:gap-6 lg:p-6 {state ===
 	'limit'
 		? 'border-brand-ink shadow-[4px_4px_0_0_#0078BF]'
 		: 'border-brand-proof'}"
 >
-	<!-- Thumbnail. Fixed box, so the card's height does not jump between renders. -->
+	<!-- Preview. Fixed box, so the card's height does not jump between renders. -->
 	<div
-		class="flex h-20 w-16 flex-shrink-0 items-center justify-center overflow-hidden border border-brand-rule bg-brand-subtle"
+		class="flex h-[180px] w-full flex-shrink-0 items-center justify-center overflow-hidden border border-brand-rule bg-brand-subtle lg:w-[280px]"
 	>
 		{#if imageUrl}
-			<img src={imageUrl} alt="" class="h-full w-full object-cover" />
+			<img src={imageUrl} alt="" class="h-full w-full object-contain" />
 		{:else}
 			<span class="font-mono text-[10px] tracking-[0.06em] text-brand-mute"
 				>{formatLabel.toUpperCase()}</span
@@ -174,7 +174,8 @@
 		{/if}
 	</div>
 
-	<div class="flex flex-1 flex-col gap-1">
+	<div class="flex min-w-0 flex-1 flex-col justify-between gap-4">
+	<div class="flex min-w-0 flex-col gap-1">
 		{#if state === 'limit'}
 			<p
 				class="font-display text-[21px] font-bold leading-[26px] tracking-[-0.02em] text-brand-ink"
@@ -251,7 +252,7 @@
 		{/if}
 	</div>
 
-	<div class="flex flex-shrink-0 flex-wrap items-center gap-2">
+	<div class="flex flex-wrap items-center gap-2">
 		{#if state === 'limit'}
 			<button
 				type="button"
@@ -312,20 +313,18 @@
 				Download {formatLabel}
 			</button>
 		{/if}
+		{#if imageUrl && state !== 'limit'}
+			<ShareResultButton
+				assetUrl={imageUrl}
+				contentType="image"
+				{width}
+				{height}
+				format={fileExtension}
+				source="tool"
+				{toolName}
+				variant="small"
+			/>
+		{/if}
+	</div>
 	</div>
 </div>
-
-{#if imageUrl && state !== 'limit'}
-	<div class="mt-2 flex w-full justify-end">
-		<ShareResultButton
-			assetUrl={imageUrl}
-			contentType="image"
-			{width}
-			{height}
-			format={fileExtension}
-			source="tool"
-			{toolName}
-			variant="small"
-		/>
-	</div>
-{/if}
