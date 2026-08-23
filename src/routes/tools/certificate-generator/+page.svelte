@@ -5,7 +5,8 @@
 	 * Bulk upsell, gallery, form and preview become the tool card; the quota
 	 * ladder and Generate move to its toolbar. SEO copy is frozen.
 	 */
-	import NextSteps from '$lib/components/tools/NextSteps.svelte';
+	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
+	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
@@ -330,6 +331,48 @@
 	const TOOL_PATH = '/tools/certificate-generator';
 
 	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+	$: lastFreeRender = !isUserLoggedIn && guestRemaining <= 1;
+
+	const certificateExamples = [
+		{
+			id: 'javascript',
+			label: 'JavaScript',
+			fileName: 'certificate.js',
+			code: `<span class="text-[#6a9955]">// Render a certificate from an HTML template with dynamic fields</span>
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">html</span> = <span class="text-[#9cdcfe]">template</span>.<span class="text-[#dcdcaa]">replace</span>(<span class="text-[#ce9178]">'{{name}}'</span>, <span class="text-[#9cdcfe]">recipient</span>.<span class="text-[#9cdcfe]">name</span>);
+
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">response</span> = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]">'https://api.pictify.io/image'</span>, {
+  <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
+  <span class="text-[#9cdcfe]">headers</span>: { <span class="text-[#ce9178]">'Content-Type'</span>: <span class="text-[#ce9178]">'application/json'</span>, <span class="text-[#ce9178]">'Authorization'</span>: <span class="text-[#ce9178]">'Bearer YOUR_API_KEY'</span> },
+  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">stringify</span>({ <span class="text-[#9cdcfe]">html</span>, <span class="text-[#9cdcfe]">width</span>: <span class="text-[#b5cea8]">1600</span>, <span class="text-[#9cdcfe]">height</span>: <span class="text-[#b5cea8]">1131</span> })
+});
+
+<span class="text-[#c586c0]">const</span> { <span class="text-[#9cdcfe]">image</span> } = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]">response</span>.<span class="text-[#dcdcaa]">json</span>();
+<span class="text-[#9cdcfe]">console</span>.<span class="text-[#dcdcaa]">log</span>(<span class="text-[#9cdcfe]">image</span>.<span class="text-[#9cdcfe]">url</span>); <span class="text-[#6a9955]">// loop over a CSV to issue a whole class</span>`
+		},
+		{
+			id: 'python',
+			label: 'Python',
+			fileName: 'certificate.py',
+			code: `<span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]">requests</span>
+
+<span class="text-[#c586c0]">for</span> <span class="text-[#9cdcfe]">name</span> <span class="text-[#c586c0]">in</span> <span class="text-[#9cdcfe]">recipients</span>:
+    <span class="text-[#9cdcfe]">html</span> = <span class="text-[#9cdcfe]">template</span>.<span class="text-[#dcdcaa]">replace</span>(<span class="text-[#ce9178]">"{{name}}"</span>, <span class="text-[#9cdcfe]">name</span>)
+    <span class="text-[#9cdcfe]">resp</span> = <span class="text-[#9cdcfe]">requests</span>.<span class="text-[#dcdcaa]">post</span>(<span class="text-[#ce9178]">"https://api.pictify.io/image"</span>,
+        <span class="text-[#9cdcfe]">headers</span>={<span class="text-[#ce9178]">"Authorization"</span>: <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>},
+        <span class="text-[#9cdcfe]">json</span>={<span class="text-[#ce9178]">"html"</span>: <span class="text-[#9cdcfe]">html</span>, <span class="text-[#ce9178]">"width"</span>: <span class="text-[#b5cea8]">1600</span>, <span class="text-[#ce9178]">"height"</span>: <span class="text-[#b5cea8]">1131</span>})
+    <span class="text-[#dcdcaa]">print</span>(<span class="text-[#9cdcfe]">resp</span>.<span class="text-[#dcdcaa]">json</span>()[<span class="text-[#ce9178]">"url"</span>])`
+		},
+		{
+			id: 'curl',
+			label: 'cURL',
+			fileName: 'certificate.sh',
+			code: `<span class="text-[#dcdcaa]">curl</span> -X POST <span class="text-[#ce9178]">https://api.pictify.io/image</span> \\
+  -H <span class="text-[#ce9178]">"Content-Type: application/json"</span> \\
+  -H <span class="text-[#ce9178]">"Authorization: Bearer YOUR_API_KEY"</span> \\
+  -d <span class="text-[#ce9178]">'{"html":"&lt;div&gt;Certificate for ...&lt;/div&gt;","width":1600,"height":1131}'</span>`
+		}
+	];
 
 	const RELATED = [
 		{
@@ -719,72 +762,32 @@
 
 	<div slot="result">
 		{#if generatedImageUrl}
-			<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
-				<div
-					class="bg-brand-proof/10 border-[3px] border-brand-proof rounded-tile p-8 text-center relative overflow-hidden"
+			<ResultCard
+				imageUrl={generatedImageUrl}
+				formatLabel="PNG"
+				fileExtension="png"
+				width={selectedTemplate.width}
+				height={selectedTemplate.height}
+				loggedIn={isUserLoggedIn}
+				lastFree={lastFreeRender}
+				toolName={TOOL_NAME}
+				toolPath={TOOL_PATH}
+			/>
+			<div class="mt-4 flex justify-center">
+				<a
+					href="/dashboard/workflows/new"
+					class="inline-flex items-center gap-2 rounded-lg border-[1.5px] border-brand-ink bg-brand-field px-5 py-2.5 font-sans text-sm font-semibold text-brand-ink shadow-[2px_2px_0_0_#000] transition-transform hover:-translate-y-0.5"
 				>
-					<div class="absolute top-0 right-0 w-32 h-32 bg-brand-proof/20 rounded-full blur-2xl" />
-
-					<h3 class="text-2xl font-semibold text-brand-ink tracking-tight mb-6">
-						Your certificate is ready!
-					</h3>
-
-					<div class="inline-block bg-brand-paper border border-brand-ink p-2 rotate-1 mb-8">
-						<img
-							loading="lazy"
-							src={generatedImageUrl}
-							alt="Generated {selectedTemplate.name} certificate for {formValues.recipientName}"
-							class="max-w-full h-auto max-h-[400px]"
-						/>
-					</div>
-
-					<div class="flex flex-wrap justify-center gap-4">
-						<button
-							on:click={() =>
-								downloadFile(generatedImageUrl, 'certificate.png', {
-									tool_name: 'certificate_generator'
-								})}
-							class="px-6 py-3 bg-brand-paper text-brand-ink border border-brand-ink font-bold tracking-wide transition-all rounded-xl flex items-center gap-2"
-						>
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-								/></svg
-							>
-							Download PNG
-						</button>
-						<a
-							href="/dashboard/workflows/new"
-							class="px-6 py-3 bg-brand-proof text-brand-ink border border-brand-ink font-bold tracking-wide transition-all rounded-xl flex items-center gap-2"
-						>
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M13 10V3L4 14h7v7l9-11h-7z"
-								/></svg
-							>
-							Send These in Bulk
-						</a>
-					</div>
-				</div>
-
-				<div class="mt-12">
-					<NextSteps
-						heading="Now Automate It"
-						description="You've proved it works. Now integrate certificate generation into your app."
-						curlSnippet={apiSnippet}
-						generatedUrl={generatedImageUrl}
-						generatedWidth={selectedTemplate.width}
-						generatedHeight={selectedTemplate.height}
-						generatedFormat="png"
-						toolName="Certificate Generator"
-					/>
-				</div>
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+						><path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M13 10V3L4 14h7v7l9-11h-7z"
+						/></svg
+					>
+					Need a whole class? Send these in bulk from a CSV
+				</a>
 			</div>
 		{:else if generationError}
 			<div class="max-w-3xl mx-auto px-4 mb-12">
@@ -805,6 +808,15 @@
 			</div>
 		{/if}
 	</div>
+
+	<AutomateSection
+		slot="automate"
+		title="Automate with the"
+		titleHighlight="API"
+		toolName={TOOL_NAME}
+		description="Issue certificates programmatically. Render one HTML template per recipient with a single POST — loop over a CSV to award a whole cohort, or trigger it from your LMS on completion."
+		codeExamples={certificateExamples}
+	/>
 
 	<svelte:fragment slot="longform">
 		<div class="max-w-5xl mx-auto mt-16 sm:mt-20">
