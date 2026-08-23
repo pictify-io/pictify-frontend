@@ -11,6 +11,8 @@
 	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
 	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
 	import LongformSection from '$lib/components/tools/v2/LongformSection.svelte';
+	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
+	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { createImagePublic } from '../../../api/image.js';
 	import { onMount } from 'svelte';
@@ -537,6 +539,45 @@
 	const TOOL_PATH = '/tools/linkedin-banner-generator';
 
 	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+	$: lastFreeRender = !isUserLoggedIn && guestRemaining <= 1;
+
+	const linkedinBannerExamples = [
+		{
+			id: 'javascript',
+			label: 'JavaScript',
+			fileName: 'banner.js',
+			code: `<span class="text-[#6a9955]">// Render a 1584x396 LinkedIn banner from HTML</span>
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">response</span> = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]">'https://api.pictify.io/image'</span>, {
+  <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
+  <span class="text-[#9cdcfe]">headers</span>: { <span class="text-[#ce9178]">'Content-Type'</span>: <span class="text-[#ce9178]">'application/json'</span>, <span class="text-[#ce9178]">'Authorization'</span>: <span class="text-[#ce9178]">'Bearer YOUR_API_KEY'</span> },
+  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">stringify</span>({ <span class="text-[#9cdcfe]">html</span>: <span class="text-[#9cdcfe]">bannerHtml</span>, <span class="text-[#9cdcfe]">width</span>: <span class="text-[#b5cea8]">1584</span>, <span class="text-[#9cdcfe]">height</span>: <span class="text-[#b5cea8]">396</span> })
+});
+
+<span class="text-[#c586c0]">const</span> { <span class="text-[#9cdcfe]">image</span> } = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]">response</span>.<span class="text-[#dcdcaa]">json</span>();
+<span class="text-[#9cdcfe]">console</span>.<span class="text-[#dcdcaa]">log</span>(<span class="text-[#9cdcfe]">image</span>.<span class="text-[#9cdcfe]">url</span>); <span class="text-[#6a9955]">// personalize per teammate at scale</span>`
+		},
+		{
+			id: 'python',
+			label: 'Python',
+			fileName: 'banner.py',
+			code: `<span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]">requests</span>
+
+<span class="text-[#9cdcfe]">resp</span> = <span class="text-[#9cdcfe]">requests</span>.<span class="text-[#dcdcaa]">post</span>(<span class="text-[#ce9178]">"https://api.pictify.io/image"</span>,
+    <span class="text-[#9cdcfe]">headers</span>={<span class="text-[#ce9178]">"Authorization"</span>: <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>},
+    <span class="text-[#9cdcfe]">json</span>={<span class="text-[#ce9178]">"html"</span>: <span class="text-[#9cdcfe]">banner_html</span>, <span class="text-[#ce9178]">"width"</span>: <span class="text-[#b5cea8]">1584</span>, <span class="text-[#ce9178]">"height"</span>: <span class="text-[#b5cea8]">396</span>})
+
+<span class="text-[#dcdcaa]">print</span>(<span class="text-[#9cdcfe]">resp</span>.<span class="text-[#dcdcaa]">json</span>()[<span class="text-[#ce9178]">"url"</span>])`
+		},
+		{
+			id: 'curl',
+			label: 'cURL',
+			fileName: 'banner.sh',
+			code: `<span class="text-[#dcdcaa]">curl</span> -X POST <span class="text-[#ce9178]">https://api.pictify.io/image</span> \\
+  -H <span class="text-[#ce9178]">"Content-Type: application/json"</span> \\
+  -H <span class="text-[#ce9178]">"Authorization: Bearer YOUR_API_KEY"</span> \\
+  -d <span class="text-[#ce9178]">'{"html":"&lt;div&gt;...&lt;/div&gt;","width":1584,"height":396}'</span>`
+		}
+	];
 
 	const RELATED = [
 		{
@@ -710,6 +751,7 @@
 
 				{#if selectedTemplate}
 					<div
+						bind:this={bannerTemplateWrapper}
 						class="relative bg-[#f0f0f0] flex items-center justify-center p-6 border-b-[4px] border-black"
 						style="background-image: repeating-linear-gradient(45deg, #e5e5e5 25%, transparent 25%, transparent 75%, #e5e5e5 75%, #e5e5e5), repeating-linear-gradient(45deg, #e5e5e5 25%, #f0f0f0 25%, #f0f0f0 75%, #e5e5e5 75%, #e5e5e5); background-position: 0 0, 10px 10px; background-size: 20px 20px;"
 					>
@@ -873,99 +915,28 @@
 
 	<div slot="result">
 		{#if imageUrl}
-			<div class="mb-16">
-				<div class="relative">
-					<div
-						class="absolute inset-0 bg-brand-proof translate-x-3 translate-y-3 border-[4px] border-black hidden md:block"
-					/>
-
-					<div class="relative border-[4px] border-black bg-brand-paper">
-						<!-- Header -->
-						<div
-							class="bg-brand-proof text-brand-ink px-6 py-4 flex items-center gap-3 border-b-[4px] border-black"
-						>
-							<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M5 13l4 4L19 7"
-								/>
-							</svg>
-							<h3 class="text-2xl font-semibold tracking-tight">Your Banner is Ready!</h3>
-						</div>
-
-						<div class="p-6 md:p-8">
-							<!-- Banner Preview -->
-							<div class="aspect-[4/1] border border-brand-ink overflow-hidden mb-6">
-								<img
-									loading="lazy"
-									src={imageUrl}
-									alt="Generated LinkedIn Banner"
-									class="w-full h-full object-cover"
-								/>
-							</div>
-
-							<!-- Watermark Notice -->
-							{#if !isUserLoggedIn && generationCount > 2}
-								<div class="bg-brand-field border border-brand-ink p-5 mb-6">
-									<p class="font-semibold text-brand-ink tracking-wide">
-										Free downloads include a small Pictify watermark
-									</p>
-									<p class="text-sm font-bold text-brand-slate mt-1">
-										Sign up free to download without watermark
-									</p>
-									<a
-										href="/signup"
-										on:click={() =>
-											analytics.track('tool_signup_click', {
-												tool_name: 'linkedin_banner_generator',
-												cta_location: 'remove_watermark'
-											})}
-										class="inline-block mt-3 px-6 py-3 bg-brand-ink text-white font-semibold tracking-wider border border-brand-ink transition-all"
-									>
-										Remove Watermark Free
-									</a>
-								</div>
-							{/if}
-
-							<!-- Action Buttons -->
-							<div class="flex flex-wrap gap-4">
-								<button
-									on:click={downloadBanner}
-									class="flex-1 sm:flex-none px-8 py-4 bg-brand-proof text-brand-ink border border-brand-ink font-semibold tracking-wider transition-all flex items-center justify-center gap-2"
-								>
-									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="3"
-											d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-										/>
-									</svg>
-									Download PNG
-								</button>
-								<button
-									on:click={() => copyToClipboard(imageUrl)}
-									class="flex-1 sm:flex-none px-8 py-4 bg-brand-paper text-brand-ink border border-brand-ink font-semibold tracking-wider transition-all flex items-center justify-center gap-2"
-								>
-									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="3"
-											d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-										/>
-									</svg>
-									Copy URL
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+			<ResultCard
+				{imageUrl}
+				formatLabel="PNG"
+				fileExtension="png"
+				width={LINKEDIN_BANNER_WIDTH}
+				height={LINKEDIN_BANNER_HEIGHT}
+				loggedIn={isUserLoggedIn}
+				lastFree={lastFreeRender}
+				toolName={TOOL_NAME}
+				toolPath={TOOL_PATH}
+			/>
 		{/if}
 	</div>
+
+	<AutomateSection
+		slot="automate"
+		title="Automate with the"
+		titleHighlight="API"
+		toolName={TOOL_NAME}
+		description="Generate LinkedIn banners programmatically. Render a 1584×396 cover from HTML with one POST — personalize per teammate or per campaign at scale."
+		codeExamples={linkedinBannerExamples}
+	/>
 
 	<svelte:fragment slot="longform">
 		<LongformSection index="01" id="how-to" first>
