@@ -6,7 +6,8 @@
 	 * Generate move into its toolbar. SEO copy is frozen.
 	 */
 	import InvoiceTemplate from '$lib/components/tools/InvoiceTemplate.svelte';
-	import NextSteps from '$lib/components/tools/NextSteps.svelte';
+	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
+	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
 	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
 	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
@@ -75,19 +76,6 @@
 			return '';
 		}
 	}
-
-	$: nextStepsCurlSnippet = buildCurlSnippetFromHtml(getCurrentInvoiceHtml(), 800, 1200);
-	$: nextStepsTemplateDraft = imageUrl
-		? {
-				version: 1,
-				name: 'Invoice template',
-				type: 'invoice',
-				width: 800,
-				height: 1200,
-				backgroundImageUrl: imageUrl,
-				source: 'invoice-generator'
-		  }
-		: null;
 
 	const structuredDataJson = JSON.stringify({
 		'@context': 'https://schema.org',
@@ -350,6 +338,45 @@
 	const TOOL_PATH = '/tools/online-invoice-generator';
 
 	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+	$: lastFreeRender = !isUserLoggedIn && guestRemaining <= 1;
+
+	const invoiceExamples = [
+		{
+			id: 'javascript',
+			label: 'JavaScript',
+			fileName: 'invoice.js',
+			code: `<span class="text-[#6a9955]">// Render an invoice image from your own HTML template</span>
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">response</span> = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]">'https://api.pictify.io/image'</span>, {
+  <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
+  <span class="text-[#9cdcfe]">headers</span>: { <span class="text-[#ce9178]">'Content-Type'</span>: <span class="text-[#ce9178]">'application/json'</span>, <span class="text-[#ce9178]">'Authorization'</span>: <span class="text-[#ce9178]">'Bearer YOUR_API_KEY'</span> },
+  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">stringify</span>({ <span class="text-[#9cdcfe]">html</span>: <span class="text-[#9cdcfe]">invoiceHtml</span>, <span class="text-[#9cdcfe]">width</span>: <span class="text-[#b5cea8]">800</span>, <span class="text-[#9cdcfe]">fileExtension</span>: <span class="text-[#ce9178]">'pdf'</span> })
+});
+
+<span class="text-[#c586c0]">const</span> { <span class="text-[#9cdcfe]">image</span> } = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]">response</span>.<span class="text-[#dcdcaa]">json</span>();
+<span class="text-[#9cdcfe]">console</span>.<span class="text-[#dcdcaa]">log</span>(<span class="text-[#9cdcfe]">image</span>.<span class="text-[#9cdcfe]">url</span>); <span class="text-[#6a9955]">// email or store the invoice</span>`
+		},
+		{
+			id: 'python',
+			label: 'Python',
+			fileName: 'invoice.py',
+			code: `<span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]">requests</span>
+
+<span class="text-[#9cdcfe]">resp</span> = <span class="text-[#9cdcfe]">requests</span>.<span class="text-[#dcdcaa]">post</span>(<span class="text-[#ce9178]">"https://api.pictify.io/image"</span>,
+    <span class="text-[#9cdcfe]">headers</span>={<span class="text-[#ce9178]">"Authorization"</span>: <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>},
+    <span class="text-[#9cdcfe]">json</span>={<span class="text-[#ce9178]">"html"</span>: <span class="text-[#9cdcfe]">invoice_html</span>, <span class="text-[#ce9178]">"width"</span>: <span class="text-[#b5cea8]">800</span>, <span class="text-[#ce9178]">"fileExtension"</span>: <span class="text-[#ce9178]">"pdf"</span>})
+
+<span class="text-[#dcdcaa]">print</span>(<span class="text-[#9cdcfe]">resp</span>.<span class="text-[#dcdcaa]">json</span>()[<span class="text-[#ce9178]">"url"</span>])`
+		},
+		{
+			id: 'curl',
+			label: 'cURL',
+			fileName: 'invoice.sh',
+			code: `<span class="text-[#dcdcaa]">curl</span> -X POST <span class="text-[#ce9178]">https://api.pictify.io/image</span> \\
+  -H <span class="text-[#ce9178]">"Content-Type: application/json"</span> \\
+  -H <span class="text-[#ce9178]">"Authorization: Bearer YOUR_API_KEY"</span> \\
+  -d <span class="text-[#ce9178]">'{"html":"&lt;div&gt;INVOICE ...&lt;/div&gt;","width":800,"fileExtension":"pdf"}'</span>`
+		}
+	];
 
 	const RELATED = [
 		{
@@ -679,49 +706,28 @@
 
 	<div slot="result">
 		{#if imageUrl}
-			<div class="bg-brand-paper border border-brand-ink overflow-hidden">
-				<div
-					class="bg-brand-proof px-4 py-3 border-b border-brand-ink flex items-center justify-between"
-				>
-					<span class="font-semibold tracking-wider text-sm text-brand-ink"
-						>✓ Invoice Generated</span
-					>
-					<div class="flex items-center gap-2">
-						<button
-							on:click={() => copyToClipboard(imageUrl)}
-							class="px-3 py-1 bg-brand-ink text-white border border-brand-ink font-bold text-xs transition-all"
-						>
-							Copy URL
-						</button>
-						<a
-							href={imageUrl}
-							target="_blank"
-							class="px-3 py-1 bg-brand-paper text-brand-ink border border-brand-ink font-bold text-xs transition-all"
-						>
-							Open in Tab
-						</a>
-					</div>
-				</div>
-				<div class="p-4">
-					<img
-						loading="lazy"
-						src={imageUrl}
-						alt="Invoice"
-						class="w-full h-auto border border-brand-ink"
-					/>
-				</div>
-			</div>
-
-			<NextSteps
-				heading="Next steps"
-				description="Copy the API request, save this invoice as a template background, and batch render variants."
-				curlSnippet={nextStepsCurlSnippet}
-				templateDraft={nextStepsTemplateDraft}
-				generatedUrl={imageUrl}
-				toolName="Invoice Generator"
+			<ResultCard
+				{imageUrl}
+				formatLabel="PNG"
+				fileExtension="png"
+				width={800}
+				height={null}
+				loggedIn={isUserLoggedIn}
+				lastFree={lastFreeRender}
+				toolName={TOOL_NAME}
+				toolPath={TOOL_PATH}
 			/>
 		{/if}
 	</div>
+
+	<AutomateSection
+		slot="automate"
+		title="Automate with the"
+		titleHighlight="API"
+		toolName={TOOL_NAME}
+		description="Generate invoices programmatically. Render any invoice HTML to an image or PDF with one POST — wire it into billing, receipts, and order confirmations."
+		codeExamples={invoiceExamples}
+	/>
 
 	<svelte:fragment slot="longform">
 		<LongformSection index="01" id="templates" first>
