@@ -463,7 +463,7 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 						</div>
 					</div>
 					{#if parseError}
-						<p class="mt-4 text-sm font-bold text-brand-pink">{parseError}</p>
+						<p class="mt-4 text-sm font-bold text-brand-alarm">{parseError}</p>
 					{/if}
 					{#if rows.length}
 						<p class="mt-4 text-sm font-bold text-brand-slate">
