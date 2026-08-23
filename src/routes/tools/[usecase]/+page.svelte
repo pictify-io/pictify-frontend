@@ -9,7 +9,7 @@
 	 */
 	import Nav from '$lib/components/landing/Nav.svelte';
 	import Footer from '$lib/components/landing/Footer.svelte';
-	import NextSteps from '$lib/components/tools/NextSteps.svelte';
+	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
 	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
 	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
@@ -206,6 +206,7 @@
 	const TOOL_NAME = 'usecase_tool';
 
 	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+	$: lastFreeRender = !isUserLoggedIn && guestRemaining <= 1;
 
 	// Three neighbours from the same shelf on /tools, so the cards match the hub.
 	const RELATED = [
@@ -354,58 +355,6 @@
 									<p class="font-bold text-brand-mute">Preview not available</p>
 								</div>
 							{/if}
-
-							<!-- Action Bar -->
-							<div class="flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg">
-								<a
-									href="/signup"
-									class="flex-1 py-4 bg-brand-proof text-brand-ink border border-brand-ink font-semibold text-lg tracking-wide transition-all flex items-center justify-center gap-3 rounded-xl"
-								>
-									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-										/></svg
-									>
-									Automate This Template (Free)
-								</a>
-								<button
-									type="button"
-									on:click={handleQuickGenerate}
-									disabled={isGenerating}
-									class="flex-1 py-4 bg-brand-paper text-brand-ink border border-brand-ink font-semibold text-lg tracking-wide transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
-								>
-									{#if isGenerating}
-										<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"
-											><circle
-												class="opacity-25"
-												cx="12"
-												cy="12"
-												r="10"
-												stroke="currentColor"
-												stroke-width="4"
-											/><path
-												class="opacity-75"
-												fill="currentColor"
-												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-											/></svg
-										>
-										Working...
-									{:else}
-										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M13 10V3L4 14h7v7l9-11h-7z"
-											/></svg
-										>
-										Generate Image
-									{/if}
-								</button>
-							</div>
 						</div>
 					</div>
 
@@ -438,59 +387,17 @@
 
 		<div slot="result">
 			{#if generatedImageUrl}
-				<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
-					<div
-						class="bg-brand-proof/10 border-[3px] border-brand-proof rounded-tile p-8 text-center relative overflow-hidden"
-					>
-						<div class="absolute top-0 right-0 w-32 h-32 bg-brand-proof/20 rounded-full blur-2xl" />
-
-						<h3 class="text-2xl font-semibold text-brand-ink tracking-tight mb-6">
-							Success! Here is your image
-						</h3>
-
-						<div class="inline-block bg-brand-paper border border-brand-ink p-2 rotate-1 mb-8">
-							<img
-								loading="lazy"
-								src={generatedImageUrl}
-								alt="Generated result"
-								class="max-w-full h-auto max-h-[400px]"
-							/>
-						</div>
-
-						<div class="flex flex-wrap justify-center gap-4">
-							<button
-								on:click={() =>
-									downloadFile(generatedImageUrl, 'pictify-result.png', {
-										tool_name: useCaseId.replace(/-/g, '_')
-									})}
-								class="px-6 py-3 bg-brand-paper text-brand-ink border border-brand-ink font-bold tracking-wide transition-all rounded-xl flex items-center gap-2"
-							>
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-									/></svg
-								>
-								Download PNG
-							</button>
-						</div>
-					</div>
-
-					<div class="mt-12">
-						<NextSteps
-							heading="Now Automate It"
-							description="You've proved it works. Now integrate this into your app."
-							curlSnippet={apiSnippet}
-							generatedUrl={generatedImageUrl}
-							generatedWidth={generatedDims.width}
-							generatedHeight={generatedDims.height}
-							generatedFormat="png"
-							toolName={config?.label || useCaseId}
-						/>
-					</div>
-				</div>
+				<ResultCard
+					imageUrl={generatedImageUrl}
+					formatLabel="PNG"
+					fileExtension="png"
+					width={generatedDims.width}
+					height={generatedDims.height}
+					loggedIn={isUserLoggedIn}
+					lastFree={lastFreeRender}
+					toolName={TOOL_NAME}
+					toolPath={`/tools/${useCaseId}`}
+				/>
 			{:else if generationError}
 				<div class="max-w-3xl mx-auto px-4 mb-12">
 					<div
