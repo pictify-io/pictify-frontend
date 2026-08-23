@@ -530,189 +530,188 @@ print(res.json()['image']['url'])`;
 
 	<div slot="tool">
 		<ToolCard>
-			<div class="flex flex-col gap-6 p-5 lg:p-7">
-				<div id="paste-url" class="scroll-mt-20" />
-				<div class="max-w-3xl mx-auto mb-6">
-					<div class="flex gap-2">
-						<input
-							type="url"
-							placeholder="https://twitter.com/jack/status/20"
-							bind:value={urlInput}
-							on:keydown={(e) => e.key === 'Enter' && handleFetchClick()}
-							class="flex-1 px-4 py-3 text-base bg-brand-paper border border-brand-ink rounded-lg focus:outline-none transition-all"
-						/>
-						<button
-							on:click={handleFetchClick}
-							disabled={status === 'fetching'}
-							class="px-6 py-3 bg-brand-field text-brand-ink font-semibold border border-brand-ink rounded-lg disabled:opacity-60 disabled:cursor-not-allowed transition-all"
-						>
-							{status === 'fetching' ? 'Fetching…' : 'Fetch'}
-						</button>
-					</div>
-					{#if fetchError}
-						<p class="mt-2 text-sm font-bold text-brand-alarm">{fetchError}</p>
-					{/if}
-					{#if fetchNotice}
-						<div
-							class="mt-3 p-3 bg-brand-powder border border-brand-blue rounded-lg text-sm font-semibold text-brand-slate flex items-start gap-2"
-						>
-							<span class="text-brand-blue font-semibold">ℹ</span>
-							<span>{fetchNotice}</span>
-						</div>
-					{/if}
-					{#if status === 'confirm-overwrite'}
-						<div
-							class="mt-3 p-3 bg-brand-field/30 border border-brand-field rounded-lg flex items-center gap-3"
-						>
-							<span class="text-sm font-bold text-brand-ink"
-								>Refetching will replace your edits.</span
-							>
+			<div class="flex w-full flex-col lg:flex-row lg:items-stretch">
+				<!-- Controls pane: URL + tweet fields -->
+				<div
+					class="flex w-full min-w-0 flex-col gap-5 overflow-y-auto bg-brand-paper p-5 lg:w-[420px] lg:flex-shrink-0 lg:border-r-[1.5px] lg:border-brand-ink lg:p-6"
+				>
+					<div id="paste-url" class="scroll-mt-20" />
+					<!-- Fetch from URL -->
+					<div class="flex flex-col gap-2">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">TWEET URL</span>
+						<div class="flex gap-2">
+							<input
+								type="url"
+								placeholder="https://twitter.com/jack/status/20"
+								bind:value={urlInput}
+								on:keydown={(e) => e.key === 'Enter' && handleFetchClick()}
+								class="h-11 min-w-0 flex-1 rounded-lg border-[1.5px] border-brand-ink bg-white px-3 font-mono text-sm text-brand-ink placeholder-brand-mute focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
 							<button
-								on:click={confirmOverwrite}
-								class="px-3 py-1.5 bg-brand-ink text-white text-sm font-bold rounded border border-brand-ink"
-								>Refetch</button
+								on:click={handleFetchClick}
+								disabled={status === 'fetching'}
+								class="h-11 flex-shrink-0 rounded-lg border-[1.5px] border-brand-ink bg-brand-paper px-4 font-sans text-sm font-semibold text-brand-ink transition-colors hover:bg-brand-field disabled:cursor-not-allowed disabled:opacity-60"
 							>
-							<button
-								on:click={cancelOverwrite}
-								class="px-3 py-1.5 bg-brand-paper text-brand-ink text-sm font-bold rounded border border-brand-ink"
-								>Cancel</button
+								{status === 'fetching' ? 'Fetching…' : 'Fetch'}
+							</button>
+						</div>
+						{#if fetchError}
+							<p class="text-sm font-bold text-brand-alarm">{fetchError}</p>
+						{/if}
+						{#if fetchNotice}
+							<div
+								class="flex items-start gap-2 rounded-lg border border-brand-blue bg-brand-powder p-3 text-sm font-semibold text-brand-slate"
 							>
-						</div>
-					{/if}
-				</div>
-				<!-- Preview on top, fields below (stacked vertically; preview is full-width so tall cards don't clip) -->
-				<div class="flex flex-col-reverse gap-6 mb-10 max-w-3xl mx-auto">
-					<!-- Fields -->
-					<div class="bg-brand-paper border border-brand-ink rounded-tile p-6">
-						<h2 class="text-xl font-semibold mb-4 text-brand-ink">Tweet fields</h2>
-						<div class="space-y-4">
-							<div>
-								<label class="block text-sm font-bold text-brand-slate mb-1">Display name</label>
-								<input
-									type="text"
-									value={tweet.author.name}
-									on:input={(e) => updateAuthor('name', e.target.value)}
-									class="w-full px-3 py-2 bg-brand-paper border border-brand-ink rounded-md font-semibold"
-								/>
+								<span class="font-semibold text-brand-blue">ℹ</span>
+								<span>{fetchNotice}</span>
 							</div>
-							<div>
-								<label class="block text-sm font-bold text-brand-slate mb-1"
-									>Handle (without @)</label
+						{/if}
+						{#if status === 'confirm-overwrite'}
+							<div
+								class="flex items-center gap-3 rounded-lg border border-brand-field bg-brand-field/30 p-3"
+							>
+								<span class="text-sm font-bold text-brand-ink">Refetching will replace your edits.</span>
+								<button
+									on:click={confirmOverwrite}
+									class="rounded border border-brand-ink bg-brand-ink px-3 py-1.5 text-sm font-bold text-white"
+									>Refetch</button
 								>
-								<input
-									type="text"
-									value={tweet.author.handle}
-									on:input={(e) => updateAuthor('handle', e.target.value.replace(/^@/, ''))}
-									class="w-full px-3 py-2 bg-brand-paper border border-brand-ink rounded-md font-semibold"
-								/>
-							</div>
-							<div>
-								<label class="block text-sm font-bold text-brand-slate mb-1">Avatar URL</label>
-								<input
-									type="url"
-									value={tweet.author.avatar_url || ''}
-									on:input={(e) => updateAuthor('avatar_url', e.target.value || null)}
-									placeholder="https://pbs.twimg.com/..."
-									class="w-full px-3 py-2 bg-brand-paper border border-brand-ink rounded-md font-semibold"
-								/>
-							</div>
-							<div class="flex gap-4">
-								<label class="flex items-center gap-2 font-bold text-sm text-brand-slate">
-									<input
-										type="checkbox"
-										checked={tweet.author.is_verified_blue}
-										on:change={(e) => updateAuthor('is_verified_blue', e.target.checked)}
-										class="w-5 h-5"
-									/>
-									Verified (blue)
-								</label>
-								<label class="flex items-center gap-2 font-bold text-sm text-brand-slate">
-									<input
-										type="checkbox"
-										checked={tweet.author.is_verified}
-										on:change={(e) => updateAuthor('is_verified', e.target.checked)}
-										class="w-5 h-5"
-									/>
-									Verified (legacy)
-								</label>
-							</div>
-							<div>
-								<label class="block text-sm font-bold text-brand-slate mb-1">Tweet body</label>
-								<textarea
-									value={tweet.body}
-									on:input={(e) => updateTweetField('body', e.target.value)}
-									rows="4"
-									class="w-full px-3 py-2 bg-brand-paper border border-brand-ink rounded-md font-semibold resize-none"
-								/>
-							</div>
-							<div>
-								<label class="block text-sm font-bold text-brand-slate mb-1"
-									>Date (ISO 8601 or blank)</label
+								<button
+									on:click={cancelOverwrite}
+									class="rounded border border-brand-ink bg-brand-paper px-3 py-1.5 text-sm font-bold text-brand-ink"
+									>Cancel</button
 								>
-								<input
-									type="text"
-									value={tweet.created_at || ''}
-									on:input={(e) => updateTweetField('created_at', e.target.value || null)}
-									placeholder="2026-04-14T10:00:00.000Z"
-									class="w-full px-3 py-2 bg-brand-paper border border-brand-ink rounded-md font-semibold"
-								/>
 							</div>
-							<div class="grid grid-cols-3 gap-3">
-								<div>
-									<label class="block text-xs font-bold text-brand-slate mb-1">Replies</label>
-									<input
-										type="number"
-										min="0"
-										value={tweet.metrics.replies ?? ''}
-										on:input={(e) => updateMetric('replies', e.target.value)}
-										class="w-full px-2 py-2 bg-brand-paper border border-brand-ink rounded-md font-semibold"
-									/>
-								</div>
-								<div>
-									<label class="block text-xs font-bold text-brand-slate mb-1">Retweets</label>
-									<input
-										type="number"
-										min="0"
-										value={tweet.metrics.retweets ?? ''}
-										on:input={(e) => updateMetric('retweets', e.target.value)}
-										class="w-full px-2 py-2 bg-brand-paper border border-brand-ink rounded-md font-semibold"
-									/>
-								</div>
-								<div>
-									<label class="block text-xs font-bold text-brand-slate mb-1">Likes</label>
-									<input
-										type="number"
-										min="0"
-										value={tweet.metrics.likes ?? ''}
-										on:input={(e) => updateMetric('likes', e.target.value)}
-										class="w-full px-2 py-2 bg-brand-paper border border-brand-ink rounded-md font-semibold"
-									/>
-								</div>
-							</div>
-						</div>
-						{#if generationError}
-							<p class="mt-2 text-sm font-bold text-brand-alarm">{generationError}</p>
 						{/if}
 					</div>
 
-					<!-- Live preview -->
-					<div class="bg-brand-subtle border border-brand-ink rounded-tile p-6">
-						<h2 class="text-xl font-semibold mb-4 text-brand-ink">Live preview</h2>
-						<div class="flex items-start justify-center">
-							<div
-								class="rounded-xl overflow-hidden border border-brand-rule shadow-md bg-brand-paper max-w-full"
-							>
-								<!-- Rendered tweet card; same HTML that will be POSTed to /image/public on Download -->
-								<iframe
-									bind:this={previewIframe}
-									on:load={resizePreview}
-									title="Tweet preview"
-									srcdoc={previewHtml}
-									scrolling="no"
-									style="width:{CARD_WIDTH}px;max-width:100%;height:{previewHeight}px;border:0;display:block;overflow:hidden"
-									sandbox="allow-same-origin"
+					<!-- Tweet fields -->
+					<div class="flex flex-col gap-4">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">TWEET FIELDS</span>
+						<div>
+							<label class="mb-1 block text-sm font-bold text-brand-slate">Display name</label>
+							<input
+								type="text"
+								value={tweet.author.name}
+								on:input={(e) => updateAuthor('name', e.target.value)}
+								class="w-full rounded-md border border-brand-ink bg-white px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
+						</div>
+						<div>
+							<label class="mb-1 block text-sm font-bold text-brand-slate">Handle (without @)</label>
+							<input
+								type="text"
+								value={tweet.author.handle}
+								on:input={(e) => updateAuthor('handle', e.target.value.replace(/^@/, ''))}
+								class="w-full rounded-md border border-brand-ink bg-white px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
+						</div>
+						<div>
+							<label class="mb-1 block text-sm font-bold text-brand-slate">Avatar URL</label>
+							<input
+								type="url"
+								value={tweet.author.avatar_url || ''}
+								on:input={(e) => updateAuthor('avatar_url', e.target.value || null)}
+								placeholder="https://pbs.twimg.com/..."
+								class="w-full rounded-md border border-brand-ink bg-white px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
+						</div>
+						<div class="flex flex-wrap gap-4">
+							<label class="flex items-center gap-2 text-sm font-bold text-brand-slate">
+								<input
+									type="checkbox"
+									checked={tweet.author.is_verified_blue}
+									on:change={(e) => updateAuthor('is_verified_blue', e.target.checked)}
+									class="h-5 w-5 accent-brand-ink"
+								/>
+								Verified (blue)
+							</label>
+							<label class="flex items-center gap-2 text-sm font-bold text-brand-slate">
+								<input
+									type="checkbox"
+									checked={tweet.author.is_verified}
+									on:change={(e) => updateAuthor('is_verified', e.target.checked)}
+									class="h-5 w-5 accent-brand-ink"
+								/>
+								Verified (legacy)
+							</label>
+						</div>
+						<div>
+							<label class="mb-1 block text-sm font-bold text-brand-slate">Tweet body</label>
+							<textarea
+								value={tweet.body}
+								on:input={(e) => updateTweetField('body', e.target.value)}
+								rows="4"
+								class="w-full resize-none rounded-md border border-brand-ink bg-white px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
+						</div>
+						<div>
+							<label class="mb-1 block text-sm font-bold text-brand-slate">Date (ISO 8601 or blank)</label>
+							<input
+								type="text"
+								value={tweet.created_at || ''}
+								on:input={(e) => updateTweetField('created_at', e.target.value || null)}
+								placeholder="2026-04-14T10:00:00.000Z"
+								class="w-full rounded-md border border-brand-ink bg-white px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
+						</div>
+						<div class="grid grid-cols-3 gap-3">
+							<div>
+								<label class="mb-1 block text-xs font-bold text-brand-slate">Replies</label>
+								<input
+									type="number"
+									min="0"
+									value={tweet.metrics.replies ?? ''}
+									on:input={(e) => updateMetric('replies', e.target.value)}
+									class="w-full rounded-md border border-brand-ink bg-white px-2 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
 								/>
 							</div>
+							<div>
+								<label class="mb-1 block text-xs font-bold text-brand-slate">Retweets</label>
+								<input
+									type="number"
+									min="0"
+									value={tweet.metrics.retweets ?? ''}
+									on:input={(e) => updateMetric('retweets', e.target.value)}
+									class="w-full rounded-md border border-brand-ink bg-white px-2 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+								/>
+							</div>
+							<div>
+								<label class="mb-1 block text-xs font-bold text-brand-slate">Likes</label>
+								<input
+									type="number"
+									min="0"
+									value={tweet.metrics.likes ?? ''}
+									on:input={(e) => updateMetric('likes', e.target.value)}
+									class="w-full rounded-md border border-brand-ink bg-white px-2 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+								/>
+							</div>
+						</div>
+						{#if generationError}
+							<p class="text-sm font-bold text-brand-alarm">{generationError}</p>
+						{/if}
+					</div>
+				</div>
+
+				<!-- Preview pane -->
+				<div
+					class="flex min-h-[360px] min-w-0 flex-1 flex-col gap-2 border-t-[1.5px] border-brand-ink bg-brand-subtle p-4 lg:min-h-0 lg:border-t-0"
+				>
+					<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">LIVE PREVIEW</span>
+					<div class="flex flex-1 items-start justify-center overflow-auto p-2 sm:p-4">
+						<div
+							class="max-w-full overflow-hidden rounded-xl border border-brand-rule bg-brand-paper shadow-md"
+						>
+							<!-- Rendered tweet card; same HTML that will be POSTed to /image/public on Download -->
+							<iframe
+								bind:this={previewIframe}
+								on:load={resizePreview}
+								title="Tweet preview"
+								srcdoc={previewHtml}
+								scrolling="no"
+								style="width:{CARD_WIDTH}px;max-width:100%;height:{previewHeight}px;border:0;display:block;overflow:hidden"
+								sandbox="allow-same-origin"
+							/>
 						</div>
 					</div>
 				</div>
