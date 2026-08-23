@@ -11,11 +11,11 @@
 	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
 	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
 	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
+	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
 	import { toast } from '../../../store/toast.store';
 	import { createImagePublic } from '../../../api/image.js';
 	import { saveLastRender } from '$lib/lastRender.js';
 	import { user } from '../../../store/user.store';
-	import NextSteps from '$lib/components/tools/NextSteps.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
@@ -699,18 +699,6 @@
 		)}'`;
 	}
 
-	$: nextStepsCurlSnippet = buildCurlSnippetFromHtml(buildSrcDoc(), previewWidth, previewHeight);
-	$: nextStepsTemplateDraft = generatedImage?.url
-		? {
-				version: 1,
-				name: 'Code card template',
-				type: 'social-media',
-				width: previewWidth,
-				height: previewHeight,
-				backgroundImageUrl: generatedImage.url,
-				source: 'code-to-image'
-		  }
-		: null;
 
 	async function generateImage() {
 		// Check if non-logged in user has reached limit
@@ -722,7 +710,6 @@
 		// Track generation in global limits store
 		generationLimits.increment();
 		isGenerating = true;
-		currentTab = 'image';
 
 		let html = buildSrcDoc();
 
@@ -894,6 +881,10 @@
 	const TOOL_PATH = '/tools/code-to-image';
 
 	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+	$: lastFreeRender = !isUserLoggedIn && guestRemaining <= 1;
+
+	const selectCls =
+		'h-10 w-full rounded border-[1.5px] border-brand-ink bg-white px-2.5 font-sans text-sm font-semibold text-brand-ink focus:outline-none focus:ring-2 focus:ring-brand-royal cursor-pointer';
 
 	const RELATED = [
 		{
@@ -965,658 +956,234 @@
 
 	<div slot="tool">
 		<ToolCard>
-			<div class="grid grid-cols-1 items-start gap-6 p-5 lg:grid-cols-[340px_1fr] lg:gap-8 lg:p-7">
+			<div class="flex w-full flex-col lg:flex-row lg:items-stretch">
+				<!-- Controls pane: code editor + config -->
 				<div
-					class="bg-brand-paper border border-brand-ink lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] overflow-hidden order-2 lg:order-1"
+					class="flex w-full min-w-0 flex-col gap-5 overflow-y-auto bg-brand-paper p-5 lg:w-[360px] lg:flex-shrink-0 lg:border-r-[1.5px] lg:border-brand-ink lg:p-6"
 				>
-					<!-- Terminal Header -->
-					<div
-						class="bg-brand-ink text-white px-4 py-3 flex justify-between items-center border-b border-brand-ink"
-					>
-						<h2 class="font-bold font-mono tracking-widest text-xs flex items-center gap-2">
-							<span class="animate-pulse">_</span> CONFIG
-						</h2>
-						<div class="flex gap-2">
-							<div class="w-3 h-3 bg-brand-pink border border-black" />
-							<div class="w-3 h-3 bg-brand-field border border-black" />
-							<div class="w-3 h-3 bg-brand-proof border border-black" />
+					<!-- Code editor -->
+					<div class="flex flex-col gap-2">
+						<div class="flex items-center justify-between">
+							<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">CODE</span>
+							<button
+								class="rounded border-[1.5px] border-brand-ink bg-brand-paper px-2.5 py-1 font-mono text-[10px] font-bold tracking-wider text-brand-ink transition-colors hover:bg-brand-field"
+								on:click={() => {
+									code = sampleCode[language] || '';
+									isUsingSample = true;
+								}}
+							>
+								RESET
+							</button>
 						</div>
-					</div>
-					<div
-						class="p-4 sm:p-6 overflow-y-auto custom-scrollbar max-h-[60vh] lg:max-h-[calc(100vh-14rem)]"
-					>
-						<div class="space-y-6">
-							<!-- Language & Theme -->
-							<div class="space-y-4">
-								<div>
-									<label
-										for="language"
-										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
-										>Language</label
-									>
-									<div class="relative">
-										<select
-											id="language"
-											class="w-full bg-brand-paper border border-brand-ink text-brand-ink text-sm font-bold transition-all outline-none block p-2.5 appearance-none cursor-pointer"
-											bind:value={language}
-											on:change={() => {
-												/* update filename via reactive */
-											}}
-										>
-											{#each languageOptions as opt}
-												<option value={opt.id}>{opt.name}</option>
-											{/each}
-										</select>
-										<div
-											class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-brand-ink"
-										>
-											<svg
-												class="fill-current h-4 w-4"
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 20 20"
-												><path
-													d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-												/></svg
-											>
-										</div>
-									</div>
-								</div>
-
-								<div>
-									<label
-										for="theme"
-										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
-										>Theme</label
-									>
-									<div class="relative">
-										<select
-											id="theme"
-											class="w-full bg-brand-paper border border-brand-ink text-brand-ink text-sm font-bold transition-all outline-none block p-2.5 appearance-none cursor-pointer"
-											bind:value={themeId}
-										>
-											{#each themeOptions as opt}
-												<option value={opt.id}>{opt.name}</option>
-											{/each}
-										</select>
-										<div
-											class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-brand-ink"
-										>
-											<svg
-												class="fill-current h-4 w-4"
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 20 20"
-												><path
-													d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-												/></svg
-											>
-										</div>
-									</div>
-								</div>
-
-								<div>
-									<label
-										for="font"
-										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
-										>Font</label
-									>
-									<div class="relative">
-										<select
-											id="font"
-											class="w-full bg-brand-paper border border-brand-ink text-brand-ink text-sm font-bold transition-all outline-none block p-2.5 appearance-none cursor-pointer"
-											bind:value={fontId}
-										>
-											{#each fontOptions as opt}
-												<option value={opt.id}>{opt.name}</option>
-											{/each}
-										</select>
-										<div
-											class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-brand-ink"
-										>
-											<svg
-												class="fill-current h-4 w-4"
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 20 20"
-												><path
-													d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-												/></svg
-											>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="h-[3px] bg-brand-ink" />
-
-							<!-- Appearance -->
-							<div class="space-y-4">
-								<div>
-									<label
-										for="backdrop"
-										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
-										>Background</label
-									>
-									<div class="relative">
-										<select
-											id="backdrop"
-											class="w-full bg-brand-paper border border-brand-ink text-brand-ink text-sm font-bold transition-all outline-none block p-2.5 appearance-none cursor-pointer"
-											bind:value={backdrop}
-										>
-											{#each backdropOptions as option}
-												<option value={option.id}>{option.name}</option>
-											{/each}
-										</select>
-										<div
-											class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-brand-ink"
-										>
-											<svg
-												class="fill-current h-4 w-4"
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 20 20"
-												><path
-													d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-												/></svg
-											>
-										</div>
-									</div>
-								</div>
-
-								{#if backdrop === 'solid'}
-									<div>
-										<label
-											for="solidBg"
-											class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
-											>Color</label
-										>
-										<div class="flex items-center gap-2">
-											<input
-												id="solidBg"
-												class="h-10 w-full border border-brand-ink cursor-pointer transition-all"
-												type="color"
-												bind:value={solidBackground}
-											/>
-											<input
-												type="text"
-												class="w-24 border border-brand-ink p-2 text-sm font-mono transition-all outline-none"
-												bind:value={solidBackground}
-											/>
-										</div>
-									</div>
-								{/if}
-								{#if backdrop === 'custom-gradient'}
-									<div class="grid grid-cols-2 gap-2">
-										<div>
-											<label
-												for="gradientStart"
-												class="block text-xs font-semibold text-brand-ink mb-1 tracking-wider"
-												>Start</label
-											>
-											<input
-												id="gradientStart"
-												class="h-8 w-full border border-brand-ink cursor-pointer"
-												type="color"
-												bind:value={customGradientStart}
-											/>
-										</div>
-										<div>
-											<label
-												for="gradientEnd"
-												class="block text-xs font-semibold text-brand-ink mb-1 tracking-wider"
-												>End</label
-											>
-											<input
-												id="gradientEnd"
-												class="h-8 w-full border border-brand-ink cursor-pointer"
-												type="color"
-												bind:value={customGradientEnd}
-											/>
-										</div>
-									</div>
-								{/if}
-
-								<div>
-									<label
-										for="padding"
-										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
-										>Padding ({padding}px)</label
-									>
-									<input
-										id="padding"
-										type="range"
-										min="16"
-										max="128"
-										bind:value={padding}
-										class="w-full cursor-pointer"
-									/>
-								</div>
-							</div>
-
-							<div class="h-px bg-brand-rule" />
-
-							<!-- Window Settings -->
-							<div class="space-y-3">
-								<div
-									class="flex items-center justify-between p-3 bg-brand-subtle border border-brand-ink"
-								>
-									<label for="chrome" class="text-xs font-semibold text-brand-ink tracking-wider"
-										>Window Controls</label
-									>
-									<div class="relative inline-block w-12 align-middle select-none">
-										<input
-											type="checkbox"
-											name="chrome"
-											id="chrome"
-											bind:checked={showWindowChrome}
-											class="toggle-checkbox absolute block w-6 h-6 bg-brand-paper border border-brand-ink appearance-none cursor-pointer transition-all checked:right-0 checked:bg-brand-pink"
-										/>
-										<label
-											for="chrome"
-											class="toggle-label block overflow-hidden h-6 bg-brand-rule cursor-pointer border border-brand-ink"
-										/>
-									</div>
-								</div>
-
-								<div
-									class="flex items-center justify-between p-3 bg-brand-subtle border border-brand-ink"
-								>
-									<label
-										for="lineNumbers"
-										class="text-xs font-semibold text-brand-ink tracking-wider">Line Numbers</label
-									>
-									<div class="relative inline-block w-12 align-middle select-none">
-										<input
-											type="checkbox"
-											name="lineNumbers"
-											id="lineNumbers"
-											bind:checked={showLineNumbers}
-											class="toggle-checkbox absolute block w-6 h-6 bg-brand-paper border border-brand-ink appearance-none cursor-pointer transition-all checked:right-0 checked:bg-brand-pink"
-										/>
-										<label
-											for="lineNumbers"
-											class="toggle-label block overflow-hidden h-6 bg-brand-rule cursor-pointer border border-brand-ink"
-										/>
-									</div>
-								</div>
-							</div>
-
-							<div class="h-[3px] bg-brand-ink" />
-
-							<!-- Advanced Styling -->
-							<div class="space-y-4">
-								<h3
-									class="text-xs font-semibold text-brand-ink tracking-widest flex items-center gap-2 pb-2 border-b-[2px] border-black"
-								>
-									<span
-										class="w-5 h-5 bg-brand-field border border-brand-ink flex items-center justify-center text-xs"
-										>⚙</span
-									>
-									Advanced Styling
-								</h3>
-
-								<div>
-									<label
-										for="fontSize"
-										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
-										>Font Size ({fontSize}px)</label
-									>
-									<input
-										id="fontSize"
-										type="range"
-										min="10"
-										max="24"
-										bind:value={fontSize}
-										class="w-full cursor-pointer"
-									/>
-								</div>
-
-								<div>
-									<label
-										for="lineHeight"
-										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
-										>Line Height ({lineHeight})</label
-									>
-									<input
-										id="lineHeight"
-										type="range"
-										min="1"
-										max="2.5"
-										step="0.1"
-										bind:value={lineHeight}
-										class="w-full cursor-pointer"
-									/>
-								</div>
-
-								<div>
-									<label
-										for="opacity"
-										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
-										>Card Opacity ({Math.round(cardOpacity * 100)}%)</label
-									>
-									<input
-										id="opacity"
-										type="range"
-										min="0"
-										max="1"
-										step="0.05"
-										bind:value={cardOpacity}
-										class="w-full cursor-pointer"
-									/>
-								</div>
-
-								<div>
-									<label
-										for="shadow"
-										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
-										>Shadow Intensity</label
-									>
-									<input
-										id="shadow"
-										type="range"
-										min="0"
-										max="1"
-										step="0.05"
-										bind:value={shadowIntensity}
-										class="w-full cursor-pointer"
-									/>
-								</div>
-
-								<div>
-									<label
-										for="blur"
-										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
-										>Blur ({blurEffect}px)</label
-									>
-									<input
-										id="blur"
-										type="range"
-										min="0"
-										max="20"
-										bind:value={blurEffect}
-										class="w-full cursor-pointer"
-									/>
-								</div>
-
-								<div>
-									<label
-										for="radius"
-										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
-										>Border Radius ({borderRadius}px)</label
-									>
-									<input
-										id="radius"
-										type="range"
-										min="0"
-										max="32"
-										bind:value={borderRadius}
-										class="w-full cursor-pointer"
-									/>
-								</div>
-
-								<div>
-									<label
-										for="tabWidth"
-										class="block text-xs font-semibold text-brand-ink mb-1.5 tracking-wider"
-										>Tab Width ({codeTabWidth})</label
-									>
-									<input
-										id="tabWidth"
-										type="range"
-										min="2"
-										max="8"
-										step="2"
-										bind:value={codeTabWidth}
-										class="w-full cursor-pointer"
-									/>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- Editor Area -->
-				<div class="bg-brand-paper border border-brand-ink overflow-hidden">
-					<!-- Terminal Header -->
-					<div
-						class="bg-brand-ink text-white px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between border-b border-brand-ink"
-					>
-						<div class="flex items-center gap-2">
-							<div class="flex gap-1.5 sm:gap-2 mr-2 sm:mr-4">
-								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand-pink border border-black" />
-								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand-field border border-black" />
-								<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand-proof border border-black" />
-							</div>
-							<span class="font-mono text-[10px] sm:text-xs tracking-widest">~ code_editor</span>
-						</div>
-						<button
-							class="px-2 sm:px-3 py-1 bg-brand-pink hover:bg-data-red text-white text-[10px] sm:text-xs font-bold tracking-wider border border-brand-ink transition-all"
-							on:click={() => {
-								code = sampleCode[language] || '';
-								isUsingSample = true;
+						<textarea
+							id="codeInput"
+							class="min-h-[220px] w-full resize-y rounded-lg border-[1.5px] border-brand-ink bg-white p-4 font-mono text-sm text-brand-ink placeholder-brand-mute focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							bind:value={code}
+							on:input={() => {
+								isUsingSample = false;
+								if (!hasTrackedFirstInput) {
+									hasTrackedFirstInput = true;
+									analytics.trackToolFirstInput({ tool_name: 'code_to_image' });
+								}
 							}}
+							placeholder="Paste your code here..."
+							spellcheck="false"
+						/>
+					</div>
+
+					<!-- Language, theme, font, background -->
+					<div class="flex flex-col gap-3">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">LANGUAGE &amp; STYLE</span>
+						<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+							<label class="flex flex-col gap-1">
+								<span class="text-xs font-semibold text-brand-ink">Language</span>
+								<select bind:value={language} class={selectCls}>
+									{#each languageOptions as opt}
+										<option value={opt.id}>{opt.name}</option>
+									{/each}
+								</select>
+							</label>
+							<label class="flex flex-col gap-1">
+								<span class="text-xs font-semibold text-brand-ink">Theme</span>
+								<select bind:value={themeId} class={selectCls}>
+									{#each themeOptions as opt}
+										<option value={opt.id}>{opt.name}</option>
+									{/each}
+								</select>
+							</label>
+							<label class="flex flex-col gap-1">
+								<span class="text-xs font-semibold text-brand-ink">Font</span>
+								<select bind:value={fontId} class={selectCls}>
+									{#each fontOptions as opt}
+										<option value={opt.id}>{opt.name}</option>
+									{/each}
+								</select>
+							</label>
+							<label class="flex flex-col gap-1">
+								<span class="text-xs font-semibold text-brand-ink">Background</span>
+								<select bind:value={backdrop} class={selectCls}>
+									{#each backdropOptions as option}
+										<option value={option.id}>{option.name}</option>
+									{/each}
+								</select>
+							</label>
+						</div>
+
+						{#if backdrop === 'solid'}
+							<div class="flex items-center gap-2">
+								<input
+									type="color"
+									bind:value={solidBackground}
+									class="h-10 w-14 flex-shrink-0 cursor-pointer rounded border-[1.5px] border-brand-ink"
+								/>
+								<input
+									type="text"
+									bind:value={solidBackground}
+									class="h-10 w-full rounded border-[1.5px] border-brand-ink px-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-royal"
+								/>
+							</div>
+						{/if}
+						{#if backdrop === 'custom-gradient'}
+							<div class="grid grid-cols-2 gap-2">
+								<label class="flex flex-col gap-1">
+									<span class="text-xs font-semibold text-brand-ink">Start</span>
+									<input
+										type="color"
+										bind:value={customGradientStart}
+										class="h-9 w-full cursor-pointer rounded border-[1.5px] border-brand-ink"
+									/>
+								</label>
+								<label class="flex flex-col gap-1">
+									<span class="text-xs font-semibold text-brand-ink">End</span>
+									<input
+										type="color"
+										bind:value={customGradientEnd}
+										class="h-9 w-full cursor-pointer rounded border-[1.5px] border-brand-ink"
+									/>
+								</label>
+							</div>
+						{/if}
+					</div>
+
+					<!-- Toggles -->
+					<div class="flex flex-wrap gap-2">
+						<button
+							type="button"
+							on:click={() => (showWindowChrome = !showWindowChrome)}
+							class="rounded-full border px-3 py-1.5 font-mono text-[11px] tracking-[0.04em] transition-colors {showWindowChrome
+								? 'border-brand-ink bg-brand-ink text-white'
+								: 'border-brand-rule bg-brand-paper text-brand-ink hover:bg-brand-subtle'}"
 						>
-							Reset
+							WINDOW CONTROLS
+						</button>
+						<button
+							type="button"
+							on:click={() => (showLineNumbers = !showLineNumbers)}
+							class="rounded-full border px-3 py-1.5 font-mono text-[11px] tracking-[0.04em] transition-colors {showLineNumbers
+								? 'border-brand-ink bg-brand-ink text-white'
+								: 'border-brand-rule bg-brand-paper text-brand-ink hover:bg-brand-subtle'}"
+						>
+							LINE NUMBERS
 						</button>
 					</div>
-					<textarea
-						id="codeInput"
-						class="w-full p-4 sm:p-6 font-mono text-xs sm:text-sm min-h-[150px] sm:min-h-[200px] focus:outline-none resize-y bg-brand-paper border-none"
-						bind:value={code}
-						on:input={() => {
-							isUsingSample = false;
-							if (!hasTrackedFirstInput) {
-								hasTrackedFirstInput = true;
-								analytics.trackToolFirstInput({ tool_name: 'code_to_image' });
-							}
-						}}
-						placeholder="Paste your code here..."
-						spellcheck="false"
-					/>
-				</div>
 
-				<!-- Action Bar -->
-				<div
-					class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-[#e5e7eb] border border-brand-ink p-3 sm:p-4"
-				>
-					<div class="flex items-center gap-2 sm:gap-3">
-						{#if previewFrame}
-							<div
-								class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-brand-paper border border-brand-ink"
-							>
-								<span class="text-[10px] font-bold text-brand-ink tracking-wider">SIZE:</span>
-								<input
-									type="number"
-									class="w-12 bg-transparent text-center outline-none font-mono font-bold text-xs border-b-2 border-black focus:border-brand-danger"
-									bind:value={previewWidth}
-									min="400"
-									max="1600"
-									on:input={() => {
-										if (previewFrame) {
-											previewFrame.style.width = `${previewWidth}px`;
-										}
-									}}
-								/>
-								<span class="font-bold text-xs">×</span>
-								<input
-									type="number"
-									class="w-12 bg-transparent text-center outline-none font-mono font-bold text-xs border-b-2 border-black focus:border-brand-danger"
-									bind:value={previewHeight}
-									min="300"
-									max="1200"
-									on:input={() => {
-										if (previewFrame) {
-											previewFrame.style.height = `${previewHeight}px`;
-										}
-									}}
-								/>
-							</div>
-						{/if}
-					</div>
-
-					<button
-						on:click={generateImage}
-						disabled={isGenerating}
-						class="bg-brand-pink hover:bg-data-red text-white px-4 sm:px-8 py-2.5 sm:py-3 border border-brand-ink transition-all font-semibold tracking-wide flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full sm:w-auto"
-					>
-						{#if isGenerating}
-							<svg
-								class="animate-spin h-4 w-4 sm:h-5 sm:w-5 text-white"
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-							>
-								<circle
-									class="opacity-25"
-									cx="12"
-									cy="12"
-									r="10"
-									stroke="currentColor"
-									stroke-width="4"
-								/>
-								<path
-									class="opacity-75"
-									fill="currentColor"
-									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-								/>
-							</svg>
-							<span class="hidden xs:inline">GENERATING...</span>
-							<span class="xs:hidden">...</span>
-						{:else}
-							<svg
-								class="w-4 h-4 sm:w-5 sm:h-5"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-								/></svg
-							>
-							<span class="hidden sm:inline">GENERATE IMAGE</span>
-							<span class="sm:hidden">GENERATE</span>
-						{/if}
-					</button>
-				</div>
-
-				<!-- Preview Area -->
-				<div
-					class="bg-brand-paper border border-brand-ink overflow-hidden relative min-h-[350px] sm:min-h-[500px] lg:min-h-[600px]"
-				>
-					<!-- Preview Header -->
-					<div
-						class="bg-[#e5e7eb] px-3 sm:px-4 py-2 border-b border-brand-ink flex items-center justify-between"
-					>
-						<span class="font-mono text-[10px] sm:text-xs font-bold tracking-wider"
-							>PREVIEW OUTPUT</span
+					<!-- Advanced styling -->
+					<details class="group border-t-[1.5px] border-brand-rule pt-4">
+						<summary
+							class="flex cursor-pointer list-none items-center justify-between font-mono text-[11px] tracking-[0.06em] text-brand-mute"
 						>
-						<div class="flex gap-1">
-							<div class="w-2 h-2 bg-brand-ink" />
-							<div class="w-2 h-2 bg-brand-ink" />
-							<div class="w-2 h-2 bg-brand-ink" />
+							ADVANCED STYLING
+							<span class="transition-transform group-open:rotate-180">▾</span>
+						</summary>
+						<div class="mt-4 flex flex-col gap-4">
+							<label class="flex flex-col gap-1">
+								<span class="text-xs font-semibold text-brand-ink">Padding ({padding}px)</span>
+								<input type="range" min="16" max="128" bind:value={padding} class="w-full cursor-pointer accent-brand-ink" />
+							</label>
+							<label class="flex flex-col gap-1">
+								<span class="text-xs font-semibold text-brand-ink">Font Size ({fontSize}px)</span>
+								<input type="range" min="10" max="24" bind:value={fontSize} class="w-full cursor-pointer accent-brand-ink" />
+							</label>
+							<label class="flex flex-col gap-1">
+								<span class="text-xs font-semibold text-brand-ink">Line Height ({lineHeight})</span>
+								<input type="range" min="1" max="2.5" step="0.1" bind:value={lineHeight} class="w-full cursor-pointer accent-brand-ink" />
+							</label>
+							<label class="flex flex-col gap-1">
+								<span class="text-xs font-semibold text-brand-ink">Card Opacity ({Math.round(cardOpacity * 100)}%)</span>
+								<input type="range" min="0" max="1" step="0.05" bind:value={cardOpacity} class="w-full cursor-pointer accent-brand-ink" />
+							</label>
+							<label class="flex flex-col gap-1">
+								<span class="text-xs font-semibold text-brand-ink">Shadow Intensity</span>
+								<input type="range" min="0" max="1" step="0.05" bind:value={shadowIntensity} class="w-full cursor-pointer accent-brand-ink" />
+							</label>
+							<label class="flex flex-col gap-1">
+								<span class="text-xs font-semibold text-brand-ink">Blur ({blurEffect}px)</span>
+								<input type="range" min="0" max="20" bind:value={blurEffect} class="w-full cursor-pointer accent-brand-ink" />
+							</label>
+							<label class="flex flex-col gap-1">
+								<span class="text-xs font-semibold text-brand-ink">Border Radius ({borderRadius}px)</span>
+								<input type="range" min="0" max="32" bind:value={borderRadius} class="w-full cursor-pointer accent-brand-ink" />
+							</label>
+							<label class="flex flex-col gap-1">
+								<span class="text-xs font-semibold text-brand-ink">Tab Width ({codeTabWidth})</span>
+								<input type="range" min="2" max="8" step="2" bind:value={codeTabWidth} class="w-full cursor-pointer accent-brand-ink" />
+							</label>
+						</div>
+					</details>
+				</div>
+
+				<!-- Preview pane -->
+				<div
+					class="flex min-h-[360px] min-w-0 flex-1 flex-col gap-2 border-t-[1.5px] border-brand-ink bg-brand-subtle p-4 lg:min-h-0 lg:border-t-0"
+				>
+					<div class="flex items-center justify-between gap-2">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">LIVE PREVIEW</span>
+						<div class="flex items-center gap-1.5">
+							<span class="font-mono text-[10px] tracking-wider text-brand-mute">SIZE</span>
+							<input
+								type="number"
+								bind:value={previewWidth}
+								min="400"
+								max="1600"
+								on:input={() => {
+									if (previewFrame) previewFrame.style.width = `${previewWidth}px`;
+								}}
+								class="h-8 w-16 rounded border-[1.5px] border-brand-ink bg-white px-2 text-center font-mono text-xs focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
+							<span class="font-mono text-xs text-brand-mute">×</span>
+							<input
+								type="number"
+								bind:value={previewHeight}
+								min="300"
+								max="1200"
+								on:input={() => {
+									if (previewFrame) previewFrame.style.height = `${previewHeight}px`;
+								}}
+								class="h-8 w-16 rounded border-[1.5px] border-brand-ink bg-white px-2 text-center font-mono text-xs focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
 						</div>
 					</div>
-					<!-- Checkered Preview Background -->
 					<div
-						class="min-h-[300px] sm:min-h-[450px] lg:min-h-[550px] flex items-center justify-center overflow-auto"
+						class="relative flex flex-1 items-center justify-center overflow-auto border-[1.5px] border-brand-ink bg-white shadow-[4px_4px_0_0_#000]"
 						style="background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f0f0f0 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;"
 					>
-						{#if currentTab === 'preview'}
-							<div
-								class="w-full h-full overflow-auto p-4 sm:p-8 flex items-center justify-center"
-								bind:this={iframeContainer}
-							>
-								{#key srcdocKey}
-									<iframe
-										class="bg-transparent transition-all duration-300 ease-out border border-brand-ink max-w-full"
-										title="code-image-preview"
-										srcdoc={srcdocContent}
-										sandbox="allow-scripts"
-										bind:this={previewFrame}
-										style="width: min({previewWidth}px, 100%); height: {previewHeight}px;"
-									/>
-								{/key}
-							</div>
-						{:else if generatedImage}
-							<div class="flex items-center justify-center w-full h-full p-4 sm:p-8">
-								<img
-									loading="lazy"
-									src={generatedImage.url}
-									alt="Generated output"
-									class="max-w-full h-auto border border-brand-ink"
-								/>
-							</div>
-						{/if}
-					</div>
-
-					<!-- Action bar below preview (only when image is generated) -->
-					{#if generatedImage}
 						<div
-							class="bg-brand-proof border-t border-brand-ink px-3 sm:px-5 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-3"
+							class="flex h-full w-full items-center justify-center overflow-auto p-4 sm:p-8"
+							bind:this={iframeContainer}
 						>
-							<span class="font-semibold text-xs sm:text-sm tracking-widest text-brand-ink"
-								>✓ Image generated</span
-							>
-							<div class="flex items-center gap-2 sm:gap-3 flex-wrap">
-								<button
-									on:click={() =>
-										downloadFile(generatedImage.url, 'code-snippet.png', {
-											tool_name: 'code_to_image'
-										})}
-									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-paper border border-brand-ink font-bold tracking-wide text-xs transition-all"
-									>Download PNG</button
-								>
-								<a
-									href={generatedImage.url}
-									target="_blank"
-									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-paper border border-brand-ink font-bold tracking-wide text-xs transition-all"
-									>Open in Tab</a
-								>
-								<button
-									on:click={() => copyToClipboard(generatedImage.url)}
-									class="px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-ink text-white border border-brand-ink font-bold tracking-wide text-xs transition-all"
-									>Copy URL</button
-								>
-								<button
-									class="px-3 sm:px-4 py-1.5 sm:py-2 border border-brand-ink font-bold bg-brand-ink text-white text-xs transition-all"
-									on:click={() => handleSocialShare('twitter')}
-								>
-									<span class="inline-flex items-center gap-1.5 justify-center">
-										<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-											<path
-												d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-											/>
-										</svg>
-										X
-									</span>
-								</button>
-								<button
-									class="px-3 sm:px-4 py-1.5 sm:py-2 border border-brand-ink font-bold bg-[#0A66C2] text-white text-xs transition-all"
-									on:click={() => handleSocialShare('linkedin')}
-								>
-									<span class="inline-flex items-center gap-1.5 justify-center">
-										<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-											<path
-												d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.065 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-											/>
-										</svg>
-										LinkedIn
-									</span>
-								</button>
-							</div>
+							{#key srcdocKey}
+								<iframe
+									class="max-w-full border border-brand-ink bg-transparent transition-all duration-300 ease-out"
+									title="code-image-preview"
+									srcdoc={srcdocContent}
+									sandbox="allow-scripts"
+									bind:this={previewFrame}
+									style="width: min({previewWidth}px, 100%); height: {previewHeight}px;"
+								/>
+							{/key}
 						</div>
-					{/if}
+					</div>
 				</div>
-
-				<!-- Next steps — outside preview panel -->
-				{#if generatedImage}
-					<NextSteps
-						heading="Next steps"
-						description="Copy the API request, save this output as a template background, and batch render variants."
-						curlSnippet={nextStepsCurlSnippet}
-						templateDraft={nextStepsTemplateDraft}
-						generatedUrl={generatedImage?.url || ''}
-						toolName="Code to Image"
-					/>
-				{/if}
 			</div>
 
 			<svelte:fragment slot="toolbar-left">
@@ -1643,6 +1210,31 @@
 		</ToolCard>
 	</div>
 
+	<div slot="result">
+		{#if generatedImage?.url}
+			<ResultCard
+				imageUrl={generatedImage.url}
+				formatLabel="PNG"
+				fileExtension="png"
+				width={previewWidth}
+				height={previewHeight}
+				loggedIn={isUserLoggedIn}
+				lastFree={lastFreeRender}
+				toolName={TOOL_NAME}
+				toolPath={TOOL_PATH}
+			/>
+		{/if}
+	</div>
+
+	<AutomateSection
+		slot="automate"
+		title="Automate with the"
+		titleHighlight="API"
+		toolName={TOOL_NAME}
+		description="Generate syntax-highlighted code screenshots programmatically. Same renderer as this page, driven by one POST."
+		codeExamples={codeToImageExamples}
+	/>
+
 	<svelte:fragment slot="longform">
 		<!-- Section banner for the long-form block; text is frozen. -->
 		<h2
@@ -1650,14 +1242,6 @@
 		>
 			LEARN MORE ABOUT <span>CODE TO IMAGE</span>
 		</h2>
-
-		<AutomateSection
-			title="Automate with the"
-			titleHighlight="API"
-			toolName={TOOL_NAME}
-			description="Generate syntax-highlighted code screenshots programmatically. Same renderer as this page, driven by one POST."
-			codeExamples={codeToImageExamples}
-		/>
 
 		<!-- Code to Image — Comparison -->
 		<section
