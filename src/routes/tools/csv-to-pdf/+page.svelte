@@ -10,7 +10,7 @@
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
 	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
 	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
-	import LongformSection from '$lib/components/tools/v2/LongformSection.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import Papa from 'papaparse';
 	import { user } from '../../../store/user.store';

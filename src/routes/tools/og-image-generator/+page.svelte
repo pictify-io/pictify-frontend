@@ -12,7 +12,7 @@
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
 	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
 	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
-	import LongformSection from '$lib/components/tools/v2/LongformSection.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
 	import OgImageTemplate from '$lib/components/tools/OgImageTemplate.svelte';
 	import { getTemplate, getWebsiteInfo } from '../../../api/tools/og-image';
 	import { createImagePublic } from '../../../api/image.js';

@@ -39,13 +39,19 @@
 	// Kept for backwards compat while cert-gen/invoice still emit it today.
 	export let keywords = '';
 
+	// Tags the older hand-rolled heads emit that this component did not cover.
+	// Opt-in for the same reason as everything else here: adopting the component
+	// must not add or drop a single tag on a page that already ranks.
+	export let author = ''; // e.g. "Pictify.io"
+	export let ogLocale = ''; // e.g. "en_US"
+
 	// Richer SEO opt-ins (per-tag)
-	export let robots = '';                 // e.g. "index,follow,max-image-preview:large,max-snippet:-1"
-	export let ogSiteName = '';             // e.g. "Pictify"
-	export let twitterSite = '';            // e.g. "@pictify_io"
-	export let twitterCreator = '';         // e.g. "@pictify_io"
-	export let ogImageWidth = null;         // number
-	export let ogImageHeight = null;        // number
+	export let robots = ''; // e.g. "index,follow,max-image-preview:large,max-snippet:-1"
+	export let ogSiteName = ''; // e.g. "Pictify"
+	export let twitterSite = ''; // e.g. "@pictify_io"
+	export let twitterCreator = ''; // e.g. "@pictify_io"
+	export let ogImageWidth = null; // number
+	export let ogImageHeight = null; // number
 	export let ogImageAlt = '';
 	export let twitterImageAlt = '';
 
@@ -77,6 +83,13 @@
 	 */
 	export let howToSteps = null;
 	export let howToMeta = null; // { name, description, totalTime, supply, tool }
+	/**
+	 * Schemas this component does not build — the certificate page's ItemList of
+	 * templates, for one. Each object is serialised verbatim into its own
+	 * <script type="application/ld+json">, so a route adopting this component
+	 * keeps whatever structured data it ships today.
+	 */
+	export let extraSchemas = null;
 
 	// Root URL used for the BreadcrumbList items. Derived from canonical when absent.
 	function rootFromCanonical(c) {
@@ -99,14 +112,19 @@
 						name: f.q,
 						acceptedAnswer: { '@type': 'Answer', text: f.a }
 					}))
-				})
+			  })
 			: '';
 	$: _breadcrumbJson = breadcrumbLabel
 		? JSON.stringify({
 				'@context': 'https://schema.org',
 				'@type': 'BreadcrumbList',
 				itemListElement: [
-					{ '@type': 'ListItem', position: 1, name: 'Home', item: `${rootFromCanonical(canonical)}/` },
+					{
+						'@type': 'ListItem',
+						position: 1,
+						name: 'Home',
+						item: `${rootFromCanonical(canonical)}/`
+					},
 					{
 						'@type': 'ListItem',
 						position: 2,
@@ -115,8 +133,11 @@
 					},
 					{ '@type': 'ListItem', position: 3, name: breadcrumbLabel }
 				]
-			})
+		  })
 		: '';
+	$: _extraJson = Array.isArray(extraSchemas)
+		? extraSchemas.filter(Boolean).map((schema) => JSON.stringify(schema))
+		: [];
 	$: _howToJson =
 		Array.isArray(howToSteps) && howToSteps.length > 0
 			? JSON.stringify({
@@ -130,7 +151,7 @@
 						text: s.text,
 						...(s.url ? { url: s.url } : {})
 					}))
-				})
+			  })
 			: '';
 </script>
 
@@ -138,6 +159,7 @@
 	{#if title}<title>{title}</title>{/if}
 	{#if description}<meta name="description" content={description} />{/if}
 	{#if keywords}<meta name="keywords" content={keywords} />{/if}
+	{#if author}<meta name="author" content={author} />{/if}
 	{#if canonical}<link rel="canonical" href={canonical} />{/if}
 
 	{#if robots}<meta name="robots" content={robots} />{/if}
@@ -151,6 +173,7 @@
 	{#if ogImageWidth}<meta property="og:image:width" content={String(ogImageWidth)} />{/if}
 	{#if ogImageHeight}<meta property="og:image:height" content={String(ogImageHeight)} />{/if}
 	{#if ogImageAlt}<meta property="og:image:alt" content={ogImageAlt} />{/if}
+	{#if ogLocale}<meta property="og:locale" content={ogLocale} />{/if}
 
 	<meta name="twitter:card" content="summary_large_image" />
 	{#if twitterSite}<meta name="twitter:site" content={twitterSite} />{/if}
@@ -172,4 +195,7 @@
 	{#if _howToJson}
 		{@html `<script type="application/ld+json">${_howToJson}</script>`}
 	{/if}
+	{#each _extraJson as schemaJson}
+		{@html `<script type="application/ld+json">${schemaJson}</script>`}
+	{/each}
 </svelte:head>

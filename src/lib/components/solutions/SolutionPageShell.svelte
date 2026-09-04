@@ -13,7 +13,7 @@
 	 */
 	import ToolPageShell from '$lib/components/tools/scaffold/ToolPageShell.svelte';
 	import ToolBreadcrumb from '$lib/components/tools/scaffold/ToolBreadcrumb.svelte';
-	import ToolSeoHead from '$lib/components/tools/scaffold/ToolSeoHead.svelte';
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
 	import ToolFaq from '$lib/components/tools/scaffold/ToolFaq.svelte';
 
 	// SEO — passed through to ToolSeoHead

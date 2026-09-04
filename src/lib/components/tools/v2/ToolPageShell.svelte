@@ -20,6 +20,7 @@
 	import RailSignupCard from './RailSignupCard.svelte';
 	import ClosingBand from './ClosingBand.svelte';
 	import RelatedToolCards from './RelatedToolCards.svelte';
+	import { resolveToolCards } from '$lib/pseo/tool-cards.js';
 
 	/** Analytics name, e.g. `html_to_png`. */
 	export let toolName = '';
@@ -31,7 +32,11 @@
 	export let facts = '';
 	/** [{ id, label }] — drives the rail TOC and the mobile chip row. */
 	export let toc = [];
-	/** [{ title, meta, href, art }] — three art-strip cards. */
+	/**
+	 * Three art-strip cards. Slugs into the shared registry
+	 * (`related={['table', 'code-to-image']}`) or full card objects; routes move
+	 * to slugs one at a time, so both forms resolve.
+	 */
 	export let related = [];
 	export let loggedIn = false;
 	/** 'rail' | 'column' | null (decide from `toc`). */
@@ -44,6 +49,7 @@
 	 */
 	export let hasResult = false;
 
+	$: relatedCards = resolveToolCards(related);
 	$: mode = longform || (toc.length >= 6 ? 'rail' : 'column');
 	$: showRail = mode === 'rail';
 </script>
@@ -169,7 +175,7 @@
 		</div>
 
 		<!-- ── Related tools ─────────────────────────────────────────── -->
-		{#if related.length}
+		{#if relatedCards.length}
 			<section class="mx-auto mt-16 w-full max-w-page px-5 lg:px-10">
 				<!--
 					A <p>, not an <h2>: the routes' heading outlines are frozen for
@@ -179,7 +185,7 @@
 					More from the counter
 				</p>
 				<div class="mt-5">
-					<RelatedToolCards tools={related} {toolName} />
+					<RelatedToolCards tools={relatedCards} {toolName} />
 				</div>
 			</section>
 		{/if}

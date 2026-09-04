@@ -12,7 +12,7 @@
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
 	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
 	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
-	import LongformSection from '$lib/components/tools/v2/LongformSection.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { getTemplates, getTemplate } from '../../../api/tools/invoice.js';
 	import { onMount } from 'svelte';

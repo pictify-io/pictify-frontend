@@ -6,7 +6,7 @@
 	 * the toolbar and the result surface are new. ToolSeoHead and ToolFaq stay:
 	 * they own the frozen schema and heading.
 	 */
-	import ToolSeoHead from '$lib/components/tools/scaffold/ToolSeoHead.svelte';
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
 	import ToolFaq from '$lib/components/tools/scaffold/ToolFaq.svelte';
 	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
@@ -14,7 +14,7 @@
 	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
 	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
 	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
-	import LongformSection from '$lib/components/tools/v2/LongformSection.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
 	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import { onMount } from 'svelte';
 	import { user } from '../../../store/user.store';

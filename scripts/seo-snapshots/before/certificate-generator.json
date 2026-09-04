@@ -1,0 +1,375 @@
+{
+  "route": "/tools/certificate-generator",
+  "title": "Certificate Generator: Free Maker + Bulk API for Events & Training | Pictify",
+  "canonical": "https://pictify.io/tools/certificate-generator",
+  "metas": {
+    "description": "Free certificate generator with 5 professional templates: customize names, dates, and achievements, then download a high-res PNG. Bulk-generate via the free API.",
+    "keywords": "certificate generator, certificate maker, certificate template, make a certificate, create a certificate, online certificate maker, certificate of achievement template, certificate builder, free certificate maker, bulk certificate generator, certificate generator API, Pictify",
+    "og:description": "Free certificate generator with 5 templates. Bulk-generate certificates for events, training programs, and courses with the free API.",
+    "og:image": "https://media.pictify.io/qyl7z-1775406830860.png",
+    "og:image:alt": "Pictify Certificate Generator: 5 free templates with API for bulk generation",
+    "og:image:height": "630",
+    "og:image:width": "1200",
+    "og:site_name": "Pictify",
+    "og:title": "Certificate Generator: Free Maker + Bulk API for Events & Training | Pictify",
+    "og:type": "website",
+    "og:url": "https://pictify.io/tools/certificate-generator",
+    "robots": "index, follow, max-image-preview:large",
+    "twitter:card": "summary_large_image",
+    "twitter:description": "Free certificate generator with 5 templates. Bulk-generate certificates for events, training, and courses via API.",
+    "twitter:image": "https://media.pictify.io/qyl7z-1775406830860.png",
+    "twitter:image:alt": "Pictify Certificate Generator: 5 free templates with API for bulk generation",
+    "twitter:site": "@pictify_io",
+    "twitter:title": "Certificate Generator: Free Maker + Bulk API for Events & Training | Pictify"
+  },
+  "jsonLd": [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/",
+          "name": "Home",
+          "position": 1
+        },
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/tools",
+          "name": "Tools",
+          "position": 2
+        },
+        {
+          "@type": "ListItem",
+          "name": "Certificate Generator",
+          "position": 3
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, pick a template, fill in the details, and download a high-resolution PNG free, no signup required. A free account adds bulk generation, PDF output, and email delivery via workflows."
+          },
+          "name": "Is this certificate generator really free?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The form fields update the recipient name, organization, date, and achievement text live in the preview. Every template is plain HTML and CSS under the hood, so with a free account you can edit the template code directly, or describe the design you want and let the AI Template Maker write it."
+          },
+          "name": "Can I customize the certificate design?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "This free tool generates high-quality PNG images at 1920x1080 resolution. With a free account, the API and workflows also render certificates as PDF (including multi-page), JPG, and WebP."
+          },
+          "name": "What formats can I download certificates in?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Pictify works as a bulk certificate generator for events, training programs, and courses. Upload a CSV in a workflow (one row per attendee) and every row renders its own certificate. Or use the API to batch generate up to 500 certificates per call. Perfect for course completions, event attendance, and employee recognition programs."
+          },
+          "name": "Can I bulk generate certificates for events or training programs?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, this is what makes Pictify different from other certificate makers. A batch run renders every row of your CSV against the same template in one job, and hands back a CDN link per certificate plus a per-row status you can poll. A webhook fires when the run finishes, so your own system can pick the files up without anyone watching a progress bar."
+          },
+          "name": "Can I generate certificates in bulk automatically?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Export your Sheet as CSV and upload it to a workflow; columns map to certificate variables in the wizard. Unlike Sheets add-ons such as Autocrat, the merge runs on managed infrastructure (no Apps Script 6-minute timeouts) and delivery never touches your Gmail quota."
+          },
+          "name": "Can I generate certificates from Google Sheets?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Every workflow exposes a signed webhook. Point your LMS completion event, Typeform, or a Zapier/Make/n8n flow at it and each payload renders and delivers one certificate, with the same per-recipient status tracking as a CSV run."
+          },
+          "name": "Can my LMS or form tool trigger certificates automatically?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. In a workflow, templates are HTML: drop an <img> tag with your logo URL anywhere in the design, or upload it as a brand asset. Because templates are code, there is no limit on layout, fonts, or imagery."
+          },
+          "name": "Can I add my company logo?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, certificates are generated at 1920x1080 pixels which provides excellent print quality for standard certificate sizes. For best results, print on high-quality paper or card stock."
+          },
+          "name": "Are the generated certificates printable?"
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "description": "Make a custom certificate online for free in six steps using Pictify's certificate generator.",
+      "name": "How to Make a Certificate Online",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "name": "Choose a template",
+          "position": 1,
+          "text": "Choose a certificate template from the gallery above."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Enter details",
+          "position": 2,
+          "text": "Enter the recipient name, organization, date, and achievement."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Preview the certificate",
+          "position": 3,
+          "text": "Preview your certificate in the interactive live preview."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Watch the live preview",
+          "position": 4,
+          "text": "The certificate preview updates instantly as you type."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Generate the certificate",
+          "position": 5,
+          "text": "Click Generate Certificate to create a high-resolution PNG."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Download",
+          "position": 6,
+          "text": "Download your certificate, or start a batch run to render them in bulk from a CSV."
+        }
+      ],
+      "supply": [
+        {
+          "@type": "HowToSupply",
+          "name": "Recipient name, organization, date, achievement text"
+        }
+      ],
+      "tool": [
+        {
+          "@type": "HowToTool",
+          "name": "Pictify Certificate Generator"
+        }
+      ],
+      "totalTime": "PT2M"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "CreativeWork",
+            "description": "Classic formal certificate of achievement with gold borders and elegant serif typography.",
+            "name": "Certificate of Achievement Template"
+          },
+          "position": 1
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "CreativeWork",
+            "description": "Sleek dark theme certificate of completion with purple accents and clean sans-serif typography.",
+            "name": "Certificate of Completion Template"
+          },
+          "position": 2
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "CreativeWork",
+            "description": "Professional corporate certificate design with navy header and formal layout.",
+            "name": "Corporate Certificate Template"
+          },
+          "position": 3
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "CreativeWork",
+            "description": "Clean minimalist certificate design with generous whitespace and refined typography.",
+            "name": "Minimalist Certificate Template"
+          },
+          "position": 4
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "CreativeWork",
+            "description": "Bold, colorful award certificate with coral accents and playful geometric elements.",
+            "name": "Creative Award Certificate Template"
+          },
+          "position": 5
+        }
+      ],
+      "itemListOrder": "https://schema.org/ItemListUnordered",
+      "name": "Free Certificate Templates",
+      "numberOfItems": 5
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "description": "API-first image, document, and video generation. Every row of a spreadsheet or webhook becomes a rendered, personalized certificate, badge, report, or video, delivered by email.",
+      "logo": "https://pictify.io/logo.png",
+      "name": "Pictify",
+      "sameAs": [
+        "https://github.com/pictify-io"
+      ],
+      "url": "https://pictify.io"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "applicationCategory": [
+        "DesignApplication",
+        "ImageGenerator"
+      ],
+      "creator": {
+        "@type": "Organization",
+        "name": "Pictify.io",
+        "url": "https://pictify.io"
+      },
+      "description": "Create professional certificates for free with Pictify's interactive certificate generator. Choose from 5 beautiful templates, customize recipient names, dates, and achievements, and download as PNG.",
+      "featureList": [
+        "5 professional certificate templates",
+        "Real-time live preview",
+        "Customizable text fields",
+        "High-resolution PNG download",
+        "API for bulk generation",
+        "No signup required"
+      ],
+      "name": "Pictify.io Certificate Generator",
+      "offers": {
+        "@type": "Offer",
+        "availability": "https://schema.org/InStock",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "operatingSystem": "Web",
+      "url": "https://pictify.io/tools/certificate-generator"
+    }
+  ],
+  "outline": [
+    {
+      "tag": "h1",
+      "text": "CERTIFICATE GENERATOR"
+    },
+    {
+      "tag": "h2",
+      "text": "Need certificates for a whole list?"
+    },
+    {
+      "tag": "h2",
+      "text": "CHOOSE A TEMPLATE"
+    },
+    {
+      "tag": "h2",
+      "text": "_ CERTIFICATE DETAILS"
+    },
+    {
+      "tag": "h3",
+      "text": "1 Recipient Name"
+    },
+    {
+      "tag": "h3",
+      "text": "2 Organization Name"
+    },
+    {
+      "tag": "h3",
+      "text": "3 Date"
+    },
+    {
+      "tag": "h3",
+      "text": "4 Achievement"
+    },
+    {
+      "tag": "h2",
+      "text": "Automate with the API"
+    },
+    {
+      "tag": "h2",
+      "text": "LEARN MORE ABOUT CERTIFICATES"
+    },
+    {
+      "tag": "h3",
+      "text": "What is a Certificate Generator?"
+    },
+    {
+      "tag": "h3",
+      "text": "Why Use Our Certificate Generator?"
+    },
+    {
+      "tag": "h3",
+      "text": "How to Make a Certificate Online in 6 Steps"
+    },
+    {
+      "tag": "h3",
+      "text": "Bulk Certificate Generator for Events: Delivered, Not Downloaded"
+    },
+    {
+      "tag": "h3",
+      "text": "Frequently Asked Questions"
+    },
+    {
+      "tag": "h3",
+      "text": "Certificate Templates: Choose from 5 Free Designs"
+    },
+    {
+      "tag": "h3",
+      "text": "Use Our Online Certificate Maker for Free"
+    },
+    {
+      "tag": "h3",
+      "text": "Need Them Delivered, Not Just Downloaded?"
+    },
+    {
+      "tag": "h3",
+      "text": "More Tools You'll Love"
+    },
+    {
+      "tag": "h2",
+      "text": "Product"
+    },
+    {
+      "tag": "h2",
+      "text": "Developers"
+    },
+    {
+      "tag": "h2",
+      "text": "Integrations"
+    },
+    {
+      "tag": "h2",
+      "text": "Company"
+    }
+  ]
+}

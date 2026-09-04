@@ -10,7 +10,7 @@
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
 	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
 	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
-	import LongformSection from '$lib/components/tools/v2/LongformSection.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
 	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
 	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
