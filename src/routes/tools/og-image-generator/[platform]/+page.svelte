@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import OgImageGenerator from '../+page.svelte';
-	import SEOHead from '$lib/seo/SEOHead.svelte';
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
 	import { ogPlatforms, popularSizes } from '$lib/pseo/config.js';
 
 	$: platformId = $page.params.platform;
@@ -78,13 +78,20 @@
 	};
 </script>
 
-<SEOHead
+<ToolSeoHead
 	{title}
 	{description}
 	{canonical}
 	robots="index, follow, max-image-preview:large"
+	ogTitle={title}
+	ogDescription={description}
+	ogSiteName="Pictify"
 	ogImage="https://media.pictify.io/31hxg-1775406864453.png"
-	{schema}
+	twitterTitle={title}
+	twitterDescription={description}
+	twitterImage="https://media.pictify.io/31hxg-1775406864453.png"
+	twitterUrl={canonical}
+	extraSchemas={[schema]}
 />
 
 <section>

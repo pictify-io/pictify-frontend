@@ -7,7 +7,7 @@
 	 * the in-editor Generate button moves into that toolbar so every tool page
 	 * has its primary action in the same place.
 	 */
-	import SEOHead from '$lib/seo/SEOHead.svelte';
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
 	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
 	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
@@ -30,14 +30,17 @@
 		platformRecommendedSizes,
 		parseSize
 	} from '$lib/pseo/config.js';
-	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
 	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
 	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/telemetry.js';
 	import { downloadFile } from '$lib/utils/download.js';
-	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
+	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
+	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
+	import ProseGroup from '$lib/components/tools/v2/longform/ProseGroup.svelte';
+	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
+	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 
 	// Optional platform prop to specialize content (e.g., 'wordpress')
 	export let platform = null;
@@ -805,45 +808,42 @@
 		}
 	];
 
-	const RELATED = [
+	/** The visible accordion. faqSchema keeps its own wording; both are frozen. */
+	const FAQS = [
 		{
-			title: 'LinkedIn banner',
-			meta: 'TEMPLATE → 1584×396',
-			href: '/tools/linkedin-banner-generator',
-			art: '/landing/tools/linkedin-banner.svg'
+			q: 'How do I add an OG image?',
+			a: "Add the og:image meta tag in your page's <head> section with the absolute URL of your image."
 		},
 		{
-			title: 'Tweet screenshot',
-			meta: 'TWEET URL → PNG',
-			href: '/tools/tweet-screenshot',
-			art: '/landing/tools/tweet-screenshot.svg'
+			q: 'What size should it be?',
+			a: 'The recommended size is 1200×630 pixels (1.91:1 ratio) for optimal display on Facebook, Twitter, and LinkedIn.'
 		},
 		{
-			title: 'HTML to image',
-			meta: 'HTML → PNG · JPG · WEBP',
-			href: '/tools/html-to-image',
-			art: '/landing/tools/html-to-image.svg'
+			q: 'Is there an API?',
+			a: 'Yes! Use our REST API to generate OG images programmatically. Perfect for blogs, e-commerce, and SaaS platforms.'
 		}
 	];
+
+	const RELATED = ['linkedin-banner-generator', 'tweet-screenshot', 'html-to-image'];
 </script>
 
 {#if !isPlatform}
 	<!-- Platform variants render their own SEOHead in [platform]/+page.svelte -->
-	<SEOHead
+	<ToolSeoHead
 		title="Free OG Image Generator: Create Open Graph Images in Seconds | Pictify"
 		description="Pick a template, customize colors and text, and export your OG image in one click. 20+ templates for Twitter, LinkedIn, Facebook. Free, no signup. API available."
 		canonical="https://pictify.io/tools/og-image-generator"
 		robots="index, follow, max-image-preview:large"
+		ogTitle="Free OG Image Generator: Create Open Graph Images in Seconds | Pictify"
+		ogDescription="Pick a template, customize colors and text, export your OG image. 20+ templates for Twitter, LinkedIn, Facebook. Free, no signup."
+		ogSiteName="Pictify"
 		ogImage="https://media.pictify.io/31hxg-1775406864453.png"
-		openGraph={{
-			description:
-				'Pick a template, customize colors and text, export your OG image. 20+ templates for Twitter, LinkedIn, Facebook. Free, no signup.'
-		}}
-		twitter={{
-			description:
-				'Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds.'
-		}}
-		schema={[structuredData, faqSchema, breadcrumbSchema]}
+		twitterTitle="Free OG Image Generator: Create Open Graph Images in Seconds | Pictify"
+		twitterDescription="Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds."
+		twitterImage="https://media.pictify.io/31hxg-1775406864453.png"
+		twitterUrl="https://pictify.io/tools/og-image-generator"
+		webApplicationSchema={structuredData}
+		extraSchemas={[faqSchema, breadcrumbSchema]}
 	/>
 {/if}
 
@@ -857,24 +857,18 @@
 	hasResult={!!imageUrl}
 	longform="column"
 >
-	<h1
-		slot="h1"
-		class="font-display text-[38px] font-extrabold leading-[1.04] tracking-[-0.02em] text-brand-ink lg:text-[52px] lg:leading-[56px]"
-	>
+	<HeroTitle slot="h1">
 		<span>OG IMAGE</span>
 		<span>GENERATOR</span>
 		{#if isPlatform}
 			<span class="whitespace-nowrap">for {platformLabel}</span>
 		{/if}
-	</h1>
+	</HeroTitle>
 
-	<p
-		slot="hero-sub"
-		class="max-w-[640px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
-	>
+	<HeroSub slot="hero-sub">
 		Create stunning <span class="font-medium">Open Graph images</span> for your website.
 		<span class="text-brand-slate">Boost social media engagement with custom social cards</span>
-	</p>
+	</HeroSub>
 
 	<div slot="tool">
 		<ToolCard>
@@ -993,7 +987,7 @@
 							</div>
 							{#if error}
 								<div
-									class="mt-4 p-4 bg-brand-pink/10 border-[3px] border-brand-danger text-brand-pink font-bold flex items-center gap-2"
+									class="mt-4 p-4 bg-brand-pink/10 border border-brand-danger text-brand-pink font-bold flex items-center gap-2"
 								>
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
@@ -1009,7 +1003,7 @@
 						</div>
 					{:else}
 						<div class="border-t-[3px] border-dashed border-gray-300 pt-8">
-							<div class="bg-brand-proof/10 border-[3px] border-brand-proof p-6 text-center">
+							<div class="bg-brand-proof/10 border border-brand-proof p-6 text-center">
 								<p class="text-brand-ink font-bold text-lg">
 									✓ Select a template below to start designing
 								</p>
@@ -1073,7 +1067,7 @@
 											</span>
 											Logo
 										</h4>
-										<div class="p-4 bg-brand-subtle border-[3px] border-gray-200 space-y-4">
+										<div class="p-4 bg-brand-subtle border border-brand-rule space-y-4">
 											{#if websiteInfo.logo}
 												<div
 													class="bg-brand-paper p-4 border-[2px] border-gray-200 flex justify-center"
@@ -1145,7 +1139,7 @@
 												<input
 													id="og-heading"
 													type="text"
-													class="w-full border-[3px] border-gray-200 text-lg font-bold focus:outline-none focus:border-black py-3 px-4 transition-all"
+													class="w-full border border-brand-rule text-lg font-bold focus:outline-none focus:border-black py-3 px-4 transition-all"
 													placeholder="Enter heading"
 													value={websiteInfo.heading}
 													on:input={updateHeading}
@@ -1158,7 +1152,7 @@
 												>
 												<textarea
 													id="og-description"
-													class="w-full border-[3px] border-gray-200 text-base font-medium focus:outline-none focus:border-black py-3 px-4 transition-all resize-none"
+													class="w-full border border-brand-rule text-base font-medium focus:outline-none focus:border-black py-3 px-4 transition-all resize-none"
 													rows="3"
 													value={websiteInfo.subHeading}
 													on:input={updateSubHeading}
@@ -1184,7 +1178,7 @@
 											</span>
 											Style
 										</h4>
-										<div class="p-4 bg-brand-subtle border-[3px] border-gray-200">
+										<div class="p-4 bg-brand-subtle border border-brand-rule">
 											<div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
 												<div>
 													<label for="og-font" class="text-xs font-bold text-brand-mute block mb-2"
@@ -1192,7 +1186,7 @@
 													>
 													<select
 														id="og-font"
-														class="w-full border-[3px] border-gray-200 text-base font-bold focus:outline-none focus:border-black py-3 px-4 bg-brand-paper appearance-none cursor-pointer"
+														class="w-full border border-brand-rule text-base font-bold focus:outline-none focus:border-black py-3 px-4 bg-brand-paper appearance-none cursor-pointer"
 														on:change={(e) => updateFont(combinedFonts[e.target.selectedIndex])}
 													>
 														{#each combinedFonts as font}
@@ -1330,13 +1324,12 @@
 	/>
 
 	<svelte:fragment slot="longform">
-		<LongformSection index="01" id="templates" first>
-			<h2
-				slot="heading"
-				class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink"
-			>
-				{isPlatform ? `Templates for ${platformLabel}` : 'Choose Template'}
-			</h2>
+		<LongformSection
+			index="01"
+			id="templates"
+			first
+			title={isPlatform ? `Templates for ${platformLabel}` : 'Choose Template'}
+		>
 			<div class="w-full max-w-5xl mx-auto mb-20">
 				<div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4 px-2 md:px-0">
 					{#if !isUserLoggedIn}
@@ -1391,175 +1384,42 @@
 					{/each}
 				</div>
 			</div>
+
+			<!-- These two were h3s in a two-up card grid; they keep that level. -->
+			<ProseGroup
+				columns={2}
+				items={[
+					{
+						heading: 'What is an OG Image?',
+						body: "An OG (Open Graph) image is the preview that appears when your content is shared on social media. It's your first impression. Make it count with professional designs."
+					},
+					{
+						heading: 'Why Use This Tool?',
+						bullets: [
+							'Create pro images in minutes',
+							'Match your brand perfectly',
+							'Boost CTR by up to 40%'
+						]
+					}
+				]}
+			/>
 		</LongformSection>
 
-		<!-- API Section -->
-		<section class="mb-16 max-w-5xl mx-auto">
-			<ApiPromptSection
-				title={apiCtaDetails.title}
-				description={apiCtaDetails.description}
-				featurePoints={apiCtaDetails.featurePoints}
-				codeSnippet={apiCtaDetails.codeSnippet}
-				codeLanguage="bash"
-				docsUrl={apiCtaDetails.docsUrl}
-				docsLabel={apiCtaDetails.docsLabel}
-				secondaryCtaLabel={apiCtaDetails.secondaryCtaLabel}
-				secondaryCtaUrl="https://docs.pictify.io/api-reference/overview"
-				note="Contact us for volume pricing or dedicated rendering regions."
-			/>
-		</section>
-
-		<div class="max-w-5xl mx-auto px-2 md:px-0">
-			<!-- What is OG Image -->
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-				<div class="border border-brand-ink bg-brand-paper p-6 md:p-8">
-					<div
-						class="w-12 h-12 bg-brand-field border border-brand-ink flex items-center justify-center mb-6"
-					>
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-							/></svg
-						>
-					</div>
-					<h3 class="text-2xl font-semibold mb-4 text-brand-ink">What is an OG Image?</h3>
-					<p class="text-brand-ink font-medium leading-relaxed">
-						An OG (Open Graph) image is the preview that appears when your content is shared on
-						social media. It's your first impression. Make it count with professional designs.
-					</p>
-				</div>
-
-				<div class="border border-brand-ink bg-brand-paper p-6 md:p-8">
-					<div
-						class="w-12 h-12 bg-brand-pink border border-brand-ink flex items-center justify-center mb-6"
-					>
-						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M13 10V3L4 14h7v7l9-11h-7z"
-							/></svg
-						>
-					</div>
-					<h3 class="text-2xl font-semibold mb-4 text-brand-ink">Why Use This Tool?</h3>
-					<ul class="space-y-3">
-						<li class="flex items-center gap-3 font-bold text-brand-ink">
-							<div class="w-2 h-2 bg-brand-ink" />
-							Create pro images in minutes
-						</li>
-						<li class="flex items-center gap-3 font-bold text-brand-ink">
-							<div class="w-2 h-2 bg-brand-ink" />
-							Match your brand perfectly
-						</li>
-						<li class="flex items-center gap-3 font-bold text-brand-ink">
-							<div class="w-2 h-2 bg-brand-ink" />
-							Boost CTR by up to 40%
-						</li>
-					</ul>
-				</div>
-			</div>
-
-			<!-- FAQ Section -->
-			<div class="border border-brand-ink bg-brand-paper p-6 md:p-8 mb-16">
-				<h2 class="text-3xl font-semibold mb-8 text-brand-ink">FAQ</h2>
-				<div class="space-y-4">
-					<details class="group">
-						<summary
-							class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
-						>
-							<span class="font-semibold text-lg text-brand-ink">How do I add an OG image?</span>
-							<span
-								class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
-							>
-								<svg
-									class="h-4 w-4 group-open:rotate-180 transition-transform"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-									><path
-										fill-rule="evenodd"
-										d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-										clip-rule="evenodd"
-									/></svg
-								>
-							</span>
-						</summary>
-						<div
-							class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
-						>
-							Add the <code class="bg-brand-rule px-2 py-1 font-mono text-sm">og:image</code> meta tag
-							in your page's &lt;head&gt; section with the absolute URL of your image.
-						</div>
-					</details>
-
-					<details class="group">
-						<summary
-							class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
-						>
-							<span class="font-semibold text-lg text-brand-ink">What size should it be?</span>
-							<span
-								class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
-							>
-								<svg
-									class="h-4 w-4 group-open:rotate-180 transition-transform"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-									><path
-										fill-rule="evenodd"
-										d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-										clip-rule="evenodd"
-									/></svg
-								>
-							</span>
-						</summary>
-						<div
-							class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
-						>
-							The recommended size is <strong>1200×630 pixels</strong> (1.91:1 ratio) for optimal display
-							on Facebook, Twitter, and LinkedIn.
-						</div>
-					</details>
-
-					<details class="group">
-						<summary
-							class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
-						>
-							<span class="font-semibold text-lg text-brand-ink">Is there an API?</span>
-							<span
-								class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
-							>
-								<svg
-									class="h-4 w-4 group-open:rotate-180 transition-transform"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-									><path
-										fill-rule="evenodd"
-										d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-										clip-rule="evenodd"
-									/></svg
-								>
-							</span>
-						</summary>
-						<div
-							class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
-						>
-							Yes! Use our REST API to generate OG images programmatically. Perfect for blogs,
-							e-commerce, and SaaS platforms.
-						</div>
-					</details>
-				</div>
-			</div>
-		</div>
+		<LongformSection index="02" id="faq" title="FAQ">
+			<FaqList faqs={FAQS} />
+		</LongformSection>
 	</svelte:fragment>
 
 	<svelte:fragment slot="footer-links">
-		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
-			<RelatedTools
-				tools={['youtube-thumbnail', 'linkedin-banner', 'twitter-header', 'responsive-images']}
-			/>
-		</div>
+		<RelatedLinks
+			toolName={TOOL_NAME}
+			links={[
+				{ href: '/tools/youtube-thumbnail', label: 'YouTube Thumbnail' },
+				{ href: '/tools/linkedin-banner', label: 'LinkedIn Banner' },
+				{ href: '/tools/twitter-header', label: 'Twitter Header' },
+				{ href: '/tools/responsive-images', label: 'Responsive Images' },
+				{ href: '/tools', label: 'View all tools →' }
+			]}
+		/>
 	</svelte:fragment>
 </ToolPageShell>

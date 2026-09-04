@@ -18,127 +18,59 @@
     "twitter:url": "https://pictify.io/tools/og-image-generator"
   },
   "jsonLd": [
-    [
-      {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "bestRating": "5",
-          "ratingCount": "4192",
-          "ratingValue": "4.9",
-          "worstRating": "1"
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/",
+          "name": "Home",
+          "position": 1
         },
-        "applicationCategory": [
-          "DesignApplication",
-          "SEO Tool"
-        ],
-        "creator": {
-          "@type": "Organization",
-          "logo": "https://pictify.io/logo.png",
-          "name": "Pictify.io",
-          "url": "https://pictify.io"
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/tools",
+          "name": "Tools",
+          "position": 2
         },
-        "description": "Create custom Open Graph images for improved social media engagement and SEO.",
-        "featureList": [
-          "Customizable templates",
-          "Automatic website info extraction",
-          "Color and font customization",
-          "API access",
-          "Social media preview"
-        ],
-        "interactionStatistic": {
-          "@type": "InteractionCounter",
-          "interactionType": "https://schema.org/UseAction",
-          "userInteractionCount": "45897"
-        },
-        "keywords": [
-          "OG image generator",
-          "Open Graph images",
-          "social media images",
-          "SEO",
-          "content marketing"
-        ],
-        "mainEntityOfPage": {
-          "@id": "https://pictify.io/tools/og-image-generator",
-          "@type": "WebPage"
-        },
-        "name": "Pictify OG Image Generator",
-        "offers": {
-          "@type": "Offer",
-          "availability": "https://schema.org/InStock",
-          "price": "0",
-          "priceCurrency": "USD"
-        },
-        "operatingSystem": "Web",
-        "screenshot": {
-          "@type": "ImageObject",
-          "height": "630",
-          "url": "https://media.pictify.io/31hxg-1775406864453.png",
-          "width": "1200"
-        },
-        "softwareHelp": {
-          "@type": "CreativeWork",
-          "name": "OG Image Generator Documentation",
-          "url": "https://docs.pictify.io/api-reference/generation/images"
-        },
-        "softwareVersion": "1.2.0",
-        "url": "https://pictify.io/tools/og-image-generator"
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Add the og:image meta tag in your page's <head> section with the absolute URL of your image."
-            },
-            "name": "How do I add an OG image?"
+        {
+          "@type": "ListItem",
+          "name": "OG Image Generator",
+          "position": 3
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Add the og:image meta tag in your page's <head> section with the absolute URL of your image."
           },
-          {
-            "@type": "Question",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "The recommended size is 1200×630 pixels (1.91:1 ratio) for optimal display on Facebook, Twitter, and LinkedIn."
-            },
-            "name": "What size should it be?"
+          "name": "How do I add an OG image?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The recommended size is 1200×630 pixels (1.91:1 ratio) for optimal display on Facebook, Twitter, and LinkedIn."
           },
-          {
-            "@type": "Question",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes! Use our REST API to generate OG images programmatically. Perfect for blogs, e-commerce, and SaaS platforms."
-            },
-            "name": "Is there an API?"
-          }
-        ]
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "item": "https://pictify.io/",
-            "name": "Home",
-            "position": 1
+          "name": "What size should it be?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Use our REST API to generate OG images programmatically. Perfect for blogs, e-commerce, and SaaS platforms."
           },
-          {
-            "@type": "ListItem",
-            "item": "https://pictify.io/tools",
-            "name": "Tools",
-            "position": 2
-          },
-          {
-            "@type": "ListItem",
-            "name": "OG Image Generator",
-            "position": 3
-          }
-        ]
-      }
-    ],
+          "name": "Is there an API?"
+        }
+      ]
+    },
     {
       "@context": "https://schema.org",
       "@type": "Organization",
@@ -149,6 +81,72 @@
         "https://github.com/pictify-io"
       ],
       "url": "https://pictify.io"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "bestRating": "5",
+        "ratingCount": "4192",
+        "ratingValue": "4.9",
+        "worstRating": "1"
+      },
+      "applicationCategory": [
+        "DesignApplication",
+        "SEO Tool"
+      ],
+      "creator": {
+        "@type": "Organization",
+        "logo": "https://pictify.io/logo.png",
+        "name": "Pictify.io",
+        "url": "https://pictify.io"
+      },
+      "description": "Create custom Open Graph images for improved social media engagement and SEO.",
+      "featureList": [
+        "Customizable templates",
+        "Automatic website info extraction",
+        "Color and font customization",
+        "API access",
+        "Social media preview"
+      ],
+      "interactionStatistic": {
+        "@type": "InteractionCounter",
+        "interactionType": "https://schema.org/UseAction",
+        "userInteractionCount": "45897"
+      },
+      "keywords": [
+        "OG image generator",
+        "Open Graph images",
+        "social media images",
+        "SEO",
+        "content marketing"
+      ],
+      "mainEntityOfPage": {
+        "@id": "https://pictify.io/tools/og-image-generator",
+        "@type": "WebPage"
+      },
+      "name": "Pictify OG Image Generator",
+      "offers": {
+        "@type": "Offer",
+        "availability": "https://schema.org/InStock",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "operatingSystem": "Web",
+      "screenshot": {
+        "@type": "ImageObject",
+        "height": "630",
+        "url": "https://media.pictify.io/31hxg-1775406864453.png",
+        "width": "1200"
+      },
+      "softwareHelp": {
+        "@type": "CreativeWork",
+        "name": "OG Image Generator Documentation",
+        "url": "https://docs.pictify.io/api-reference/generation/images"
+      },
+      "softwareVersion": "1.2.0",
+      "url": "https://pictify.io/tools/og-image-generator"
     }
   ],
   "outline": [
@@ -165,10 +163,6 @@
       "text": "Choose Template"
     },
     {
-      "tag": "h2",
-      "text": "Ship OG images straight from your product"
-    },
-    {
       "tag": "h3",
       "text": "What is an OG Image?"
     },
@@ -179,10 +173,6 @@
     {
       "tag": "h2",
       "text": "FAQ"
-    },
-    {
-      "tag": "h3",
-      "text": "More Tools You'll Love"
     },
     {
       "tag": "h2",
