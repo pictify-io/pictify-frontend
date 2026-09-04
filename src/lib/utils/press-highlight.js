@@ -30,7 +30,10 @@ export const PRESS = {
 /** CodeMirror highlight rules. Punctuation is deliberately absent — it inherits. */
 export const pressHighlight = syntaxHighlighting(
 	HighlightStyle.define([
-		{ tag: [t.tagName, t.keyword, t.function(t.variableName), t.standard(t.tagName)], color: PRESS.keyword },
+		{
+			tag: [t.tagName, t.keyword, t.function(t.variableName), t.standard(t.tagName)],
+			color: PRESS.keyword
+		},
 		{ tag: [t.string, t.special(t.string), t.number, t.bool, t.literal], color: PRESS.string },
 		{ tag: [t.attributeName, t.propertyName, t.definition(t.propertyName)], color: PRESS.property },
 		{ tag: [t.comment, t.lineComment, t.blockComment], color: PRESS.comment, fontStyle: 'italic' },
@@ -151,38 +154,157 @@ const ESCAPE = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESCAPE[c]);
 
 /**
+ * Per-language rule sets for read-only snippets.
+ *
+ * Every list reads the same PRESS palette, so a string is the same green in a
+ * curl snippet and in the JSON response beside it. Order is priority: earlier
+ * rules win the characters they match, and a later rule keeps whatever is left
+ * over (see `addSpans`), which is how a `{{token}}` can sit inside a string
+ * without the rest of that string losing its colour.
+ *
+ * Patterns run against ESCAPED source, so a double quote is `&quot;` and a
+ * single quote `&#39;`. `&(?!quot;)` inside the string patterns lets an escaped
+ * ampersand live in a string without ending it.
+ */
+const TOKEN_RULE = { re: /\{\{[^}]*\}\}/g, color: PRESS.token, weight: 500 };
+const DQ = '&quot;(?:[^&]|&(?!quot;))*?&quot;';
+const SQ = '&#39;(?:[^&]|&(?!#39;))*?&#39;';
+
+export const LANG_RULES = {
+	html: [
+		TOKEN_RULE,
+		{ re: /&lt;!--[\s\S]*?--&gt;/g, color: PRESS.comment },
+		{ re: new RegExp(`${DQ}|${SQ}`, 'g'), color: PRESS.string },
+		{ re: /&lt;\/?[a-zA-Z][\w-]*/g, color: PRESS.keyword },
+		{ re: /\b[a-zA-Z-]+(?==)/g, color: PRESS.property }
+	],
+
+	json: [
+		TOKEN_RULE,
+		// Keys before values: a quoted run followed by a colon is a property.
+		{ re: new RegExp(`${DQ}(?=\\s*:)`, 'g'), color: PRESS.property },
+		{ re: new RegExp(DQ, 'g'), color: PRESS.string },
+		{ re: /\b(?:true|false|null)\b/g, color: PRESS.string },
+		{ re: /-?\b\d+(?:\.\d+)?\b/g, color: PRESS.string }
+	],
+
+	js: [
+		TOKEN_RULE,
+		// Not preceded by ':' — otherwise the // in https:// starts a comment.
+		{ re: /(?<![:/\w])\/\/[^\n]*/g, color: PRESS.comment },
+		// A quoted key ('Content-Type':) is a property, not a string.
+		{ re: new RegExp(`(?:${DQ}|${SQ})(?=\\s*:)`, 'g'), color: PRESS.property },
+		{ re: new RegExp(`${DQ}|${SQ}|\`[^\`]*\``, 'g'), color: PRESS.string },
+		{
+			re: /\b(?:const|let|var|await|async|function|return|import|export|from|new|if|else|try|catch)\b/g,
+			color: PRESS.keyword
+		},
+		{ re: /\b(?:fetch|JSON|stringify|parse|json|require|console|log)\b/g, color: PRESS.keyword },
+		// Bare identifiers used as object keys. Runs after strings, so a colon
+		// inside a URL is already spoken for.
+		{ re: /\b[A-Za-z_$][\w$]*(?=\s*:)/g, color: PRESS.property }
+	],
+
+	python: [
+		TOKEN_RULE,
+		// Not preceded by '&' — escaping turns a single quote into &#39;, and a
+		// naive # rule swallows the rest of the line from inside that entity.
+		{ re: /(?<![&\w])#[^\n]*/g, color: PRESS.comment },
+		{ re: new RegExp(`(?:${DQ}|${SQ})(?=\\s*:)`, 'g'), color: PRESS.property },
+		{ re: new RegExp(`${DQ}|${SQ}`, 'g'), color: PRESS.string },
+		{
+			re: /\b(?:import|from|def|return|print|True|False|None|with|as|if|else)\b/g,
+			color: PRESS.keyword
+		},
+		{ re: /\b(?:requests|post|get|json|headers|dumps|loads)\b/g, color: PRESS.keyword },
+		{ re: /\b[A-Za-z_][\w]*(?=\s*=(?!=))/g, color: PRESS.property }
+	],
+
+	shell: [
+		TOKEN_RULE,
+		{ re: /(?<![&\w])#[^\n]*/g, color: PRESS.comment },
+		// Header names sit INSIDE the quoted argument, so they are claimed before
+		// the string rule; the string rule then colours what is left of that
+		// argument rather than losing it to the overlap.
+		{ re: /(?<=&quot;)[A-Za-z][\w-]*(?=:\s)/g, color: PRESS.property },
+		{ re: new RegExp(`${DQ}|${SQ}`, 'g'), color: PRESS.string },
+		{ re: /(?:^|\s)(?:curl|-X|-H|-d|--data|--header|--request)\b/g, color: PRESS.keyword },
+		{ re: /\b(?:POST|GET|PUT|PATCH|DELETE)\b/g, color: PRESS.keyword }
+	],
+
+	php: [
+		TOKEN_RULE,
+		{ re: /(?<![&\w:/])(?:\/\/|#)[^\n]*/g, color: PRESS.comment },
+		{ re: new RegExp(`(?:${DQ}|${SQ})(?=\\s*=&gt;)`, 'g'), color: PRESS.property },
+		{ re: new RegExp(`${DQ}|${SQ}`, 'g'), color: PRESS.string },
+		{
+			re: /&lt;\?php|\b(?:curl_init|curl_setopt|curl_setopt_array|curl_exec|curl_close|json_encode|json_decode|echo|return|function)\b/g,
+			color: PRESS.keyword
+		},
+		{ re: /\bCURLOPT_[A-Z_]+\b/g, color: PRESS.property },
+		{ re: /\$[A-Za-z_]\w*/g, color: PRESS.keyword }
+	]
+};
+
+/**
+ * The original mixed rule set: HTML fragments, curl and prose in one pane.
+ * Still the default so existing callers (the studio's Use it panel, the setup
+ * cards) keep the highlighting they were written against.
+ */
+const AUTO_RULES = [
+	TOKEN_RULE,
+	{ re: /(^|\n)\s*(?:#|\/\/)(?!39;)[^\n]*/g, color: PRESS.comment },
+	{ re: new RegExp(`${DQ}|${SQ}`, 'g'), color: PRESS.string },
+	{ re: /&lt;\/?[a-zA-Z][\w-]*/g, color: PRESS.keyword },
+	{
+		re: /\b(curl|await|fetch|import|requests|const|POST|GET|Authorization|Bearer)\b/g,
+		color: PRESS.keyword
+	},
+	{ re: /\b[a-zA-Z_][\w-]*(?=\s*[:=])/g, color: PRESS.property }
+];
+
+/**
+ * Add a match to the span list, keeping only the parts no earlier rule claimed.
+ *
+ * The earlier version dropped an overlapping match whole, which meant a string
+ * containing a `{{token}}` lost its string colour entirely — the token was
+ * matched first, so the string that surrounded it was discarded and rendered as
+ * plain text. Splitting instead of dropping is what lets a high-priority rule
+ * paint a fragment (a token, a header name) while a lower-priority rule still
+ * colours the rest of the run it sits inside.
+ */
+function addSpans(spans, start, end, color, weight) {
+	const clashes = spans
+		.filter((s) => start < s.end && end > s.start)
+		.sort((a, b) => a.start - b.start);
+	let cursor = start;
+	for (const c of clashes) {
+		if (c.start > cursor) spans.push({ start: cursor, end: Math.min(c.start, end), color, weight });
+		cursor = Math.max(cursor, c.end);
+		if (cursor >= end) return;
+	}
+	if (cursor < end) spans.push({ start: cursor, end, color, weight });
+}
+
+/**
  * Highlight a read-only snippet to an HTML string.
  *
- * Deliberately small: a regex pass, not a parser. It runs on curl/JSON/HTML
- * fragments a few lines long where a real grammar buys nothing and mounting
- * CodeMirror to render static text buys less. `{{tokens}}` are matched FIRST
- * so a variable inside a JSON string still reads as a variable — that is the
- * distinction the whole palette exists to make.
+ * Deliberately small: a regex pass, not a parser. It runs on snippets a few
+ * lines long where a real grammar buys nothing and mounting CodeMirror to
+ * render static text buys less.
  *
  * Output is escaped before any markup is added, so a snippet containing HTML
  * cannot inject into the page.
  *
  * @param {string} code
+ * @param {'html'|'json'|'js'|'python'|'shell'|'php'|'auto'} [lang]
  * @returns {string} HTML with <span style="color:…"> runs
  */
-export function highlightToHtml(code) {
+export function highlightToHtml(code, lang = 'auto') {
 	const src = esc(code ?? '');
-	const rules = [
-		// {{variables}} — before strings, so tokens inside quotes stay pink.
-		{ re: /\{\{[^}]*\}\}/g, color: PRESS.token, weight: 500 },
-		{ re: /(^|\n)\s*(#|\/\/)[^\n]*/g, color: PRESS.comment },
-		{ re: /&quot;[^&]*?&quot;|&#39;[^&]*?&#39;/g, color: PRESS.string },
-		// HTML tag names and the leading token of a shell line (curl, node…).
-		{ re: /&lt;\/?[a-zA-Z][\w-]*/g, color: PRESS.keyword },
-		{ re: /\b(curl|await|fetch|import|requests|const|POST|GET|Authorization|Bearer)\b/g, color: PRESS.keyword },
-		{ re: /\b[a-zA-Z_][\w-]*(?=\s*[:=])/g, color: PRESS.property }
-	];
+	const rules = LANG_RULES[lang] || AUTO_RULES;
 
-	// One pass: collect non-overlapping matches, earliest and highest priority
-	// first, then stitch. Sequential replace() would re-match inside the markup
-	// it just inserted.
 	const spans = [];
-	const taken = (start, end) => spans.some((s) => start < s.end && end > s.start);
 	for (const rule of rules) {
 		rule.re.lastIndex = 0;
 		let m;
@@ -190,7 +312,7 @@ export function highlightToHtml(code) {
 			if (!m[0].length) break;
 			const start = m.index + (m[0].length - m[0].trimStart().length);
 			const end = m.index + m[0].length;
-			if (!taken(start, end)) spans.push({ start, end, color: rule.color, weight: rule.weight });
+			if (end > start) addSpans(spans, start, end, rule.color, rule.weight);
 		}
 	}
 	spans.sort((a, b) => a.start - b.start);

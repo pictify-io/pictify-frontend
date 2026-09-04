@@ -68,6 +68,9 @@ export default defineConfig({
 			'@openvideo/engine-pixi',
 			'codemirror',
 			'@codemirror/lang-html',
+			// The playground's VARIABLES pane and its JSON linter.
+			'@codemirror/lang-json',
+			'@codemirror/lint',
 			'@codemirror/lang-css',
 			'@codemirror/lang-javascript',
 			'@codemirror/state',

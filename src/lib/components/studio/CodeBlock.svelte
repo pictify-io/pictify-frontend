@@ -20,13 +20,26 @@
 	export let showCopy = true;
 	/** Tailwind max-height class for the scroll area. */
 	export let maxHeight = 'max-h-[220px]';
+	/**
+	 * Which rule set to highlight with: 'html' | 'json' | 'js' | 'python' |
+	 * 'shell' | 'php'. The default keeps the original mixed rules, so callers
+	 * written before this prop behave exactly as they did.
+	 */
+	export let lang = 'auto';
+	/** Chrome off: the playground frames its own code panes. */
+	export let bare = false;
 
-	$: html = highlightToHtml(code);
+	$: html = highlightToHtml(code, lang);
 </script>
 
-<div class="flex flex-col gap-2 rounded-tile p-3.5" style="background-color: {PRESS.bg}">
+<div
+	class="flex flex-col gap-2 {bare ? '' : 'rounded-tile p-3.5'}"
+	style={bare ? '' : `background-color: ${PRESS.bg}`}
+>
 	<pre
-		class="{maxHeight} overflow-auto whitespace-pre-wrap break-words font-mono text-[11px] leading-[17px]"
+		class="{maxHeight} overflow-auto whitespace-pre-wrap break-words font-mono {bare
+			? 'text-[12px] leading-[19px]'
+			: 'text-[11px] leading-[17px]'}"
 		style="color: {PRESS.text}">{@html html}</pre>
 	{#if showCopy}
 		<button
