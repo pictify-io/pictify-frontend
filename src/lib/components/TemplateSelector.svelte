@@ -190,7 +190,9 @@
 				currentPage = page;
 				hasMore = res.hasMore ?? false;
 			}
-		} catch (err) { /* ignored */ } finally {
+		} catch (err) {
+			/* ignored */
+		} finally {
 			loading = false;
 			loadingMore = false;
 		}
@@ -283,19 +285,19 @@
 
 		const wrapper = document.createElement('div');
 		wrapper.className =
-			'bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-xl overflow-hidden';
+			'bg-brand-paper border border-brand-ink rounded-btn overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.12)]';
 		wrapper.style.fontFamily = 'inherit';
 
 		// Search bar
 		const searchWrap = document.createElement('div');
-		searchWrap.className = 'p-3 border-b-[2px] border-gray-200';
+		searchWrap.className = 'p-2.5 border-b border-brand-rule';
 		searchWrap.innerHTML = `
 			<div class="relative">
-				<svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+				<svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-brand-mute pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
 				</svg>
-				<input data-search-input type="text" placeholder="Search templates..."
-					class="w-full pl-10 pr-4 py-2.5 border-[2px] border-gray-300 rounded-lg text-sm font-bold bg-white focus:outline-none focus:border-gray-900 transition-colors" />
+				<input data-search-input type="text" placeholder="SEARCH TEMPLATES"
+					class="w-full h-8 pl-8 pr-3 border border-brand-rule rounded-btn font-mono text-[11px] tracking-[0.06em] text-brand-ink bg-brand-paper placeholder:text-brand-mute focus:outline-none focus:border-brand-ink transition-colors" />
 			</div>`;
 		wrapper.appendChild(searchWrap);
 
@@ -317,11 +319,11 @@
 
 	const SPINNER_HTML = `
 		<div class="flex items-center justify-center py-3" data-load-more>
-			<svg class="w-4 h-4 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24">
+			<svg class="w-4 h-4 animate-spin text-brand-mute" fill="none" viewBox="0 0 24 24">
 				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
 				<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
 			</svg>
-			<span class="ml-2 text-[10px] font-bold text-gray-600">Loading more...</span>
+			<span class="ml-2 font-mono text-[10px] tracking-[0.06em] text-brand-mute">LOADING MORE</span>
 		</div>`;
 
 	function renderLoadMoreIndicator() {
@@ -339,11 +341,11 @@
 		if (loading) {
 			listEl.innerHTML = `
 				<div class="flex items-center justify-center py-8">
-					<svg class="w-5 h-5 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24">
+					<svg class="w-5 h-5 animate-spin text-brand-mute" fill="none" viewBox="0 0 24 24">
 						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
 						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
 					</svg>
-					<span class="ml-2 text-xs font-bold text-gray-600">Loading templates...</span>
+					<span class="ml-2 font-mono text-[11px] tracking-[0.06em] text-brand-mute">LOADING TEMPLATES</span>
 				</div>`;
 			return;
 		}
@@ -351,8 +353,14 @@
 		if (templates.length === 0) {
 			listEl.innerHTML = `
 				<div class="py-8 text-center">
-					<p class="text-sm font-bold text-gray-600">${escapeHtml(query ? 'No templates found' : emptyText)}</p>
-					${query ? '<p class="text-xs text-gray-600 mt-1">Try a different search term</p>' : ''}
+					<p class="font-sans text-[13px] text-brand-slate">${escapeHtml(
+						query ? 'No templates found' : emptyText
+					)}</p>
+					${
+						query
+							? '<p class="font-mono text-[11px] text-brand-mute mt-1">Try a different search term</p>'
+							: ''
+					}
 				</div>`;
 			return;
 		}
@@ -361,30 +369,30 @@
 			const btn = document.createElement('button');
 			btn.type = 'button';
 			btn.setAttribute('data-tpl-index', i);
-			btn.className = `w-full flex items-center gap-3 px-4 py-3 text-left transition-colors tpl-normal ${
-				i < templates.length - 1 ? 'border-b border-gray-100' : ''
+			btn.className = `w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition-colors tpl-normal ${
+				i < templates.length - 1 ? 'border-b border-brand-rule' : ''
 			}`;
 
 			const thumbHtml = tpl.thumbnail
 				? `<img loading="lazy" src="${escapeHtml(
 						tpl.thumbnail
-				  )}" alt="" class="w-12 h-9 object-cover rounded border-[1.5px] border-gray-200 shrink-0 bg-gray-100" />`
-				: `<div class="w-12 h-9 rounded border-[1.5px] border-gray-200 bg-gray-100 shrink-0 flex items-center justify-center">
-						<svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				  )}" alt="" class="w-10 h-[30px] object-cover rounded-sm border border-brand-rule shrink-0 bg-brand-subtle" />`
+				: `<div class="w-10 h-[30px] rounded-sm border border-brand-rule bg-brand-subtle shrink-0 flex items-center justify-center">
+						<svg class="w-3.5 h-3.5 text-brand-mute" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
 						</svg>
 					</div>`;
 
 			const dimHtml =
 				tpl.width && tpl.height
-					? `<p class="text-[10px] font-bold text-gray-400 mt-0.5">${escapeHtml(
+					? `<p class="font-mono text-[10px] text-brand-mute mt-0.5">${escapeHtml(
 							tpl.width
-					  )} x ${escapeHtml(tpl.height)}</p>`
+					  )}×${escapeHtml(tpl.height)}</p>`
 					: '';
 
 			const checkHtml =
 				value === tpl.uid
-					? `<svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					? `<svg class="w-4 h-4 text-brand-proof shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
 					</svg>`
 					: '';
@@ -393,7 +401,7 @@
 			btn.innerHTML = `
 				${thumbHtml}
 				<div class="flex-1 min-w-0">
-					<p class="text-sm font-bold text-gray-900 truncate">${name}</p>
+					<p class="font-mono text-[12.5px] text-brand-ink truncate">${name}</p>
 					${dimHtml}
 				</div>
 				${checkHtml}`;
@@ -414,68 +422,58 @@
 	}
 </script>
 
-<!-- Trigger Button -->
+<!--
+	The trigger is the compact mono field from board AU5-0: the template's name
+	on the left, its uid on the right. No thumbnail here — the lane is 372px and
+	a preview would double the control's height for something the list already
+	shows.
+-->
 <button
 	bind:this={triggerEl}
 	type="button"
 	on:click={toggle}
 	{disabled}
-	class="w-full flex items-center gap-3 px-4 py-3 border-[3px] rounded-xl text-sm font-bold bg-white transition-all text-left
+	class="flex h-9 w-full items-center justify-between gap-3 rounded-btn border px-3 text-left transition-colors
 		{disabled
-		? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-		: open
-		? 'border-brand-accent shadow-brutal-accent'
-		: 'border-gray-900 hover:shadow-brutal-lg cursor-pointer'}"
+		? 'cursor-not-allowed border-brand-rule bg-brand-subtle'
+		: 'cursor-pointer border-brand-ink bg-brand-paper hover:bg-brand-subtle'}"
 >
 	{#if displayTemplate}
-		{#if displayTemplate.thumbnail}
-			<img loading="lazy"
-				src={displayTemplate.thumbnail}
-				alt=""
-				class="w-10 h-[30px] object-cover rounded border-[1.5px] border-gray-200 shrink-0 bg-gray-100"
-			/>
-		{:else}
-			<div
-				class="w-10 h-[30px] rounded border-[1.5px] border-gray-200 bg-gray-100 shrink-0 flex items-center justify-center"
+		<span class="truncate font-mono text-[12.5px] text-brand-ink">
+			{displayTemplate.name || displayTemplate.uid}
+		</span>
+		<span class="flex flex-shrink-0 items-center gap-1.5 font-mono text-[11px] text-brand-mute">
+			{#if displayTemplate.name && displayTemplate.uid}{displayTemplate.uid}{/if}
+			<svg
+				class="h-3 w-3 transition-transform {open ? 'rotate-180' : ''}"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
 			>
-				<svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="1.5"
-						d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-					/>
-				</svg>
-			</div>
-		{/if}
-		<span class="truncate flex-1 text-gray-900">{displayTemplate.name || displayTemplate.uid}</span>
-		{#if displayTemplate.width && displayTemplate.height}
-			<span
-				class="shrink-0 text-[10px] font-black uppercase tracking-widest bg-gray-100 border-[1.5px] border-gray-200 text-gray-500 px-2 py-0.5 rounded-md"
-			>
-				{displayTemplate.width}x{displayTemplate.height}
-			</span>
-		{/if}
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+			</svg>
+		</span>
 	{:else}
-		<span class="text-gray-400 flex-1">{placeholder}</span>
+		<span class="truncate font-mono text-[12.5px] text-brand-mute">{placeholder}</span>
+		<svg
+			class="h-3 w-3 flex-shrink-0 text-brand-mute transition-transform {open ? 'rotate-180' : ''}"
+			fill="none"
+			stroke="currentColor"
+			viewBox="0 0 24 24"
+		>
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+		</svg>
 	{/if}
-
-	<!-- Chevron -->
-	<svg
-		class="w-4 h-4 shrink-0 text-gray-400 transition-transform {open ? 'rotate-180' : ''}"
-		fill="none"
-		stroke="currentColor"
-		viewBox="0 0 24 24"
-	>
-		<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-	</svg>
 </button>
 
 <style>
+	/* The keyboard highlight and the hover wash are the same field tint the
+	   playground's active call row uses, so "where am I" reads the same in both
+	   lanes. */
 	:global(.tpl-highlighted) {
-		background-color: rgba(255, 196, 128, 0.2) !important;
+		background-color: rgba(216, 243, 74, 0.35) !important;
 	}
 	:global(.tpl-normal:hover) {
-		background-color: rgb(249, 250, 251);
+		background-color: #f4f6f4;
 	}
 </style>

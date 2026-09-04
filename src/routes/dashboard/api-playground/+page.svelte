@@ -1282,8 +1282,11 @@
 {/if}
 
 <style>
-	/* CodeMirror sizes itself from its host; without this the pane collapses to
-	   the height of its first line inside a flex column. */
+	/* CodeMirror sizes itself from its host, and svelte-codemirror-editor puts
+	   its own .codemirror-wrapper in between. That wrapper is height:auto, so
+	   styling only .cm-editor resolves 100% against auto and the pane collapses
+	   to its first line — every editor here has to be told to fill twice. */
+	.pg-editor :global(.codemirror-wrapper),
 	.pg-editor :global(.cm-editor) {
 		height: 100%;
 	}
