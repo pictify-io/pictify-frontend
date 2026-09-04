@@ -8,6 +8,7 @@
     "og:description": "Create custom invoices to streamline your billing process and maintain a professional image.",
     "og:image": "https://media.pictify.io/qyl7z-1775406830860.png",
     "og:title": "Online Invoice Generator | Pictify.io",
+    "og:type": "website",
     "og:url": "https://pictify.io/tools/online-invoice-generator",
     "twitter:card": "summary_large_image",
     "twitter:description": "Create custom invoices to streamline your billing process and maintain a professional image.",
@@ -114,26 +115,6 @@
     },
     {
       "tag": "h2",
-      "text": "_ INVOICE DETAILS"
-    },
-    {
-      "tag": "h3",
-      "text": "1 Your Company"
-    },
-    {
-      "tag": "h3",
-      "text": "2 Client Info"
-    },
-    {
-      "tag": "h3",
-      "text": "3 Invoice Details"
-    },
-    {
-      "tag": "h3",
-      "text": "4 Line Items"
-    },
-    {
-      "tag": "h2",
       "text": "Automate with the API"
     },
     {
@@ -142,27 +123,19 @@
     },
     {
       "tag": "h2",
-      "text": "LEARN MORE ABOUT INVOICING"
-    },
-    {
-      "tag": "h3",
       "text": "What is an Online Invoice Generator?"
     },
     {
-      "tag": "h3",
+      "tag": "h2",
       "text": "Benefits of Using Our Invoice Generator"
     },
     {
-      "tag": "h3",
+      "tag": "h2",
       "text": "How to Use Our Invoice Generator"
     },
     {
-      "tag": "h3",
+      "tag": "h2",
       "text": "Frequently Asked Questions"
-    },
-    {
-      "tag": "h3",
-      "text": "More Tools You'll Love"
     },
     {
       "tag": "h2",

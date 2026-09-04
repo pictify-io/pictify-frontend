@@ -22,7 +22,14 @@
 	import { createImagePublic } from '../../../api/image.js';
 	import { page } from '$app/stores';
 	import { analytics } from '$lib/telemetry.js';
-	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
+	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
+	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
+	import Prose from '$lib/components/tools/v2/longform/Prose.svelte';
+	import FeatureGrid from '$lib/components/tools/v2/longform/FeatureGrid.svelte';
+	import StepCards from '$lib/components/tools/v2/longform/StepCards.svelte';
+	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
+	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 
 	// User login state
 	let isUserLoggedIn = false;
@@ -77,7 +84,7 @@
 		}
 	}
 
-	const structuredDataJson = JSON.stringify({
+	const structuredData = {
 		'@context': 'https://schema.org',
 		'@type': 'WebApplication',
 		name: 'Pictify.io Online Invoice Generator',
@@ -92,7 +99,7 @@
 			priceCurrency: 'USD',
 			availability: 'https://schema.org/InStock'
 		}
-	});
+	};
 
 	const invoiceFaqs = [
 		{
@@ -112,26 +119,6 @@
 			a: 'Our templates include standard elements required for most invoices. Please check your local regulations for specific requirements.'
 		}
 	];
-
-	const faqSchemaJson = JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'FAQPage',
-		mainEntity: invoiceFaqs.map((faq) => ({
-			'@type': 'Question',
-			name: faq.q,
-			acceptedAnswer: { '@type': 'Answer', text: faq.a }
-		}))
-	});
-
-	const breadcrumbSchemaJson = JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'BreadcrumbList',
-		itemListElement: [
-			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
-			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
-			{ '@type': 'ListItem', position: 3, name: 'Online Invoice Generator' }
-		]
-	});
 
 	// Function to calculate iframe scale based on container width
 	function calculateScale(containerWidth) {
@@ -378,55 +365,25 @@
 		}
 	];
 
-	const RELATED = [
-		{
-			title: 'CSV to PDF',
-			meta: 'CSV → PDF',
-			href: '/tools/csv-to-pdf',
-			art: '/landing/tools/csv-to-pdf.svg'
-		},
-		{
-			title: 'Table to image',
-			meta: 'CSV · HTML → PNG',
-			href: '/tools/table',
-			art: '/landing/tools/table-to-image.svg'
-		},
-		{
-			title: 'Membership card',
-			meta: 'MEMBER → PNG',
-			href: '/tools/membership-card',
-			art: '/landing/tools/membership-card.svg'
-		}
-	];
+	const RELATED = ['csv-to-pdf', 'certificate-generator', 'table'];
 </script>
 
-<svelte:head>
-	<title>Free Online Invoice Generator | Pictify.io</title>
-	<meta
-		name="description"
-		content="Create professional invoices for free with Pictify.io's Online Invoice Generator. Customize templates, add your branding, and generate invoices in seconds."
-	/>
-	<meta name="keywords" content="invoice generator, free invoice, online invoice, business tools" />
-	<link rel="canonical" href="https://pictify.io/tools/online-invoice-generator" />
-	<meta property="og:title" content="Online Invoice Generator | Pictify.io" />
-	<meta
-		property="og:description"
-		content="Create custom invoices to streamline your billing process and maintain a professional image."
-	/>
-	<meta property="og:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
-	<meta property="og:url" content="https://pictify.io/tools/online-invoice-generator" />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:site" content="@pictify_io" />
-	<meta name="twitter:title" content="Online Invoice Generator | Pictify.io" />
-	<meta
-		name="twitter:description"
-		content="Create custom invoices to streamline your billing process and maintain a professional image."
-	/>
-	<meta name="twitter:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
-	{@html `<script type="application/ld+json">${structuredDataJson}</script>`}
-	{@html `<script type="application/ld+json">${faqSchemaJson}</script>`}
-	{@html `<script type="application/ld+json">${breadcrumbSchemaJson}</script>`}
-</svelte:head>
+<ToolSeoHead
+	title="Free Online Invoice Generator | Pictify.io"
+	description="Create professional invoices for free with Pictify.io's Online Invoice Generator. Customize templates, add your branding, and generate invoices in seconds."
+	keywords="invoice generator, free invoice, online invoice, business tools"
+	canonical="https://pictify.io/tools/online-invoice-generator"
+	ogTitle="Online Invoice Generator | Pictify.io"
+	ogDescription="Create custom invoices to streamline your billing process and maintain a professional image."
+	ogImage="https://media.pictify.io/qyl7z-1775406830860.png"
+	twitterSite="@pictify_io"
+	twitterTitle="Online Invoice Generator | Pictify.io"
+	twitterDescription="Create custom invoices to streamline your billing process and maintain a professional image."
+	twitterImage="https://media.pictify.io/qyl7z-1775406830860.png"
+	webApplicationSchema={structuredData}
+	faqs={invoiceFaqs}
+	breadcrumbLabel="Online Invoice Generator"
+/>
 
 <ToolPageShell
 	toolName={TOOL_NAME}
@@ -438,45 +395,39 @@
 	hasResult={!!imageUrl}
 	longform="column"
 >
-	<h1
-		slot="h1"
-		class="font-display text-[38px] font-extrabold leading-[1.04] tracking-[-0.02em] text-brand-ink lg:text-[52px] lg:leading-[56px]"
-	>
+	<HeroTitle slot="h1">
 		<span>INVOICE</span>
 		<span>GENERATOR</span>
-	</h1>
+	</HeroTitle>
 
-	<p
-		slot="hero-sub"
-		class="max-w-[640px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
-	>
+	<HeroSub slot="hero-sub">
 		Create <span class="font-medium">professional invoices</span> for your business.
 		<span class="text-brand-slate">Free, customizable templates with real-time preview</span>
-	</p>
+	</HeroSub>
 
 	<div slot="tool">
 		<ToolCard>
 			<div class="grid grid-cols-1 items-start gap-6 p-5 lg:grid-cols-2 lg:gap-8 lg:p-7">
 				<div class="bg-brand-paper border border-brand-ink overflow-hidden">
-					<!-- Panel header: keeps the frozen H2, drops the v1 window chrome. -->
+					<!-- Panel header. A chrome label, so it is a <p> (D2). -->
 					<div class="flex items-center gap-2 border-b border-brand-ink bg-brand-press px-4 py-2.5">
-						<h2 class="font-mono text-xs tracking-[0.06em] text-white">
+						<p class="font-mono text-xs tracking-[0.06em] text-white">
 							<span class="animate-pulse">_</span> INVOICE DETAILS
-						</h2>
+						</p>
 					</div>
 
 					<div class="p-4 sm:p-6 space-y-4">
 						<!-- Company Section -->
 						<div class="space-y-3">
-							<h3
-								class="text-xs font-semibold text-brand-ink tracking-wider flex items-center gap-2"
+							<p
+								class="flex items-center gap-2 text-xs font-semibold tracking-wider text-brand-ink"
 							>
 								<span
 									class="w-6 h-6 bg-brand-field border border-brand-ink flex items-center justify-center text-xs"
 									>1</span
 								>
 								Your Company
-							</h3>
+							</p>
 							<input
 								bind:value={invoiceData.companyName}
 								type="text"
@@ -503,15 +454,15 @@
 
 						<!-- Client Section -->
 						<div class="space-y-3">
-							<h3
-								class="text-xs font-semibold text-brand-ink tracking-wider flex items-center gap-2"
+							<p
+								class="flex items-center gap-2 text-xs font-semibold tracking-wider text-brand-ink"
 							>
 								<span
 									class="w-6 h-6 bg-data-sky border border-brand-ink flex items-center justify-center text-xs text-white"
 									>2</span
 								>
 								Client Info
-							</h3>
+							</p>
 							<input
 								bind:value={invoiceData.clientName}
 								type="text"
@@ -530,15 +481,15 @@
 
 						<!-- Invoice Details -->
 						<div class="space-y-3">
-							<h3
-								class="text-xs font-semibold text-brand-ink tracking-wider flex items-center gap-2"
+							<p
+								class="flex items-center gap-2 text-xs font-semibold tracking-wider text-brand-ink"
 							>
 								<span
 									class="w-6 h-6 bg-data-violet border border-brand-ink flex items-center justify-center text-xs text-white"
 									>3</span
 								>
 								Invoice Details
-							</h3>
+							</p>
 							<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 								<input
 									bind:value={invoiceData.invoiceNumber}
@@ -564,15 +515,15 @@
 
 						<!-- Line Items -->
 						<div class="space-y-3">
-							<h3
-								class="text-xs font-semibold text-brand-ink tracking-wider flex items-center gap-2"
+							<p
+								class="flex items-center gap-2 text-xs font-semibold tracking-wider text-brand-ink"
 							>
 								<span
 									class="w-6 h-6 bg-brand-pink border border-brand-ink flex items-center justify-center text-xs text-white"
 									>4</span
 								>
 								Line Items
-							</h3>
+							</p>
 							{#each invoiceData.items as item, index}
 								<div class="flex flex-wrap gap-2">
 									<input
@@ -730,13 +681,7 @@
 	/>
 
 	<svelte:fragment slot="longform">
-		<LongformSection index="01" id="templates" first>
-			<h2
-				slot="heading"
-				class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink"
-			>
-				INVOICE TEMPLATES
-			</h2>
+		<LongformSection index="01" id="templates" first title="INVOICE TEMPLATES">
 			<div class="mt-12 sm:mt-16">
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 					{#each templates as template}
@@ -767,220 +712,60 @@
 			</div>
 		</LongformSection>
 
-		<div class="max-w-5xl mx-auto mt-16 sm:mt-20">
-			<!-- Separator -->
-			<div class="border-t-[3px] sm:border-t-[4px] border-black relative mb-8 sm:mb-12 lg:mb-16">
-				<div
-					class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-brand-subtle px-4 sm:px-6"
-				>
-					<div
-						class="w-8 h-8 sm:w-10 sm:h-10 bg-brand-field border border-brand-ink flex items-center justify-center"
-					>
-						<span class="font-semibold text-sm sm:text-lg">?</span>
-					</div>
-				</div>
-			</div>
-
-			<h2
-				class="text-2xl sm:text-3xl md:text-5xl font-semibold mb-8 sm:mb-12 text-center text-brand-ink tracking-[-0.02em] px-2"
-			>
-				LEARN MORE ABOUT <br class="md:hidden" />
-				<span class="relative inline-block text-white mt-2">
-					<span class="relative z-10 px-2 sm:px-4">INVOICING</span>
-					<span
-						class="absolute inset-0 bg-brand-pink transform -skew-x-2 border border-brand-ink -z-0"
-					/>
-				</span>
-			</h2>
-
-			<!-- What is Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-field border border-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M13 10V3L4 14h7v7l9-11h-7z"
-						/></svg
-					>
-					Overview
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
-				>
-					What is an Online Invoice Generator?
-				</h3>
-				<p class="text-sm sm:text-base text-brand-slate leading-relaxed font-medium">
+		<LongformSection index="02" id="what-is" title="What is an Online Invoice Generator?">
+			<Prose>
+				<p>
 					An online invoice generator is a powerful tool that allows businesses and freelancers to
 					create professional invoices quickly and easily. It streamlines the billing process, helps
 					maintain accurate financial records, and presents a polished image to clients.
 				</p>
-			</section>
+			</Prose>
+		</LongformSection>
 
-			<!-- Benefits Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-proof border border-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-						/></svg
-					>
-					Benefits
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
-				>
-					Benefits of Using Our Invoice Generator
-				</h3>
-				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-					{#each ['Create professional invoices in minutes', 'Customize templates to match your brand', 'Automate calculations for taxes and totals', 'Save time on billing and bookkeeping', 'Access your invoices from anywhere', 'Improve cash flow with accurate billing'] as benefit}
-						<div
-							class="bg-brand-subtle border border-brand-ink p-3 flex items-center gap-3 transition-all"
-						>
-							<span class="font-semibold text-brand-proof">✓</span>
-							<span class="font-bold text-brand-ink text-sm">{benefit}</span>
-						</div>
-					{/each}
-				</div>
-			</section>
+		<LongformSection index="03" id="benefits" title="Benefits of Using Our Invoice Generator">
+			<FeatureGrid
+				columns={2}
+				items={[
+					{ title: 'Create professional invoices in minutes' },
+					{ title: 'Customize templates to match your brand' },
+					{ title: 'Automate calculations for taxes and totals' },
+					{ title: 'Save time on billing and bookkeeping' },
+					{ title: 'Access your invoices from anywhere' },
+					{ title: 'Improve cash flow with accurate billing' }
+				]}
+			/>
+		</LongformSection>
 
-			<!-- How to Use Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-sky border border-brand-ink text-white text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-						/><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-						/></svg
-					>
-					Guide
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
-				>
-					How to Use Our Invoice Generator
-				</h3>
-				<div class="space-y-4">
-					{#each [{ num: '1', text: 'Enter your company and client details' }, { num: '2', text: 'Choose from our professional invoice templates' }, { num: '3', text: 'Add line items for products or services' }, { num: '4', text: 'Set tax rates and discounts if applicable' }, { num: '5', text: 'Preview your invoice in real-time' }, { num: '6', text: 'Generate and download your custom invoice' }] as step}
-						<div class="flex items-start gap-4">
-							<span
-								class="bg-data-sky text-white w-8 h-8 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
-								>{step.num}</span
-							>
-							<span class="font-bold text-brand-ink text-sm pt-1">{step.text}</span>
-						</div>
-					{/each}
-				</div>
-			</section>
+		<LongformSection index="04" id="how-to" title="How to Use Our Invoice Generator">
+			<!-- These six were plain numbered lines, not headings. -->
+			<StepCards
+				titleTag="p"
+				steps={[
+					{ title: 'Enter your company and client details' },
+					{ title: 'Choose from our professional invoice templates' },
+					{ title: 'Add line items for products or services' },
+					{ title: 'Set tax rates and discounts if applicable' },
+					{ title: 'Preview your invoice in real-time' },
+					{ title: 'Generate and download your custom invoice' }
+				]}
+			/>
+		</LongformSection>
 
-			<!-- FAQ Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-pink border border-brand-ink text-white text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-						/></svg
-					>
-					FAQ
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
-				>
-					Frequently Asked Questions
-				</h3>
-				<div class="space-y-3">
-					{#each invoiceFaqs as faq}
-						<details
-							class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
-						>
-							<summary
-								class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none text-sm"
-							>
-								<span>{faq.q}</span>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-								>
-									<path
-										fill-rule="evenodd"
-										d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-										clip-rule="evenodd"
-									/>
-								</svg>
-							</summary>
-							<div
-								class="p-4 pt-0 text-brand-slate border-t border-brand-ink bg-brand-paper text-sm"
-							>
-								{faq.a}
-							</div>
-						</details>
-					{/each}
-				</div>
-			</section>
-
-			<!-- Share Buttons -->
-			<div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-12">
-				<button
-					class="px-6 py-3 bg-brand-ink text-white border border-brand-ink font-bold tracking-wide transition-all flex items-center justify-center gap-2"
-					on:click={() => sharePage('twitter')}
-				>
-					<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-						<path
-							d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-						/>
-					</svg>
-					Share on X
-				</button>
-				<button
-					class="px-6 py-3 bg-[#0A66C2] text-white border border-brand-ink font-bold tracking-wide transition-all flex items-center justify-center gap-2"
-					on:click={() => sharePage('linkedin')}
-				>
-					<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-						<path
-							d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-						/>
-					</svg>
-					Share on LinkedIn
-				</button>
-			</div>
-		</div>
+		<LongformSection index="05" id="faq" title="Frequently Asked Questions">
+			<FaqList faqs={invoiceFaqs} />
+		</LongformSection>
 	</svelte:fragment>
 
 	<svelte:fragment slot="footer-links">
-		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
-			<RelatedTools tools={['receipt', 'certificate', 'membership-card', 'event-ticket']} />
-		</div>
+		<RelatedLinks
+			toolName={TOOL_NAME}
+			links={[
+				{ href: '/tools/receipt', label: 'Receipt Generator' },
+				{ href: '/tools/certificate', label: 'Certificate Generator' },
+				{ href: '/tools/membership-card', label: 'Membership Card' },
+				{ href: '/tools/event-ticket', label: 'Event Ticket' },
+				{ href: '/tools', label: 'View all tools →' }
+			]}
+		/>
 	</svelte:fragment>
 </ToolPageShell>
