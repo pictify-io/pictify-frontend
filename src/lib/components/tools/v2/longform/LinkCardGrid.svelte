@@ -18,6 +18,8 @@
 	/** 2 or 3 across. Literal classes — Tailwind can't build them from a variable. */
 	export let columns = 2;
 	export let toolName = '';
+	/** 'h3' by default; 'h4' or 'p' where the block being replaced used those. */
+	export let titleTag = 'h3';
 
 	const COLUMN_CLASS = {
 		2: 'grid grid-cols-1 gap-4 md:grid-cols-2',
@@ -45,7 +47,9 @@
 				</div>
 			{/if}
 			<div>
-				<h3 class="text-xl font-semibold text-brand-ink">{item.title}</h3>
+				<svelte:element this={titleTag} class="text-xl font-semibold text-brand-ink"
+					>{item.title}</svelte:element
+				>
 				<p class="text-sm font-bold text-brand-slate group-hover:text-brand-ink">{item.body}</p>
 			</div>
 		</a>

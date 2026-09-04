@@ -54,7 +54,7 @@
           "@type": "Question",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes, pick a template, fill in the details, and download a high-resolution PNG free, no signup required. A free account adds bulk generation, PDF output, and email delivery via workflows."
+            "text": "Yes, pick a template, fill in the details, and download a high-resolution PNG free, no signup required. A free account adds bulk generation, PDF output, and API access."
           },
           "name": "Is this certificate generator really free?"
         },
@@ -102,7 +102,7 @@
           "@type": "Question",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. Every workflow exposes a signed webhook. Point your LMS completion event, Typeform, or a Zapier/Make/n8n flow at it and each payload renders and delivers one certificate, with the same per-recipient status tracking as a CSV run."
+            "text": "Yes. Every workflow exposes a signed webhook. Point your LMS completion event, Typeform, or a Zapier/Make/n8n flow at it and each payload renders one certificate, with the same per-row status tracking as a CSV run."
           },
           "name": "Can my LMS or form tool trigger certificates automatically?"
         },
@@ -238,7 +238,7 @@
     {
       "@context": "https://schema.org",
       "@type": "Organization",
-      "description": "API-first image, document, and video generation. Every row of a spreadsheet or webhook becomes a rendered, personalized certificate, badge, report, or video, delivered by email.",
+      "description": "API-first image, document, and video generation. Every row of a spreadsheet or webhook becomes a rendered, personalized certificate, badge, report, or video.",
       "logo": "https://pictify.io/logo.png",
       "name": "Pictify",
       "sameAs": [
@@ -333,7 +333,7 @@
     },
     {
       "tag": "h3",
-      "text": "Bulk Certificate Generator for Events: Delivered, Not Downloaded"
+      "text": "Bulk Certificate Generator for Events: One Run, Not 300 Exports"
     },
     {
       "tag": "h3",
@@ -349,7 +349,7 @@
     },
     {
       "tag": "h3",
-      "text": "Need Them Delivered, Not Just Downloaded?"
+      "text": "Need Three Hundred, Not Just One?"
     },
     {
       "tag": "h3",

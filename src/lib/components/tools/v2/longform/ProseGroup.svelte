@@ -19,6 +19,11 @@
 	export let items = [];
 	/** 1 = stacked, 2 = two-up from the `sm` breakpoint. */
 	export let columns = 1;
+	/**
+	 * 'h3' by default. Pass 'h4' where the block being replaced already shipped
+	 * h4 — these outlines are frozen, so a level cannot drift either way.
+	 */
+	export let headingTag = 'h3';
 
 	$: wrapper = columns === 2 ? 'grid grid-cols-1 gap-6 sm:grid-cols-2' : 'flex flex-col gap-6';
 </script>
@@ -26,7 +31,11 @@
 <div class={wrapper}>
 	{#each items as item}
 		<div class="flex flex-col gap-1">
-			<h3 class="font-sans text-lg font-medium leading-6 text-brand-ink">{item.heading}</h3>
+			<svelte:element
+				this={headingTag}
+				class="font-sans text-lg font-medium leading-6 text-brand-ink"
+				>{item.heading}</svelte:element
+			>
 			{#if item.body}
 				<p class="font-sans text-[15px] leading-[23px] text-brand-slate">{item.body}</p>
 			{/if}
