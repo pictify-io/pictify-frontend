@@ -22,7 +22,19 @@
 	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
 	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
 	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
-	import LongformSection from '$lib/components/tools/v2/LongformSection.svelte';
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
+	import LongformPair from '$lib/components/tools/v2/longform/LongformPair.svelte';
+	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
+	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
+	import Lead from '$lib/components/tools/v2/longform/Lead.svelte';
+	import ProseGroup from '$lib/components/tools/v2/longform/ProseGroup.svelte';
+	import FeatureGrid from '$lib/components/tools/v2/longform/FeatureGrid.svelte';
+	import StepCards from '$lib/components/tools/v2/longform/StepCards.svelte';
+	import CheckList from '$lib/components/tools/v2/longform/CheckList.svelte';
+	import ComparisonTable from '$lib/components/tools/v2/longform/ComparisonTable.svelte';
+	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
+	import LinkCardGrid from '$lib/components/tools/v2/longform/LinkCardGrid.svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
@@ -86,6 +98,15 @@
 	// Size variants canonicalize to the parent format page so they don't
 	// compete with it in search (they were outranking it for head terms).
 	$: canonicalUrl = `https://pictify.io/tools/html-to-${format}`;
+	$: keywords = hasSize
+		? `convert image from HTML, HTML to ${format.toUpperCase()} ${sizeString}, ${format.toUpperCase()} converter, ${sizeString} image, online image generator, web design tool, ${
+				currentFormat.fullName
+		  } image creator, Pictify.io`
+		: format === 'image'
+		? `html to image, convert html to image, html and css to image, html to image converter, html to png, html to jpg, html to webp, online image generator, web design tool, Pictify.io`
+		: `convert image from HTML, HTML to ${format.toUpperCase()}, ${format.toUpperCase()} converter, online image generator, web design tool, ${
+				currentFormat.fullName
+		  } image creator, Pictify.io`;
 	$: ogDescription = hasSize
 		? `Convert HTML to high-quality ${
 				(currentFormat && currentFormat.fullName) || 'Image'
@@ -385,39 +406,6 @@
 		}
 	}
 
-	// Function to handle social sharing with rewards
-	function handleSocialShare(platform) {
-		const url = encodeURIComponent(window.location.href);
-		const text = encodeURIComponent(
-			`Check out this awesome HTML to ${format.toUpperCase()} converter!`
-		);
-
-		if (platform === 'twitter') {
-			window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
-		} else if (platform === 'linkedin') {
-			window.open(
-				`https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${encodeURIComponent(
-					'HTML to Image Converter'
-				)}&summary=${text}`,
-				'_blank'
-			);
-		}
-
-		// Reward: +1 guest generation today (once)
-		if (!isUserLoggedIn && shareBonusGenerations < 1) {
-			shareBonusGenerations = 1;
-			try {
-				localStorage.setItem(bonusKey, String(shareBonusGenerations));
-				localStorage.setItem(bonusKey + '_date', new Date().toDateString());
-			} catch (e) {}
-		}
-		toast.set({
-			message: 'Thanks for sharing! +1 extra guest generation unlocked for today.',
-			type: 'success',
-			duration: 3000
-		});
-	}
-
 	// Add format-specific information
 	const formatInfo = {
 		jpg: {
@@ -531,26 +519,102 @@
 		{ id: 'use-cases', label: 'Use Cases & Technical Specs' }
 	];
 
-	const RELATED = [
+	const RELATED = ['table', 'code-to-image', 'og-image-generator'];
+
+	/**
+	 * The visible FAQ. Deliberately NOT the FAQPage in `schemaMarkup` below:
+	 * that one asks different questions ("Can I convert HTML to X with an API?")
+	 * and both are frozen for search, so they stay two lists until a copy pass
+	 * reconciles them.
+	 */
+	$: FAQS = [
 		{
-			title: 'Table to image',
-			meta: 'CSV · HTML → PNG',
-			href: '/tools/table',
-			art: '/landing/tools/table-to-image.svg'
+			q: 'How does it work?',
+			a: `Our converter renders your HTML code in a virtual browser environment and captures the output as a high-quality ${format.toUpperCase()} image. This process ensures that your HTML is accurately represented in the final image.`
 		},
 		{
-			title: 'Code to image',
-			meta: 'SNIPPET → PNG',
-			href: '/tools/code-to-image',
-			art: '/landing/tools/code-to-image.svg'
+			q: 'External resources?',
+			a: 'Yes, our converter supports HTML with external resources such as images and stylesheets. However, for the best results and fastest conversion, we recommend using inline styles and data URIs for images when possible.'
 		},
 		{
-			title: 'OG image generator',
-			meta: 'TITLE · LOGO → 1200×630',
-			href: '/tools/og-image-generator',
-			art: '/landing/tools/og-image-generator.svg'
+			q: 'Max file size?',
+			a: 'Our free tool supports HTML files up to 5MB in size. For larger files or batch conversions, consider upgrading to our premium plan or API service.'
+		},
+		{
+			q: 'Privacy?',
+			a: 'Yes, we take your privacy seriously. Your HTML code is processed in real-time and is not stored on our servers. Once the conversion is complete, all data is immediately deleted.'
 		}
 	];
+
+	$: HOW_TO_STEPS = [
+		{
+			title: 'Input Code',
+			body: 'Paste your HTML code in the editor above or use our default template.'
+		},
+		{
+			title: 'Preview',
+			body: `Check how your HTML will look as a ${currentFormat.fullName} image.`
+		},
+		{
+			title: 'Convert',
+			body: `Click convert to generate your ${currentFormat.fullName} image instantly.`
+		}
+	];
+
+	// Static copy; `highlightRow` is what makes the table page-specific.
+	const FORMAT_TABLE_COLUMNS = ['Format', 'Best For', 'Transparency', 'File Size'];
+	const FORMAT_TABLE_ROWS = [
+		['PNG', 'Screenshots, UI elements, text-heavy images', 'Yes', 'Large'],
+		['JPG', 'Photos, OG images, social cards, email headers', 'No', 'Small'],
+		['WebP', 'Web graphics, combining quality of PNG with size of JPG', 'Yes', 'Smallest']
+	];
+	$: formatTableHighlight = ['png', 'jpg', 'webp'].indexOf(format);
+
+	/** 11 — the same four rows, read across the three formats. */
+	$: comparisonFormats = [currentFormat, ...otherFormats.map((f) => formatInfo[f])];
+	$: comparisonColumns = ['Feature', ...comparisonFormats.map((f) => f.fullName)];
+	$: comparisonRows = [
+		['Best For', ...comparisonFormats.map((f) => f.bestFor)],
+		[
+			'Compression',
+			...comparisonFormats.map((f) =>
+				f.fullName === 'WebP' ? 'Lossy & Lossless' : f.fullName === 'PNG' ? 'Lossless' : 'Lossy'
+			)
+		],
+		[
+			'File Size',
+			...comparisonFormats.map((f) =>
+				f.fullName === 'WebP' ? 'Small' : f.fullName === 'PNG' ? 'Large' : 'Medium'
+			)
+		],
+		['Transparency', ...comparisonFormats.map((f) => (f.fullName === 'PNG' ? 'Yes' : 'No'))]
+	];
+
+	/** 03 — the other formats, plus the all-formats page when not already on it. */
+	$: otherFormatLinks = [
+		...otherFormats.map((f) => ({
+			href: `/tools/html-to-${f}`,
+			badge: f,
+			title: formatInfo[f].fullName,
+			body: `Perfect for ${formatInfo[f].bestFor}`
+		})),
+		...(format !== 'image'
+			? [
+					{
+						href: '/tools/html-to-image',
+						badge: 'ALL',
+						title: 'HTML to Image',
+						body: 'One converter for PNG, JPG, and WebP'
+					}
+			  ]
+			: [])
+	];
+
+	$: socialPreviewLinks = featuredPlatforms.map((platform) => ({
+		href: `/tools/og-image-generator/${platform.id}`,
+		title: platform.label,
+		body: `Design branded OG images tailored for ${platform.label}.`
+	}));
 
 	// Enhanced Schema Markup (dimension-aware)
 	$: schemaMarkup = format
@@ -670,56 +734,25 @@
 		: null;
 </script>
 
-<svelte:head>
-	<title>{headTitle}</title>
-	<meta name="description" content={headDescription} />
-	<meta
-		name="keywords"
-		content={hasSize
-			? `convert image from HTML, HTML to ${format.toUpperCase()} ${sizeString}, ${format.toUpperCase()} converter, ${sizeString} image, online image generator, web design tool, ${
-					currentFormat.fullName
-			  } image creator, Pictify.io`
-			: format === 'image'
-			? `html to image, convert html to image, html and css to image, html to image converter, html to png, html to jpg, html to webp, online image generator, web design tool, Pictify.io`
-			: `convert image from HTML, HTML to ${format.toUpperCase()}, ${format.toUpperCase()} converter, online image generator, web design tool, ${
-					currentFormat.fullName
-			  } image creator, Pictify.io`}
-	/>
-	<meta name="author" content="Pictify.io" />
-	<meta name="robots" content="index, follow, max-image-preview:large" />
-	<meta property="og:title" content={headTitle} />
-	<meta property="og:description" content={ogDescription} />
-	<meta property="og:image" content="https://media.pictify.io/gre6p-1775406841745.png" />
-	<meta property="og:url" content={canonicalUrl} />
-	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="Pictify.io" />
-	<meta property="og:locale" content="en_US" />
-	<link rel="canonical" href={canonicalUrl} />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:site" content="@pictify_io" />
-	<meta name="twitter:title" content={headTitle} />
-	<meta name="twitter:description" content={headDescription} />
-	<meta name="twitter:image" content="https://media.pictify.io/gre6p-1775406841745.png" />
-
-	{#if schemaMarkup}
-		{@html `<script type="application/ld+json">
-	${JSON.stringify(schemaMarkup)}
-</script>`}
-	{/if}
-	{@html `<script type="application/ld+json">${JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'BreadcrumbList',
-		itemListElement: [
-			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
-			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
-			{
-				'@type': 'ListItem',
-				position: 3,
-				name: 'HTML to ' + (format ? format.toUpperCase() : 'Image')
-			}
-		]
-	})}</script>`}
-</svelte:head>
+<ToolSeoHead
+	title={headTitle}
+	description={headDescription}
+	{keywords}
+	author="Pictify.io"
+	robots="index, follow, max-image-preview:large"
+	canonical={canonicalUrl}
+	ogTitle={headTitle}
+	{ogDescription}
+	ogImage="https://media.pictify.io/gre6p-1775406841745.png"
+	ogSiteName="Pictify.io"
+	ogLocale="en_US"
+	twitterTitle={headTitle}
+	twitterDescription={headDescription}
+	twitterImage="https://media.pictify.io/gre6p-1775406841745.png"
+	twitterSite="@pictify_io"
+	webApplicationSchema={schemaMarkup}
+	breadcrumbLabel={`HTML to ${format ? format.toUpperCase() : 'Image'}`}
+/>
 
 <ToolPageShell
 	toolName={toolKey}
@@ -734,21 +767,15 @@
 	hasResult={!!imageUrl}
 	longform="rail"
 >
-	<h1
-		slot="h1"
-		class="font-display text-[38px] font-extrabold leading-[1.04] tracking-[-0.02em] text-brand-ink lg:text-[52px] lg:leading-[56px]"
-	>
+	<HeroTitle slot="h1">
 		<span>HTML TO</span>
 		<span>{currentFormat.fullName}</span>
 		{#if hasSize}
 			<span class="whitespace-nowrap">{sizeString}</span>
 		{/if}
-	</h1>
+	</HeroTitle>
 
-	<p
-		slot="hero-sub"
-		class="max-w-[640px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
-	>
+	<HeroSub slot="hero-sub">
 		{#if format === 'image'}
 			Convert your HTML &amp; CSS into an image in one click: export PNG, JPG, or WebP.
 			<span class="text-brand-slate">Perfect for {currentFormat.bestFor}</span>
@@ -756,7 +783,7 @@
 			Transform your HTML code into high-quality {currentFormat.fullName} images instantly.
 			<span class="text-brand-slate">Perfect for {currentFormat.bestFor}</span>
 		{/if}
-	</p>
+	</HeroSub>
 
 	<!-- ── Tool ──────────────────────────────────────────────────────── -->
 	<div slot="tool">
@@ -947,34 +974,24 @@
 
 	<!-- ── Long-form ─────────────────────────────────────────────────── -->
 	<svelte:fragment slot="longform">
-		<LongformSection index="01" id="key-features" first>
-			<h2
-				slot="heading"
-				class="font-display text-[32px] font-bold leading-[42px] tracking-[-0.02em] text-brand-ink"
-			>
-				Key Features {#if hasSize} for {currentFormat.fullName} at {sizeString}{/if}
-			</h2>
-			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-				{#each currentFormat.benefits as benefit, i}
-					<div class="bg-brand-subtle border border-brand-ink p-6 transition-all duration-200">
-						<div class="flex flex-col items-start gap-4">
-							<div
-								class="w-10 h-10 bg-brand-ink text-white flex items-center justify-center font-semibold text-lg border-[2px] border-transparent"
-							>
-								{i + 1}
-							</div>
-							<div>
-								<p class="text-brand-ink font-bold text-lg leading-tight">
-									{benefit}
-									{#if hasSize}(works great at {sizeString}){/if}
-								</p>
-							</div>
-						</div>
-					</div>
-				{/each}
-			</div>
+		<LongformSection
+			index="01"
+			id="key-features"
+			first
+			title={`Key Features${hasSize ? ` for ${currentFormat.fullName} at ${sizeString}` : ''}`}
+		>
+			<FeatureGrid
+				items={currentFormat.benefits.map((benefit) => ({
+					title: hasSize ? `${benefit} (works great at ${sizeString})` : benefit
+				}))}
+			/>
 		</LongformSection>
 
+		<!--
+			The automate block sits inside the reading column here rather than in the
+			shell's `automate` slot: this page's heading order is frozen, and
+			"Automate with the API" reads between 01 and 02 today.
+		-->
 		<AutomateSection
 			title="Automate with the"
 			titleHighlight="API"
@@ -985,709 +1002,162 @@
 			codeExamples={htmlToImageExamples}
 		/>
 
-		<LongformSection index="02" id="choosing-format">
-			<h2
-				slot="heading"
-				class="font-display text-[32px] font-bold leading-[42px] tracking-[-0.02em] text-brand-ink"
-			>
-				HTML to Image: Choosing the Right Format
-			</h2>
-			<div class="overflow-x-auto">
-				<table class="w-full text-left border-collapse">
-					<thead>
-						<tr class="border-b border-brand-ink">
-							<th class="p-3 font-semibold text-sm">Format</th>
-							<th class="p-3 font-semibold text-sm">Best For</th>
-							<th class="p-3 font-semibold text-sm">Transparency</th>
-							<th class="p-3 font-semibold text-sm">File Size</th>
-						</tr>
-					</thead>
-					<tbody class="text-sm font-medium text-brand-slate">
-						<tr class="border-b border-brand-rule {format === 'png' ? 'bg-brand-field/30' : ''}">
-							<td class="p-3 font-semibold">PNG</td>
-							<td class="p-3">Screenshots, UI elements, text-heavy images</td>
-							<td class="p-3">Yes</td>
-							<td class="p-3">Large</td>
-						</tr>
-						<tr class="border-b border-brand-rule {format === 'jpg' ? 'bg-brand-field/30' : ''}">
-							<td class="p-3 font-semibold">JPG</td>
-							<td class="p-3">Photos, OG images, social cards, email headers</td>
-							<td class="p-3">No</td>
-							<td class="p-3">Small</td>
-						</tr>
-						<tr class={format === 'webp' ? 'bg-brand-field/30' : ''}>
-							<td class="p-3 font-semibold">WebP</td>
-							<td class="p-3">Web graphics, combining quality of PNG with size of JPG</td>
-							<td class="p-3">Yes</td>
-							<td class="p-3">Smallest</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+		<LongformSection
+			index="02"
+			id="choosing-format"
+			title="HTML to Image: Choosing the Right Format"
+		>
+			<ComparisonTable
+				columns={FORMAT_TABLE_COLUMNS}
+				rows={FORMAT_TABLE_ROWS}
+				highlightRow={formatTableHighlight}
+			/>
 		</LongformSection>
 
-		<LongformSection index="03" id="other-formats">
-			<h2
-				slot="heading"
-				class="font-display text-[32px] font-bold leading-[42px] tracking-[-0.02em] text-brand-ink"
-			>
-				Try Other Formats {#if hasSize} at {sizeString}{/if}
-			</h2>
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-				{#each otherFormats as otherFormat}
-					<a
-						href={`/tools/html-to-${otherFormat}`}
-						class="flex items-center gap-4 p-5 transition-all border border-brand-ink bg-brand-paper hover:bg-brand-field group"
-					>
-						<div
-							class="w-12 h-12 bg-brand-ink text-white flex items-center justify-center font-semibold text-sm border border-brand-rule group-hover:border-black group-hover:bg-brand-paper group-hover:text-brand-ink"
-						>
-							{otherFormat}
-						</div>
-						<div>
-							<h3 class="text-xl font-semibold text-brand-ink group-hover:text-brand-ink">
-								{formatInfo[otherFormat].fullName}
-							</h3>
-							<p class="text-brand-slate font-bold text-sm group-hover:text-brand-ink">
-								Perfect for {formatInfo[otherFormat].bestFor}
-							</p>
-						</div>
-					</a>
-				{/each}
-				{#if format !== 'image'}
-					<a
-						href="/tools/html-to-image"
-						class="flex items-center gap-4 p-5 transition-all border border-brand-ink bg-brand-paper hover:bg-brand-field group"
-					>
-						<div
-							class="w-12 h-12 bg-brand-ink text-white flex items-center justify-center font-semibold text-sm border border-brand-rule group-hover:border-black group-hover:bg-brand-paper group-hover:text-brand-ink"
-						>
-							ALL
-						</div>
-						<div>
-							<h3 class="text-xl font-semibold text-brand-ink group-hover:text-brand-ink">
-								HTML to Image
-							</h3>
-							<p class="text-brand-slate font-bold text-sm group-hover:text-brand-ink">
-								One converter for PNG, JPG, and WebP
-							</p>
-						</div>
-					</a>
-				{/if}
-			</div>
+		<LongformSection
+			index="03"
+			id="other-formats"
+			title={`Try Other Formats${hasSize ? ` at ${sizeString}` : ''}`}
+		>
+			<LinkCardGrid items={otherFormatLinks} columns={2} toolName={toolKey} />
 		</LongformSection>
 
-		<LongformSection index="04" id="social-previews">
-			<h2
-				slot="heading"
-				class="font-display text-[32px] font-bold leading-[42px] tracking-[-0.02em] text-brand-ink"
-			>
-				Need social previews?
-			</h2>
-			<p class="text-brand-ink font-bold mb-6 text-lg">
-				Create platform-optimized Open Graph images after exporting your HTML.
-			</p>
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-				{#each featuredPlatforms as platform}
-					<a
-						href={`/tools/og-image-generator/${platform.id}`}
-						class="bg-brand-paper border border-brand-ink p-6 transition-all"
-					>
-						<h3 class="text-xl font-semibold text-brand-ink mb-2">{platform.label}</h3>
-						<p class="text-sm text-brand-slate font-medium">
-							Design branded OG images tailored for {platform.label}.
-						</p>
-					</a>
-				{/each}
-			</div>
+		<LongformSection index="04" id="social-previews" title="Need social previews?">
+			<Lead>Create platform-optimized Open Graph images after exporting your HTML.</Lead>
+			<LinkCardGrid items={socialPreviewLinks} columns={3} toolName={toolKey} />
 		</LongformSection>
 
-		<LongformSection index="05" id="how-to-convert">
-			<h2
-				slot="heading"
-				class="font-display text-[32px] font-bold leading-[42px] tracking-[-0.02em] text-brand-ink"
-			>
-				How to Convert
-			</h2>
-			<div class="flex flex-col md:flex-row gap-6">
-				<div class="flex-1 p-6 border border-brand-ink bg-brand-subtle relative">
-					<div
-						class="absolute -top-4 -left-4 w-10 h-10 bg-brand-ink text-white flex items-center justify-center font-semibold text-xl border border-brand-rule"
-					>
-						1
-					</div>
-					<h3 class="text-xl font-semibold mt-2 mb-2">Input Code</h3>
-					<p class="font-bold text-brand-slate">
-						Paste your HTML code in the editor above or use our default template.
-					</p>
-				</div>
-				<div class="flex-1 p-6 border border-brand-ink bg-brand-subtle relative">
-					<div
-						class="absolute -top-4 -left-4 w-10 h-10 bg-brand-ink text-white flex items-center justify-center font-semibold text-xl border border-brand-rule"
-					>
-						2
-					</div>
-					<h3 class="text-xl font-semibold mt-2 mb-2">Preview</h3>
-					<p class="font-bold text-brand-slate">
-						Check how your HTML will look as a {currentFormat.fullName} image.
-					</p>
-				</div>
-				<div class="flex-1 p-6 border border-brand-ink bg-brand-subtle relative">
-					<div
-						class="absolute -top-4 -left-4 w-10 h-10 bg-brand-ink text-white flex items-center justify-center font-semibold text-xl border border-brand-rule"
-					>
-						3
-					</div>
-					<h3 class="text-xl font-semibold mt-2 mb-2">Convert</h3>
-					<p class="font-bold text-brand-slate">
-						Click convert to generate your {currentFormat.fullName} image instantly.
-					</p>
-				</div>
-			</div>
+		<LongformSection index="05" id="how-to-convert" title="How to Convert">
+			<StepCards steps={HOW_TO_STEPS} />
 		</LongformSection>
 
-		<LongformSection index="06" id="best-practices-format">
-			<h2
-				slot="heading"
-				class="font-display text-[32px] font-bold leading-[42px] tracking-[-0.02em] text-brand-ink"
-			>
-				Best Practices for {currentFormat.fullName} Conversion {#if hasSize} at {sizeString}{/if}
-			</h2>
-			<ul class="text-lg text-brand-slate space-y-4">
-				<li class="flex items-start gap-3">
-					<svg
-						class="w-6 h-6 text-brand-pink mt-1 flex-shrink-0"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M5 13l4 4L19 7"
-						/>
-					</svg>
-					<span>Optimize your HTML design for {currentFormat.bestFor}</span>
-				</li>
-				<li class="flex items-start gap-3">
-					<svg
-						class="w-6 h-6 text-brand-pink mt-1 flex-shrink-0"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M5 13l4 4L19 7"
-						/>
-					</svg>
-					<span>Consider the final image dimensions</span>
-				</li>
-				<li class="flex items-start gap-3">
-					<svg
-						class="w-6 h-6 text-brand-pink mt-1 flex-shrink-0"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M5 13l4 4L19 7"
-						/>
-					</svg>
-					<span>Test across different devices</span>
-				</li>
-			</ul>
+		<LongformSection
+			index="06"
+			id="best-practices-format"
+			title={`Best Practices for ${currentFormat.fullName} Conversion${
+				hasSize ? ` at ${sizeString}` : ''
+			}`}
+		>
+			<CheckList
+				items={[
+					`Optimize your HTML design for ${currentFormat.bestFor}`,
+					'Consider the final image dimensions',
+					'Test across different devices'
+				]}
+			/>
 		</LongformSection>
 
-		<LongformSection index="07" id="faq">
-			<h2
-				slot="heading"
-				class="font-display text-[32px] font-bold leading-[42px] tracking-[-0.02em] text-brand-ink"
-			>
-				FAQ
-			</h2>
-			<div class="space-y-4">
-				<details class="group">
-					<summary
-						class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
-					>
-						<span class="font-semibold text-lg text-brand-ink">How does it work?</span>
-						<span
-							class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-4 w-4 group-open:rotate-180 transition-transform"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-								><path
-									fill-rule="evenodd"
-									d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-									clip-rule="evenodd"
-								/></svg
-							>
-						</span>
-					</summary>
-					<div
-						class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
-					>
-						Our converter renders your HTML code in a virtual browser environment and captures the
-						output as a high-quality {format.toUpperCase()} image. This process ensures that your HTML
-						is accurately represented in the final image.
-					</div>
-				</details>
-
-				<details class="group">
-					<summary
-						class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
-					>
-						<span class="font-semibold text-lg text-brand-ink">External resources?</span>
-						<span
-							class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-4 w-4 group-open:rotate-180 transition-transform"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-								><path
-									fill-rule="evenodd"
-									d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-									clip-rule="evenodd"
-								/></svg
-							>
-						</span>
-					</summary>
-					<div
-						class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
-					>
-						Yes, our converter supports HTML with external resources such as images and stylesheets.
-						However, for the best results and fastest conversion, we recommend using inline styles
-						and data URIs for images when possible.
-					</div>
-				</details>
-
-				<details class="group">
-					<summary
-						class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
-					>
-						<span class="font-semibold text-lg text-brand-ink">Max file size?</span>
-						<span
-							class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-4 w-4 group-open:rotate-180 transition-transform"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-								><path
-									fill-rule="evenodd"
-									d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-									clip-rule="evenodd"
-								/></svg
-							>
-						</span>
-					</summary>
-					<div
-						class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
-					>
-						Our free tool supports HTML files up to 5MB in size. For larger files or batch
-						conversions, consider upgrading to our premium plan or API service.
-					</div>
-				</details>
-
-				<details class="group">
-					<summary
-						class="flex items-center justify-between cursor-pointer bg-brand-paper p-4 border border-brand-ink transition-all"
-					>
-						<span class="font-semibold text-lg text-brand-ink">Privacy?</span>
-						<span
-							class="border border-brand-ink p-1 bg-brand-ink text-white group-open:bg-brand-paper group-open:text-brand-ink transition-colors"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-4 w-4 group-open:rotate-180 transition-transform"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-								><path
-									fill-rule="evenodd"
-									d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-									clip-rule="evenodd"
-								/></svg
-							>
-						</span>
-					</summary>
-					<div
-						class="mt-0 p-4 border-x border-b border-brand-ink bg-brand-subtle text-brand-ink font-medium"
-					>
-						Yes, we take your privacy seriously. Your HTML code is processed in real-time and is not
-						stored on our servers. Once the conversion is complete, all data is immediately deleted.
-					</div>
-				</details>
-			</div>
+		<LongformSection index="07" id="faq" title="FAQ">
+			<FaqList faqs={FAQS} />
 		</LongformSection>
 
-		<LongformSection index="08" id="best-practices">
-			<h2
-				slot="heading"
-				class="font-display text-[32px] font-bold leading-[42px] tracking-[-0.02em] text-brand-ink"
-			>
-				Best Practices
-			</h2>
-			<ul class="text-lg text-brand-ink space-y-4 font-medium">
-				<li class="flex items-start gap-4">
-					<div
-						class="w-6 h-6 bg-brand-ink text-white flex items-center justify-center flex-shrink-0 mt-1"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="3"
-								d="M5 13l4 4L19 7"
-							/></svg
-						>
-					</div>
-					<span>Optimize your HTML design for {currentFormat.bestFor}</span>
-				</li>
-				<li class="flex items-start gap-4">
-					<div
-						class="w-6 h-6 bg-brand-ink text-white flex items-center justify-center flex-shrink-0 mt-1"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="3"
-								d="M5 13l4 4L19 7"
-							/></svg
-						>
-					</div>
-					<span>Consider the final image dimensions to optimize your HTML layout</span>
-				</li>
-				<li class="flex items-start gap-4">
-					<div
-						class="w-6 h-6 bg-brand-ink text-white flex items-center justify-center flex-shrink-0 mt-1"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="3"
-								d="M5 13l4 4L19 7"
-							/></svg
-						>
-					</div>
-					<span>Test your {currentFormat.fullName} images across different devices</span>
-				</li>
-				<li class="flex items-start gap-4">
-					<div
-						class="w-6 h-6 bg-brand-ink text-white flex items-center justify-center flex-shrink-0 mt-1"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="3"
-								d="M5 13l4 4L19 7"
-							/></svg
-						>
-					</div>
-					<span>Use appropriate compression settings to balance quality and file size</span>
-				</li>
-				<li class="flex items-start gap-4">
-					<div
-						class="w-6 h-6 bg-brand-ink text-white flex items-center justify-center flex-shrink-0 mt-1"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="3"
-								d="M5 13l4 4L19 7"
-							/></svg
-						>
-					</div>
-					<span>For text-heavy designs, ensure readability after conversion</span>
-				</li>
-			</ul>
+		<LongformSection index="08" id="best-practices" title="Best Practices">
+			<CheckList
+				items={[
+					`Optimize your HTML design for ${currentFormat.bestFor}`,
+					'Consider the final image dimensions to optimize your HTML layout',
+					`Test your ${currentFormat.fullName} images across different devices`,
+					'Use appropriate compression settings to balance quality and file size',
+					'For text-heavy designs, ensure readability after conversion'
+				]}
+			/>
 		</LongformSection>
 
-		<LongformSection index="09" id="fast-free">
-			<h2
-				slot="heading"
-				class="font-display text-[32px] font-bold leading-[42px] tracking-[-0.02em] text-brand-ink"
-			>
-				Fast, Free, Optimized.
-			</h2>
-			<p class="text-lg mb-6 text-brand-ink font-medium leading-relaxed">
+		<LongformSection index="09" id="fast-free" title="Fast, Free, Optimized.">
+			<Lead>
 				Our HTML to {currentFormat.fullName} converter is built for speed and quality. Ideal for {currentFormat.bestFor},
 				ensuring your visuals are pixel-perfect.
-			</p>
-			<ul class="text-lg text-brand-ink space-y-4 font-bold">
-				{#each currentFormat.benefits as benefit}
-					<li class="flex items-center gap-4">
-						<div class="w-2 h-2 bg-brand-ink" />
-						<span>{benefit}</span>
-					</li>
-				{/each}
-				<li class="flex items-center gap-4">
-					<div class="w-2 h-2 bg-brand-ink" />
-					<span>Instant Conversion in seconds</span>
-				</li>
-				<li class="flex items-center gap-4">
-					<div class="w-2 h-2 bg-brand-ink" />
-					<span>Privacy-Focused & Secure</span>
-				</li>
-			</ul>
+			</Lead>
+			<CheckList
+				items={[
+					...currentFormat.benefits,
+					'Instant Conversion in seconds',
+					'Privacy-Focused & Secure'
+				]}
+			/>
 		</LongformSection>
 
-		<div class="flex flex-col gap-10">
-			<LongformSection index="10" id="why-choose" compact>
-				<h2
-					slot="heading"
-					class="font-display text-2xl font-bold leading-[30px] tracking-[-0.02em] text-brand-ink"
-				>
-					Why Choose This Tool?
-				</h2>
-				<div class="flex flex-col gap-6">
-					<div class="flex flex-col gap-1">
-						<h3 class="font-sans text-lg font-medium leading-6 text-brand-ink">
-							Optimized for {currentFormat.bestFor}
-						</h3>
-						<p class="font-sans text-[15px] leading-[23px] text-brand-slate">
-							{currentFormat.fullName} is excellent for {currentFormat.bestFor}, making it a go-to
-							choice.
-						</p>
-					</div>
-					<div class="flex flex-col gap-1">
-						<h3 class="font-sans text-lg font-medium leading-6 text-brand-ink">Key Advantages</h3>
-						<p class="font-sans text-[15px] leading-[23px] text-brand-slate">
-							{currentFormat.benefits.join('. ')}.
-						</p>
-					</div>
-					<div class="flex flex-col gap-1">
-						<h3 class="font-sans text-lg font-medium leading-6 text-brand-ink">Considerations</h3>
-						<p class="font-sans text-[15px] leading-[23px] text-brand-slate">
-							While {currentFormat.fullName} excels in many areas, it's worth noting that {currentFormat.drawbacks}.
-						</p>
-					</div>
-				</div>
+		<!--
+			columns={1} keeps these four stacked, as they render today. The two-up
+			pair layout is a live design question (section 11 is a four-column
+			table), so it is not being decided here.
+		-->
+		<LongformPair columns={1}>
+			<LongformSection index="10" id="why-choose" compact title="Why Choose This Tool?">
+				<ProseGroup
+					items={[
+						{
+							heading: `Optimized for ${currentFormat.bestFor}`,
+							body: `${currentFormat.fullName} is excellent for ${currentFormat.bestFor}, making it a go-to choice.`
+						},
+						{ heading: 'Key Advantages', body: `${currentFormat.benefits.join('. ')}.` },
+						{
+							heading: 'Considerations',
+							body: `While ${currentFormat.fullName} excels in many areas, it's worth noting that ${currentFormat.drawbacks}.`
+						}
+					]}
+				/>
 			</LongformSection>
 
-			<LongformSection index="11" id="vs-others" compact>
-				<h2
-					slot="heading"
-					class="font-display text-2xl font-bold leading-[30px] tracking-[-0.02em] text-brand-ink"
-				>
-					{currentFormat.fullName} vs Others
-				</h2>
-
-				<!-- Comparison Table -->
-				<div class="overflow-x-auto border border-brand-ink">
-					<table class="min-w-full divide-y divide-brand-rule">
-						<thead>
-							<tr>
-								<th
-									class="px-4 py-3 bg-brand-ink text-left text-xs font-semibold text-white tracking-wider"
-									>Feature</th
-								>
-								{#each [currentFormat, ...otherFormats.map((f) => formatInfo[f])] as format}
-									<th
-										class="px-4 py-3 bg-brand-ink border-l border-brand-rule text-left text-xs font-semibold text-white tracking-wider"
-										>{format.fullName}</th
-									>
-								{/each}
-							</tr>
-						</thead>
-						<tbody class="bg-brand-paper divide-y divide-brand-rule">
-							<tr>
-								<td
-									class="px-4 py-3 text-sm font-bold text-brand-ink border-r border-brand-rule bg-brand-subtle"
-									>Best For</td
-								>
-								{#each [currentFormat, ...otherFormats.map((f) => formatInfo[f])] as format, i}
-									<td
-										class={`px-4 py-3 text-sm font-bold text-brand-ink ${
-											i > 0 ? 'border-l border-brand-rule' : ''
-										}`}>{format.bestFor}</td
-									>
-								{/each}
-							</tr>
-							<tr>
-								<td
-									class="px-4 py-3 text-sm font-bold text-brand-ink border-r border-brand-rule bg-brand-subtle"
-									>Compression</td
-								>
-								{#each [currentFormat, ...otherFormats.map((f) => formatInfo[f])] as format, i}
-									<td
-										class={`px-4 py-3 text-sm font-bold text-brand-ink ${
-											i > 0 ? 'border-l border-brand-rule' : ''
-										}`}
-									>
-										{format.fullName === 'WebP'
-											? 'Lossy & Lossless'
-											: format.fullName === 'PNG'
-											? 'Lossless'
-											: 'Lossy'}
-									</td>
-								{/each}
-							</tr>
-							<tr>
-								<td
-									class="px-4 py-3 text-sm font-bold text-brand-ink border-r border-brand-rule bg-brand-subtle"
-									>File Size</td
-								>
-								{#each [currentFormat, ...otherFormats.map((f) => formatInfo[f])] as format, i}
-									<td
-										class={`px-4 py-3 text-sm font-bold text-brand-ink ${
-											i > 0 ? 'border-l border-brand-rule' : ''
-										}`}
-									>
-										{format.fullName === 'WebP'
-											? 'Small'
-											: format.fullName === 'PNG'
-											? 'Large'
-											: 'Medium'}
-									</td>
-								{/each}
-							</tr>
-							<tr>
-								<td
-									class="px-4 py-3 text-sm font-bold text-brand-ink border-r border-brand-rule bg-brand-subtle"
-									>Transparency</td
-								>
-								{#each [currentFormat, ...otherFormats.map((f) => formatInfo[f])] as format, i}
-									<td
-										class={`px-4 py-3 text-sm font-bold text-brand-ink ${
-											i > 0 ? 'border-l border-brand-rule' : ''
-										}`}
-									>
-										{format.fullName === 'PNG' ? 'Yes' : 'No'}
-									</td>
-								{/each}
-							</tr>
-						</tbody>
-					</table>
-				</div>
+			<LongformSection
+				index="11"
+				id="vs-others"
+				compact
+				title={`${currentFormat.fullName} vs Others`}
+			>
+				<ComparisonTable columns={comparisonColumns} rows={comparisonRows} />
 			</LongformSection>
 
-			<LongformSection index="12" id="use-cases" compact>
-				<h2
-					slot="heading"
-					class="font-display text-2xl font-bold leading-[30px] tracking-[-0.02em] text-brand-ink"
-				>
-					Real-World Use Cases
-				</h2>
-
-				<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-					<div class="flex flex-col gap-1">
-						<h3 class="font-sans text-lg font-medium leading-6 text-brand-ink">Social Media</h3>
-						<p class="font-sans text-[15px] leading-[23px] text-brand-slate">
-							Create eye-catching social media posts directly from HTML templates.
-						</p>
-					</div>
-					<div class="flex flex-col gap-1">
-						<h3 class="font-sans text-lg font-medium leading-6 text-brand-ink">Email Campaigns</h3>
-						<p class="font-sans text-[15px] leading-[23px] text-brand-slate">
-							Generate optimized images for email newsletters that load quickly.
-						</p>
-					</div>
-					<div class="flex flex-col gap-1">
-						<h3 class="font-sans text-lg font-medium leading-6 text-brand-ink">Website Mockups</h3>
-						<p class="font-sans text-[15px] leading-[23px] text-brand-slate">
-							Quickly create and share website designs with clients.
-						</p>
-					</div>
-					<div class="flex flex-col gap-1 hover:bg-brand-paper transition-colors">
-						<h3 class="font-sans text-lg font-medium leading-6 text-brand-ink">Documentation</h3>
-						<p class="font-sans text-[15px] leading-[23px] text-brand-slate">
-							Easily include web page screenshots in technical docs.
-						</p>
-					</div>
-				</div>
+			<LongformSection index="12" id="use-cases" compact title="Real-World Use Cases">
+				<ProseGroup
+					columns={2}
+					items={[
+						{
+							heading: 'Social Media',
+							body: 'Create eye-catching social media posts directly from HTML templates.'
+						},
+						{
+							heading: 'Email Campaigns',
+							body: 'Generate optimized images for email newsletters that load quickly.'
+						},
+						{
+							heading: 'Website Mockups',
+							body: 'Quickly create and share website designs with clients.'
+						},
+						{
+							heading: 'Documentation',
+							body: 'Easily include web page screenshots in technical docs.'
+						}
+					]}
+				/>
 			</LongformSection>
 
-			<LongformSection index="13" id="tech-specs" compact>
-				<h2
-					slot="heading"
-					class="font-display text-2xl font-bold leading-[30px] tracking-[-0.02em] text-brand-ink"
-				>
-					Technical Specs
-				</h2>
-
-				<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-					<div class="flex flex-col gap-1">
-						<h3 class="font-sans text-lg font-medium leading-6 text-brand-ink">
-							Conversion Process
-						</h3>
-						<p class="font-sans text-[15px] leading-[23px] text-brand-slate">
-							Headless browser rendering ensures pixel-perfect conversion.
-						</p>
-					</div>
-					<div class="flex flex-col gap-1">
-						<h3 class="font-sans text-lg font-medium leading-6 text-brand-ink">Image Quality</h3>
-						<p class="font-sans text-[15px] leading-[23px] text-brand-slate">
-							Generated at 96 DPI with optimized compression settings.
-						</p>
-					</div>
-					<div class="flex flex-col gap-1">
-						<h3 class="font-sans text-lg font-medium leading-6 text-brand-ink">
-							Supported Features
-						</h3>
-						<ul class="list-disc pl-5 font-sans text-[15px] leading-[23px] text-brand-slate">
-							<li>CSS3 and JavaScript rendering</li>
-							<li>Custom dimensions up to 4000x4000px</li>
-							<li>Web fonts supported</li>
-						</ul>
-					</div>
-					<div class="flex flex-col gap-1">
-						<h3 class="font-sans text-lg font-medium leading-6 text-brand-ink">Performance</h3>
-						<p class="font-sans text-[15px] leading-[23px] text-brand-slate">
-							Average conversion time under 5 seconds.
-						</p>
-					</div>
-				</div>
+			<LongformSection index="13" id="tech-specs" compact title="Technical Specs">
+				<ProseGroup
+					columns={2}
+					items={[
+						{
+							heading: 'Conversion Process',
+							body: 'Headless browser rendering ensures pixel-perfect conversion.'
+						},
+						{
+							heading: 'Image Quality',
+							body: 'Generated at 96 DPI with optimized compression settings.'
+						},
+						{
+							heading: 'Supported Features',
+							bullets: [
+								'CSS3 and JavaScript rendering',
+								'Custom dimensions up to 4000x4000px',
+								'Web fonts supported'
+							]
+						},
+						{ heading: 'Performance', body: 'Average conversion time under 5 seconds.' }
+					]}
+				/>
 			</LongformSection>
-		</div>
-
-		<!-- Social Share Section -->
-		<div class="flex flex-col gap-4 border-t border-brand-rule pt-8 sm:flex-row sm:items-center sm:justify-between">
-			<p class="font-mono text-xs tracking-[0.06em] text-brand-mute">SPREAD THE WORD</p>
-			<div class="flex flex-wrap gap-3">
-				<button
-					class="flex h-10 items-center gap-2 rounded-lg border border-brand-ink bg-brand-paper px-4 font-sans text-sm font-semibold text-brand-ink transition-colors hover:bg-brand-field"
-					on:click={() => handleSocialShare('twitter')}
-				>
-					<svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-						<path
-							d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-						/>
-					</svg>
-					Share on X
-				</button>
-				<button
-					class="flex h-10 items-center gap-2 rounded-lg border border-brand-ink bg-brand-paper px-4 font-sans text-sm font-semibold text-brand-ink transition-colors hover:bg-brand-field"
-					on:click={() => handleSocialShare('linkedin')}
-				>
-					<svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-						<path
-							d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.065 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-						/>
-					</svg>
-					Share on LinkedIn
-				</button>
-			</div>
-		</div>
+		</LongformPair>
 	</svelte:fragment>
-
-	
 </ToolPageShell>
 
 <!-- Anchors referenced by the HowTo schema steps. -->
