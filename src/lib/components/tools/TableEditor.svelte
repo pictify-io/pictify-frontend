@@ -590,7 +590,7 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 					inputMode = 'html';
 					srcdocKey++;
 				}}
-				class="px-5 py-2.5 text-sm font-semibold tracking-wider border-l-[3px] border-gray-900 transition-colors {inputMode ===
+				class="px-5 py-2.5 text-sm font-semibold tracking-wider border-l border-brand-ink transition-colors {inputMode ===
 				'html'
 					? 'bg-brand-ink text-white'
 					: 'bg-brand-paper text-brand-slate hover:bg-brand-subtle'}"
@@ -926,10 +926,10 @@ Frank Lee,DevOps Engineer,Engineering,Active`;
 				{#each [{ id: 'javascript', label: 'JavaScript' }, { id: 'python', label: 'Python' }, { id: 'go', label: 'Go' }, { id: 'ruby', label: 'Ruby' }, { id: 'php', label: 'PHP' }] as lang}
 					<button
 						on:click={() => (apiLang = lang.id)}
-						class="px-4 py-2 text-sm font-semibold border-[3px] transition-all rounded-lg tracking-wider {apiLang ===
+						class="px-4 py-2 text-sm font-semibold border-[1.5px] transition-all rounded-lg tracking-wider {apiLang ===
 						lang.id
-							? 'border-gray-900 bg-brand-ink text-white'
-							: 'border-gray-900 bg-brand-paper text-brand-slate hover:bg-brand-subtle'}"
+							? 'border-brand-ink bg-brand-ink text-white'
+							: 'border-brand-ink bg-brand-paper text-brand-slate hover:bg-brand-subtle'}"
 					>
 						{lang.label}
 					</button>
@@ -1433,7 +1433,7 @@ Bob,Designer,Active"""</span
 	<!-- First Generation Prompt (Modal) -->
 	{#if showFirstGenerationPrompt && !isUserLoggedIn}
 		<div class="fixed inset-0 bg-brand-ink/60 flex items-center justify-center z-50 p-4">
-			<div class="bg-brand-paper border-[4px] border-black max-w-md w-full mx-auto">
+			<div class="bg-brand-paper border-[1.5px] border-brand-ink max-w-md w-full mx-auto">
 				<div
 					class="bg-brand-proof px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
 				>
@@ -1487,7 +1487,7 @@ Bob,Designer,Active"""</span
 			class="fixed inset-0 bg-brand-ink/60 flex items-center justify-center z-50 p-4"
 			style="margin-top: 0px;"
 		>
-			<div class="bg-brand-paper border-[4px] border-black max-w-md w-full mx-auto">
+			<div class="bg-brand-paper border-[1.5px] border-brand-ink max-w-md w-full mx-auto">
 				<div
 					class="bg-brand-pink px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
 				>

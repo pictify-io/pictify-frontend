@@ -763,7 +763,7 @@
 									type="file"
 									accept="image/*"
 									on:change={handleLogoUpload}
-									class="w-full px-4 py-4 border border-brand-ink font-bold focus:outline-none transition-all bg-brand-paper file:mr-4 file:py-2 file:px-4 file:border-[2px] file:border-gray-900 file:bg-brand-field file:text-brand-ink file:font-semibold file: file:text-xs file:tracking-wider file:cursor-pointer"
+									class="w-full px-4 py-4 border border-brand-ink font-bold focus:outline-none transition-all bg-brand-paper file:mr-4 file:py-2 file:px-4 file:border file:border-brand-ink file:bg-brand-field file:text-brand-ink file:font-semibold file: file:text-xs file:tracking-wider file:cursor-pointer"
 								/>
 							</div>
 						</div>

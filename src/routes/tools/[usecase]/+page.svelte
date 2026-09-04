@@ -385,7 +385,7 @@
 			{:else if generationError}
 				<div class="max-w-3xl mx-auto px-4 mb-12">
 					<div
-						class="bg-red-50 border-[3px] border-red-500 rounded-tile p-6 flex items-center gap-4"
+						class="flex items-center gap-4 rounded-tile border border-brand-danger bg-red-50 p-6"
 					>
 						<div
 							class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center border-2 border-red-500 text-red-500"

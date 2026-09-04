@@ -188,10 +188,10 @@
 					<button
 						type="button"
 						on:click={() => selectTemplate(template)}
-						class="flex-shrink-0 flex items-center gap-2.5 px-4 py-2 bg-brand-paper border-[3px] rounded-xl transition-all cursor-pointer {selected?.id ===
+						class="flex-shrink-0 flex items-center gap-2.5 px-4 py-2 bg-brand-paper border-[1.5px] rounded-xl transition-all cursor-pointer {selected?.id ===
 						template.id
 							? 'border-brand-danger'
-							: 'border-gray-900 hover:'}"
+							: 'border-brand-ink hover:'}"
 						title={template.description || template.name}
 					>
 						<span
@@ -230,7 +230,7 @@
 				<button
 					type="button"
 					on:click={openEditTab}
-					class="px-5 py-2.5 text-xs font-semibold tracking-wide transition-colors border-l-[3px] border-gray-900 {activeTab ===
+					class="px-5 py-2.5 text-xs font-semibold tracking-wide transition-colors border-l border-brand-ink {activeTab ===
 					'edit'
 						? 'bg-brand-field text-brand-ink'
 						: 'bg-brand-paper text-brand-mute hover:text-brand-ink'}"

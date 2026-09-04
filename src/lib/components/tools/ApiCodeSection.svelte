@@ -35,10 +35,12 @@
 <!-- Programmatic Usage Section -->
 <section class="mt-20">
 	<div class="text-center mb-12">
-		<div class="inline-block bg-white border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform rotate-1 rounded-lg">
-			<span class="font-black uppercase tracking-widest text-sm">For Developers</span>
+		<div
+			class="inline-block bg-white border-[1.5px] border-brand-ink px-4 py-1 mb-6 transform rotate-1 rounded-lg"
+		>
+			<span class="font-semibold uppercase tracking-widest text-sm">For Developers</span>
 		</div>
-		<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
+		<h2 class="text-3xl md:text-5xl font-semibold text-gray-900 uppercase tracking-tighter">
 			{title} <span class="text-brand-danger">{titleHighlight}</span>
 		</h2>
 		<p class="text-lg md:text-xl font-bold text-gray-700 mt-4 max-w-3xl mx-auto">
@@ -53,10 +55,10 @@
 				{#each codeExamples as lang}
 					<button
 						on:click={() => (selectedLang = lang.id)}
-						class="px-4 py-2 text-sm font-black border-[3px] transition-all rounded-lg uppercase tracking-wider
+						class="px-4 py-2 text-sm font-semibold border-[1.5px] transition-all rounded-lg uppercase tracking-wider
 							{selectedLang === lang.id
-								? 'border-gray-900 bg-gray-900 text-white shadow-[3px_3px_0_0_#ffc480]'
-								: 'border-gray-900 bg-white text-gray-600 hover:bg-gray-50'}"
+							? 'border-brand-ink bg-gray-900 text-white shadow-[3px_3px_0_0_#ffc480]'
+							: 'border-brand-ink bg-white text-gray-600 hover:bg-gray-50'}"
 					>
 						{lang.label}
 					</button>
@@ -65,19 +67,23 @@
 		</div>
 
 		<!-- Code Snippet -->
-		<div class="bg-[#1e1e1e] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
-			<div class="bg-[#2d2d2d] px-4 py-3 border-b-[3px] border-gray-900 flex items-center justify-between">
+		<div class="bg-[#1e1e1e] rounded-2xl border-[1.5px] border-brand-ink overflow-hidden">
+			<div
+				class="bg-[#2d2d2d] px-4 py-3 border-b border-brand-ink flex items-center justify-between"
+			>
 				<div class="flex items-center gap-2">
-					<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
-					<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]"></div>
-					<div class="w-3.5 h-3.5 rounded-full bg-[#27c93f]"></div>
+					<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]" />
+					<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]" />
+					<div class="w-3.5 h-3.5 rounded-full bg-[#27c93f]" />
 				</div>
 				<span class="text-xs text-gray-500 font-mono font-bold uppercase tracking-wider">
 					{activeLang?.fileName || ''}
 				</span>
 			</div>
 			<div class="p-6 overflow-x-auto">
-				<pre class="text-sm font-mono text-gray-300 leading-relaxed"><code>{@html activeLang?.code || ''}</code></pre>
+				<pre class="text-sm font-mono text-gray-300 leading-relaxed"><code
+						>{@html activeLang?.code || ''}</code
+					></pre>
 			</div>
 		</div>
 	{/if}
@@ -88,7 +94,7 @@
 			<a
 				href="/signup"
 				on:click={handleSignupClick}
-				class="px-8 py-4 bg-gray-900 text-white font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+				class="px-8 py-4 bg-gray-900 text-white font-semibold border-[1.5px] border-brand-ink rounded-xl uppercase tracking-widest hover: hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
 				Get API Key
 			</a>
@@ -96,7 +102,7 @@
 				href="https://docs.pictify.io"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="px-8 py-4 bg-white text-gray-900 font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+				class="px-8 py-4 bg-white text-gray-900 font-semibold border-[1.5px] border-brand-ink rounded-xl uppercase tracking-widest hover: hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
 			>
 				Read API Docs
 			</a>

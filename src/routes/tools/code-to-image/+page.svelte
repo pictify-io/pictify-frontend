@@ -1481,7 +1481,7 @@
 
 {#if showFirstGenerationPrompt}
 	<div class="fixed inset-0 bg-brand-ink/60 flex items-center justify-center z-50 p-4">
-		<div class="bg-brand-paper border-[4px] border-black max-w-md w-full mx-auto">
+		<div class="mx-auto w-full max-w-md border-[1.5px] border-brand-ink bg-brand-paper">
 			<!-- Modal Header -->
 			<div
 				class="bg-brand-proof px-6 py-3 border-b-[4px] border-black flex justify-between items-center"
@@ -1544,7 +1544,7 @@
 		class="fixed inset-0 bg-brand-ink/60 flex items-center justify-center z-50 p-4"
 		style="margin-top: 0px;"
 	>
-		<div class="bg-brand-paper border-[4px] border-black max-w-md w-full mx-auto">
+		<div class="mx-auto w-full max-w-md border-[1.5px] border-brand-ink bg-brand-paper">
 			<!-- Modal Header -->
 			<div
 				class="bg-brand-pink px-6 py-3 border-b-[4px] border-black flex justify-between items-center"

@@ -506,7 +506,7 @@
 				{#if barcodeError}
 					<div class="text-center">
 						<div
-							class="w-12 h-12 rounded-full bg-red-100 border-[3px] border-red-500 flex items-center justify-center mx-auto mb-3"
+							class="w-12 h-12 rounded-full bg-red-100 border border-brand-danger flex items-center justify-center mx-auto mb-3"
 						>
 							<span class="text-red-500 font-semibold text-lg">!</span>
 						</div>
@@ -569,7 +569,7 @@
 	{#if imageUrl}
 		<div class="mt-12">
 			<div
-				class="bg-brand-proof/10 border-[3px] border-brand-proof rounded-tile p-8 text-center relative overflow-hidden"
+				class="bg-brand-proof/10 border border-brand-proof rounded-tile p-8 text-center relative overflow-hidden"
 			>
 				<div class="absolute top-0 right-0 w-32 h-32 bg-brand-proof/20 rounded-full blur-2xl" />
 				<h3 class="text-2xl font-semibold text-brand-ink tracking-tight mb-6">
@@ -770,7 +770,7 @@
 			<div class="flex flex-wrap gap-4">
 				<a
 					href="/signup"
-					class="px-6 py-3 bg-brand-proof text-brand-ink font-semibold border-[3px] border-brand-proof rounded-xl tracking-wide hover:bg-[#22c55e] transition-colors"
+					class="px-6 py-3 bg-brand-proof text-brand-ink font-semibold border border-brand-proof rounded-xl tracking-wide hover:bg-[#22c55e] transition-colors"
 				>
 					Get API Key
 				</a>

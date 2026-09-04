@@ -495,7 +495,7 @@
 					<div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
 						{#each certificateHtmlTemplates as template}
 							<button
-								class="flex-shrink-0 w-44 bg-brand-paper border-[3px] {selectedTemplate.id ===
+								class="flex-shrink-0 w-44 bg-brand-paper border-[1.5px] {selectedTemplate.id ===
 								template.id
 									? 'border-brand-danger'
 									: 'border-black'} p-3 overflow-hidden transition-all cursor-pointer rounded-xl relative"
@@ -744,7 +744,7 @@
 			</div>
 		{:else if generationError}
 			<div class="max-w-3xl mx-auto px-4 mb-12">
-				<div class="bg-red-50 border-[3px] border-red-500 rounded-tile p-6 flex items-center gap-4">
+				<div class="flex items-center gap-4 rounded-tile border border-brand-danger bg-red-50 p-6">
 					<div
 						class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center border-2 border-red-500 text-red-500 font-semibold"
 					>

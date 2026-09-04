@@ -686,7 +686,7 @@
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 					{#each templates as template}
 						<button
-							class="relative bg-brand-paper border-[3px] {selectedTemplate === template
+							class="relative bg-brand-paper border-[1.5px] {selectedTemplate === template
 								? 'border-brand-danger'
 								: 'border-black'} p-3 overflow-hidden transition-all cursor-pointer"
 							on:click={() => updateTemplate(template)}

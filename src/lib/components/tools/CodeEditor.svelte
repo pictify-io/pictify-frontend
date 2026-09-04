@@ -389,7 +389,7 @@
 								on:click={() => {
 									createGif();
 								}}
-								class="bg-brand-accent hover:bg-[#ffb366] text-black px-4 py-2 text-sm font-bold uppercase tracking-wide flex items-center gap-2 transition-colors border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+								class="bg-brand-accent hover:bg-[#ffb366] text-black px-4 py-2 text-sm font-bold uppercase tracking-wide flex items-center gap-2 transition-colors border border-brand-ink hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -490,7 +490,7 @@
 				<!-- Tab Bar -->
 				<div class="flex bg-[#1a1a2e] px-4 py-3">
 					<span
-						class="px-5 py-2 text-sm font-black uppercase tracking-wider bg-white text-black border-[2px] border-black shadow-[3px_3px_0_0_#ff6b6b]"
+						class="px-5 py-2 text-sm font-semibold uppercase tracking-wider bg-white text-black border border-brand-ink shadow-[3px_3px_0_0_#ff6b6b]"
 					>
 						HTML
 					</span>
