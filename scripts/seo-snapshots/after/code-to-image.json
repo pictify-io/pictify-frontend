@@ -18,77 +18,75 @@
     "twitter:url": "https://pictify.io/tools/code-to-image"
   },
   "jsonLd": [
-    [
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "We support 25+ programming languages including JavaScript, TypeScript, Python, Java, C++, C#, PHP, Ruby, Go, Rust, Swift, HTML, CSS, SQL, JSON, YAML, Markdown, and many more."
-            },
-            "name": "What programming languages are supported?"
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/",
+          "name": "Home",
+          "position": 1
+        },
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/tools",
+          "name": "Tools",
+          "position": 2
+        },
+        {
+          "@type": "ListItem",
+          "name": "Code to Image",
+          "position": 3
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We support 25+ programming languages including JavaScript, TypeScript, Python, Java, C++, C#, PHP, Ruby, Go, Rust, Swift, HTML, CSS, SQL, JSON, YAML, Markdown, and many more."
           },
-          {
-            "@type": "Question",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes! Choose from 18+ themes, 12+ coding fonts, customize padding, border radius, background styles, window frames, and advanced effects like shadows and blur."
-            },
-            "name": "Can I customize the appearance?"
+          "name": "What programming languages are supported?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Choose from 18+ themes, 12+ coding fonts, customize padding, border radius, background styles, window frames, and advanced effects like shadows and blur."
           },
-          {
-            "@type": "Question",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "We generate high-quality PNG images, perfect for social media, documentation, and presentations with crisp text rendering and transparency support."
-            },
-            "name": "What image formats are supported?"
+          "name": "Can I customize the appearance?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We generate high-quality PNG images, perfect for social media, documentation, and presentations with crisp text rendering and transparency support."
           },
-          {
-            "@type": "Question",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "No strict limit, but we recommend keeping snippets reasonably sized for best visual results. Focus on the most important parts of your code."
-            },
-            "name": "Is there a limit on code length?"
+          "name": "What image formats are supported?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No strict limit, but we recommend keeping snippets reasonably sized for best visual results. Focus on the most important parts of your code."
           },
-          {
-            "@type": "Question",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes! All generated images can be used for personal and commercial purposes. Guest limits may apply, and free accounts remove watermarks."
-            },
-            "name": "Can I use images commercially?"
-          }
-        ]
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "item": "https://pictify.io/",
-            "name": "Home",
-            "position": 1
+          "name": "Is there a limit on code length?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! All generated images can be used for personal and commercial purposes. Guest limits may apply, and free accounts remove watermarks."
           },
-          {
-            "@type": "ListItem",
-            "item": "https://pictify.io/tools",
-            "name": "Tools",
-            "position": 2
-          },
-          {
-            "@type": "ListItem",
-            "name": "Code to Image",
-            "position": 3
-          }
-        ]
-      }
-    ],
+          "name": "Can I use images commercially?"
+        }
+      ]
+    },
     {
       "@context": "https://schema.org",
       "@type": "Organization",
@@ -112,47 +110,35 @@
     },
     {
       "tag": "h2",
-      "text": "LEARN MORE ABOUT CODE TO IMAGE"
-    },
-    {
-      "tag": "h3",
       "text": "Code Screenshot Tools Compared"
     },
     {
-      "tag": "h3",
+      "tag": "h2",
       "text": "What is a Code to Image Generator?"
     },
     {
-      "tag": "h3",
+      "tag": "h2",
       "text": "Benefits of Using Our Code to Image Generator"
     },
     {
-      "tag": "h3",
+      "tag": "h2",
       "text": "How to Use Our Code to Image Generator"
     },
     {
-      "tag": "h3",
+      "tag": "h2",
       "text": "Real-World Use Cases"
     },
     {
-      "tag": "h3",
+      "tag": "h2",
       "text": "Best Practices for Creating Code Images"
     },
     {
-      "tag": "h3",
+      "tag": "h2",
       "text": "Frequently Asked Questions"
     },
     {
-      "tag": "h3",
+      "tag": "h2",
       "text": "Supported Programming Languages"
-    },
-    {
-      "tag": "h3",
-      "text": "More Tools You'll Love"
-    },
-    {
-      "tag": "h3",
-      "text": "Related Tools"
     },
     {
       "tag": "h2",

@@ -43,6 +43,7 @@
 	// Opt-in for the same reason as everything else here: adopting the component
 	// must not add or drop a single tag on a page that already ranks.
 	export let author = ''; // e.g. "Pictify.io"
+	export let twitterUrl = ''; // emitted by the older $lib/seo head
 	export let ogLocale = ''; // e.g. "en_US"
 
 	// Richer SEO opt-ins (per-tag)
@@ -176,6 +177,7 @@
 	{#if ogLocale}<meta property="og:locale" content={ogLocale} />{/if}
 
 	<meta name="twitter:card" content="summary_large_image" />
+	{#if twitterUrl}<meta name="twitter:url" content={twitterUrl} />{/if}
 	{#if twitterSite}<meta name="twitter:site" content={twitterSite} />{/if}
 	{#if twitterCreator}<meta name="twitter:creator" content={twitterCreator} />{/if}
 	{#if twitterTitle}<meta name="twitter:title" content={twitterTitle} />{/if}

@@ -5,7 +5,7 @@
 	 * Controls and editor become the tool card's two columns; the quota ladder
 	 * and Generate move to its toolbar. SEO copy is frozen.
 	 */
-	import SEOHead from '$lib/seo/SEOHead.svelte';
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
 	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
 	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
@@ -22,7 +22,18 @@
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/telemetry.js';
 	import { downloadFile } from '$lib/utils/download.js';
-	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
+	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
+	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
+	import Lead from '$lib/components/tools/v2/longform/Lead.svelte';
+	import Prose from '$lib/components/tools/v2/longform/Prose.svelte';
+	import ProseGroup from '$lib/components/tools/v2/longform/ProseGroup.svelte';
+	import FeatureGrid from '$lib/components/tools/v2/longform/FeatureGrid.svelte';
+	import StepCards from '$lib/components/tools/v2/longform/StepCards.svelte';
+	import ComparisonTable from '$lib/components/tools/v2/longform/ComparisonTable.svelte';
+	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
+	import TagList from '$lib/components/tools/v2/longform/TagList.svelte';
+	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 	let stickyBar;
 
 	// Syntax highlighting via refractor (Prism under the hood)
@@ -699,7 +710,6 @@
 		)}'`;
 	}
 
-
 	async function generateImage() {
 		// Check if non-logged in user has reached limit
 		if (!isUserLoggedIn && freeGenerationsUsed >= effectiveMaxFreeGenerations) {
@@ -830,52 +840,28 @@
 		return css.replace('[styleOpen]', openTag).replace('[styleClose]', closeTag);
 	}
 
-	const faqSchema = {
-		'@context': 'https://schema.org',
-		'@type': 'FAQPage',
-		mainEntity: [
-			{
-				'@type': 'Question',
-				name: 'What programming languages are supported?',
-				acceptedAnswer: {
-					'@type': 'Answer',
-					text: 'We support 25+ programming languages including JavaScript, TypeScript, Python, Java, C++, C#, PHP, Ruby, Go, Rust, Swift, HTML, CSS, SQL, JSON, YAML, Markdown, and many more.'
-				}
-			},
-			{
-				'@type': 'Question',
-				name: 'Can I customize the appearance?',
-				acceptedAnswer: {
-					'@type': 'Answer',
-					text: 'Yes! Choose from 18+ themes, 12+ coding fonts, customize padding, border radius, background styles, window frames, and advanced effects like shadows and blur.'
-				}
-			},
-			{
-				'@type': 'Question',
-				name: 'What image formats are supported?',
-				acceptedAnswer: {
-					'@type': 'Answer',
-					text: 'We generate high-quality PNG images, perfect for social media, documentation, and presentations with crisp text rendering and transparency support.'
-				}
-			},
-			{
-				'@type': 'Question',
-				name: 'Is there a limit on code length?',
-				acceptedAnswer: {
-					'@type': 'Answer',
-					text: 'No strict limit, but we recommend keeping snippets reasonably sized for best visual results. Focus on the most important parts of your code.'
-				}
-			},
-			{
-				'@type': 'Question',
-				name: 'Can I use images commercially?',
-				acceptedAnswer: {
-					'@type': 'Answer',
-					text: 'Yes! All generated images can be used for personal and commercial purposes. Guest limits may apply, and free accounts remove watermarks.'
-				}
-			}
-		]
-	};
+	const FAQS = [
+		{
+			q: 'What programming languages are supported?',
+			a: 'We support 25+ programming languages including JavaScript, TypeScript, Python, Java, C++, C#, PHP, Ruby, Go, Rust, Swift, HTML, CSS, SQL, JSON, YAML, Markdown, and many more.'
+		},
+		{
+			q: 'Can I customize the appearance?',
+			a: 'Yes! Choose from 18+ themes, 12+ coding fonts, customize padding, border radius, background styles, window frames, and advanced effects like shadows and blur.'
+		},
+		{
+			q: 'What image formats are supported?',
+			a: 'We generate high-quality PNG images, perfect for social media, documentation, and presentations with crisp text rendering and transparency support.'
+		},
+		{
+			q: 'Is there a limit on code length?',
+			a: 'No strict limit, but we recommend keeping snippets reasonably sized for best visual results. Focus on the most important parts of your code.'
+		},
+		{
+			q: 'Can I use images commercially?',
+			a: 'Yes! All generated images can be used for personal and commercial purposes. Guest limits may apply, and free accounts remove watermarks.'
+		}
+	];
 
 	const TOOL_NAME = 'code_to_image';
 	const TOOL_PATH = '/tools/code-to-image';
@@ -886,46 +872,36 @@
 	const selectCls =
 		'h-10 w-full rounded border-[1.5px] border-brand-ink bg-white px-2.5 font-sans text-sm font-semibold text-brand-ink focus:outline-none focus:ring-2 focus:ring-brand-royal cursor-pointer';
 
-	const RELATED = [
-		{
-			title: 'Markdown to image',
-			meta: 'MD → PNG',
-			href: '/tools/markdown',
-			art: '/landing/tools/markdown-to-image.svg'
-		},
-		{
-			title: 'HTML to image',
-			meta: 'HTML → PNG · JPG · WEBP',
-			href: '/tools/html-to-image',
-			art: '/landing/tools/html-to-image.svg'
-		},
-		{
-			title: 'Tweet screenshot',
-			meta: 'TWEET URL → PNG',
-			href: '/tools/tweet-screenshot',
-			art: '/landing/tools/tweet-screenshot.svg'
-		}
+	const RELATED = ['markdown', 'html-to-image', 'tweet-screenshot'];
+
+	/** Eight sections, so the column gets the rail. */
+	const TOC = [
+		{ id: 'compared', label: 'Tools Compared' },
+		{ id: 'what-is', label: 'What is a Code to Image Generator?' },
+		{ id: 'benefits', label: 'Benefits' },
+		{ id: 'how-to', label: 'How to Use It' },
+		{ id: 'use-cases', label: 'Real-World Use Cases' },
+		{ id: 'best-practices', label: 'Best Practices' },
+		{ id: 'faq', label: 'FAQ' },
+		{ id: 'languages', label: 'Supported Languages' }
 	];
 </script>
 
-<SEOHead
+<ToolSeoHead
 	title="Code to Image: Code Screenshot Generator (25+ Themes, Free API) | Pictify"
 	description="Turn code snippets into beautiful screenshots with syntax highlighting: 25+ languages, 18+ themes, custom fonts. Export PNG free or automate with the API."
 	canonical="https://pictify.io/tools/code-to-image"
 	robots="index, follow, max-image-preview:large"
+	ogTitle="Code to Image: Code Screenshot Generator (25+ Themes, Free API) | Pictify"
+	ogDescription="Turn code snippets into beautiful screenshots with syntax highlighting: 25+ languages, 18+ themes, custom fonts. Export PNG free or automate with the API."
+	ogSiteName="Pictify"
 	ogImage="https://media.pictify.io/by55n-1775406886142.png"
-	schema={[
-		faqSchema,
-		{
-			'@context': 'https://schema.org',
-			'@type': 'BreadcrumbList',
-			itemListElement: [
-				{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
-				{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
-				{ '@type': 'ListItem', position: 3, name: 'Code to Image' }
-			]
-		}
-	]}
+	twitterTitle="Code to Image: Code Screenshot Generator (25+ Themes, Free API) | Pictify"
+	twitterDescription="Turn code snippets into beautiful screenshots with syntax highlighting: 25+ languages, 18+ themes, custom fonts. Export PNG free or automate with the API."
+	twitterImage="https://media.pictify.io/by55n-1775406886142.png"
+	twitterUrl="https://pictify.io/tools/code-to-image"
+	faqs={FAQS}
+	breadcrumbLabel="Code to Image"
 />
 
 <ToolPageShell
@@ -936,7 +912,8 @@
 	related={RELATED}
 	loggedIn={isUserLoggedIn}
 	hasResult={!!generatedImage}
-	longform="column"
+	toc={TOC}
+	longform="rail"
 >
 	<h1
 		slot="h1"
@@ -993,7 +970,9 @@
 
 					<!-- Language, theme, font, background -->
 					<div class="flex flex-col gap-3">
-						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">LANGUAGE &amp; STYLE</span>
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute"
+							>LANGUAGE &amp; STYLE</span
+						>
 						<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
 							<label class="flex flex-col gap-1">
 								<span class="text-xs font-semibold text-brand-ink">Language</span>
@@ -1098,35 +1077,91 @@
 						<div class="mt-4 flex flex-col gap-4">
 							<label class="flex flex-col gap-1">
 								<span class="text-xs font-semibold text-brand-ink">Padding ({padding}px)</span>
-								<input type="range" min="16" max="128" bind:value={padding} class="w-full cursor-pointer accent-brand-ink" />
+								<input
+									type="range"
+									min="16"
+									max="128"
+									bind:value={padding}
+									class="w-full cursor-pointer accent-brand-ink"
+								/>
 							</label>
 							<label class="flex flex-col gap-1">
 								<span class="text-xs font-semibold text-brand-ink">Font Size ({fontSize}px)</span>
-								<input type="range" min="10" max="24" bind:value={fontSize} class="w-full cursor-pointer accent-brand-ink" />
+								<input
+									type="range"
+									min="10"
+									max="24"
+									bind:value={fontSize}
+									class="w-full cursor-pointer accent-brand-ink"
+								/>
 							</label>
 							<label class="flex flex-col gap-1">
 								<span class="text-xs font-semibold text-brand-ink">Line Height ({lineHeight})</span>
-								<input type="range" min="1" max="2.5" step="0.1" bind:value={lineHeight} class="w-full cursor-pointer accent-brand-ink" />
+								<input
+									type="range"
+									min="1"
+									max="2.5"
+									step="0.1"
+									bind:value={lineHeight}
+									class="w-full cursor-pointer accent-brand-ink"
+								/>
 							</label>
 							<label class="flex flex-col gap-1">
-								<span class="text-xs font-semibold text-brand-ink">Card Opacity ({Math.round(cardOpacity * 100)}%)</span>
-								<input type="range" min="0" max="1" step="0.05" bind:value={cardOpacity} class="w-full cursor-pointer accent-brand-ink" />
+								<span class="text-xs font-semibold text-brand-ink"
+									>Card Opacity ({Math.round(cardOpacity * 100)}%)</span
+								>
+								<input
+									type="range"
+									min="0"
+									max="1"
+									step="0.05"
+									bind:value={cardOpacity}
+									class="w-full cursor-pointer accent-brand-ink"
+								/>
 							</label>
 							<label class="flex flex-col gap-1">
 								<span class="text-xs font-semibold text-brand-ink">Shadow Intensity</span>
-								<input type="range" min="0" max="1" step="0.05" bind:value={shadowIntensity} class="w-full cursor-pointer accent-brand-ink" />
+								<input
+									type="range"
+									min="0"
+									max="1"
+									step="0.05"
+									bind:value={shadowIntensity}
+									class="w-full cursor-pointer accent-brand-ink"
+								/>
 							</label>
 							<label class="flex flex-col gap-1">
 								<span class="text-xs font-semibold text-brand-ink">Blur ({blurEffect}px)</span>
-								<input type="range" min="0" max="20" bind:value={blurEffect} class="w-full cursor-pointer accent-brand-ink" />
+								<input
+									type="range"
+									min="0"
+									max="20"
+									bind:value={blurEffect}
+									class="w-full cursor-pointer accent-brand-ink"
+								/>
 							</label>
 							<label class="flex flex-col gap-1">
-								<span class="text-xs font-semibold text-brand-ink">Border Radius ({borderRadius}px)</span>
-								<input type="range" min="0" max="32" bind:value={borderRadius} class="w-full cursor-pointer accent-brand-ink" />
+								<span class="text-xs font-semibold text-brand-ink"
+									>Border Radius ({borderRadius}px)</span
+								>
+								<input
+									type="range"
+									min="0"
+									max="32"
+									bind:value={borderRadius}
+									class="w-full cursor-pointer accent-brand-ink"
+								/>
 							</label>
 							<label class="flex flex-col gap-1">
 								<span class="text-xs font-semibold text-brand-ink">Tab Width ({codeTabWidth})</span>
-								<input type="range" min="2" max="8" step="2" bind:value={codeTabWidth} class="w-full cursor-pointer accent-brand-ink" />
+								<input
+									type="range"
+									min="2"
+									max="8"
+									step="2"
+									bind:value={codeTabWidth}
+									class="w-full cursor-pointer accent-brand-ink"
+								/>
 							</label>
 						</div>
 					</details>
@@ -1137,7 +1172,8 @@
 					class="flex min-h-[360px] min-w-0 flex-1 flex-col gap-2 border-t-[1.5px] border-brand-ink bg-brand-subtle p-4 lg:min-h-0 lg:border-t-0"
 				>
 					<div class="flex items-center justify-between gap-2">
-						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">LIVE PREVIEW</span>
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">LIVE PREVIEW</span
+						>
 						<div class="flex items-center gap-1.5">
 							<span class="font-mono text-[10px] tracking-wider text-brand-mute">SIZE</span>
 							<input
@@ -1236,1076 +1272,210 @@
 	/>
 
 	<svelte:fragment slot="longform">
-		<!-- Section banner for the long-form block; text is frozen. -->
-		<h2
-			class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink lg:text-[32px] lg:leading-[42px]"
-		>
-			LEARN MORE ABOUT <span>CODE TO IMAGE</span>
-		</h2>
+		<LongformSection index="01" id="compared" first title="Code Screenshot Tools Compared">
+			<ComparisonTable
+				columns={['Feature', 'Pictify', 'Carbon.sh', 'Ray.so']}
+				rows={[
+					['API Access', 'Yes', 'No', 'No'],
+					['Batch Generation', 'Yes', 'No', 'No'],
+					['Custom Themes', '18+', '15+', '8'],
+					['Languages', '25+', '150+', '20+'],
+					['CI/CD Integration', 'Yes', 'No', 'No'],
+					['Free Tier', 'Yes', 'Yes', 'Yes']
+				]}
+			/>
+		</LongformSection>
 
-		<!-- Code to Image — Comparison -->
-		<section
-			class="mb-8 sm:mb-12 bg-brand-subtle border border-brand-ink p-4 sm:p-6 md:p-10 transition-all duration-300"
-		>
-			<h3 class="text-xl sm:text-2xl font-semibold mb-6 text-brand-ink tracking-tight">
-				Code Screenshot Tools Compared
-			</h3>
-			<div class="overflow-x-auto">
-				<table class="w-full text-left border-collapse text-sm">
-					<thead>
-						<tr class="border-b border-brand-ink">
-							<th class="p-3 font-semibold text-xs">Feature</th>
-							<th class="p-3 font-semibold text-xs">Pictify</th>
-							<th class="p-3 font-semibold text-xs">Carbon.sh</th>
-							<th class="p-3 font-semibold text-xs">Ray.so</th>
-						</tr>
-					</thead>
-					<tbody class="font-medium text-brand-slate">
-						<tr class="border-b border-gray-200">
-							<td class="p-3 font-bold">API Access</td>
-							<td class="p-3 text-green-600 font-bold">Yes</td>
-							<td class="p-3 text-red-500">No</td>
-							<td class="p-3 text-red-500">No</td>
-						</tr>
-						<tr class="border-b border-gray-200">
-							<td class="p-3 font-bold">Batch Generation</td>
-							<td class="p-3 text-green-600 font-bold">Yes</td>
-							<td class="p-3 text-red-500">No</td>
-							<td class="p-3 text-red-500">No</td>
-						</tr>
-						<tr class="border-b border-gray-200">
-							<td class="p-3 font-bold">Custom Themes</td>
-							<td class="p-3">18+</td>
-							<td class="p-3">15+</td>
-							<td class="p-3">8</td>
-						</tr>
-						<tr class="border-b border-gray-200">
-							<td class="p-3 font-bold">Languages</td>
-							<td class="p-3">25+</td>
-							<td class="p-3">150+</td>
-							<td class="p-3">20+</td>
-						</tr>
-						<tr class="border-b border-gray-200">
-							<td class="p-3 font-bold">CI/CD Integration</td>
-							<td class="p-3 text-green-600 font-bold">Yes</td>
-							<td class="p-3 text-red-500">No</td>
-							<td class="p-3 text-red-500">No</td>
-						</tr>
-						<tr>
-							<td class="p-3 font-bold">Free Tier</td>
-							<td class="p-3 text-green-600 font-bold">Yes</td>
-							<td class="p-3 text-green-600">Yes</td>
-							<td class="p-3 text-green-600">Yes</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</section>
+		<LongformSection index="02" id="what-is" title="What is a Code to Image Generator?">
+			<Prose>
+				<p>
+					A Code to Image Generator is a powerful tool that converts your source code into
+					beautiful, syntax-highlighted images. Perfect for sharing code snippets on social media,
+					creating documentation, presentations, or blog posts.
+				</p>
+				<p>
+					Whether you're a developer sharing code on Twitter, a technical writer creating
+					documentation, or an educator preparing tutorials, our code to image generator makes your
+					code visually appealing.
+				</p>
+			</Prose>
+		</LongformSection>
 
-		<!-- What is a Code to Image Generator Section -->
-		<section
-			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
-		>
-			<div
-				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-field border border-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
-			>
-				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M13 10V3L4 14h7v7l9-11h-7z"
-					/></svg
-				>
-				Overview
-			</div>
-			<h3
-				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
-			>
-				What is a Code to Image Generator?
-			</h3>
-			<p class="text-sm sm:text-base text-brand-slate leading-relaxed mb-3 sm:mb-4 font-medium">
-				A Code to Image Generator is a powerful tool that converts your source code into beautiful,
-				syntax-highlighted images. Perfect for sharing code snippets on social media, creating
-				documentation, presentations, or blog posts.
-			</p>
-			<p class="text-sm sm:text-base text-brand-slate leading-relaxed font-medium">
-				Whether you're a developer sharing code on Twitter, a technical writer creating
-				documentation, or an educator preparing tutorials, our code to image generator makes your
-				code visually appealing.
-			</p>
-		</section>
+		<LongformSection index="03" id="benefits" title="Benefits of Using Our Code to Image Generator">
+			<FeatureGrid
+				columns={2}
+				items={[
+					{
+						title:
+							'Support for 25+ programming languages including JavaScript, Python, Java, C++, and more'
+					},
+					{ title: '18+ beautiful syntax highlighting themes including dark and light options' },
+					{ title: '12+ popular coding fonts including JetBrains Mono, Fira Code, and more' },
+					{ title: 'Customizable window frames and backgrounds for professional appearance' },
+					{ title: 'Advanced styling options including opacity, shadows, and blur effects' },
+					{ title: 'Real-time preview to see exactly how your image will look' },
+					{ title: 'High-quality PNG output perfect for social media and documentation' },
+					{
+						title:
+							'Free to try (guest limits may apply). Create a free account to remove watermarks.'
+					}
+				]}
+			/>
+		</LongformSection>
 
-		<!-- Benefits Section -->
-		<section
-			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
-		>
-			<div
-				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-pink border border-brand-ink text-white text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
-			>
-				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-					/></svg
-				>
-				Features
-			</div>
-			<h3
-				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-8 text-brand-ink tracking-tight"
-			>
-				Benefits of Using Our Code to Image Generator
-			</h3>
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-				<div
-					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
-				>
-					<div class="bg-brand-pink p-2 border border-brand-ink text-white flex-shrink-0">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-							/></svg
-						>
-					</div>
-					<span class="font-bold text-brand-ink text-sm"
-						>Support for 25+ programming languages including JavaScript, Python, Java, C++, and more</span
-					>
-				</div>
+		<LongformSection index="04" id="how-to" title="How to Use Our Code to Image Generator">
+			<StepCards
+				titleTag="h4"
+				steps={[
+					{
+						title: 'Choose Your Programming Language',
+						body: 'Select from 25+ supported programming languages including JavaScript, Python, Java, C++, TypeScript, and more.'
+					},
+					{
+						title: 'Paste or Type Your Code',
+						body: 'Enter your code in the text area. You can use our sample code for each language or paste your own code snippet.'
+					},
+					{
+						title: 'Customize the Appearance',
+						body: 'Choose from 18+ themes, 12+ fonts, and customize padding, border radius, background styles, and advanced effects.'
+					},
+					{
+						title: 'Preview Your Image',
+						body: 'See exactly how your code image will look with our real-time preview. Adjust dimensions and settings as needed.'
+					},
+					{
+						title: 'Generate and Download',
+						body: 'Click "Generate Image" to create your high-quality PNG image. Copy the URL or download directly to use in your projects.'
+					}
+				]}
+			/>
+		</LongformSection>
 
-				<div
-					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
-				>
-					<div class="bg-brand-field p-2 border border-brand-ink text-brand-ink flex-shrink-0">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-							/></svg
-						>
-					</div>
-					<span class="font-bold text-brand-ink text-sm"
-						>18+ beautiful syntax highlighting themes including dark and light options</span
-					>
-				</div>
+		<LongformSection index="05" id="use-cases" title="Real-World Use Cases">
+			<ProseGroup
+				columns={2}
+				headingTag="h4"
+				items={[
+					{
+						heading: 'Social Media Sharing',
+						body: 'Share beautiful code snippets on Twitter, LinkedIn, Instagram. Stand out with professional-looking code images.'
+					},
+					{
+						heading: 'Documentation & Tutorials',
+						body: 'Create stunning code examples for technical documentation, API guides, and programming tutorials.'
+					},
+					{
+						heading: 'Presentations & Slides',
+						body: 'Include beautiful code images in your technical presentations, conference talks, and educational slides.'
+					},
+					{
+						heading: 'Blog Posts & Articles',
+						body: 'Enhance your technical blog posts and articles with syntax-highlighted code images.'
+					},
+					{
+						heading: 'Education & Teaching',
+						body: 'Create clear, readable code examples for programming courses, workshops, and educational materials.'
+					},
+					{
+						heading: 'Portfolio & Resume',
+						body: 'Showcase your coding skills in portfolios and resumes with beautiful code screenshots.'
+					}
+				]}
+			/>
+		</LongformSection>
 
-				<div
-					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
-				>
-					<div class="bg-brand-proof p-2 border border-brand-ink text-brand-ink flex-shrink-0">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-							/></svg
-						>
-					</div>
-					<span class="font-bold text-brand-ink text-sm"
-						>12+ popular coding fonts including JetBrains Mono, Fira Code, and more</span
-					>
-				</div>
-
-				<div
-					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
-				>
-					<div class="bg-data-sky p-2 border border-brand-ink text-white flex-shrink-0">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
-							/></svg
-						>
-					</div>
-					<span class="font-bold text-brand-ink text-sm"
-						>Customizable window frames and backgrounds for professional appearance</span
-					>
-				</div>
-
-				<div
-					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
-				>
-					<div class="bg-data-violet p-2 border border-brand-ink text-white flex-shrink-0">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-							/></svg
-						>
-					</div>
-					<span class="font-bold text-brand-ink text-sm"
-						>Advanced styling options including opacity, shadows, and blur effects</span
-					>
-				</div>
-
-				<div
-					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
-				>
-					<div class="bg-data-pink p-2 border border-brand-ink text-white flex-shrink-0">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-							/><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-							/></svg
-						>
-					</div>
-					<span class="font-bold text-brand-ink text-sm"
-						>Real-time preview to see exactly how your image will look</span
-					>
-				</div>
-
-				<div
-					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
-				>
-					<div class="bg-[#facc15] p-2 border border-brand-ink text-brand-ink flex-shrink-0">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-							/></svg
-						>
-					</div>
-					<span class="font-bold text-brand-ink text-sm"
-						>High-quality PNG output perfect for social media and documentation</span
-					>
-				</div>
-
-				<div
-					class="bg-brand-subtle border border-brand-ink p-4 flex items-start gap-4 transition-all"
-				>
-					<div class="bg-[#22c55e] p-2 border border-brand-ink text-white flex-shrink-0">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-							/></svg
-						>
-					</div>
-					<span class="font-bold text-brand-ink text-sm"
-						>Free to try (guest limits may apply). Create a free account to remove watermarks.</span
-					>
-				</div>
-			</div>
-		</section>
-
-		<!-- How to Use Section -->
-		<section
-			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
-		>
-			<div
-				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-proof border border-brand-ink text-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
-			>
-				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-					/><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-					/></svg
-				>
-				Guide
-			</div>
-			<h3
-				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-8 text-brand-ink tracking-tight"
-			>
-				How to Use Our Code to Image Generator
-			</h3>
-			<div class="space-y-5">
-				<div class="flex items-start gap-4">
-					<span
-						class="bg-brand-pink text-white w-10 h-10 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
-						>1</span
-					>
-					<div>
-						<h4 class="font-semibold text-lg text-brand-ink mb-1">
-							Choose Your Programming Language
-						</h4>
-						<p class="text-brand-slate text-sm">
-							Select from 25+ supported programming languages including JavaScript, Python, Java,
-							C++, TypeScript, and more.
-						</p>
-					</div>
-				</div>
-				<div class="flex items-start gap-4">
-					<span
-						class="bg-brand-pink text-white w-10 h-10 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
-						>2</span
-					>
-					<div>
-						<h4 class="font-semibold text-lg text-brand-ink mb-1">Paste or Type Your Code</h4>
-						<p class="text-brand-slate text-sm">
-							Enter your code in the text area. You can use our sample code for each language or
-							paste your own code snippet.
-						</p>
-					</div>
-				</div>
-				<div class="flex items-start gap-4">
-					<span
-						class="bg-brand-pink text-white w-10 h-10 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
-						>3</span
-					>
-					<div>
-						<h4 class="font-semibold text-lg text-brand-ink mb-1">Customize the Appearance</h4>
-						<p class="text-brand-slate text-sm">
-							Choose from 18+ themes, 12+ fonts, and customize padding, border radius, background
-							styles, and advanced effects.
-						</p>
-					</div>
-				</div>
-				<div class="flex items-start gap-4">
-					<span
-						class="bg-brand-pink text-white w-10 h-10 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
-						>4</span
-					>
-					<div>
-						<h4 class="font-semibold text-lg text-brand-ink mb-1">Preview Your Image</h4>
-						<p class="text-brand-slate text-sm">
-							See exactly how your code image will look with our real-time preview. Adjust
-							dimensions and settings as needed.
-						</p>
-					</div>
-				</div>
-				<div class="flex items-start gap-4">
-					<span
-						class="bg-brand-pink text-white w-10 h-10 flex items-center justify-center font-semibold flex-shrink-0 border border-brand-ink"
-						>5</span
-					>
-					<div>
-						<h4 class="font-semibold text-lg text-brand-ink mb-1">Generate and Download</h4>
-						<p class="text-brand-slate text-sm">
-							Click "Generate Image" to create your high-quality PNG image. Copy the URL or download
-							directly to use in your projects.
-						</p>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- Real-World Use Cases Section -->
-		<section
-			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
-		>
-			<div
-				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-field border border-brand-ink text-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
-			>
-				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-					/></svg
-				>
-				Applications
-			</div>
-			<h3
-				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-8 text-brand-ink tracking-tight"
-			>
-				Real-World Use Cases
-			</h3>
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-				<div class="bg-brand-subtle border border-brand-ink p-5 transition-all">
-					<h4 class="text-lg font-semibold mb-2 text-brand-ink flex items-center gap-3">
-						<span
-							class="w-8 h-8 bg-brand-pink border border-brand-ink flex items-center justify-center flex-shrink-0"
-						>
-							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-								/></svg
-							>
-						</span>
-						Social Media Sharing
-					</h4>
-					<p class="text-brand-slate text-sm">
-						Share beautiful code snippets on Twitter, LinkedIn, Instagram. Stand out with
-						professional-looking code images.
-					</p>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-5 transition-all">
-					<h4 class="text-lg font-semibold mb-2 text-brand-ink flex items-center gap-3">
-						<span
-							class="w-8 h-8 bg-brand-field border border-brand-ink flex items-center justify-center flex-shrink-0"
-						>
-							<svg
-								class="w-4 h-4 text-brand-ink"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-								/></svg
-							>
-						</span>
-						Documentation & Tutorials
-					</h4>
-					<p class="text-brand-slate text-sm">
-						Create stunning code examples for technical documentation, API guides, and programming
-						tutorials.
-					</p>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-5 transition-all">
-					<h4 class="text-lg font-semibold mb-2 text-brand-ink flex items-center gap-3">
-						<span
-							class="w-8 h-8 bg-brand-proof border border-brand-ink flex items-center justify-center flex-shrink-0"
-						>
-							<svg
-								class="w-4 h-4 text-brand-ink"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
-								/></svg
-							>
-						</span>
-						Presentations & Slides
-					</h4>
-					<p class="text-brand-slate text-sm">
-						Include beautiful code images in your technical presentations, conference talks, and
-						educational slides.
-					</p>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-5 transition-all">
-					<h4 class="text-lg font-semibold mb-2 text-brand-ink flex items-center gap-3">
-						<span
-							class="w-8 h-8 bg-data-sky border border-brand-ink flex items-center justify-center flex-shrink-0"
-						>
-							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-								/></svg
-							>
-						</span>
-						Blog Posts & Articles
-					</h4>
-					<p class="text-brand-slate text-sm">
-						Enhance your technical blog posts and articles with syntax-highlighted code images.
-					</p>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-5 transition-all">
-					<h4 class="text-lg font-semibold mb-2 text-brand-ink flex items-center gap-3">
-						<span
-							class="w-8 h-8 bg-data-violet border border-brand-ink flex items-center justify-center flex-shrink-0"
-						>
-							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-								/></svg
-							>
-						</span>
-						Education & Teaching
-					</h4>
-					<p class="text-brand-slate text-sm">
-						Create clear, readable code examples for programming courses, workshops, and educational
-						materials.
-					</p>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-5 transition-all">
-					<h4 class="text-lg font-semibold mb-2 text-brand-ink flex items-center gap-3">
-						<span
-							class="w-8 h-8 bg-brand-ink border border-brand-ink flex items-center justify-center flex-shrink-0"
-						>
-							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-								/></svg
-							>
-						</span>
-						Portfolio & Resume
-					</h4>
-					<p class="text-brand-slate text-sm">
-						Showcase your coding skills in portfolios and resumes with beautiful code screenshots.
-					</p>
-				</div>
-			</div>
-		</section>
-
-		<!-- Best Practices Section -->
-		<section
-			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
-		>
-			<div
-				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-pink border border-brand-ink text-white text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
-			>
-				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-					/></svg
-				>
-				Tips
-			</div>
-			<h3
-				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-8 text-brand-ink tracking-tight"
-			>
-				Best Practices for Creating Code Images
-			</h3>
-			<p class="text-base text-brand-slate leading-relaxed mb-6">
+		<LongformSection index="06" id="best-practices" title="Best Practices for Creating Code Images">
+			<Lead>
 				To create the most effective and professional-looking code images, follow these best
 				practices:
-			</p>
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-				<div class="space-y-4">
-					<h4 class="font-semibold text-lg text-brand-ink flex items-center gap-2">
-						<span
-							class="w-8 h-8 bg-brand-pink text-white border border-brand-ink flex items-center justify-center text-sm"
-							>&lt;/&gt;</span
-						>
-						Code Quality
-					</h4>
-					<div class="space-y-2">
-						<div
-							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
-						>
-							<svg
-								class="w-5 h-5 text-brand-pink flex-shrink-0"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M5 13l4 4L19 7"
-								/>
-							</svg>
-							<span class="font-bold text-brand-ink text-sm"
-								>Keep code snippets concise and focused</span
-							>
-						</div>
-						<div
-							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
-						>
-							<svg
-								class="w-5 h-5 text-brand-pink flex-shrink-0"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M5 13l4 4L19 7"
-								/>
-							</svg>
-							<span class="font-bold text-brand-ink text-sm"
-								>Use proper indentation and formatting</span
-							>
-						</div>
-						<div
-							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
-						>
-							<svg
-								class="w-5 h-5 text-brand-pink flex-shrink-0"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M5 13l4 4L19 7"
-								/>
-							</svg>
-							<span class="font-bold text-brand-ink text-sm"
-								>Include meaningful comments when necessary</span
-							>
-						</div>
-						<div
-							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
-						>
-							<svg
-								class="w-5 h-5 text-brand-pink flex-shrink-0"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M5 13l4 4L19 7"
-								/>
-							</svg>
-							<span class="font-bold text-brand-ink text-sm"
-								>Remove sensitive information like API keys</span
-							>
-						</div>
-					</div>
-				</div>
+			</Lead>
+			<ProseGroup
+				headingTag="h4"
+				items={[
+					{
+						heading: 'Code Quality',
+						bullets: [
+							'Keep code snippets concise and focused',
+							'Use proper indentation and formatting',
+							'Include meaningful comments when necessary',
+							'Remove sensitive information like API keys'
+						]
+					},
+					{
+						heading: 'Visual Design',
+						bullets: [
+							'Choose themes that match your brand',
+							'Use high-contrast themes for readability',
+							'Select clear, professional-looking fonts',
+							'Use appropriate padding and spacing'
+						]
+					},
+					{
+						heading: 'Pro Tips',
+						bullets: [
+							'Use line numbers for longer code snippets',
+							'Test different background styles',
+							'Consider platform-specific image sizes',
+							'Save favorite settings for consistency'
+						]
+					}
+				]}
+			/>
+		</LongformSection>
 
-				<div class="space-y-4">
-					<h4 class="font-semibold text-lg text-brand-ink flex items-center gap-2">
-						<span
-							class="w-8 h-8 bg-brand-proof text-brand-ink border border-brand-ink flex items-center justify-center text-sm"
-							>🎨</span
-						>
-						Visual Design
-					</h4>
-					<div class="space-y-2">
-						<div
-							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
-						>
-							<svg
-								class="w-5 h-5 text-brand-proof flex-shrink-0"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M5 13l4 4L19 7"
-								/>
-							</svg>
-							<span class="font-bold text-brand-ink text-sm"
-								>Choose themes that match your brand</span
-							>
-						</div>
-						<div
-							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
-						>
-							<svg
-								class="w-5 h-5 text-brand-proof flex-shrink-0"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M5 13l4 4L19 7"
-								/>
-							</svg>
-							<span class="font-bold text-brand-ink text-sm"
-								>Use high-contrast themes for readability</span
-							>
-						</div>
-						<div
-							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
-						>
-							<svg
-								class="w-5 h-5 text-brand-proof flex-shrink-0"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M5 13l4 4L19 7"
-								/>
-							</svg>
-							<span class="font-bold text-brand-ink text-sm"
-								>Select clear, professional-looking fonts</span
-							>
-						</div>
-						<div
-							class="bg-brand-subtle border border-brand-ink p-3 flex items-start gap-3 transition-all"
-						>
-							<svg
-								class="w-5 h-5 text-brand-proof flex-shrink-0"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M5 13l4 4L19 7"
-								/>
-							</svg>
-							<span class="font-bold text-brand-ink text-sm"
-								>Use appropriate padding and spacing</span
-							>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="mt-8 p-5 bg-brand-field border border-brand-ink">
-				<h4 class="font-semibold text-lg text-brand-ink mb-4 flex items-center gap-2">
-					<span
-						class="w-7 h-7 bg-brand-ink text-white border border-brand-ink flex items-center justify-center text-sm"
-						>💡</span
-					>
-					Pro Tips
-				</h4>
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-					<div class="flex items-start gap-2 p-2">
-						<span class="font-semibold text-brand-ink">→</span>
-						<span class="font-bold text-brand-ink text-sm"
-							>Use line numbers for longer code snippets</span
-						>
-					</div>
-					<div class="flex items-start gap-2 p-2">
-						<span class="font-semibold text-brand-ink">→</span>
-						<span class="font-bold text-brand-ink text-sm">Test different background styles</span>
-					</div>
-					<div class="flex items-start gap-2 p-2">
-						<span class="font-semibold text-brand-ink">→</span>
-						<span class="font-bold text-brand-ink text-sm"
-							>Consider platform-specific image sizes</span
-						>
-					</div>
-					<div class="flex items-start gap-2 p-2">
-						<span class="font-semibold text-brand-ink">→</span>
-						<span class="font-bold text-brand-ink text-sm"
-							>Save favorite settings for consistency</span
-						>
-					</div>
-				</div>
-			</div>
-		</section>
+		<LongformSection index="07" id="faq" title="Frequently Asked Questions">
+			<FaqList faqs={FAQS} />
+		</LongformSection>
 
-		<!-- FAQ Section -->
-		<section
-			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
-		>
-			<div
-				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-proof border border-brand-ink text-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
-			>
-				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-					/></svg
-				>
-				FAQ
-			</div>
-			<h3
-				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-8 text-brand-ink tracking-tight"
-			>
-				Frequently Asked Questions
-			</h3>
-			<div class="space-y-3">
-				<details
-					class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
-				>
-					<summary
-						class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none"
-					>
-						<span class="text-sm">What programming languages are supported?</span>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-					</summary>
-					<div class="p-4 pt-0 text-brand-slate border-t border-brand-ink bg-brand-paper text-sm">
-						We support 25+ programming languages including JavaScript, TypeScript, Python, Java,
-						C++, C#, PHP, Ruby, Go, Rust, Swift, HTML, CSS, SQL, JSON, YAML, Markdown, and many
-						more.
-					</div>
-				</details>
-
-				<details
-					class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
-				>
-					<summary
-						class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none"
-					>
-						<span class="text-sm">Can I customize the appearance?</span>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-					</summary>
-					<div class="p-4 pt-0 text-brand-slate border-t border-brand-ink bg-brand-paper text-sm">
-						Yes! Choose from 18+ themes, 12+ coding fonts, customize padding, border radius,
-						background styles, window frames, and advanced effects like shadows and blur.
-					</div>
-				</details>
-
-				<details
-					class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
-				>
-					<summary
-						class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none"
-					>
-						<span class="text-sm">What image formats are supported?</span>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-					</summary>
-					<div class="p-4 pt-0 text-brand-slate border-t border-brand-ink bg-brand-paper text-sm">
-						We generate high-quality PNG images, perfect for social media, documentation, and
-						presentations with crisp text rendering and transparency support.
-					</div>
-				</details>
-
-				<details
-					class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
-				>
-					<summary
-						class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none"
-					>
-						<span class="text-sm">Is there a limit on code length?</span>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-					</summary>
-					<div class="p-4 pt-0 text-brand-slate border-t border-brand-ink bg-brand-paper text-sm">
-						No strict limit, but we recommend keeping snippets reasonably sized for best visual
-						results. Focus on the most important parts of your code.
-					</div>
-				</details>
-
-				<details
-					class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
-				>
-					<summary
-						class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none"
-					>
-						<span class="text-sm">Can I use images commercially?</span>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-					</summary>
-					<div class="p-4 pt-0 text-brand-slate border-t border-brand-ink bg-brand-paper text-sm">
-						Yes! All generated images can be used for personal and commercial purposes. Guest limits
-						may apply, and free accounts remove watermarks.
-					</div>
-				</details>
-			</div>
-		</section>
-
-		<!-- Supported Languages Section -->
-		<section
-			class="mb-8 sm:mb-12 bg-brand-paper border border-brand-ink p-4 sm:p-6 md:p-10 sm:hover: transition-all duration-300"
-		>
-			<div
-				class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-field border border-brand-ink text-brand-ink text-[10px] sm:text-xs font-semibold tracking-wider mb-4 sm:mb-6"
-			>
-				<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-					/></svg
-				>
-				Languages
-			</div>
-			<h3
-				class="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-brand-ink tracking-tight"
-			>
-				Supported Programming Languages
-			</h3>
-			<p class="text-sm sm:text-base text-brand-slate leading-relaxed mb-4 sm:mb-6">
-				Our code to image generator supports syntax highlighting for all major programming
-				languages:
-			</p>
-			<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-3">
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">⚡</div>
-					<span class="font-bold text-brand-ink text-xs">JavaScript</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">🔷</div>
-					<span class="font-bold text-brand-ink text-xs">TypeScript</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">🐍</div>
-					<span class="font-bold text-brand-ink text-xs">Python</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">☕</div>
-					<span class="font-bold text-brand-ink text-xs">Java</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">⚙️</div>
-					<span class="font-bold text-brand-ink text-xs">C++</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">🔷</div>
-					<span class="font-bold text-brand-ink text-xs">C#</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">🐘</div>
-					<span class="font-bold text-brand-ink text-xs">PHP</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">💎</div>
-					<span class="font-bold text-brand-ink text-xs">Ruby</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">🐹</div>
-					<span class="font-bold text-brand-ink text-xs">Go</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">🦀</div>
-					<span class="font-bold text-brand-ink text-xs">Rust</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">🍎</div>
-					<span class="font-bold text-brand-ink text-xs">Swift</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">🌐</div>
-					<span class="font-bold text-brand-ink text-xs">HTML</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">🎨</div>
-					<span class="font-bold text-brand-ink text-xs">CSS</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">🗃️</div>
-					<span class="font-bold text-brand-ink text-xs">SQL</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">📄</div>
-					<span class="font-bold text-brand-ink text-xs">JSON</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">📝</div>
-					<span class="font-bold text-brand-ink text-xs">YAML</span>
-				</div>
-				<div class="bg-brand-subtle border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">📋</div>
-					<span class="font-bold text-brand-ink text-xs">Markdown</span>
-				</div>
-				<div class="bg-brand-pink border border-brand-ink p-3 text-center transition-all">
-					<div class="text-xl mb-1">+</div>
-					<span class="font-bold text-white text-xs">More!</span>
-				</div>
-			</div>
-		</section>
+		<LongformSection index="08" id="languages" title="Supported Programming Languages">
+			<Prose>
+				<p>
+					Our code to image generator supports syntax highlighting for all major programming
+					languages:
+				</p>
+			</Prose>
+			<TagList
+				items={[
+					'JavaScript',
+					'TypeScript',
+					'Python',
+					'Java',
+					'C++',
+					'C#',
+					'PHP',
+					'Ruby',
+					'Go',
+					'Rust',
+					'Swift',
+					'HTML',
+					'CSS',
+					'SQL',
+					'JSON',
+					'YAML',
+					'Markdown',
+					'More!'
+				]}
+			/>
+		</LongformSection>
 	</svelte:fragment>
 
+	<!--
+		One footer link block, not two: the v1 RelatedTools section and a second
+		pill list used to render one under the other. Union of both hrefs, anchor
+		text unchanged.
+	-->
 	<svelte:fragment slot="footer-links">
-		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
-			<RelatedTools tools={['json-to-image', 'markdown', 'api-response-card', 'changelog-card']} />
-			<!-- Related Tools -->
-			<section class="mb-12 max-w-5xl mx-auto px-4">
-				<h3 class="text-xl font-semibold mb-4 text-brand-ink text-center">Related Tools</h3>
-				<div class="flex flex-wrap gap-3 justify-center">
-					<a
-						href="/tools/html-to-png"
-						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field transition-all"
-						>HTML to PNG</a
-					>
-					<a
-						href="/tools/url-to-image-generator"
-						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field transition-all"
-						>URL to Image</a
-					>
-					<a
-						href="/tools/og-image-generator"
-						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field transition-all"
-						>OG Image Generator</a
-					>
-					<a
-						href="/tools/markdown"
-						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field transition-all"
-						>Markdown to Image</a
-					>
-					<a
-						href="/alternatives"
-						class="px-4 py-2 border border-brand-ink bg-brand-paper font-bold text-sm hover:bg-brand-field transition-all"
-						>Compare Alternatives</a
-					>
-				</div>
-			</section>
-		</div>
+		<RelatedLinks
+			toolName={TOOL_NAME}
+			links={[
+				{ href: '/tools/html-to-png', label: 'HTML to PNG' },
+				{ href: '/tools/url-to-image-generator', label: 'URL to Image' },
+				{ href: '/tools/og-image-generator', label: 'OG Image Generator' },
+				{ href: '/tools/markdown', label: 'Markdown to Image' },
+				{ href: '/alternatives', label: 'Compare Alternatives' },
+				{ href: '/tools', label: 'View all tools →' }
+			]}
+		/>
 	</svelte:fragment>
 </ToolPageShell>
 
