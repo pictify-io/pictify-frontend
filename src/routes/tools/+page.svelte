@@ -10,176 +10,66 @@
 	 * static/landing/tools/<slug>.svg. It is decoration, never content, so it
 	 * ships as an aria-hidden <img> with an empty alt.
 	 */
+	import { TOOL_CARDS } from '$lib/pseo/tool-cards.js';
 	import Nav from '$lib/components/landing/Nav.svelte';
 	import Footer from '$lib/components/landing/Footer.svelte';
 
 	// The two wedge tools. They carry a colour-offset shadow and a full-height
 	// art pane; nothing else on the page does.
+	/**
+	 * Title, mono meta line, art path and structured-data sentence come from the
+	 * shared registry; only what is specific to a hub card — the badge and the
+	 * coloured shadow — lives here. The wedge cards render `desc` as their blurb,
+	 * which is the same string the ItemList carries, so the two cannot drift.
+	 */
 	const wedge = [
 		{
-			title: 'CSV to PDF',
-			href: '/tools/csv-to-pdf',
+			...TOOL_CARDS['csv-to-pdf'],
 			badge: 'MOST USED',
 			badgeClass: 'bg-brand-field',
-			blurb: 'A spreadsheet in, one polished PDF out. Or one document per row, when you sign in.',
-			meta: 'CSV → PDF',
-			art: '/landing/tools/csv-to-pdf.svg',
 			// Literal shadow classes: Tailwind scans this file as text, so the
 			// utilities have to appear spelled out somewhere in it.
 			shadow: 'shadow-[4px_4px_0_0_#0054A6] hover:shadow-[6px_6px_0_0_#0054A6]'
 		},
 		{
-			title: 'Certificate generator',
-			href: '/tools/certificate-generator',
+			...TOOL_CARDS['certificate-generator'],
 			badge: 'BATCH READY',
 			badgeClass: 'bg-brand-powder',
-			blurb:
-				'Five templates, live preview, clean PNG. Point a sheet at it and every attendee gets theirs.',
-			meta: 'NAMES → CERTIFICATES',
-			art: '/landing/tools/certificate-generator.svg',
 			shadow: 'shadow-[4px_4px_0_0_#FF48B0] hover:shadow-[6px_6px_0_0_#FF48B0]'
 		}
 	];
 
 	// Four labelled shelves, four tools each. `desc` is not rendered — it is the
 	// description carried into the ItemList structured data.
+	// Four labelled shelves, four tools each, by registry slug.
 	const sections = [
-		{
-			label: 'MARKUP → IMAGE',
-			tools: [
-				{
-					title: 'HTML to image',
-					meta: 'HTML → PNG · JPG · WEBP',
-					href: '/tools/html-to-image',
-					art: '/landing/tools/html-to-image.svg',
-					desc: 'Convert HTML & CSS to PNG, JPG, or WebP. Free converter with API access.'
-				},
-				{
-					title: 'Code to image',
-					meta: 'SNIPPET → PNG',
-					href: '/tools/code-to-image',
-					art: '/landing/tools/code-to-image.svg',
-					desc: 'Turn code snippets into beautiful images with themes and fonts.'
-				},
-				{
-					title: 'Markdown to image',
-					meta: 'MD → PNG',
-					href: '/tools/markdown',
-					art: '/landing/tools/markdown-to-image.svg',
-					desc: 'Convert markdown to shareable images with themes and fonts.'
-				},
-				{
-					title: 'Table to image',
-					meta: 'CSV · HTML → PNG',
-					href: '/tools/table',
-					art: '/landing/tools/table-to-image.svg',
-					desc: 'Turn CSV data or HTML tables into polished, shareable table images.'
-				}
-			]
-		},
+		{ label: 'MARKUP → IMAGE', tools: ['html-to-image', 'code-to-image', 'markdown', 'table'] },
 		{
 			label: 'SOCIAL & OG',
 			tools: [
-				{
-					title: 'OG image generator',
-					meta: 'TITLE · LOGO → 1200×630',
-					href: '/tools/og-image-generator',
-					art: '/landing/tools/og-image-generator.svg',
-					desc: 'Create custom Open Graph images for social sharing and search previews.'
-				},
-				{
-					title: 'Tweet screenshot',
-					meta: 'TWEET URL → PNG',
-					href: '/tools/tweet-screenshot',
-					art: '/landing/tools/tweet-screenshot.svg',
-					desc: 'Paste any tweet URL, edit every field, download a clean PNG. No API key needed.'
-				},
-				{
-					title: 'LinkedIn banner',
-					meta: 'TEMPLATE → 1584×396',
-					href: '/tools/linkedin-banner-generator',
-					art: '/landing/tools/linkedin-banner.svg',
-					desc: 'Create LinkedIn banners from 20+ templates for developers, marketers, and more.'
-				},
-				{
-					title: 'Social proof card',
-					meta: 'REVIEW → PNG',
-					href: '/tools/social-proof-card',
-					art: '/landing/tools/social-proof-card.svg',
-					desc: 'Turn a review or testimonial into a branded card image.'
-				}
+				'og-image-generator',
+				'tweet-screenshot',
+				'linkedin-banner-generator',
+				'social-proof-card'
 			]
 		},
 		{
 			label: 'CAPTURE & DOCUMENTS',
 			tools: [
-				{
-					title: 'URL to image',
-					meta: 'ANY URL → SCREENSHOT',
-					href: '/tools/url-to-image-generator',
-					art: '/landing/tools/url-to-image.svg',
-					desc: 'Screenshot any URL at any size, straight from the browser or the API.'
-				},
-				{
-					title: 'Invoice generator',
-					meta: 'LINE ITEMS → PNG',
-					href: '/tools/online-invoice-generator',
-					art: '/landing/tools/invoice-generator.svg',
-					desc: 'Create professional invoices quickly with a free online generator.'
-				},
-				{
-					title: 'Email header',
-					meta: 'TEXT · BRAND → PNG',
-					href: '/tools/email-header',
-					art: '/landing/tools/email-header.svg',
-					desc: 'Generate branded email header images for campaigns and newsletters.'
-				},
-				{
-					title: 'Barcode & QR',
-					meta: 'VALUE → PNG',
-					href: '/tools/barcode-generator',
-					art: '/landing/tools/barcode-qr.svg',
-					desc: 'Render barcodes and QR codes as images from any value.'
-				}
+				'url-to-image-generator',
+				'online-invoice-generator',
+				'email-header',
+				'barcode-generator'
 			]
 		},
 		{
 			label: 'WIDGETS & CARDS',
-			tools: [
-				{
-					title: 'Badge maker',
-					meta: 'TEXT → PNG',
-					href: '/tools/badge',
-					art: '/landing/tools/badge-maker.svg',
-					desc: 'Build status and achievement badges as images.'
-				},
-				{
-					title: 'Leaderboard',
-					meta: 'ROWS → PNG',
-					href: '/tools/leaderboard',
-					art: '/landing/tools/leaderboard.svg',
-					desc: 'Turn ranked rows into a shareable leaderboard card.'
-				},
-				{
-					title: 'Membership card',
-					meta: 'MEMBER → PNG',
-					href: '/tools/membership-card',
-					art: '/landing/tools/membership-card.svg',
-					desc: 'Generate membership and loyalty cards for every member on file.'
-				},
-				{
-					title: 'Portfolio card',
-					meta: 'PROFILE → PNG',
-					href: '/tools/portfolio-card',
-					art: '/landing/tools/portfolio-card.svg',
-					desc: 'Render profile and portfolio cards from a template.'
-				}
-			]
+			tools: ['badge', 'leaderboard', 'membership-card', 'portfolio-card']
 		}
-	];
+	].map((section) => ({ ...section, tools: section.tools.map((slug) => TOOL_CARDS[slug]) }));
 
 	const allTools = [
-		...wedge.map((t) => ({ name: t.title, url: t.href, description: t.blurb })),
+		...wedge.map((t) => ({ name: t.title, url: t.href, description: t.desc })),
 		...sections.flatMap((s) =>
 			s.tools.map((t) => ({ name: t.title, url: t.href, description: t.desc }))
 		)
@@ -306,7 +196,7 @@
 							>
 								{tool.title}
 							</h2>
-							<p class="font-sans text-sm leading-[21px] text-brand-slate">{tool.blurb}</p>
+							<p class="font-sans text-sm leading-[21px] text-brand-slate">{tool.desc}</p>
 							<span class="font-mono text-[11px] leading-[14px] tracking-[0.04em] text-brand-mute"
 								>{tool.meta}</span
 							>
