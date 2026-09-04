@@ -28,6 +28,14 @@
 	export let lang = 'auto';
 	/** Chrome off: the playground frames its own code panes. */
 	export let bare = false;
+	/**
+	 * Wrap long lines, or let them run and scroll horizontally.
+	 *
+	 * Wrapping suits a narrow rail beside prose. It is wrong for a code pane: a
+	 * re-flowed line stops matching the line number beside it, and a JSON value
+	 * can no longer be read as one run.
+	 */
+	export let wrap = true;
 
 	$: html = highlightToHtml(code, lang);
 </script>
@@ -37,7 +45,9 @@
 	style={bare ? '' : `background-color: ${PRESS.bg}`}
 >
 	<pre
-		class="{maxHeight} overflow-auto whitespace-pre-wrap break-words font-mono {bare
+		class="{maxHeight} overflow-auto {wrap
+			? 'whitespace-pre-wrap break-words'
+			: 'whitespace-pre'} font-mono {bare
 			? 'text-[12px] leading-[19px]'
 			: 'text-[11px] leading-[17px]'}"
 		style="color: {PRESS.text}">{@html html}</pre>

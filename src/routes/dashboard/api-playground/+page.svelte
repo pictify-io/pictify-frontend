@@ -2,11 +2,16 @@
 	/**
 	 * API playground — a workbench, not a reference index.
 	 *
-	 * Three lanes on one screen: the calls you can make, the request you are
-	 * about to send, and the answer. The request-as-code and the response are
-	 * BOTH visible at once, which is the whole reason this page exists — the
-	 * previous version made them tabs, so reading the answer hid the call that
-	 * produced it, and comparing the two meant clicking back and forth.
+	 * A quiet calls list, then two cards: Input and Result.
+	 *
+	 * Three earlier shapes were rejected for the same reason — too much on
+	 * screen at once. The fix is not a smaller version of everything; it is
+	 * showing one thing at a time in the Result card. Preview, JSON and Code are
+	 * three views of the same answer, so only one needs to be on screen, and the
+	 * status chip in the header says how the call went whichever is showing.
+	 *
+	 * The calls list stays visible: it is how you learn what the API can do, and
+	 * hiding it behind a dropdown was rejected outright.
 	 *
 	 * Everything here is real: your key, your quota, and the renders land on the
 	 * Renders page like any other. The status is whatever the server said, taken
@@ -208,8 +213,22 @@
 
 	const ALL = GROUPS.flatMap((g) => g.calls);
 
+	/** How each format is written on screen; the value sent is still the id. */
+	const FORMAT_LABELS = {
+		WEBP: 'WebP',
+		MP4: 'MP4',
+		GIF: 'GIF',
+		PNG: 'PNG',
+		JPG: 'JPG',
+		PDF: 'PDF'
+	};
+
 	let openId = 'html-image';
 	let selection = {};
+	/** 'PREVIEW' | 'JSON' | 'CODE' — which view of the answer is showing. */
+	let resultTab = 'PREVIEW';
+	let recentOpen = false;
+	let moreOptions = false;
 	let sending = false;
 	let response = null;
 	let showHeaders = false;
@@ -251,17 +270,15 @@
 	const grabView = EditorView.updateListener.of((u) => {
 		editorView = u.view;
 	});
+	/*
+	 * No lineWrapping. A wrapped line stops lining up with its gutter number,
+	 * and both the validation line and the 422 fix hint count lines — "line 5"
+	 * has to mean the fifth number in the gutter. Long lines scroll sideways.
+	 */
 	$: editorExtensions =
 		call.editor === 'html'
-			? [...pressTheme, lineNumbers(), EditorView.lineWrapping, htmlLang(), grabView]
-			: [
-					...pressTheme,
-					lineNumbers(),
-					EditorView.lineWrapping,
-					jsonLang(),
-					linter(jsonParseLinter()),
-					grabView
-			  ];
+			? [...pressTheme, lineNumbers(), htmlLang(), grabView]
+			: [...pressTheme, lineNumbers(), jsonLang(), linter(jsonParseLinter()), grabView];
 
 	/** The text in the editor for this call, as a string. */
 	$: editorValue =
@@ -401,6 +418,7 @@
 		response = null;
 		showHeaders = false;
 		previewDims = '';
+		recentOpen = false;
 		clearTimeout(batchTimer);
 
 		const req = sendableRequest;
@@ -437,6 +455,14 @@
 				usageWidget.update((u) => ({ ...u, current: (u.current || 0) + 1 }));
 			}
 			pushRecent(raw.status, latencyMs);
+			/*
+			 * Land on whichever view actually answers the question. A 2xx that
+			 * produced a file has something to look at; anything else, the JSON is
+			 * the answer and the preview stage would just say "nothing here".
+			 */
+			const file =
+				body?.url || body?.image?.url || body?.media?.url || body?.results?.[0]?.url || null;
+			resultTab = raw.ok && file ? 'PREVIEW' : 'JSON';
 			const id = body?.batchId || body?.batch?.id;
 			if (raw.status === 202 && id) pollBatch(id);
 		} catch (e) {
@@ -450,6 +476,7 @@
 				body: { error: e?.message || 'The request never reached the server.' }
 			};
 			pushRecent(0, response.latencyMs);
+			resultTab = 'JSON';
 		} finally {
 			sending = false;
 		}
@@ -537,6 +564,44 @@
 		? `${Math.round(response.latencyMs / 1000)} s`
 		: `${(response.latencyMs / 1000).toFixed(2)} s`;
 	$: responseJson = response ? JSON.stringify(response.body, null, 2) : '';
+	$: responseBytes = response
+		? Number(response.headers?.['content-length']) || new Blob([responseJson]).size
+		: 0;
+	$: sizeText =
+		responseBytes > 1024 ? `${(responseBytes / 1024).toFixed(1)} KB` : `${responseBytes} B`;
+
+	/** `PNG · 1200 × 630 · 142 KB · saved to your renders` under the stage. */
+	$: resultMeta = [
+		(state.format || call.formats?.[0] || '').toUpperCase(),
+		previewDims,
+		responseBytes ? sizeText : '',
+		response?.ok ? 'saved to your renders' : ''
+	]
+		.filter(Boolean)
+		.join(' · ');
+
+	/**
+	 * The status square's colour, as a utility class pair (background, text).
+	 * Proof-green for 2xx, field-yellow for a queued 202, pink for everything
+	 * else including a transport failure, which has no HTTP status at all.
+	 */
+	$: statusClass =
+		!response || response.status === 0
+			? 'bg-brand-pink text-brand-pink'
+			: response.status === 202
+			? 'bg-brand-field text-brand-field'
+			: response.status >= 200 && response.status < 300
+			? 'bg-brand-proof text-brand-proof'
+			: response.status < 400
+			? 'bg-brand-field text-brand-field'
+			: 'bg-brand-pink text-brand-pink';
+
+	/** The header chip. Reads `Idle` until something has been sent. */
+	$: statusChip = sending
+		? 'Sending…'
+		: response
+		? `${response.status || 'ERR'} · ${latencyText}`
+		: 'Idle';
 	$: errorField = findErrorField(response);
 
 	/** The field an error names, so the hint can offer to jump to it. */
@@ -578,10 +643,7 @@
 
 	function onImageLoad(e) {
 		const img = e.currentTarget;
-		const bytes = Number(response?.headers?.['content-length']) || response?.body?.size || 0;
-		previewDims = `${img.naturalWidth}×${img.naturalHeight}${
-			bytes ? ` · ${Math.round(bytes / 1024)} KB` : ''
-		}`;
+		previewDims = `${img.naturalWidth} × ${img.naturalHeight}`;
 	}
 
 	function onKeydown(e) {
@@ -621,254 +683,151 @@
 
 <Toast />
 
-<div
-	class="flex h-full w-full flex-col gap-[22px] bg-brand-paper px-6 pb-8 pt-6 lg:px-11 lg:pb-8 lg:pt-9"
->
-	<!-- ── Header ──────────────────────────────────────────────────── -->
-	<div
-		class="flex flex-shrink-0 flex-col gap-3 min-[900px]:flex-row min-[900px]:items-end min-[900px]:justify-between"
-	>
-		<div class="flex flex-wrap items-baseline gap-3.5">
-			<h1
-				class="font-display text-[44px] font-bold leading-[48px] tracking-[-0.02em] text-brand-ink"
-			>
-				API playground
-			</h1>
-			<p class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">
-				REAL CALLS · YOUR KEY · LANDS IN RENDERS
-			</p>
-		</div>
-		<div class="flex h-[34px] w-fit items-center gap-2 rounded-btn border border-brand-rule px-3">
-			<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">KEY</span>
-			<span class="font-mono text-xs text-brand-ink">{keyMasked}</span>
+<div class="flex h-full w-full flex-col gap-5 bg-brand-paper px-6 py-6 lg:px-8 lg:py-7">
+	<!-- ── Title ───────────────────────────────────────────────────── -->
+	<div class="flex flex-shrink-0 items-center justify-between gap-4">
+		<h1 class="font-display text-[26px] font-bold leading-[30px] tracking-[-0.02em] text-brand-ink">
+			API playground
+		</h1>
+		<div class="flex flex-shrink-0 items-center gap-2.5">
+			<span class="font-mono text-xs text-brand-slate">{keyMasked}</span>
 			<button
 				type="button"
-				class="font-mono text-[11px] tracking-[0.06em] text-brand-blue hover:underline"
-				on:click={() => copyToClipboard(key, 'API key copied')}>COPY</button
-			>
-			<span class="h-3.5 w-px bg-brand-rule" aria-hidden="true" />
-			<a
-				href="/dashboard/settings"
-				class="font-mono text-[11px] tracking-[0.06em] text-brand-blue hover:underline">ROTATE</a
+				on:click={() => copyToClipboard(key, 'API key copied')}
+				class="font-sans text-[13px] font-medium text-brand-blue hover:underline">Copy key</button
 			>
 		</div>
 	</div>
 
-	<!-- ── Workbench ───────────────────────────────────────────────── -->
-	<div class="flex min-h-0 flex-1 flex-col gap-4 min-[1200px]:flex-row">
-		<!-- Calls lane -->
-		<div class="flex flex-shrink-0 flex-col gap-0.5 min-[1200px]:w-[216px]">
-			<!-- Below 900 the lane collapses to a select; the rows would push the
-			     request off the screen on a phone. -->
-			<label class="flex flex-col gap-1.5 min-[900px]:hidden">
-				<span class="font-mono text-[10px] tracking-[0.08em] text-brand-mute">CALL</span>
-				<select
-					bind:value={openId}
-					class="h-9 rounded-btn border border-brand-ink bg-brand-paper px-2.5 font-mono text-xs text-brand-ink"
+	<div class="flex min-h-0 flex-1 flex-col gap-5 min-[900px]:flex-row">
+		<!-- ── Calls ───────────────────────────────────────────────── -->
+		<!-- Quiet on purpose: no card, no rules, no method chips. The method is
+		     in the Input header, where it belongs to the call you are editing. -->
+		<div
+			class="flex flex-shrink-0 gap-0.5 overflow-x-auto pt-1 min-[900px]:w-[168px] min-[900px]:flex-col min-[900px]:overflow-visible min-[1440px]:w-[180px]"
+		>
+			{#each GROUPS as group (group.title)}
+				<p
+					class="hidden px-2 pb-1.5 pt-3.5 font-mono text-[10px] tracking-[0.08em] text-brand-mute first:pt-0 min-[900px]:block"
 				>
-					{#each GROUPS as g (g.title)}
-						<optgroup label={g.title}>
-							{#each g.calls as c (c.id)}<option value={c.id}>{c.method} · {c.name}</option>{/each}
-						</optgroup>
-					{/each}
-				</select>
-			</label>
-
-			<div class="hidden flex-col gap-0.5 min-[900px]:flex min-[1200px]:h-full">
-				{#each GROUPS as group, gi (group.title)}
-					<div class="flex items-center gap-2.5 pb-1 {gi === 0 ? 'h-7' : 'h-[42px] pt-3.5'}">
-						<span class="flex-shrink-0 font-mono text-[11px] tracking-[0.08em] text-brand-ink">
-							{group.title}
-						</span>
-						<span class="h-px flex-1 bg-brand-rule" aria-hidden="true" />
-					</div>
-					{#each group.calls as c (c.id)}
-						<button
-							type="button"
-							on:click={() => (openId = c.id)}
-							class="flex h-10 items-center gap-2.5 rounded-btn px-2.5 text-left transition-colors {openId ===
-							c.id
-								? 'bg-brand-field'
-								: 'hover:bg-brand-subtle'}"
-						>
-							<span
-								class="w-9 flex-shrink-0 font-mono text-[10px] tracking-[0.06em] {openId === c.id
-									? 'text-brand-ink'
-									: 'text-brand-mute'}"
-							>
-								{c.method}
-							</span>
-							<span
-								class="flex-1 font-sans text-[13.5px] leading-[18px] {openId === c.id
-									? 'font-semibold text-brand-ink'
-									: 'text-brand-slate'}"
-							>
-								{c.name}
-							</span>
-						</button>
-					{/each}
-				{/each}
-
-				<div class="flex-1" aria-hidden="true" />
-
-				<div class="flex flex-col gap-2 border-t border-brand-rule pt-3.5">
-					<p class="font-mono text-[11px] tracking-[0.08em] text-brand-mute">
-						RECENT · THIS BROWSER
-					</p>
-					{#each recent as r (r.at)}
-						<button
-							type="button"
-							on:click={() => restoreRecent(r)}
-							class="flex h-6 items-center gap-2 text-left hover:opacity-70"
-						>
-							<span
-								class="h-2 w-2 flex-shrink-0"
-								style="background-color: {r.status >= 200 && r.status < 300
-									? '#00BE43'
-									: '#FF48B0'}"
-								aria-hidden="true"
-							/>
-							<span class="flex-1 truncate font-mono text-[11.5px] text-brand-slate">
-								{shortPath(r.path)} · {r.status || 'ERR'} · {(r.latencyMs / 1000).toFixed(1)}s
-							</span>
-							<span class="font-mono text-[10px] text-brand-mute">{clock(r.at)}</span>
-						</button>
-					{:else}
-						<p class="font-mono text-[11px] text-brand-mute">Nothing sent yet.</p>
-					{/each}
-					<a
-						href={DOCS}
-						target="_blank"
-						rel="noopener"
-						class="pt-1.5 font-mono text-[11px] tracking-[0.06em] text-brand-blue hover:underline"
+					{group.title}
+				</p>
+				{#each group.calls as c (c.id)}
+					<button
+						type="button"
+						on:click={() => (openId = c.id)}
+						class="flex h-8 flex-shrink-0 items-center gap-2 rounded-md px-2 text-left {openId ===
+						c.id
+							? 'bg-brand-subtle'
+							: 'hover:bg-brand-subtle/60'}"
 					>
-						MORE ENDPOINTS IN THE DOCS →
-					</a>
-				</div>
-			</div>
+						<span
+							class="flex-1 whitespace-nowrap font-sans text-[13.5px] leading-[18px] {openId ===
+							c.id
+								? 'font-semibold text-brand-ink'
+								: 'text-brand-slate'}"
+						>
+							{c.name}
+						</span>
+						{#if openId === c.id}
+							<span class="h-1.5 w-1.5 flex-shrink-0 bg-brand-field" aria-hidden="true" />
+						{/if}
+					</button>
+				{/each}
+			{/each}
+
+			<div class="hidden flex-1 min-[900px]:block" aria-hidden="true" />
+
+			<a
+				href={DOCS}
+				target="_blank"
+				rel="noopener"
+				class="hidden whitespace-nowrap font-sans text-[12.5px] text-brand-blue hover:underline min-[900px]:block"
+			>
+				All endpoints in the docs ↗
+			</a>
 		</div>
 
-		<!-- Request lane -->
+		<!-- ── Input ───────────────────────────────────────────────── -->
 		<div
-			class="flex min-h-0 flex-shrink-0 flex-col overflow-hidden rounded-card border border-brand-rule min-[1200px]:w-[372px]"
+			class="flex min-h-0 flex-col gap-4 rounded-xl border border-brand-rule p-5 min-[1200px]:w-[348px] min-[1200px]:flex-shrink-0 min-[1440px]:w-[384px]"
 		>
-			<div class="flex flex-col gap-1.5 border-b border-brand-rule px-5 pb-3.5 pt-4">
-				<div class="flex items-center justify-between gap-3">
-					<div class="flex min-w-0 items-baseline gap-2">
-						<span class="flex-shrink-0 font-mono text-xs text-brand-mute">{call.method}</span>
-						<span class="truncate font-mono text-[13px] text-brand-ink">{call.path(state)}</span>
-					</div>
-					<a
-						href={call.docs}
-						target="_blank"
-						rel="noopener"
-						class="flex-shrink-0 font-mono text-[11px] tracking-[0.06em] text-brand-blue hover:underline"
-					>
-						DOCS ↗
-					</a>
-				</div>
-				<p class="font-sans text-[13px] leading-[19px] text-brand-slate">{call.blurb}</p>
+			<div class="flex items-baseline justify-between gap-3">
+				<h2 class="font-sans text-[15px] font-semibold leading-[18px] text-brand-ink">Input</h2>
+				<span class="truncate font-mono text-[11.5px] text-brand-mute" title={call.blurb}>
+					{call.method}
+					{call.path(state)}
+				</span>
 			</div>
 
-			<!-- Body field -->
-			<div class="flex min-h-0 flex-1 flex-col gap-2 px-5 pt-4">
-				{#if call.needsTemplate}
-					<p class="font-mono text-[10px] tracking-[0.08em] text-brand-mute">
-						TEMPLATE · FROM YOUR ACCOUNT
-					</p>
+			{#if call.needsTemplate}
+				<div class="flex flex-col gap-2">
+					<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">Template</span>
 					<TemplateSelector
 						value={state.uid || ''}
 						selectedTemplate={state.template || null}
 						placeholder="Pick a template…"
 						on:change={pickTemplate}
 					/>
-				{/if}
+				</div>
+			{/if}
 
-				{#if call.idField}
-					<p class="font-mono text-[10px] tracking-[0.08em] text-brand-mute">
+			{#if call.idField}
+				<div class="flex flex-col gap-2">
+					<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">
 						{call.idField.label}
-					</p>
+					</span>
 					<input
 						value={state[call.idField.key] || ''}
 						on:input={(e) => setField(call.idField.key, e.currentTarget.value)}
 						placeholder={call.idField.placeholder}
-						class="h-9 rounded-btn border border-brand-ink px-3 font-mono text-[12.5px] text-brand-ink outline-none"
+						class="h-8 rounded-md border border-brand-rule px-2.5 font-mono text-[12.5px] text-brand-ink outline-none focus:border-brand-ink"
 					/>
-				{/if}
+				</div>
+			{/if}
 
-				{#if call.editor === 'none'}
-					<p class="pt-2 font-sans text-[13px] leading-[19px] text-brand-mute">
-						This call has no body.
-					</p>
-				{:else}
-					<div class="flex items-center justify-between pt-2.5">
-						<div class="flex gap-3.5">
-							{#if call.editor === 'html'}
-								{#each ['HTML', 'URL'] as t (t)}
-									<button
-										type="button"
-										on:click={() => setField('mode', t)}
-										class="pb-1 font-mono text-[11px] tracking-[0.08em] {(state.mode || 'HTML') ===
-										t
-											? 'border-b-2 border-brand-ink text-brand-ink'
-											: 'text-brand-mute'}">{t}</button
-									>
-								{/each}
-							{:else if call.editor === 'vars'}
-								{#each ['VARIABLES', 'FORM'] as t (t)}
-									<button
-										type="button"
-										on:click={() => setField('varsTab', t)}
-										class="pb-1 font-mono text-[11px] tracking-[0.08em] {(state.varsTab ||
-											'VARIABLES') === t
-											? 'border-b-2 border-brand-ink text-brand-ink'
-											: 'text-brand-mute'}">{t}</button
-									>
-								{/each}
-							{:else}
-								<span class="pb-1 font-mono text-[11px] tracking-[0.08em] text-brand-ink">
-									{call.editor === 'csv' ? 'CSV' : 'VARIABLE SETS'}
-								</span>
-							{/if}
-						</div>
-						<div class="flex gap-3">
+			{#if call.editor !== 'none'}
+				<!-- The body field. It grows; every other row is fixed. -->
+				<div class="flex min-h-0 flex-1 flex-col gap-2">
+					<div class="flex items-center justify-between gap-3">
+						<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">
+							{call.editor === 'html'
+								? 'HTML'
+								: call.editor === 'csv'
+								? 'CSV'
+								: call.editor === 'sets'
+								? 'Variable sets'
+								: 'Variables'}
+						</span>
+						<div class="flex flex-shrink-0 gap-3.5">
 							{#if call.editor === 'html'}
 								<button
 									type="button"
 									on:click={() => setField('html', SAMPLE_HTML)}
-									class="font-mono text-[11px] tracking-[0.06em] text-brand-blue hover:underline"
-									>SAMPLE</button
+									class="font-sans text-[12.5px] text-brand-blue hover:underline"
+									>Use a sample</button
 								>
 							{:else if call.needsTemplate}
 								<button
 									type="button"
 									on:click={refillFromTemplate}
-									class="font-mono text-[11px] tracking-[0.06em] text-brand-blue hover:underline"
-									>REFILL FROM TEMPLATE</button
+									class="whitespace-nowrap font-sans text-[12.5px] text-brand-blue hover:underline"
+									>Refill from template</button
 								>
 							{/if}
 							<button
 								type="button"
 								on:click={() => (expanded = true)}
-								title="Expand the editor"
-								class="font-mono text-[11px] text-brand-blue hover:underline">⤢</button
+								class="font-sans text-[12.5px] text-brand-blue hover:underline">Expand</button
 							>
 						</div>
 					</div>
 
-					{#if call.editor === 'html' && (state.mode || 'HTML') === 'URL'}
-						<input
-							value={state.url || ''}
-							on:input={(e) => setField('url', e.currentTarget.value)}
-							placeholder="https://example.com"
-							class="h-9 rounded-btn border border-brand-ink px-3 font-mono text-[12.5px] text-brand-ink outline-none"
-						/>
-						<div class="flex-1" />
-					{:else if call.editor === 'vars' && state.varsTab === 'FORM'}
-						<div class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto pt-1">
+					{#if call.editor === 'vars' && state.varsTab === 'FORM'}
+						<div class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
 							{#each state.required || [] as name (name)}
 								<label class="flex flex-col gap-1">
-									<span class="font-mono text-[10px] tracking-[0.08em] text-brand-mute">{name}</span
+									<span class="font-mono text-[10px] tracking-[0.06em] text-brand-mute">{name}</span
 									>
 									<input
 										value={state.variables?.[name] ?? ''}
@@ -877,7 +836,7 @@
 											setField('variables', next);
 											setField('varsText', JSON.stringify(next, null, 2));
 										}}
-										class="h-8 rounded-btn border border-brand-rule px-2.5 font-mono text-xs text-brand-ink outline-none focus:border-brand-ink"
+										class="h-8 rounded-md border border-brand-rule px-2.5 font-mono text-xs text-brand-ink outline-none focus:border-brand-ink"
 									/>
 								</label>
 							{:else}
@@ -887,7 +846,7 @@
 							{/each}
 						</div>
 					{:else}
-						<div class="min-h-0 flex-1 overflow-hidden rounded-lg pg-editor">
+						<div class="pg-editor min-h-[180px] flex-1 overflow-hidden rounded-lg">
 							<CodeMirror
 								value={editorValue}
 								extensions={editorExtensions}
@@ -897,361 +856,401 @@
 					{/if}
 
 					{#if validation}
-						<div class="flex items-center gap-2 pt-0.5">
-							<span class="h-2 w-2 flex-shrink-0 bg-brand-pink" aria-hidden="true" />
-							<span class="font-mono text-[11px] text-brand-slate">{validation.text}</span>
-						</div>
-					{/if}
-				{/if}
-			</div>
-
-			<!-- Options -->
-			{#if call.size || call.formats || call.layout}
-				<div class="flex flex-col gap-3 px-5 pb-4 pt-4">
-					{#if call.size}
-						<div class="flex items-center gap-2.5">
-							<span
-								class="w-[60px] flex-shrink-0 font-mono text-[10px] tracking-[0.08em] text-brand-mute"
+						<div class="flex items-center gap-2">
+							<span class="h-1.5 w-1.5 flex-shrink-0 bg-brand-pink" aria-hidden="true" />
+							<span class="truncate font-sans text-[12.5px] text-brand-slate"
+								>{validation.text}</span
 							>
-								WIDTH
-							</span>
-							<div class="flex h-8 flex-1 items-center rounded-btn border border-brand-rule px-2.5">
-								<input
-									value={state.width ?? 1200}
-									on:input={(e) => setField('width', e.currentTarget.value)}
-									class="w-full bg-transparent font-mono text-xs text-brand-ink outline-none"
-								/>
-								<span class="font-mono text-[10px] text-brand-mute">PX</span>
-							</div>
-							<span
-								class="w-[54px] flex-shrink-0 font-mono text-[10px] tracking-[0.08em] text-brand-mute"
-							>
-								HEIGHT
-							</span>
-							<div class="flex h-8 flex-1 items-center rounded-btn border border-brand-rule px-2.5">
-								<input
-									value={state.height ?? 630}
-									on:input={(e) => setField('height', e.currentTarget.value)}
-									class="w-full bg-transparent font-mono text-xs text-brand-ink outline-none"
-								/>
-								<span class="font-mono text-[10px] text-brand-mute">PX</span>
-							</div>
-						</div>
-					{/if}
-
-					{#if call.formats}
-						<div class="flex items-center gap-2.5">
-							<span
-								class="w-[60px] flex-shrink-0 font-mono text-[10px] tracking-[0.08em] text-brand-mute"
-							>
-								FORMAT
-							</span>
-							<div class="flex gap-1.5">
-								{#each call.formats as f (f)}
-									<button
-										type="button"
-										on:click={() => setField('format', f)}
-										class="flex h-7 items-center rounded-btn px-3 font-mono text-[11px] tracking-[0.06em] {(state.format ||
-											call.formats[0]) === f
-											? 'bg-brand-ink text-white'
-											: 'border border-brand-rule text-brand-slate'}">{f}</button
-									>
-								{/each}
-							</div>
-						</div>
-					{/if}
-
-					{#if call.layout}
-						<div class="flex items-center gap-2.5">
-							<span
-								class="w-[60px] flex-shrink-0 font-mono text-[10px] tracking-[0.08em] text-brand-mute"
-							>
-								LAYOUT
-							</span>
-							<div
-								class="flex h-8 flex-1 items-center justify-between rounded-btn border border-brand-rule px-2.5"
-							>
-								<span class="font-mono text-xs text-brand-ink">
-									{state.template?.width && state.template?.height
-										? `default · ${state.template.width}×${state.template.height}`
-										: 'default · from the template'}
-								</span>
-							</div>
-						</div>
-					{/if}
-
-					{#if call.size}
-						<div class="flex items-center gap-2.5">
-							<span
-								class="w-[60px] flex-shrink-0 font-mono text-[10px] tracking-[0.08em] text-brand-mute"
-							>
-								SELECTOR
-							</span>
-							<input
-								value={state.selector || ''}
-								on:input={(e) => setField('selector', e.currentTarget.value)}
-								placeholder="optional · #main"
-								class="h-8 flex-1 rounded-btn border border-brand-rule px-2.5 font-mono text-xs text-brand-ink outline-none"
-							/>
 						</div>
 					{/if}
 				</div>
 			{/if}
 
-			<!-- Send bar -->
-			<div
-				class="flex flex-shrink-0 items-center justify-between border-t border-brand-rule bg-brand-subtle px-5 pb-4 pt-3.5"
-			>
-				<div class="flex flex-col gap-[3px]">
-					<span class="font-mono text-[10px] tracking-[0.08em] text-brand-mute">
-						COUNTS AS 1 RENDER · {rendersLeft.toLocaleString()} LEFT
-					</span>
-					<span class="font-mono text-[10px] tracking-[0.08em] text-brand-mute">⌘⏎ TO SEND</span>
+			{#if call.size}
+				<div class="flex items-center justify-between gap-3">
+					<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">Size</span>
+					<div class="flex items-center gap-2">
+						<input
+							value={state.width ?? 1200}
+							on:input={(e) => setField('width', e.currentTarget.value)}
+							class="h-8 w-[84px] rounded-md border border-brand-rule px-2.5 font-mono text-[12.5px] text-brand-ink outline-none focus:border-brand-ink"
+						/>
+						<span class="font-mono text-xs text-brand-mute" aria-hidden="true">×</span>
+						<input
+							value={state.height ?? 630}
+							on:input={(e) => setField('height', e.currentTarget.value)}
+							class="h-8 w-[84px] rounded-md border border-brand-rule px-2.5 font-mono text-[12.5px] text-brand-ink outline-none focus:border-brand-ink"
+						/>
+					</div>
 				</div>
-				<button
-					type="button"
-					on:click={send}
-					disabled={sending}
-					class="flex h-10 items-center gap-2.5 rounded-btn bg-brand-ink px-4 font-sans text-sm font-semibold text-white disabled:opacity-60"
-				>
-					{sending ? 'Sending…' : 'Send'}
-					<span class="h-2 w-2 bg-brand-field" aria-hidden="true" />
-				</button>
-			</div>
+			{/if}
+
+			{#if call.layout}
+				<div class="flex items-center justify-between gap-3">
+					<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">Layout</span>
+					<span class="font-mono text-[12.5px] text-brand-slate">
+						{state.template?.width && state.template?.height
+							? `${state.template.width} × ${state.template.height}`
+							: 'From the template'}
+					</span>
+				</div>
+			{/if}
+
+			{#if call.formats}
+				<div class="flex items-center justify-between gap-3">
+					<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">Format</span>
+					<div class="flex flex-shrink-0 rounded-md bg-brand-subtle p-0.5">
+						{#each call.formats as f (f)}
+							<button
+								type="button"
+								on:click={() => setField('format', f)}
+								class="flex h-7 items-center rounded px-3.5 font-sans text-[12.5px] {(state.format ||
+									call.formats[0]) === f
+									? 'bg-brand-paper font-semibold text-brand-ink shadow-[0_1px_2px_rgba(0,0,0,0.08)]'
+									: 'text-brand-slate'}">{FORMAT_LABELS[f] || f}</button
+							>
+						{/each}
+					</div>
+				</div>
+			{/if}
+
+			{#if call.size}
+				<!-- Inline, not a popover: one more row when asked for, nothing when not. -->
+				{#if moreOptions}
+					<div class="flex flex-col gap-3">
+						<div class="flex items-center justify-between gap-3">
+							<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink"
+								>Selector</span
+							>
+							<input
+								value={state.selector || ''}
+								on:input={(e) => setField('selector', e.currentTarget.value)}
+								placeholder="#main"
+								class="h-8 w-[176px] rounded-md border border-brand-rule px-2.5 font-mono text-xs text-brand-ink outline-none focus:border-brand-ink"
+							/>
+						</div>
+						<div class="flex items-center justify-between gap-3">
+							<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">
+								Capture a URL
+							</span>
+							<input
+								value={state.url || ''}
+								on:input={(e) => {
+									setField('url', e.currentTarget.value);
+									setField('mode', e.currentTarget.value ? 'URL' : 'HTML');
+								}}
+								placeholder="https://example.com"
+								class="h-8 w-[176px] rounded-md border border-brand-rule px-2.5 font-mono text-xs text-brand-ink outline-none focus:border-brand-ink"
+							/>
+						</div>
+					</div>
+				{:else}
+					<button
+						type="button"
+						on:click={() => (moreOptions = true)}
+						class="w-fit font-sans text-[12.5px] text-brand-blue hover:underline"
+						>More options</button
+					>
+				{/if}
+			{/if}
+
+			<button
+				type="button"
+				on:click={send}
+				disabled={sending}
+				class="flex h-11 flex-shrink-0 items-center justify-center gap-2.5 rounded-lg bg-brand-ink font-sans text-sm font-semibold text-white disabled:opacity-60"
+			>
+				{sending ? 'Sending…' : 'Send request'}
+				<span class="h-2 w-2 bg-brand-field" aria-hidden="true" />
+			</button>
+			<p class="text-center font-mono text-[10px] tracking-[0.06em] text-brand-mute">
+				COUNTS AS 1 RENDER · {rendersLeft.toLocaleString()} LEFT · ⌘⏎
+			</p>
 		</div>
 
-		<!-- Output lane -->
-		<div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-card bg-brand-press-deep">
-			<!-- Code strip -->
-			<div
-				class="flex h-11 flex-shrink-0 items-center justify-between px-3.5"
-				class:pg-rule-b={true}
-			>
-				<div class="flex items-center gap-1.5">
-					<span class="pr-2 font-mono text-[11px] tracking-[0.08em]" class:pg-dim={true}>
-						REQUEST AS
-					</span>
-					{#each SNIPPET_LANGS as l (l.id)}
+		<!-- ── Result ──────────────────────────────────────────────── -->
+		<div
+			class="flex min-h-[360px] min-w-0 flex-1 flex-col gap-4 rounded-xl border border-brand-rule p-5"
+		>
+			<div class="flex items-center justify-between gap-3">
+				<div class="relative flex min-w-0 items-center gap-2.5">
+					<h2 class="font-sans text-[15px] font-semibold leading-[18px] text-brand-ink">Result</h2>
+					<!-- The chip is also the way back to a previous send: recent lives
+					     behind it rather than taking a column of its own. -->
+					<button
+						type="button"
+						on:click={() => (recentOpen = !recentOpen)}
+						class="flex h-[22px] flex-shrink-0 items-center gap-1.5 rounded-btn bg-brand-subtle px-2"
+					>
+						{#if response || sending}
+							<span
+								class="h-1.5 w-1.5 flex-shrink-0 {sending
+									? 'bg-brand-mute'
+									: statusClass.split(' ')[0]}"
+								aria-hidden="true"
+							/>
+						{/if}
+						<span class="whitespace-nowrap font-mono text-[11px] text-brand-ink">{statusChip}</span>
+					</button>
+
+					{#if recentOpen}
 						<button
 							type="button"
-							on:click={() => (lang = l.id)}
-							class="flex h-[26px] items-center rounded-btn px-2.5 font-mono text-[11px] tracking-[0.06em]"
-							class:bg-brand-field={lang === l.id}
-							class:text-brand-ink={lang === l.id}
-							class:text-brand-press-text={lang !== l.id}>{l.id}</button
+							class="fixed inset-0 z-40 cursor-default"
+							aria-label="Close recent calls"
+							on:click={() => (recentOpen = false)}
+						/>
+						<div
+							class="absolute left-0 top-7 z-50 w-[280px] rounded-lg border border-brand-ink bg-brand-paper p-3 shadow-[4px_4px_0_0_#000000]"
+						>
+							<p class="pb-2 font-mono text-[10px] tracking-[0.08em] text-brand-mute">
+								RECENT · THIS BROWSER
+							</p>
+							<div class="flex flex-col gap-1.5">
+								{#each recent as r (r.at)}
+									<button
+										type="button"
+										on:click={() => {
+											restoreRecent(r);
+											recentOpen = false;
+										}}
+										class="flex items-center gap-2 text-left hover:opacity-70"
+									>
+										<span
+											class="h-1.5 w-1.5 flex-shrink-0 {r.status >= 200 && r.status < 300
+												? 'bg-brand-proof'
+												: 'bg-brand-pink'}"
+											aria-hidden="true"
+										/>
+										<span class="flex-1 truncate font-mono text-[11px] text-brand-slate">
+											{shortPath(r.path)} · {r.status || 'ERR'}
+										</span>
+										<span class="font-mono text-[10px] text-brand-mute">{clock(r.at)}</span>
+									</button>
+								{:else}
+									<p class="font-sans text-[12.5px] text-brand-mute">Nothing sent yet.</p>
+								{/each}
+							</div>
+						</div>
+					{/if}
+				</div>
+
+				<div class="flex flex-shrink-0 rounded-md bg-brand-subtle p-0.5">
+					{#each [['PREVIEW', 'Preview'], ['JSON', 'JSON'], ['CODE', 'Code']] as [id, label] (id)}
+						<button
+							type="button"
+							on:click={() => (resultTab = id)}
+							class="flex h-7 items-center rounded px-3.5 font-sans text-[12.5px] {resultTab === id
+								? 'bg-brand-paper font-semibold text-brand-ink shadow-[0_1px_2px_rgba(0,0,0,0.08)]'
+								: 'text-brand-slate'}">{label}</button
 						>
 					{/each}
 				</div>
-				<div class="flex items-center gap-3.5">
-					<button
-						type="button"
-						on:click={revealKey}
-						class="font-mono text-[11px] tracking-[0.06em]"
-						class:pg-dim={true}>KEY: {keyRevealed ? 'SHOWN' : 'MASKED'}</button
-					>
-					<button
-						type="button"
-						on:click={copySnippet}
-						class="font-mono text-[11px] tracking-[0.06em] text-white">COPY</button
-					>
-				</div>
 			</div>
 
-			<!-- Request as code -->
-			<div class="min-h-0 shrink-0 overflow-auto px-3.5 pb-4 pt-3.5" style="max-height: 45%">
-				<CodeBlock
-					code={keyRevealed ? copyableSnippet : shownSnippet}
-					lang={snippetMode}
-					bare
-					showCopy={false}
-					maxHeight="max-h-none"
-				/>
-			</div>
-
-			<!-- Status line -->
-			<div class="flex h-11 flex-shrink-0 items-center justify-between px-3.5">
-				<div class="flex min-w-0 items-center gap-3">
-					<span class="flex-shrink-0 font-mono text-[11px] tracking-[0.08em]" class:pg-dim={true}>
-						RESPONSE
-					</span>
+			{#if resultTab === 'PREVIEW'}
+				<div
+					class="flex min-h-0 flex-1 items-center justify-center overflow-auto rounded-lg bg-brand-subtle p-6"
+				>
 					{#if sending}
-						<span class="pg-pulse font-mono text-xs" class:text-brand-press-text={true}
-							>sending…</span
+						<p class="pg-pulse font-sans text-[13px] text-brand-mute">Rendering…</p>
+					{:else if !response}
+						<p class="font-sans text-[13px] text-brand-mute">
+							Send the request to see the render here.
+						</p>
+					{:else if resultUrl && /\.(png|jpe?g|webp|gif)(\?|$)/i.test(resultUrl)}
+						<img
+							src={resultUrl}
+							alt="The render this call produced"
+							on:load={onImageLoad}
+							class="max-h-full max-w-full object-contain shadow-[4px_4px_0_0_#000000]"
+						/>
+					{:else if resultUrl}
+						<a
+							href={resultUrl}
+							target="_blank"
+							rel="noopener"
+							class="rounded border border-brand-rule bg-brand-paper px-4 py-3 font-mono text-[11px] text-brand-ink"
 						>
-					{:else if response}
-						<span class="flex items-center gap-1.5">
-							<span class="h-2 w-2 flex-shrink-0" style="background-color: {statusColor}" />
-							<span class="font-mono text-xs font-semibold" style="color: {statusColor}">
-								{response.status || 'ERR'}
-							</span>
-						</span>
-						<span class="flex-shrink-0 font-mono text-xs" class:text-brand-press-text={true}
-							>{latencyText}</span
-						>
-						{#if previewDims}
-							<span class="truncate font-mono text-xs" class:text-brand-press-text={true}
-								>{previewDims}</span
-							>
-						{:else if response.body?.code}
-							<span class="truncate font-mono text-xs" class:text-brand-press-text={true}
-								>{response.body.code}</span
-							>
-						{/if}
+							{resultUrl.split('.').pop()?.slice(0, 4).toUpperCase()} · open ↗
+						</a>
 					{:else}
-						<span class="font-mono text-xs" class:pg-dim={true}>
-							send the call to see its answer
-						</span>
+						<p class="max-w-[320px] text-center font-sans text-[13px] text-brand-mute">
+							That call answered {response.status} and produced no file. The JSON tab has the answer.
+						</p>
 					{/if}
 				</div>
-				{#if response}
-					<div class="flex flex-shrink-0 gap-3 pl-3">
+
+				{#if response?.ok && resultUrl}
+					<div class="flex flex-shrink-0 flex-col items-start gap-2.5">
+						<p class="font-mono text-[11.5px] text-brand-slate">{resultMeta}</p>
+						<div class="flex flex-wrap gap-2">
+							<a
+								href={resultUrl}
+								target="_blank"
+								rel="noopener"
+								on:click={() => resultAction('open')}
+								class="flex h-8 items-center rounded-md border border-brand-ink px-3 font-sans text-[12.5px] font-medium text-brand-ink"
+								>Open</a
+							>
+							<a
+								href={resultUrl}
+								download
+								on:click={() => resultAction('download')}
+								class="flex h-8 items-center rounded-md border border-brand-rule px-3 font-sans text-[12.5px] font-medium text-brand-ink"
+								>Download</a
+							>
+							<a
+								href="/dashboard/templates"
+								on:click={() => resultAction('save_template')}
+								class="flex h-8 items-center rounded-md border border-brand-rule px-3 font-sans text-[12.5px] font-medium text-brand-ink"
+								>Save as template</a
+							>
+						</div>
+					</div>
+				{/if}
+			{:else if resultTab === 'JSON'}
+				<div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-brand-press-deep">
+					<div class="pg-rule-b flex h-9 flex-shrink-0 items-center justify-between gap-3 px-3">
 						<button
 							type="button"
 							on:click={() => (showHeaders = !showHeaders)}
-							class="font-mono text-[11px] tracking-[0.06em]"
-							class:pg-dim={true}>HEADERS</button
+							disabled={!response}
+							class="font-sans text-[12.5px] text-brand-press-text disabled:opacity-40"
+							>{showHeaders ? 'Body' : 'Headers'}</button
 						>
 						<button
 							type="button"
 							on:click={() => copyToClipboard(responseJson, 'Response copied')}
-							class="font-mono text-[11px] tracking-[0.06em] text-white">COPY JSON</button
+							disabled={!response}
+							class="font-sans text-[12.5px] text-white disabled:opacity-40">Copy</button
 						>
 					</div>
-				{/if}
-			</div>
-
-			<!-- Response body -->
-			<div class="flex min-h-0 flex-1 flex-col gap-3.5 overflow-auto px-3.5 pb-4">
-				{#if showHeaders && response}
-					<div class="rounded-lg p-3" class:pg-rule={true}>
-						{#each Object.entries(response.headers) as [k, v] (k)}
-							<div class="flex gap-3 font-mono text-[11px] leading-[18px]">
-								<span class="w-40 flex-shrink-0" class:pg-dim={true}>{k}</span>
-								<span class="min-w-0 break-all" class:text-brand-press-text={true}>{v}</span>
-							</div>
-						{/each}
-					</div>
-				{/if}
-
-				{#if response}
-					<div class="flex gap-3.5">
-						{#if resultUrl}
-							<div class="flex w-[196px] flex-shrink-0 flex-col gap-2">
-								<div
-									class="flex h-[110px] items-center justify-center overflow-hidden rounded-lg"
-									class:pg-rule={true}
-								>
-									{#if /\.(png|jpe?g|webp|gif)(\?|$)/i.test(resultUrl)}
-										<img
-											src={resultUrl}
-											alt="The render this call produced"
-											on:load={onImageLoad}
-											class="max-h-full max-w-full object-contain"
-										/>
-									{:else}
-										<span class="font-mono text-[11px]" class:pg-dim={true}>
-											{resultUrl.split('.').pop()?.slice(0, 4).toUpperCase()} FILE
-										</span>
-									{/if}
+					<div class="min-h-0 flex-1 overflow-auto px-3 py-3">
+						{#if !response}
+							<p class="font-sans text-[13px] text-brand-press-text/70">
+								Send the request to see its answer.
+							</p>
+						{:else if showHeaders}
+							{#each Object.entries(response.headers) as [k, v] (k)}
+								<div class="flex gap-3 font-mono text-[11px] leading-[18px]">
+									<span class="pg-dim w-44 flex-shrink-0">{k}</span>
+									<span class="min-w-0 break-all text-brand-press-text">{v}</span>
 								</div>
-								<div class="flex flex-col gap-1 font-mono text-[11px] tracking-[0.06em]">
-									<a
-										href={resultUrl}
-										target="_blank"
-										rel="noopener"
-										on:click={() => resultAction('open')}
-										class:text-brand-field={true}>OPEN ↗</a
-									>
-									<a
-										href={resultUrl}
-										download
-										on:click={() => resultAction('download')}
-										class:text-brand-press-text={true}>DOWNLOAD</a
-									>
-									<a href="/dashboard/renders" class:pg-dim={true}>ALSO IN YOUR RENDERS</a>
-								</div>
-							</div>
-						{/if}
-						<div class="min-w-0 flex-1">
+							{/each}
+						{:else}
 							<CodeBlock
 								code={responseJson}
 								lang="json"
 								bare
+								wrap={false}
 								showCopy={false}
 								maxHeight="max-h-none"
 							/>
-						</div>
+							{#if !response.ok}
+								<div class="pg-rule mt-3.5 flex items-center justify-between gap-4 rounded-lg p-3">
+									<div class="flex min-w-0 flex-col gap-[3px]">
+										<p class="font-sans text-[13px] font-semibold text-white">
+											{#if errorField}
+												The template needs {errorField}.
+											{:else if response.status === 403}
+												Verify your email to render.
+											{:else if response.status === 0}
+												The request never reached the server.
+											{:else}
+												{response.body?.message || `That call answered ${response.status}.`}
+											{/if}
+										</p>
+										<p class="font-sans text-[12.5px] text-brand-press-text">
+											{#if response.status >= 500 || response.status === 0}
+												Try again; if it repeats, the request id in Headers is what support needs.
+											{:else}
+												Nothing was rendered and nothing was counted.
+											{/if}
+										</p>
+									</div>
+									{#if response.status === 403}
+										<a
+											href="/dashboard/settings"
+											class="flex-shrink-0 font-sans text-[12.5px] text-brand-field">Resend link</a
+										>
+									{:else if errorLine}
+										<button
+											type="button"
+											on:click={() => jumpToLine(errorLine)}
+											class="flex-shrink-0 whitespace-nowrap font-sans text-[12.5px] text-brand-field"
+											>Jump to line {errorLine} →</button
+										>
+									{:else}
+										<a
+											href={call.docs}
+											target="_blank"
+											rel="noopener"
+											class="flex-shrink-0 font-sans text-[12.5px] text-brand-field">Open docs ↗</a
+										>
+									{/if}
+								</div>
+							{:else if response.status === 202}
+								<div class="pg-rule mt-3.5 flex items-center justify-between gap-4 rounded-lg p-3">
+									<div class="flex flex-col gap-[3px]">
+										<p class="font-sans text-[13px] font-semibold text-white">
+											The batch is queued.
+										</p>
+										<p class="font-sans text-[12.5px] text-brand-press-text">
+											This pane follows it and shows the results when it finishes.
+										</p>
+									</div>
+									<button
+										type="button"
+										on:click={cancelBatch}
+										class="flex-shrink-0 font-sans text-[12.5px] text-brand-field">Cancel</button
+									>
+								</div>
+							{/if}
+						{/if}
 					</div>
-
-					{#if !response.ok}
-						<div
-							class="flex items-center justify-between gap-4 rounded-lg px-3.5 py-3"
-							class:pg-rule={true}
-						>
-							<div class="flex min-w-0 flex-col gap-[3px]">
-								<p class="font-sans text-[13px] font-semibold text-white">
-									{#if errorField}
-										The template needs {errorField}.
-									{:else if response.status === 403}
-										Verify your email to render.
-									{:else if response.status === 0}
-										The request never reached the server.
-									{:else}
-										{response.body?.message || `That call answered ${response.status}.`}
-									{/if}
-								</p>
-								<p class="font-sans text-[12.5px]" class:text-brand-press-text={true}>
-									{#if response.status >= 500 || response.status === 0}
-										Try again; if it repeats, the request id above is what support needs.
-									{:else}
-										Nothing was rendered and nothing was counted.
-									{/if}
-								</p>
-							</div>
-							{#if response.status === 403}
-								<a
-									href="/dashboard/settings"
-									class="flex-shrink-0 font-mono text-[11px] tracking-[0.06em]"
-									class:text-brand-field={true}>RESEND LINK</a
-								>
-							{:else if errorLine}
+				</div>
+			{:else}
+				<div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-brand-press-deep">
+					<div class="pg-rule-b flex h-9 flex-shrink-0 items-center justify-between gap-3 px-3">
+						<div class="flex min-w-0 items-center gap-1">
+							{#each SNIPPET_LANGS as l (l.id)}
 								<button
 									type="button"
-									on:click={() => jumpToLine(errorLine)}
-									class="flex-shrink-0 font-mono text-[11px] tracking-[0.06em]"
-									class:text-brand-field={true}>JUMP TO LINE {errorLine} →</button
+									on:click={() => (lang = l.id)}
+									class="flex h-6 flex-shrink-0 items-center rounded px-2.5 font-sans text-[12.5px] {lang ===
+									l.id
+										? 'bg-brand-paper font-semibold text-brand-ink'
+										: 'text-brand-press-text'}">{l.label}</button
 								>
-							{:else}
-								<a
-									href={call.docs}
-									target="_blank"
-									rel="noopener"
-									class="flex-shrink-0 font-mono text-[11px] tracking-[0.06em]"
-									class:text-brand-field={true}>OPEN DOCS ↗</a
-								>
-							{/if}
+							{/each}
 						</div>
-					{:else if response.status === 202}
-						<div
-							class="flex items-center justify-between gap-4 rounded-lg px-3.5 py-3"
-							class:pg-rule={true}
-						>
-							<div class="flex flex-col gap-[3px]">
-								<p class="font-sans text-[13px] font-semibold text-white">The batch is queued.</p>
-								<p class="font-sans text-[12.5px]" class:text-brand-press-text={true}>
-									This pane follows it and flips to the results when it finishes.
-								</p>
-							</div>
+						<div class="flex flex-shrink-0 items-center gap-3">
 							<button
 								type="button"
-								on:click={cancelBatch}
-								class="flex-shrink-0 font-mono text-[11px] tracking-[0.06em]"
-								class:text-brand-field={true}>CANCEL</button
+								on:click={revealKey}
+								class="hidden whitespace-nowrap font-sans text-[12.5px] text-brand-press-text min-[1100px]:block"
+								>{keyRevealed ? 'Key shown' : 'Key masked'}</button
+							>
+							<button
+								type="button"
+								on:click={copySnippet}
+								class="font-sans text-[12.5px] text-white">Copy</button
 							>
 						</div>
-					{/if}
-				{/if}
-			</div>
+					</div>
+					<div class="min-h-0 flex-1 overflow-auto px-3 py-3">
+						<CodeBlock
+							code={keyRevealed ? copyableSnippet : shownSnippet}
+							lang={snippetMode}
+							bare
+							wrap={false}
+							showCopy={false}
+							maxHeight="max-h-none"
+						/>
+					</div>
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>
@@ -1259,7 +1258,7 @@
 <!-- The expanded editor is the same value and the same change handler, so
      there is no second copy of the state to keep in step. -->
 {#if expanded}
-	<div class="fixed inset-0 z-50 flex flex-col p-6" style="background-color: rgba(0,0,0,0.6)">
+	<div class="fixed inset-0 z-50 flex flex-col bg-black/60 p-6">
 		<div class="flex items-center justify-between pb-3">
 			<span class="font-mono text-[11px] tracking-[0.08em] text-white">
 				{call.method}
@@ -1268,10 +1267,10 @@
 			<button
 				type="button"
 				on:click={() => (expanded = false)}
-				class="font-mono text-[11px] tracking-[0.06em] text-white hover:underline">CLOSE ✕</button
+				class="font-sans text-[13px] text-white hover:underline">Close</button
 			>
 		</div>
-		<div class="min-h-0 flex-1 overflow-hidden rounded-card pg-editor">
+		<div class="pg-editor min-h-0 flex-1 overflow-hidden rounded-xl">
 			<CodeMirror
 				value={editorValue}
 				extensions={editorExtensions}

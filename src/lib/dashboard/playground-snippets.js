@@ -174,12 +174,15 @@ export function toPhp(req) {
 	return lines.join('\n');
 }
 
-/** Language id → generator, and the highlighter mode each one wants. */
+/**
+ * Language id → generator, the highlighter mode each one wants, and how it is
+ * written on screen. `curl` is lower-case because that is the program's name.
+ */
 export const SNIPPET_LANGS = [
-	{ id: 'NODE', build: toNode, hl: 'js' },
-	{ id: 'PYTHON', build: toPython, hl: 'python' },
-	{ id: 'CURL', build: toCurl, hl: 'shell' },
-	{ id: 'PHP', build: toPhp, hl: 'php' }
+	{ id: 'NODE', label: 'Node', build: toNode, hl: 'js' },
+	{ id: 'PYTHON', label: 'Python', build: toPython, hl: 'python' },
+	{ id: 'CURL', label: 'curl', build: toCurl, hl: 'shell' },
+	{ id: 'PHP', label: 'PHP', build: toPhp, hl: 'php' }
 ];
 
 /** Build one snippet by language id, falling back to node for an unknown id. */
