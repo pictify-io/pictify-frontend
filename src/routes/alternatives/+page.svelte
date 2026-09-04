@@ -7,6 +7,7 @@
 	 * Switch to Pictify", "Explore Alternatives", "Also See", "Ready to
 	 * Switch?", and one "{Competitor} Alternative" per card.
 	 */
+	import { HERO_CLUSTER } from '$lib/components/landing/hero-clusters.js';
 	import Nav from '$lib/components/landing/Nav.svelte';
 	import Footer from '$lib/components/landing/Footer.svelte';
 	import PixelCluster from '$lib/components/landing/PixelCluster.svelte';
@@ -19,27 +20,6 @@
 	const description =
 		'Looking for an alternative to Cloudinary, Puppeteer, or other image tools? See how Pictify compares and why teams are switching.';
 	const canonical = 'https://pictify.io/alternatives';
-
-	const heroCluster = [
-		[0, 2, 'blue'],
-		[1, 0, 'blue'],
-		[1, 3, 'pink'],
-		[2, 1, 'blue'],
-		[2, 2, 'ink'],
-		[2, 4, 'sky'],
-		[3, 0, 'ink'],
-		[3, 2, 'blue'],
-		[3, 3, 'blue'],
-		[4, 1, 'blue'],
-		[4, 2, 'ink'],
-		[4, 3, 'ink'],
-		[4, 4, 'blue'],
-		[5, 0, 'ink'],
-		[5, 1, 'ink'],
-		[5, 2, 'blue'],
-		[5, 3, 'ink'],
-		[5, 4, 'ink']
-	];
 
 	/** The four reasons keep their live headings; only the chrome is new. */
 	const REASONS = [
@@ -100,7 +80,7 @@
 	<!-- ── Hero ──────────────────────────────────────────────────────── -->
 	<section class="relative w-full overflow-hidden bg-brand-field">
 		<PixelCluster
-			cells={heroCluster}
+			cells={HERO_CLUSTER}
 			cell={22}
 			origin="e"
 			delay={320}

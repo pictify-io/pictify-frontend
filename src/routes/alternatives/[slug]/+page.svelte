@@ -11,6 +11,7 @@
 	 * The Pictify pricing ladder reads plan-features.js rather than the strings
 	 * in the comparison data, so a price change lands here without a data edit.
 	 */
+	import { HERO_CLUSTER, BASELINE_RUN } from '$lib/components/landing/hero-clusters.js';
 	import Nav from '$lib/components/landing/Nav.svelte';
 	import Footer from '$lib/components/landing/Footer.svelte';
 	import PixelCluster from '$lib/components/landing/PixelCluster.svelte';
@@ -145,36 +146,6 @@
 		.toLocaleString('en-US', { month: 'short', year: 'numeric' })
 		.toUpperCase();
 
-	const heroCluster = [
-		[0, 2, 'blue'],
-		[1, 0, 'blue'],
-		[1, 3, 'pink'],
-		[2, 1, 'blue'],
-		[2, 2, 'ink'],
-		[2, 4, 'sky'],
-		[3, 0, 'ink'],
-		[3, 2, 'blue'],
-		[3, 3, 'blue'],
-		[4, 1, 'blue'],
-		[4, 2, 'ink'],
-		[4, 3, 'ink'],
-		[4, 4, 'blue'],
-		[5, 0, 'ink'],
-		[5, 1, 'ink'],
-		[5, 2, 'blue'],
-		[5, 3, 'ink'],
-		[5, 4, 'ink']
-	];
-	const baselineRun = [
-		[0, 0, 'blue'],
-		[2, 0, 'ink'],
-		[3, 1, 'blue'],
-		[5, 0, 'sky'],
-		[6, 1, 'blue'],
-		[8, 0, 'pink'],
-		[9, 1, 'blue']
-	];
-
 	/** Capability scores, 1–5 a side, in the order the data lists them. */
 	$: scoreRows = Object.entries(alt?.comparison?.features || {}).map(([key, score]) => ({
 		key,
@@ -262,7 +233,7 @@
 		<!-- ── Hero ──────────────────────────────────────────────────── -->
 		<section class="relative w-full overflow-hidden bg-brand-field">
 			<PixelCluster
-				cells={heroCluster}
+				cells={HERO_CLUSTER}
 				cell={22}
 				origin="e"
 				delay={320}
@@ -270,7 +241,7 @@
 				class="right-0 top-4 hidden lg:block"
 			/>
 			<PixelCluster
-				cells={baselineRun}
+				cells={BASELINE_RUN}
 				cell={14}
 				origin="w"
 				delay={520}

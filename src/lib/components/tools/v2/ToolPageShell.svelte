@@ -20,6 +20,8 @@
 	import RailSignupCard from './RailSignupCard.svelte';
 	import ClosingBand from './ClosingBand.svelte';
 	import RelatedToolCards from './RelatedToolCards.svelte';
+	import PixelCluster from '$lib/components/landing/PixelCluster.svelte';
+	import { HERO_CLUSTER, BASELINE_RUN } from '$lib/components/landing/hero-clusters.js';
 	import { resolveToolCards } from '$lib/pseo/tool-cards.js';
 
 	/** Analytics name, e.g. `html_to_png`. */
@@ -59,6 +61,21 @@
 
 	<!-- ── Hero ──────────────────────────────────────────────────────── -->
 	<section class="relative w-full overflow-hidden bg-brand-field">
+		<PixelCluster
+			cells={HERO_CLUSTER}
+			cell={22}
+			origin="e"
+			delay={320}
+			cycle={3}
+			class="right-0 top-6 hidden lg:block"
+		/>
+		<PixelCluster
+			cells={BASELINE_RUN}
+			cell={14}
+			origin="w"
+			delay={520}
+			class="-bottom-3 left-[34%] hidden lg:block"
+		/>
 		<div
 			class="relative mx-auto flex w-full max-w-page flex-col gap-3 px-5 pb-16 pt-8 lg:px-10 lg:pb-24 lg:pt-11"
 		>
@@ -76,16 +93,6 @@
 			{#if facts}
 				<p class="mt-1 font-mono text-[11px] tracking-[0.06em] text-brand-ink">{facts}</p>
 			{/if}
-
-			<!-- Two riso pills, cut by the band's right edge. Decoration only. -->
-			<div aria-hidden="true" class="pointer-events-none absolute inset-0 hidden lg:block">
-				<div
-					class="absolute right-[50px] top-10 h-[46px] w-[170px] rotate-[10deg] rounded-full bg-brand-powder"
-				/>
-				<div
-					class="absolute right-[150px] top-[100px] h-[38px] w-[110px] rotate-[10deg] rounded-full border-[1.5px] border-brand-ink"
-				/>
-			</div>
 		</div>
 	</section>
 

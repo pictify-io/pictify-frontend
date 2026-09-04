@@ -10,6 +10,7 @@
 	 * guides about APIs that change; "written in 2024" tells a reader nothing
 	 * useful, "updated last week" tells them whether to trust it.
 	 */
+	import { HERO_CLUSTER, BASELINE_RUN } from '$lib/components/landing/hero-clusters.js';
 	import Nav from '$lib/components/landing/Nav.svelte';
 	import Footer from '$lib/components/landing/Footer.svelte';
 	import PixelCluster from '$lib/components/landing/PixelCluster.svelte';
@@ -62,8 +63,7 @@
 		featured &&
 		typeFilter === 'all' &&
 		!tagFilter &&
-		(!query ||
-			`${featured.title} ${featured.description}`.toLowerCase().includes(query));
+		(!query || `${featured.title} ${featured.description}`.toLowerCase().includes(query));
 
 	const TYPES = [
 		{ id: 'all', label: 'All' },
@@ -82,19 +82,13 @@
 	// Cut by the hero's right edge, so the field reads as a window onto a
 	// larger raster. The post header uses capsules instead — no surface repeats
 	// the deco of the one before it.
-	const heroCluster = [
-		[0, 2, 'blue'], [1, 0, 'blue'], [1, 3, 'pink'],
-		[2, 1, 'blue'], [2, 2, 'ink'], [2, 4, 'sky'],
-		[3, 0, 'ink'], [3, 2, 'blue'], [3, 3, 'blue'],
-		[4, 1, 'blue'], [4, 2, 'ink'], [4, 3, 'ink'], [4, 4, 'blue'],
-		[5, 0, 'ink'], [5, 1, 'ink'], [5, 2, 'blue'], [5, 3, 'ink'], [5, 4, 'ink']
-	];
-	const baselineRun = [
-		[0, 0, 'blue'], [2, 0, 'ink'], [3, 1, 'blue'], [5, 0, 'sky'],
-		[6, 1, 'blue'], [8, 0, 'pink'], [9, 1, 'blue']
-	];
+
 	const ctaPixels = [
-		[0, 0, 'field'], [1, 1, 'field'], [2, 0, 'field'], [3, 1, 'field'], [4, 0, 'field']
+		[0, 0, 'field'],
+		[1, 1, 'field'],
+		[2, 0, 'field'],
+		[3, 1, 'field'],
+		[4, 0, 'field']
 	];
 </script>
 
@@ -140,7 +134,7 @@
 			class="absolute inset-0"
 		/>
 		<PixelCluster
-			cells={heroCluster}
+			cells={HERO_CLUSTER}
 			cell={22}
 			origin="e"
 			delay={320}
@@ -148,7 +142,7 @@
 			class="right-0 top-6 hidden lg:block"
 		/>
 		<PixelCluster
-			cells={baselineRun}
+			cells={BASELINE_RUN}
 			cell={14}
 			origin="w"
 			delay={520}
@@ -163,9 +157,11 @@
 			>
 				Guides &amp; field notes
 			</h1>
-			<p class="mt-5 max-w-[52ch] font-sans text-[16px] leading-[26px] text-brand-slate lg:text-[18px] lg:leading-[29px]">
-				How to render images, PDFs and video from HTML templates. Written against the
-				API we actually ship, and kept current as it changes.
+			<p
+				class="mt-5 max-w-[52ch] font-sans text-[16px] leading-[26px] text-brand-slate lg:text-[18px] lg:leading-[29px]"
+			>
+				How to render images, PDFs and video from HTML templates. Written against the API we
+				actually ship, and kept current as it changes.
 			</p>
 		</div>
 	</section>
@@ -192,7 +188,7 @@
 			</div>
 
 			{#if sortedTags.length}
-				<span class="hidden h-5 w-px flex-shrink-0 bg-brand-rule lg:block" aria-hidden="true"></span>
+				<span class="hidden h-5 w-px flex-shrink-0 bg-brand-rule lg:block" aria-hidden="true" />
 				<div class="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by tag">
 					{#each visibleTags as tag (tag)}
 						<button
@@ -230,7 +226,12 @@
 					aria-hidden="true"
 				>
 					<circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6" />
-					<path d="M10.8 10.8L14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+					<path
+						d="M10.8 10.8L14 14"
+						stroke="currentColor"
+						stroke-width="1.6"
+						stroke-linecap="round"
+					/>
 				</svg>
 				<input
 					id="blog-search"
@@ -252,7 +253,9 @@
 				style="box-shadow: 8px 8px 0 0 #0054A6"
 			>
 				{#if featured.heroImage}
-					<div class="w-full flex-shrink-0 overflow-hidden border-b border-brand-ink bg-brand-canvas lg:w-[45%] lg:border-b-0 lg:border-r">
+					<div
+						class="w-full flex-shrink-0 overflow-hidden border-b border-brand-ink bg-brand-canvas lg:w-[45%] lg:border-b-0 lg:border-r"
+					>
 						<img
 							src={featured.heroImage}
 							alt=""
@@ -273,7 +276,9 @@
 						{featured.title}
 					</h2>
 					{#if featured.description}
-						<p class="max-w-[56ch] font-sans text-[15px] leading-[24px] text-brand-slate lg:text-base lg:leading-[26px]">
+						<p
+							class="max-w-[56ch] font-sans text-[15px] leading-[24px] text-brand-slate lg:text-base lg:leading-[26px]"
+						>
 							{featured.description}
 						</p>
 					{/if}
@@ -297,7 +302,9 @@
 								{featured.readingTime} min
 							</span>
 						{/if}
-						<span class="ml-auto font-mono text-[12px] uppercase tracking-[0.08em] text-brand-ink group-hover:underline">
+						<span
+							class="ml-auto font-mono text-[12px] uppercase tracking-[0.08em] text-brand-ink group-hover:underline"
+						>
 							Read it →
 						</span>
 					</div>
@@ -331,7 +338,9 @@
 										{post.type === 'guide' ? 'Guide' : 'Article'}
 									</span>
 									{#if post.tags?.length}
-										<span class="truncate font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute">
+										<span
+											class="truncate font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute"
+										>
 											{post.tags[0]}
 										</span>
 									{/if}
@@ -369,7 +378,9 @@
 			<!-- No mascot here: the press machine is reserved for product empty
 			     states, and this is a filter that matched nothing, not an empty
 			     shelf. -->
-			<div class="flex flex-col items-start gap-3 rounded-tile border border-brand-rule bg-brand-subtle px-6 py-10">
+			<div
+				class="flex flex-col items-start gap-3 rounded-tile border border-brand-rule bg-brand-subtle px-6 py-10"
+			>
 				<p class="font-display text-[21px] font-bold text-brand-ink">Nothing matches that.</p>
 				<p class="font-sans text-[15px] text-brand-slate">
 					Try a different search, or clear the filters to see all {posts.length} posts.
@@ -401,7 +412,9 @@
 				>
 					Read it, then render it.
 				</h2>
-				<p class="mt-4 max-w-[48ch] font-sans text-[15px] leading-[25px] text-brand-slate lg:text-base lg:leading-[27px]">
+				<p
+					class="mt-4 max-w-[48ch] font-sans text-[15px] leading-[25px] text-brand-slate lg:text-base lg:leading-[27px]"
+				>
 					Every guide ends in a working template. Free tier: 50 renders a month, no card, no
 					watermark.
 				</p>
