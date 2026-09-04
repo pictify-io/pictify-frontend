@@ -1,0 +1,174 @@
+{
+  "route": "/tools/code-to-image",
+  "title": "Code to Image: Code Screenshot Generator (25+ Themes, Free API) | Pictify",
+  "canonical": "https://pictify.io/tools/code-to-image",
+  "metas": {
+    "description": "Turn code snippets into beautiful screenshots with syntax highlighting: 25+ languages, 18+ themes, custom fonts. Export PNG free or automate with the API.",
+    "og:description": "Turn code snippets into beautiful screenshots with syntax highlighting: 25+ languages, 18+ themes, custom fonts. Export PNG free or automate with the API.",
+    "og:image": "https://media.pictify.io/by55n-1775406886142.png",
+    "og:site_name": "Pictify",
+    "og:title": "Code to Image: Code Screenshot Generator (25+ Themes, Free API) | Pictify",
+    "og:type": "website",
+    "og:url": "https://pictify.io/tools/code-to-image",
+    "robots": "index, follow, max-image-preview:large",
+    "twitter:card": "summary_large_image",
+    "twitter:description": "Turn code snippets into beautiful screenshots with syntax highlighting: 25+ languages, 18+ themes, custom fonts. Export PNG free or automate with the API.",
+    "twitter:image": "https://media.pictify.io/by55n-1775406886142.png",
+    "twitter:title": "Code to Image: Code Screenshot Generator (25+ Themes, Free API) | Pictify",
+    "twitter:url": "https://pictify.io/tools/code-to-image"
+  },
+  "jsonLd": [
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "We support 25+ programming languages including JavaScript, TypeScript, Python, Java, C++, C#, PHP, Ruby, Go, Rust, Swift, HTML, CSS, SQL, JSON, YAML, Markdown, and many more."
+            },
+            "name": "What programming languages are supported?"
+          },
+          {
+            "@type": "Question",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes! Choose from 18+ themes, 12+ coding fonts, customize padding, border radius, background styles, window frames, and advanced effects like shadows and blur."
+            },
+            "name": "Can I customize the appearance?"
+          },
+          {
+            "@type": "Question",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "We generate high-quality PNG images, perfect for social media, documentation, and presentations with crisp text rendering and transparency support."
+            },
+            "name": "What image formats are supported?"
+          },
+          {
+            "@type": "Question",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No strict limit, but we recommend keeping snippets reasonably sized for best visual results. Focus on the most important parts of your code."
+            },
+            "name": "Is there a limit on code length?"
+          },
+          {
+            "@type": "Question",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes! All generated images can be used for personal and commercial purposes. Guest limits may apply, and free accounts remove watermarks."
+            },
+            "name": "Can I use images commercially?"
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "item": "https://pictify.io/",
+            "name": "Home",
+            "position": 1
+          },
+          {
+            "@type": "ListItem",
+            "item": "https://pictify.io/tools",
+            "name": "Tools",
+            "position": 2
+          },
+          {
+            "@type": "ListItem",
+            "name": "Code to Image",
+            "position": 3
+          }
+        ]
+      }
+    ],
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "description": "API-first image, document, and video generation. Every row of a spreadsheet or webhook becomes a rendered, personalized certificate, badge, report, or video.",
+      "logo": "https://pictify.io/logo.png",
+      "name": "Pictify",
+      "sameAs": [
+        "https://github.com/pictify-io"
+      ],
+      "url": "https://pictify.io"
+    }
+  ],
+  "outline": [
+    {
+      "tag": "h1",
+      "text": "CODE TO IMAGE"
+    },
+    {
+      "tag": "h2",
+      "text": "Automate with the API"
+    },
+    {
+      "tag": "h2",
+      "text": "LEARN MORE ABOUT CODE TO IMAGE"
+    },
+    {
+      "tag": "h3",
+      "text": "Code Screenshot Tools Compared"
+    },
+    {
+      "tag": "h3",
+      "text": "What is a Code to Image Generator?"
+    },
+    {
+      "tag": "h3",
+      "text": "Benefits of Using Our Code to Image Generator"
+    },
+    {
+      "tag": "h3",
+      "text": "How to Use Our Code to Image Generator"
+    },
+    {
+      "tag": "h3",
+      "text": "Real-World Use Cases"
+    },
+    {
+      "tag": "h3",
+      "text": "Best Practices for Creating Code Images"
+    },
+    {
+      "tag": "h3",
+      "text": "Frequently Asked Questions"
+    },
+    {
+      "tag": "h3",
+      "text": "Supported Programming Languages"
+    },
+    {
+      "tag": "h3",
+      "text": "More Tools You'll Love"
+    },
+    {
+      "tag": "h3",
+      "text": "Related Tools"
+    },
+    {
+      "tag": "h2",
+      "text": "Product"
+    },
+    {
+      "tag": "h2",
+      "text": "Developers"
+    },
+    {
+      "tag": "h2",
+      "text": "Integrations"
+    },
+    {
+      "tag": "h2",
+      "text": "Company"
+    }
+  ]
+}

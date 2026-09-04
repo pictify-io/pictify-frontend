@@ -202,8 +202,16 @@ async function diff() {
 				);
 		}
 
-		const ldA = left.jsonLd.map((x) => JSON.stringify(x));
-		const ldB = right.jsonLd.map((x) => JSON.stringify(x));
+		/*
+		 * The top-level Organization block is the root layout's, identical on every
+		 * page. When marketing copy changes it moves on all fifteen routes at once
+		 * and drowns out the thing this script exists to catch, so it is dropped
+		 * from the comparison. Nested Organization objects (a schema's `creator` or
+		 * `publisher`) belong to the route's own schema and are still compared.
+		 */
+		const routeLd = (blocks) => blocks.filter((x) => x['@type'] !== 'Organization');
+		const ldA = routeLd(left.jsonLd).map((x) => JSON.stringify(x));
+		const ldB = routeLd(right.jsonLd).map((x) => JSON.stringify(x));
 		for (const s of ldA)
 			if (!ldB.includes(s)) notes.push(`  json-ld removed:\n    - ${s.slice(0, 400)}`);
 		for (const s of ldB)

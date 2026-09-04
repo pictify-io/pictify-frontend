@@ -8,7 +8,14 @@
 	 * a crawler sees is h1 → h2 → h3 on every tool page.
 	 */
 
-	/** [{ heading, body?, bullets? }] */
+	/**
+	 * [{ heading, body?, bodyHtml?, bullets? }]
+	 *
+	 * `bodyHtml` is for copy that ships as markup in the pSEO config (the
+	 * use-case long descriptions carry their own line breaks). It is rendered
+	 * verbatim, so only pass content the repo controls — never anything a user
+	 * supplied.
+	 */
 	export let items = [];
 	/** 1 = stacked, 2 = two-up from the `sm` breakpoint. */
 	export let columns = 1;
@@ -22,6 +29,11 @@
 			<h3 class="font-sans text-lg font-medium leading-6 text-brand-ink">{item.heading}</h3>
 			{#if item.body}
 				<p class="font-sans text-[15px] leading-[23px] text-brand-slate">{item.body}</p>
+			{/if}
+			{#if item.bodyHtml}
+				<div class="font-sans text-[15px] leading-[23px] text-brand-slate">
+					{@html item.bodyHtml}
+				</div>
 			{/if}
 			{#if item.bullets?.length}
 				<ul class="list-disc pl-5 font-sans text-[15px] leading-[23px] text-brand-slate">

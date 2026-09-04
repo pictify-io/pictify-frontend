@@ -1,0 +1,170 @@
+{
+  "route": "/tools/csv-to-pdf",
+  "title": "CSV to PDF Converter: Free, Every Row Becomes a Document | Pictify",
+  "canonical": "https://pictify.io/tools/csv-to-pdf",
+  "metas": {
+    "description": "Convert CSV to PDF free in your browser. Render the sheet as a clean table PDF, or turn every row into its own document, then batch render the whole file through the Pictify API.",
+    "keywords": "csv to pdf, csv to pdf converter, convert csv to pdf, spreadsheet to pdf, csv to documents, generate pdf from spreadsheet, csv to pdf free, Pictify",
+    "og:description": "Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row. Then deliver each one by email.",
+    "og:image": "https://media.pictify.io/v3g37-1775406808141.png",
+    "og:site_name": "Pictify",
+    "og:title": "CSV to PDF Converter: Every Row Becomes a Document | Pictify",
+    "og:type": "website",
+    "og:url": "https://pictify.io/tools/csv-to-pdf",
+    "robots": "index, follow, max-image-preview:large",
+    "twitter:card": "summary_large_image",
+    "twitter:description": "Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row.",
+    "twitter:image": "https://media.pictify.io/v3g37-1775406808141.png",
+    "twitter:title": "CSV to PDF Converter: Every Row Becomes a Document | Pictify"
+  },
+  "jsonLd": [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/",
+          "name": "Home",
+          "position": 1
+        },
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/tools",
+          "name": "Tools",
+          "position": 2
+        },
+        {
+          "@type": "ListItem",
+          "name": "CSV to PDF",
+          "position": 3
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Upload or paste your CSV above. Choose \"one document per row\" to get a clean PDF page for every data row, or \"whole sheet\" to render the table as a single-page PDF. Click Generate and download the result: free, in your browser, no signup required."
+          },
+          "name": "How do I convert a CSV file to PDF?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, that is this tool's specialty. Every row renders as its own formatted document page: the first column becomes the document title and every column becomes a labeled field. With a free account you can go further and use branded templates (certificates, letters, reports) instead of the default layout."
+          },
+          "name": "Can each CSV row become its own PDF document?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, with a Pictify batch run. Point it at the same CSV and every row renders against your template in one job: a CDN link per document, a per-row status you can poll, and a webhook when the batch finishes. That is the part no converter or spreadsheet add-on does."
+          },
+          "name": "Can I render a whole sheet at once instead of row by row?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The free browser tool renders up to 5 pages per day for guests and 25 rows per run for signed-in users. Workflows and the batch API handle hundreds of rows per run with per-row results."
+          },
+          "name": "Is there a row limit?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The REST API renders any HTML template to PDF (including multi-page): POST your data, get a document URL back. Workflows accept a CSV upload or a signed webhook, so your CRM, form tool, or n8n/Zapier/Make flow can trigger document generation automatically."
+          },
+          "name": "Can I automate CSV to PDF conversion?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Rows are sent to the Pictify rendering API over HTTPS to produce each page, and rendered files are stored on the CDN so you can download them. Your CSV itself is never stored; parsing happens in your browser."
+          },
+          "name": "Does my data leave my browser?"
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "description": "API-first image, document, and video generation. Every row of a spreadsheet or webhook becomes a rendered, personalized certificate, badge, report, or video.",
+      "logo": "https://pictify.io/logo.png",
+      "name": "Pictify",
+      "sameAs": [
+        "https://github.com/pictify-io"
+      ],
+      "url": "https://pictify.io"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "applicationCategory": [
+        "BusinessApplication",
+        "Utility"
+      ],
+      "creator": {
+        "@type": "Organization",
+        "name": "Pictify.io",
+        "url": "https://pictify.io"
+      },
+      "description": "Convert CSV to PDF free in your browser: render the whole sheet as a table, or turn every row into its own formatted PDF document.",
+      "name": "Pictify CSV to PDF Converter",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "operatingSystem": "Web",
+      "url": "https://pictify.io/tools/csv-to-pdf"
+    }
+  ],
+  "outline": [
+    {
+      "tag": "h1",
+      "text": "CSV TO PDF"
+    },
+    {
+      "tag": "h2",
+      "text": "1 Add your CSV"
+    },
+    {
+      "tag": "h2",
+      "text": "A CSV to PDF converter that understands rows are people"
+    },
+    {
+      "tag": "h2",
+      "text": "Frequently Asked Questions"
+    },
+    {
+      "tag": "h3",
+      "text": "More Tools You'll Love"
+    },
+    {
+      "tag": "h2",
+      "text": "Product"
+    },
+    {
+      "tag": "h2",
+      "text": "Developers"
+    },
+    {
+      "tag": "h2",
+      "text": "Integrations"
+    },
+    {
+      "tag": "h2",
+      "text": "Company"
+    }
+  ]
+}
