@@ -14,6 +14,11 @@
 	export let links = [];
 	export let toolName = '';
 	export let eyebrow = 'ALSO ON THE COUNTER';
+	/**
+	 * Inside a LongformSection rather than under the page: drops the page gutter
+	 * and top margin, since the section already provides both.
+	 */
+	export let inline = false;
 
 	function track(target) {
 		analytics.track('related_tool_click', { tool_name: toolName, target });
@@ -21,8 +26,11 @@
 </script>
 
 {#if links.length}
-	<section class="mx-auto mt-16 w-full max-w-page px-5 lg:px-10">
-		<div class="border-t border-brand-rule pt-6">
+	<svelte:element
+		this={inline ? 'div' : 'section'}
+		class={inline ? '' : 'mx-auto mt-16 w-full max-w-page px-5 lg:px-10'}
+	>
+		<div class={inline ? '' : 'border-t border-brand-rule pt-6'}>
 			<p class="font-mono text-xs tracking-[0.06em] text-brand-mute">{eyebrow}</p>
 			<ul class="mt-4 flex flex-wrap gap-x-6 gap-y-2.5">
 				{#each links as link (link.href)}
@@ -38,5 +46,5 @@
 				{/each}
 			</ul>
 		</div>
-	</section>
+	</svelte:element>
 {/if}

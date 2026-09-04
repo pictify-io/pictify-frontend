@@ -19,87 +19,67 @@
     "twitter:url": "https://pictify.io/tools/url-to-image-generator"
   },
   "jsonLd": [
-    [
-      {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "applicationCategory": [
-          "DesignApplication",
-          "Utility"
-        ],
-        "description": "Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more.",
-        "name": "Pictify.io URL to Image Generator",
-        "offers": {
-          "@type": "Offer",
-          "availability": "https://schema.org/InStock",
-          "price": "0",
-          "priceCurrency": "USD"
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/",
+          "name": "Home",
+          "position": 1
         },
-        "operatingSystem": "Web",
-        "url": "https://pictify.io/tools/url-to-image-generator"
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "A tool that captures a webpage and saves it as an image file (JPG/PNG). Useful for archives, thumbnails, and proofs."
-            },
-            "name": "What is URL to Image?"
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/tools",
+          "name": "Tools",
+          "position": 2
+        },
+        {
+          "@type": "ListItem",
+          "name": "URL to Image",
+          "position": 3
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A tool that captures a webpage and saves it as an image file (JPG/PNG). Useful for archives, thumbnails, and proofs."
           },
-          {
-            "@type": "Question",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "We spawn a headless browser in the cloud, navigate to your URL, wait for assets to load, and take a high-fidelity screenshot."
-            },
-            "name": "How does URL to Image work?"
+          "name": "What is URL to Image?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We spawn a headless browser in the cloud, navigate to your URL, wait for assets to load, and take a high-fidelity screenshot."
           },
-          {
-            "@type": "Question",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes! You can select specific elements, set custom viewport sizes, and handle cookie banners via our API."
-            },
-            "name": "Can I customize the screenshot?"
+          "name": "How does URL to Image work?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! You can select specific elements, set custom viewport sizes, and handle cookie banners via our API."
           },
-          {
-            "@type": "Question",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "We do not store your URLs or generated images. All processing is done on-the-fly and images are cached temporarily on our CDN for performance."
-            },
-            "name": "Is my data private?"
-          }
-        ]
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "item": "https://pictify.io/",
-            "name": "Home",
-            "position": 1
+          "name": "Can I customize the screenshot?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We do not store your URLs or generated images. All processing is done on-the-fly and images are cached temporarily on our CDN for performance."
           },
-          {
-            "@type": "ListItem",
-            "item": "https://pictify.io/tools",
-            "name": "Tools",
-            "position": 2
-          },
-          {
-            "@type": "ListItem",
-            "name": "URL to Image",
-            "position": 3
-          }
-        ]
-      }
-    ],
+          "name": "Is my data private?"
+        }
+      ]
+    },
     {
       "@context": "https://schema.org",
       "@type": "Organization",
@@ -110,6 +90,24 @@
         "https://github.com/pictify-io"
       ],
       "url": "https://pictify.io"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "applicationCategory": [
+        "DesignApplication",
+        "Utility"
+      ],
+      "description": "Convert any URL to an image with our free URL to Image Generator. Perfect for creating thumbnails, social media previews, and more.",
+      "name": "Pictify.io URL to Image Generator",
+      "offers": {
+        "@type": "Offer",
+        "availability": "https://schema.org/InStock",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "operatingSystem": "Web",
+      "url": "https://pictify.io/tools/url-to-image-generator"
     }
   ],
   "outline": [
@@ -154,15 +152,15 @@
       "text": "FAQ"
     },
     {
-      "tag": "h3",
+      "tag": "h2",
       "text": "Why Use This Tool?"
     },
     {
-      "tag": "h3",
+      "tag": "h2",
       "text": "Pro Tips"
     },
     {
-      "tag": "h3",
+      "tag": "h2",
       "text": "Comparing Screenshot APIs?"
     },
     {

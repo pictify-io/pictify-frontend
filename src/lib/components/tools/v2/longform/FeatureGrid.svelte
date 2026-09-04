@@ -11,6 +11,12 @@
 	export let items = [];
 	/** 2 or 3 tiles per row above `sm`. Literal classes — Tailwind can't build these. */
 	export let columns = 3;
+	/**
+	 * 'p' by default: on the reference page these tiles are parallel points, not
+	 * an outline. Pass 'h3' where the block being replaced already had headings —
+	 * dropping them would quietly shrink an outline that is frozen.
+	 */
+	export let titleTag = 'p';
 
 	const COLUMN_CLASS = {
 		2: 'grid grid-cols-1 gap-6 sm:grid-cols-2',
@@ -29,7 +35,9 @@
 					{i + 1}
 				</div>
 				<div>
-					<p class="text-lg font-bold leading-tight text-brand-ink">{item.title}</p>
+					<svelte:element this={titleTag} class="text-lg font-bold leading-tight text-brand-ink"
+						>{item.title}</svelte:element
+					>
 					{#if item.body}
 						<p class="mt-2 font-sans text-[15px] leading-[23px] text-brand-slate">{item.body}</p>
 					{/if}
