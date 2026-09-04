@@ -11,7 +11,13 @@
 	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
 	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
 	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
-	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
+	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
+	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
+	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
+	import Prose from '$lib/components/tools/v2/longform/Prose.svelte';
+	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
+	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 	import Papa from 'papaparse';
 	import { user } from '../../../store/user.store';
 	import { toast } from '../../../store/toast.store';
@@ -28,26 +34,47 @@
 	// toolbar reads from the same store the render path increments.
 	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
 
-	const RELATED = [
+	/**
+	 * D3: this was the only tool page without an API block. The snippet is the
+	 * multi-page PDF call, which is the API answer to "my sheet is longer than
+	 * the free cap".
+	 */
+	const csvToPdfExamples = [
 		{
-			title: 'Table to image',
-			meta: 'CSV · HTML → PNG',
-			href: '/tools/table',
-			art: '/landing/tools/table-to-image.svg'
+			id: 'curl',
+			label: 'cURL',
+			fileName: 'render.sh',
+			code: `<span class="text-[#6a9955]"># One PDF page per row, from a template</span>
+<span class="text-[#dcdcaa]">curl</span> -X POST <span class="text-[#ce9178]">'https://api.pictify.io/pdf/multi-page'</span> \\
+  -H <span class="text-[#ce9178]">'Content-Type: application/json'</span> \\
+  -H <span class="text-[#ce9178]">'Authorization: Bearer YOUR_API_KEY'</span> \\
+  -d <span class="text-[#ce9178]">'{
+    "templateUid": "your-template-uid",
+    "variableSets": [
+      { "name": "Ada Lovelace", "course": "Analytical Engines" },
+      { "name": "Alan Turing", "course": "Computability" }
+    ],
+    "options": { "preset": "A4" }
+  }'</span>`
 		},
 		{
-			title: 'Invoice generator',
-			meta: 'LINE ITEMS → PNG',
-			href: '/tools/online-invoice-generator',
-			art: '/landing/tools/invoice-generator.svg'
-		},
-		{
-			title: 'Certificate generator',
-			meta: 'NAMES → CERTIFICATES',
-			href: '/tools/certificate-generator',
-			art: '/landing/tools/certificate-generator.svg'
+			id: 'javascript',
+			label: 'JavaScript',
+			fileName: 'render.js',
+			code: `<span class="text-[#6a9955]">// Every row of the CSV becomes a page</span>
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">rows</span> = <span class="text-[#9cdcfe]">csv</span>.<span class="text-[#dcdcaa]">map</span>((<span class="text-[#9cdcfe]">r</span>) =&gt; ({ <span class="text-[#9cdcfe]">name</span>: <span class="text-[#9cdcfe]">r</span>.<span class="text-[#9cdcfe]">name</span>, <span class="text-[#9cdcfe]">course</span>: <span class="text-[#9cdcfe]">r</span>.<span class="text-[#9cdcfe]">course</span> }));
+
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">res</span> = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]">'https://api.pictify.io/pdf/multi-page'</span>, {
+  <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
+  <span class="text-[#9cdcfe]">headers</span>: { <span class="text-[#ce9178]">'Content-Type'</span>: <span class="text-[#ce9178]">'application/json'</span>, <span class="text-[#ce9178]">'Authorization'</span>: <span class="text-[#ce9178]">'Bearer YOUR_API_KEY'</span> },
+  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">stringify</span>({ <span class="text-[#9cdcfe]">templateUid</span>, <span class="text-[#9cdcfe]">variableSets</span>: <span class="text-[#9cdcfe]">rows</span> })
+});
+
+<span class="text-[#c586c0]">const</span> { <span class="text-[#9cdcfe]">pdf</span> } = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]">res</span>.<span class="text-[#dcdcaa]">json</span>();`
 		}
 	];
+
+	const RELATED = ['table', 'certificate-generator', 'online-invoice-generator'];
 
 	// ── CSV state ────────────────────────────────────────────────────────────
 	let rows = []; // array of objects keyed by header
@@ -305,17 +332,7 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 		}
 	];
 
-	const faqSchemaJson = JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'FAQPage',
-		mainEntity: faqs.map((faq) => ({
-			'@type': 'Question',
-			name: faq.q,
-			acceptedAnswer: { '@type': 'Answer', text: faq.a }
-		}))
-	});
-
-	const structuredDataJson = JSON.stringify({
+	const structuredData = {
 		'@context': 'https://schema.org',
 		'@type': 'WebApplication',
 		name: 'Pictify CSV to PDF Converter',
@@ -326,57 +343,26 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 		operatingSystem: 'Web',
 		offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
 		creator: { '@type': 'Organization', name: 'Pictify.io', url: 'https://pictify.io' }
-	});
-
-	const breadcrumbSchemaJson = JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'BreadcrumbList',
-		itemListElement: [
-			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
-			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
-			{ '@type': 'ListItem', position: 3, name: 'CSV to PDF' }
-		]
-	});
+	};
 </script>
 
-<svelte:head>
-	<title>CSV to PDF Converter: Free, Every Row Becomes a Document | Pictify</title>
-	<meta
-		name="description"
-		content="Convert CSV to PDF free in your browser. Render the sheet as a clean table PDF, or turn every row into its own document, then batch render the whole file through the Pictify API."
-	/>
-	<meta
-		name="keywords"
-		content="csv to pdf, csv to pdf converter, convert csv to pdf, spreadsheet to pdf, csv to documents, generate pdf from spreadsheet, csv to pdf free, Pictify"
-	/>
-	<link rel="canonical" href="https://pictify.io/tools/csv-to-pdf" />
-	<meta name="robots" content="index, follow, max-image-preview:large" />
-	<meta
-		property="og:title"
-		content="CSV to PDF Converter: Every Row Becomes a Document | Pictify"
-	/>
-	<meta
-		property="og:description"
-		content="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row. Then deliver each one by email."
-	/>
-	<meta property="og:url" content="https://pictify.io/tools/csv-to-pdf" />
-	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="Pictify" />
-	<meta property="og:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta
-		name="twitter:title"
-		content="CSV to PDF Converter: Every Row Becomes a Document | Pictify"
-	/>
-	<meta
-		name="twitter:description"
-		content="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row."
-	/>
-	<meta name="twitter:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
-	{@html `<script type="application/ld+json">${structuredDataJson}</script>`}
-	{@html `<script type="application/ld+json">${faqSchemaJson}</script>`}
-	{@html `<script type="application/ld+json">${breadcrumbSchemaJson}</script>`}
-</svelte:head>
+<ToolSeoHead
+	title="CSV to PDF Converter: Free, Every Row Becomes a Document | Pictify"
+	description="Convert CSV to PDF free in your browser. Render the sheet as a clean table PDF, or turn every row into its own document, then batch render the whole file through the Pictify API."
+	keywords="csv to pdf, csv to pdf converter, convert csv to pdf, spreadsheet to pdf, csv to documents, generate pdf from spreadsheet, csv to pdf free, Pictify"
+	canonical="https://pictify.io/tools/csv-to-pdf"
+	robots="index, follow, max-image-preview:large"
+	ogTitle="CSV to PDF Converter: Every Row Becomes a Document | Pictify"
+	ogDescription="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row. Then deliver each one by email."
+	ogSiteName="Pictify"
+	ogImage="https://media.pictify.io/v3g37-1775406808141.png"
+	twitterTitle="CSV to PDF Converter: Every Row Becomes a Document | Pictify"
+	twitterDescription="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row."
+	twitterImage="https://media.pictify.io/v3g37-1775406808141.png"
+	webApplicationSchema={structuredData}
+	{faqs}
+	breadcrumbLabel="CSV to PDF"
+/>
 
 <ToolPageShell
 	toolName={TOOL_NAME}
@@ -388,35 +374,29 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 	hasResult={!!pdfBlobUrl}
 	longform="column"
 >
-	<h1
-		slot="h1"
-		class="font-display text-[38px] font-extrabold leading-[1.04] tracking-[-0.02em] text-brand-ink lg:text-[52px] lg:leading-[56px]"
-	>
+	<HeroTitle slot="h1">
 		<span>CSV</span>
 		<span>TO PDF</span>
-	</h1>
+	</HeroTitle>
 
-	<p
-		slot="hero-sub"
-		class="max-w-[640px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
-	>
+	<HeroSub slot="hero-sub">
 		Turn a spreadsheet into
 		<span class="font-medium">real documents</span>: the whole sheet as a table, or one formatted
 		PDF page per row.
 		<span class="text-brand-slate">Free, in your browser. No signup required.</span>
-	</p>
+	</HeroSub>
 
 	<div slot="tool">
 		<ToolCard>
 			<div class="flex flex-col gap-6 p-5 lg:p-7">
 				<div class="flex flex-col gap-4">
-					<h2 class="font-semibold text-lg sm:text-xl mb-4 flex items-center gap-3">
+					<p class="mb-4 flex items-center gap-3 text-lg font-semibold sm:text-xl">
 						<span
 							class="w-8 h-8 flex items-center justify-center bg-brand-field border border-brand-ink font-semibold"
 							>1</span
 						>
 						Add your CSV
-					</h2>
+					</p>
 					<div class="grid md:grid-cols-2 gap-5">
 						<label
 							class="flex flex-col items-center justify-center border border-dashed border-brand-mute hover:border-black bg-brand-subtle p-8 cursor-pointer transition-colors text-center"
@@ -477,13 +457,13 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 				</div>
 				{#if rows.length}
 					<div class="flex flex-col gap-4">
-						<h2 class="font-semibold text-lg sm:text-xl mb-4 flex items-center gap-3">
+						<p class="mb-4 flex items-center gap-3 text-lg font-semibold sm:text-xl">
 							<span
 								class="w-8 h-8 flex items-center justify-center bg-brand-field border border-brand-ink font-semibold"
 								>2</span
 							>
 							Choose the output
-						</h2>
+						</p>
 						<div class="grid md:grid-cols-2 gap-4">
 							<button
 								class="text-left p-5 border border-brand-ink transition-all {mode === 'per-row'
@@ -554,13 +534,13 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 	<div slot="result">
 		{#if pdfBlobUrl}
 			<div class="bg-brand-press border border-brand-ink p-5 sm:p-8 text-white">
-				<h2 class="font-semibold text-lg sm:text-xl mb-4 flex items-center gap-3">
+				<p class="mb-4 flex items-center gap-3 text-lg font-semibold sm:text-xl">
 					<span
 						class="w-8 h-8 flex items-center justify-center bg-brand-proof text-brand-ink border border-brand-ink font-semibold"
 						>✓</span
 					>
 					Your PDF is ready
-				</h2>
+				</p>
 				<div class="flex flex-wrap gap-3 mb-6">
 					<a
 						href={pdfBlobUrl}
@@ -598,73 +578,53 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 		{/if}
 	</div>
 
+	<AutomateSection
+		slot="automate"
+		toolName={TOOL_NAME}
+		description="Render the same CSV through the API: one PDF page per row against a branded template, with a CDN link per document and a webhook when the run finishes."
+		codeExamples={csvToPdfExamples}
+	/>
+
 	<svelte:fragment slot="longform">
-		<LongformSection index="01" id="about" first>
-			<h2
-				slot="heading"
-				class="font-display text-[28px] font-bold leading-[36px] tracking-[-0.02em] text-brand-ink"
-			>
-				A CSV to PDF converter that understands rows are people
-			</h2>
-			<p class="text-sm sm:text-base text-brand-slate leading-relaxed font-medium mb-4">
-				Most CSV to PDF converters print your spreadsheet as one long table, fine for archiving,
-				useless when each row is a person who needs their own document. This tool does both jobs:
-				render the whole sheet as a clean table PDF, or flip one switch and every row becomes its
-				own formatted page, with the first column as the title and every column as a labeled field.
-			</p>
-			<p class="text-sm sm:text-base text-brand-slate leading-relaxed font-medium">
-				And when the sheet is longer than the free cap, a
-				<a href="/docs" class="underline font-semibold">Pictify batch run</a>
-				takes the same CSV, renders each row against a branded template (certificate, letter, report,
-				or one the
-				<span class="font-semibold">AI Template Maker</span> writes from your description), and hands
-				back a CDN link per document with a webhook when the run finishes.
-			</p>
+		<LongformSection
+			index="01"
+			id="about"
+			first
+			title="A CSV to PDF converter that understands rows are people"
+		>
+			<Prose>
+				<p>
+					Most CSV to PDF converters print your spreadsheet as one long table, fine for archiving,
+					useless when each row is a person who needs their own document. This tool does both jobs:
+					render the whole sheet as a clean table PDF, or flip one switch and every row becomes its
+					own formatted page, with the first column as the title and every column as a labeled
+					field.
+				</p>
+				<p>
+					And when the sheet is longer than the free cap, a
+					<a href="/docs">Pictify batch run</a>
+					takes the same CSV, renders each row against a branded template (certificate, letter, report,
+					or one the <strong>AI Template Maker</strong> writes from your description), and hands back
+					a CDN link per document with a webhook when the run finishes.
+				</p>
+			</Prose>
 		</LongformSection>
 
-		<LongformSection index="02" id="faq">
-			<h2
-				slot="heading"
-				class="font-display text-[28px] font-bold leading-[36px] tracking-[-0.02em] text-brand-ink"
-			>
-				Frequently Asked Questions
-			</h2>
-			<div class="space-y-3">
-				{#each faqs as faq}
-					<details
-						class="group bg-brand-subtle border border-brand-ink overflow-hidden transition-all"
-					>
-						<summary
-							class="flex items-center justify-between cursor-pointer p-4 font-bold text-brand-ink select-none text-sm"
-						>
-							<span>{faq.q}</span>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-5 w-5 text-brand-ink group-open:rotate-180 transition-transform duration-300 flex-shrink-0"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-							>
-								<path
-									fill-rule="evenodd"
-									d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-									clip-rule="evenodd"
-								/>
-							</svg>
-						</summary>
-						<div
-							class="p-4 pt-0 text-brand-slate border-t-[3px] border-black bg-brand-paper text-sm"
-						>
-							{faq.a}
-						</div>
-					</details>
-				{/each}
-			</div>
+		<LongformSection index="02" id="faq" title="Frequently Asked Questions">
+			<FaqList {faqs} />
 		</LongformSection>
 	</svelte:fragment>
 
 	<svelte:fragment slot="footer-links">
-		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
-			<RelatedTools tools={['table', 'json-to-image', 'markdown', 'receipt']} />
-		</div>
+		<RelatedLinks
+			toolName={TOOL_NAME}
+			links={[
+				{ href: '/tools/table', label: 'Table to Image' },
+				{ href: '/tools/json-to-image', label: 'JSON to Image' },
+				{ href: '/tools/markdown', label: 'Markdown to Image' },
+				{ href: '/tools/receipt', label: 'Receipt Generator' },
+				{ href: '/tools', label: 'View all tools →' }
+			]}
+		/>
 	</svelte:fragment>
 </ToolPageShell>
