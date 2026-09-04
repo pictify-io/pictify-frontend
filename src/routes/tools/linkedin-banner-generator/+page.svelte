@@ -21,7 +21,6 @@
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 	import { user } from '../../../store/user.store';
-	import ApiPromptSection from '$lib/components/tools/ApiPromptSection.svelte';
 	import { analytics } from '$lib/telemetry.js';
 	import {
 		allTemplates,
@@ -34,7 +33,12 @@
 		LINKEDIN_BANNER_HEIGHT,
 		SAFE_ZONE
 	} from '$lib/pseo/linkedin-banner.js';
-	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
+	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
+	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
+	import ProseGroup from '$lib/components/tools/v2/longform/ProseGroup.svelte';
+	import StepCards from '$lib/components/tools/v2/longform/StepCards.svelte';
+	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 
 	// Social proof counter
 	let totalBannersCreated = 23847;
@@ -512,7 +516,7 @@
 		secondaryCtaLabel: 'See code examples'
 	};
 
-	const structuredDataJson = JSON.stringify({
+	const structuredData = {
 		'@context': 'https://schema.org',
 		'@type': 'WebApplication',
 		name: 'Pictify LinkedIn Banner Generator',
@@ -523,17 +527,7 @@
 		operatingSystem: 'Web',
 		offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
 		creator: { '@type': 'Organization', name: 'Pictify.io', url: 'https://pictify.io' }
-	});
-
-	const breadcrumbSchemaJson = JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'BreadcrumbList',
-		itemListElement: [
-			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
-			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
-			{ '@type': 'ListItem', position: 3, name: 'LinkedIn Banner Generator' }
-		]
-	});
+	};
 
 	const TOOL_NAME = 'linkedin_banner_generator';
 	const TOOL_PATH = '/tools/linkedin-banner-generator';
@@ -579,63 +573,27 @@
 		}
 	];
 
-	const RELATED = [
-		{
-			title: 'OG image generator',
-			meta: 'TITLE · LOGO → 1200×630',
-			href: '/tools/og-image-generator',
-			art: '/landing/tools/og-image-generator.svg'
-		},
-		{
-			title: 'Tweet screenshot',
-			meta: 'TWEET URL → PNG',
-			href: '/tools/tweet-screenshot',
-			art: '/landing/tools/tweet-screenshot.svg'
-		},
-		{
-			title: 'Portfolio card',
-			meta: 'PROFILE → PNG',
-			href: '/tools/portfolio-card',
-			art: '/landing/tools/portfolio-card.svg'
-		}
-	];
+	const RELATED = ['og-image-generator', 'tweet-screenshot', 'html-to-image'];
 </script>
 
-<svelte:head>
-	<title>Free LinkedIn Banner Generator | Create Professional Profile Banners | Pictify</title>
-	<meta
-		name="description"
-		content="Create stunning LinkedIn banners in seconds. Choose from 20+ professional templates designed for developers, designers, marketers, and more. Perfect 1584x396 dimensions guaranteed."
-	/>
-	<meta
-		name="keywords"
-		content="linkedin banner generator, linkedin cover photo, linkedin background, profile banner, linkedin header, linkedin banner maker"
-	/>
-
-	<meta property="og:title" content="Free LinkedIn Banner Generator | Pictify" />
-	<meta
-		property="og:description"
-		content="Create professional LinkedIn banners in seconds. 20+ templates for developers, designers, marketers, and more."
-	/>
-	<meta property="og:url" content="https://pictify.io/tools/linkedin-banner-generator" />
-	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="Pictify" />
-	<meta property="og:image" content="https://pictify.io/og/tools/linkedin-banner-generator.png" />
-	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="630" />
-	<meta property="og:image:alt" content="Pictify LinkedIn banner generator: free, 1584×396" />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="Free LinkedIn Banner Generator | Pictify" />
-	<meta
-		name="twitter:description"
-		content="Create professional LinkedIn banners in seconds. 20+ templates. Free, no watermark."
-	/>
-	<meta name="twitter:image" content="https://pictify.io/og/tools/linkedin-banner-generator.png" />
-
-	<link rel="canonical" href="https://pictify.io/tools/linkedin-banner-generator" />
-	{@html `<script type="application/ld+json">${structuredDataJson}</script>`}
-	{@html `<script type="application/ld+json">${breadcrumbSchemaJson}</script>`}
-</svelte:head>
+<ToolSeoHead
+	title="Free LinkedIn Banner Generator | Create Professional Profile Banners | Pictify"
+	description="Create stunning LinkedIn banners in seconds. Choose from 20+ professional templates designed for developers, designers, marketers, and more. Perfect 1584x396 dimensions guaranteed."
+	keywords="linkedin banner generator, linkedin cover photo, linkedin background, profile banner, linkedin header, linkedin banner maker"
+	canonical="https://pictify.io/tools/linkedin-banner-generator"
+	ogTitle="Free LinkedIn Banner Generator | Pictify"
+	ogDescription="Create professional LinkedIn banners in seconds. 20+ templates for developers, designers, marketers, and more."
+	ogSiteName="Pictify"
+	ogImage="https://pictify.io/og/tools/linkedin-banner-generator.png"
+	ogImageWidth={1200}
+	ogImageHeight={630}
+	ogImageAlt="Pictify LinkedIn banner generator: free, 1584×396"
+	twitterTitle="Free LinkedIn Banner Generator | Pictify"
+	twitterDescription="Create professional LinkedIn banners in seconds. 20+ templates. Free, no watermark."
+	twitterImage="https://pictify.io/og/tools/linkedin-banner-generator.png"
+	webApplicationSchema={structuredData}
+	breadcrumbLabel="LinkedIn Banner Generator"
+/>
 
 <ToolPageShell
 	toolName={TOOL_NAME}
@@ -647,22 +605,16 @@
 	hasResult={!!imageUrl}
 	longform="column"
 >
-	<h1
-		slot="h1"
-		class="font-display text-[38px] font-extrabold leading-[1.04] tracking-[-0.02em] text-brand-ink lg:text-[52px] lg:leading-[56px]"
-	>
+	<HeroTitle slot="h1">
 		<span>LINKEDIN BANNER</span>
 		<span>GENERATOR</span>
-	</h1>
+	</HeroTitle>
 
-	<p
-		slot="hero-sub"
-		class="max-w-[640px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
-	>
+	<HeroSub slot="hero-sub">
 		Choose from <span class="font-medium">{allTemplates.length}+ templates</span> designed for
 		developers, marketers, designers, and professionals.
 		<span class="text-brand-slate">Perfect 1584×396 dimensions guaranteed</span>
-	</p>
+	</HeroSub>
 
 	<div slot="tool">
 		<ToolCard>
@@ -939,128 +891,63 @@
 	/>
 
 	<svelte:fragment slot="longform">
-		<LongformSection index="01" id="how-to" first>
-			<h2
-				slot="heading"
-				class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink"
-			>
-				How to Add Your Banner to LinkedIn
-			</h2>
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-				<div class="text-center">
-					<div
-						class="w-16 h-16 bg-brand-field border border-brand-ink flex items-center justify-center mx-auto mb-4 text-2xl font-semibold"
-					>
-						01
-					</div>
-					<h3 class="font-semibold text-brand-ink tracking-wide mb-2">Create Your Banner</h3>
-					<p class="text-brand-slate font-bold text-sm">
-						Choose a template, customize it with your details, and download
-					</p>
-				</div>
-				<div class="text-center">
-					<div
-						class="w-16 h-16 bg-brand-pink text-white border border-brand-ink flex items-center justify-center mx-auto mb-4 text-2xl font-semibold"
-					>
-						02
-					</div>
-					<h3 class="font-semibold text-brand-ink tracking-wide mb-2">Go to LinkedIn</h3>
-					<p class="text-brand-slate font-bold text-sm">
-						Open your LinkedIn profile and click the camera icon on your cover photo
-					</p>
-				</div>
-				<div class="text-center">
-					<div
-						class="w-16 h-16 bg-brand-proof border border-brand-ink flex items-center justify-center mx-auto mb-4 text-2xl font-semibold"
-					>
-						03
-					</div>
-					<h3 class="font-semibold text-brand-ink tracking-wide mb-2">Upload & Save</h3>
-					<p class="text-brand-slate font-bold text-sm">
-						Upload your banner and adjust the positioning if needed
-					</p>
-				</div>
-			</div>
+		<LongformSection index="01" id="how-to" first title="How to Add Your Banner to LinkedIn">
+			<StepCards
+				steps={[
+					{
+						title: 'Create Your Banner',
+						body: 'Choose a template, customize it with your details, and download'
+					},
+					{
+						title: 'Go to LinkedIn',
+						body: 'Open your LinkedIn profile and click the camera icon on your cover photo'
+					},
+					{
+						title: 'Upload & Save',
+						body: 'Upload your new banner, adjust the crop if needed, and save your changes'
+					}
+				]}
+			/>
 		</LongformSection>
 
-		<LongformSection index="02" id="size-guide">
-			<h2
-				slot="heading"
-				class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink"
-			>
-				LinkedIn Banner Size Guide
-			</h2>
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-				<div>
-					<h3 class="font-semibold text-brand-ink tracking-wide mb-4 flex items-center gap-2">
-						<span
-							class="w-8 h-8 bg-brand-ink text-white flex items-center justify-center text-sm font-bold"
-							>✓</span
-						>
-						Recommended Dimensions
-					</h3>
-					<ul class="space-y-3">
-						<li class="flex items-center gap-3 p-3 bg-brand-subtle border border-brand-ink">
-							<span class="text-brand-proof font-semibold">✓</span>
-							<span class="font-bold"
-								>Personal Profile: <strong class="text-brand-pink">1584 x 396 pixels</strong></span
-							>
-						</li>
-						<li class="flex items-center gap-3 p-3 bg-brand-subtle border border-brand-ink">
-							<span class="text-brand-proof font-semibold">✓</span>
-							<span class="font-bold"
-								>Company Page: <strong class="text-brand-pink">1128 x 191 pixels</strong></span
-							>
-						</li>
-						<li class="flex items-center gap-3 p-3 bg-brand-subtle border border-brand-ink">
-							<span class="text-brand-proof font-semibold">✓</span>
-							<span class="font-bold"
-								>Aspect Ratio: <strong class="text-brand-pink">4:1</strong></span
-							>
-						</li>
-					</ul>
-				</div>
-				<div>
-					<h3 class="font-semibold text-brand-ink tracking-wide mb-4 flex items-center gap-2">
-						<span
-							class="w-8 h-8 bg-brand-field border border-brand-ink flex items-center justify-center text-sm font-bold"
-							>!</span
-						>
-						Important Notes
-					</h3>
-					<ul class="space-y-3">
-						<li class="flex items-start gap-3 p-3 bg-brand-subtle border border-brand-ink">
-							<span class="text-brand-accent font-semibold mt-0.5">⚠</span>
-							<span class="font-medium"
-								>Mobile App Profile Photo covers large left area (~600px)</span
-							>
-						</li>
-						<li class="flex items-start gap-3 p-3 bg-brand-subtle border border-brand-ink">
-							<span class="text-blue-500 font-semibold mt-0.5">ℹ</span>
-							<span class="font-medium"
-								>All templates now keep important text on the right side</span
-							>
-						</li>
-					</ul>
-				</div>
-			</div>
+		<LongformSection index="02" id="size-guide" title="LinkedIn Banner Size Guide">
+			<!--
+				The ✓ and ! glyphs stay inside the heading text: they were part of it
+				before, and this outline is frozen. They belong in a copy pass, not a
+				layout one.
+			-->
+			<ProseGroup
+				columns={2}
+				items={[
+					{
+						heading: '✓ Recommended Dimensions',
+						bullets: [
+							{ html: 'Personal Profile: <strong>1584 x 396 pixels</strong>' },
+							{ html: 'Company Page: <strong>1128 x 191 pixels</strong>' },
+							{ html: 'Aspect Ratio: <strong>4:1</strong>' }
+						]
+					},
+					{
+						heading: '! Important Notes',
+						bullets: [
+							'Mobile App Profile Photo covers large left area (~600px)',
+							'All templates now keep important text on the right side'
+						]
+					}
+				]}
+			/>
 		</LongformSection>
-
-		<!-- API Section -->
-		<ApiPromptSection
-			title={apiCtaDetails.title}
-			description={apiCtaDetails.description}
-			featurePoints={apiCtaDetails.featurePoints}
-			codeSnippet={apiCtaDetails.codeSnippet}
-			docsUrl={apiCtaDetails.docsUrl}
-			docsLabel={apiCtaDetails.docsLabel}
-			secondaryCtaLabel={apiCtaDetails.secondaryCtaLabel}
-		/>
 	</svelte:fragment>
 
 	<svelte:fragment slot="footer-links">
-		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
-			<RelatedTools tools={['twitter-header', 'youtube-thumbnail', 'responsive-image-generator']} />
-		</div>
+		<RelatedLinks
+			toolName={TOOL_NAME}
+			links={[
+				{ href: '/tools/twitter-header', label: 'Twitter Header' },
+				{ href: '/tools/youtube-thumbnail', label: 'YouTube Thumbnail' },
+				{ href: '/tools/responsive-image-generator', label: 'Responsive Image Generator' },
+				{ href: '/tools', label: 'View all tools →' }
+			]}
+		/>
 	</svelte:fragment>
 </ToolPageShell>

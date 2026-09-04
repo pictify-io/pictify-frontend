@@ -47,7 +47,10 @@
 			{#if item.bullets?.length}
 				<ul class="list-disc pl-5 font-sans text-[15px] leading-[23px] text-brand-slate">
 					{#each item.bullets as bullet}
-						<li>{bullet}</li>
+						<!-- Same rule as bodyHtml: repo-controlled copy only. -->
+						<li>
+							{#if typeof bullet === 'object'}{@html bullet.html}{:else}{bullet}{/if}
+						</li>
 					{/each}
 				</ul>
 			{/if}
