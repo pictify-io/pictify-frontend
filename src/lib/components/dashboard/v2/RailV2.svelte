@@ -11,6 +11,7 @@
 	import { page } from '$app/stores';
 	import { afterNavigate } from '$app/navigation';
 	import NavIcon from './NavIcon.svelte';
+	import BrandMark from '$lib/components/BrandMark.svelte';
 	import DitherMeter from './DitherMeter.svelte';
 	import VerifyEmailCard from './VerifyEmailCard.svelte';
 	import {
@@ -140,9 +141,7 @@
 	     they never leave the frame. -->
 	<div class="flex flex-1 flex-col gap-5 overflow-hidden">
 		<a href="/dashboard" class="flex items-center gap-2" aria-label="Pictify home">
-			<span class="flex h-6 w-6 items-center justify-center rounded-md bg-brand-ink">
-				<span class="block h-[9px] w-[9px] bg-brand-field" />
-			</span>
+			<BrandMark size={24} />
 			<span class="font-display text-[19px] font-extrabold tracking-[-0.03em] text-brand-ink"
 				>Pictify</span
 			>

@@ -1,4 +1,5 @@
 <script>
+	import BrandMark from '$lib/components/BrandMark.svelte';
 	import '../../app.css';
 	import RailV2 from '$lib/components/dashboard/v2/RailV2.svelte';
 	import CommandPalette from '$lib/components/dashboard/CommandPalette.svelte';
@@ -39,12 +40,14 @@
 
 		<!-- Mobile top bar: the rail is desktop furniture; small screens get the
 		     mark and a toggle. -->
-		<header class="flex h-14 flex-shrink-0 items-center justify-between border-b border-brand-rule px-4 lg:hidden">
+		<header
+			class="flex h-14 flex-shrink-0 items-center justify-between border-b border-brand-rule px-4 lg:hidden"
+		>
 			<a href="/dashboard" class="flex items-center gap-2" aria-label="Pictify home">
-				<span class="flex h-6 w-6 items-center justify-center rounded-md bg-brand-ink">
-					<span class="block h-[9px] w-[9px] bg-brand-field"></span>
-				</span>
-				<span class="font-display text-lg font-extrabold tracking-[-0.03em] text-brand-ink">Pictify</span>
+				<BrandMark size={24} />
+				<span class="font-display text-lg font-extrabold tracking-[-0.03em] text-brand-ink"
+					>Pictify</span
+				>
 			</a>
 			<button
 				type="button"
@@ -53,9 +56,9 @@
 				aria-label="Toggle navigation"
 				aria-expanded={railOpen}
 			>
-				<span class="block h-0.5 w-4 bg-brand-ink"></span>
-				<span class="block h-0.5 w-4 bg-brand-ink"></span>
-				<span class="block h-0.5 w-4 bg-brand-ink"></span>
+				<span class="block h-0.5 w-4 bg-brand-ink" />
+				<span class="block h-0.5 w-4 bg-brand-ink" />
+				<span class="block h-0.5 w-4 bg-brand-ink" />
 			</button>
 		</header>
 
@@ -79,12 +82,15 @@
 				<RailV2 />
 			</div>
 
-			<main class="min-w-0 flex-grow overflow-y-auto overflow-x-hidden" style="scrollbar-gutter: stable;">
+			<main
+				class="min-w-0 flex-grow overflow-y-auto overflow-x-hidden"
+				style="scrollbar-gutter: stable;"
+			>
 				{#if isUserLoaded}
 					<slot />
 				{:else}
 					<div class="flex h-full items-center justify-center">
-						<span class="block h-3 w-3 animate-pulse bg-brand-field" aria-label="Loading"></span>
+						<span class="block h-3 w-3 animate-pulse bg-brand-field" aria-label="Loading" />
 					</div>
 				{/if}
 			</main>

@@ -8,6 +8,7 @@
 	 *
 	 * The API seams are marked TODO below. Everything else is real.
 	 */
+	import BrandMark from '$lib/components/BrandMark.svelte';
 	import { onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
@@ -203,7 +204,9 @@
 			const rendered = await renderOnboarding({ templateUid: templateId });
 			// A fresh URL resets the rendered screen's failed state; if the same
 			// URL comes back, the cache-buster still forces the image to retry.
-			url = rendered.url ? `${rendered.url}${rendered.url.includes('?') ? '&' : '?'}r=${Date.now()}` : url;
+			url = rendered.url
+				? `${rendered.url}${rendered.url.includes('?') ? '&' : '?'}r=${Date.now()}`
+				: url;
 			// Deliberately no elapsedMs here: the chip's claim ("written and
 			// rendered in…") describes the first wait, which already happened.
 		} catch {
@@ -285,17 +288,19 @@
 
 <!-- onboarding-v2 opts this page out of the app-wide root font-size down-scale (see app.css). -->
 <div class="onboarding-v2 flex min-h-screen w-full flex-col bg-brand-paper">
-	<header class="flex h-[72px] w-full flex-shrink-0 items-center justify-between border-b border-brand-rule px-10">
+	<header
+		class="flex h-[72px] w-full flex-shrink-0 items-center justify-between border-b border-brand-rule px-10"
+	>
 		<a href="/" class="flex items-center gap-2.5" aria-label="Pictify home">
-			<span class="flex h-[26px] w-[26px] items-center justify-center rounded-md bg-brand-ink">
-				<span class="block h-2.5 w-2.5 bg-brand-field"></span>
-			</span>
+			<BrandMark size={26} />
 			<span class="font-display text-[21px] font-extrabold tracking-[-0.03em] text-brand-ink">
 				Pictify
 			</span>
 		</a>
 		<div class="flex items-center gap-6">
-			<span class="font-mono text-[11px] uppercase tracking-[0.1em] text-brand-mute">{stepLabel}</span>
+			<span class="font-mono text-[11px] uppercase tracking-[0.1em] text-brand-mute"
+				>{stepLabel}</span
+			>
 			<button
 				type="button"
 				on:click={() => finish('exit')}
@@ -311,7 +316,13 @@
 		     else in the system — the corners carry the brand so the centre can
 		     stay all work. -->
 		<PixelCluster
-			cells={[[2, 0, 'powder'], [1, 1, 'blue'], [2, 1, 'ink'], [0, 2, 'sky'], [2, 2, 'blue']]}
+			cells={[
+				[2, 0, 'powder'],
+				[1, 1, 'blue'],
+				[2, 1, 'ink'],
+				[0, 2, 'sky'],
+				[2, 2, 'blue']
+			]}
 			cell={44}
 			origin="sw"
 			class="-bottom-[30px] -left-10 hidden lg:block"

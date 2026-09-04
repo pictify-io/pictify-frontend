@@ -1,6 +1,7 @@
 <script>
 	export let isLogin = false;
 
+	import BrandMark from '$lib/components/BrandMark.svelte';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
@@ -191,9 +192,7 @@
 		class="flex w-full flex-shrink-0 flex-col justify-between px-5 py-8 lg:w-[660px] lg:px-[88px] lg:py-11"
 	>
 		<a href="/" class="flex items-center gap-2.5" aria-label="Pictify home">
-			<span class="flex h-[26px] w-[26px] items-center justify-center rounded-md bg-brand-ink">
-				<span class="block h-2.5 w-2.5 bg-brand-field"></span>
-			</span>
+			<BrandMark size={26} />
 			<span class="font-display text-[21px] font-extrabold tracking-[-0.03em] text-brand-ink">
 				Pictify
 			</span>
@@ -202,7 +201,9 @@
 		<div class="flex w-full flex-col gap-[22px] py-10 lg:py-0">
 			{#if view === 'sent'}
 				<div class="flex flex-col gap-2">
-					<h1 class="font-display text-[46px] font-extrabold leading-[46px] tracking-[-0.04em] text-brand-ink">
+					<h1
+						class="font-display text-[46px] font-extrabold leading-[46px] tracking-[-0.04em] text-brand-ink"
+					>
 						Check your inbox.
 					</h1>
 					<p class="font-sans text-base leading-6 text-brand-slate lg:w-[400px]">
@@ -219,8 +220,11 @@
 				</button>
 			{:else}
 				<div class="flex flex-col gap-2">
-					<h1 class="font-display text-[46px] font-extrabold leading-[46px] tracking-[-0.04em] text-brand-ink">
-						{#if view === 'forgot'}Reset your password.{:else if isLogin}Welcome back.{:else}Start rendering.{/if}
+					<h1
+						class="font-display text-[46px] font-extrabold leading-[46px] tracking-[-0.04em] text-brand-ink"
+					>
+						{#if view === 'forgot'}Reset your password.{:else if isLogin}Welcome back.{:else}Start
+							rendering.{/if}
 					</h1>
 					<p class="font-sans text-base leading-6 text-brand-slate lg:w-[400px]">
 						{#if view === 'forgot'}
@@ -240,24 +244,42 @@
 						class="flex h-[54px] w-full items-center justify-center gap-3 rounded-btn border-2 border-brand-ink bg-brand-paper font-sans text-base font-semibold text-brand-ink transition-colors hover:bg-brand-canvas"
 					>
 						<svg width="19" height="19" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-							<path d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z" fill="#4285F4" />
-							<path d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z" fill="#34A853" />
-							<path d="M11.69 28.18c-.44-1.32-.69-2.73-.69-4.18s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z" fill="#FBBC05" />
-							<path d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z" fill="#EA4335" />
+							<path
+								d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"
+								fill="#4285F4"
+							/>
+							<path
+								d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"
+								fill="#34A853"
+							/>
+							<path
+								d="M11.69 28.18c-.44-1.32-.69-2.73-.69-4.18s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"
+								fill="#FBBC05"
+							/>
+							<path
+								d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"
+								fill="#EA4335"
+							/>
 						</svg>
 						Continue with Google
 					</button>
 
 					<div class="flex w-full items-center gap-4">
-						<span class="h-px flex-1 bg-brand-rule"></span>
+						<span class="h-px flex-1 bg-brand-rule" />
 						<span class="font-mono text-[11px] tracking-[0.1em] text-brand-mute">or</span>
-						<span class="h-px flex-1 bg-brand-rule"></span>
+						<span class="h-px flex-1 bg-brand-rule" />
 					</div>
 				{/if}
 
-				<form class="flex w-full flex-col gap-[22px]" on:submit|preventDefault={view === 'forgot' ? handleForgotPassword : handleSubmit}>
+				<form
+					class="flex w-full flex-col gap-[22px]"
+					on:submit|preventDefault={view === 'forgot' ? handleForgotPassword : handleSubmit}
+				>
 					<div class="flex w-full flex-col gap-[7px]">
-						<label for="email" class="font-mono text-[11px] uppercase tracking-[0.09em] text-[#6B6B68]">
+						<label
+							for="email"
+							class="font-mono text-[11px] uppercase tracking-[0.09em] text-[#6B6B68]"
+						>
 							Email
 						</label>
 						<input
@@ -273,7 +295,10 @@
 					{#if view === 'credentials'}
 						<div class="flex w-full flex-col gap-[7px]">
 							<div class="flex items-center justify-between">
-								<label for="password" class="font-mono text-[11px] uppercase tracking-[0.09em] text-[#6B6B68]">
+								<label
+									for="password"
+									class="font-mono text-[11px] uppercase tracking-[0.09em] text-[#6B6B68]"
+								>
 									Password
 								</label>
 								{#if isLogin}
@@ -286,7 +311,9 @@
 									</button>
 								{/if}
 							</div>
-							<div class="flex h-[54px] w-full items-center rounded-btn border-2 border-brand-ink bg-brand-paper px-4 focus-within:ring-2 focus-within:ring-brand-royal">
+							<div
+								class="flex h-[54px] w-full items-center rounded-btn border-2 border-brand-ink bg-brand-paper px-4 focus-within:ring-2 focus-within:ring-brand-royal"
+							>
 								<!-- Split rather than a dynamic `type`: Svelte forbids that with bind:value. -->
 								{#if showPassword}
 									<input
@@ -323,8 +350,12 @@
 											<span
 												class="block h-2 w-2 {rule.ok ? 'bg-brand-proof' : 'bg-[#D3D5CE]'}"
 												aria-hidden="true"
-											></span>
-											<span class="font-mono text-[11px] {rule.ok ? 'text-[#3F5B47]' : 'text-brand-mute'}">
+											/>
+											<span
+												class="font-mono text-[11px] {rule.ok
+													? 'text-[#3F5B47]'
+													: 'text-brand-mute'}"
+											>
 												{rule.label}
 											</span>
 										</span>
@@ -339,7 +370,7 @@
 							role="alert"
 							class="flex items-start gap-2.5 rounded-btn border-2 border-brand-ink bg-brand-rose px-4 py-3 font-sans text-[15px] leading-[21px] text-brand-ink"
 						>
-							<span class="mt-[6px] block h-2 w-2 flex-shrink-0 bg-brand-ink" aria-hidden="true"></span>
+							<span class="mt-[6px] block h-2 w-2 flex-shrink-0 bg-brand-ink" aria-hidden="true" />
 							{errorMessage}
 						</p>
 					{/if}
