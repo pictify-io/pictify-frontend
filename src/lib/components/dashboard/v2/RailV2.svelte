@@ -9,10 +9,17 @@
 	 */
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { afterNavigate } from '$app/navigation';
 	import NavIcon from './NavIcon.svelte';
 	import DitherMeter from './DitherMeter.svelte';
 	import VerifyEmailCard from './VerifyEmailCard.svelte';
-	import { currentTeam, teams, teamMembers, initializeTeamState, switchTeamAction } from '../../../../store/team.store';
+	import {
+		currentTeam,
+		teams,
+		teamMembers,
+		initializeTeamState,
+		switchTeamAction
+	} from '../../../../store/team.store';
 	import { usageWidget, initPLG, PLAN_DISPLAY_NAMES } from '../../../../store/plg.store';
 	import { user, activeApiToken, getAPITokenAction } from '../../../../store/user.store';
 
@@ -42,16 +49,55 @@
 	let copied = false;
 
 	$: path = $page.url.pathname;
-	const isActive = (item) =>
-		item.exact ? path === item.href : path === item.href || path.startsWith(item.href + '/');
+	/**
+	 * `path` is an ARGUMENT, not something this closes over.
+	 *
+	 * Svelte invalidates a template expression only when an identifier that
+	 * appears IN that expression changes. Written as `isActive(item)` reading
+	 * `path` from scope, navigating re-rendered nothing: `path` updated, but no
+	 * expression mentioned it, so every row kept the active state it had on
+	 * first render and the rail stayed stuck on whatever page you landed on.
+	 * Naming it at the call site is what makes the highlight follow the route.
+	 */
+	const isActive = (item, current) =>
+		item.exact
+			? current === item.href
+			: current === item.href || current.startsWith(item.href + '/');
+
+	/** Open the MORE group when the page you are on lives inside it. */
+	$: moreHasActive = MORE.some((item) => isActive(item, path));
+
+	/*
+	 * The nav list scrolls: at 720px tall it shows about 326px of a 531px list,
+	 * so a page under MORE can be marked active and still sit below the fold —
+	 * which looks exactly like the highlight not working.
+	 *
+	 * This corrects rather than predicts. Timing the scroll was unreliable: the
+	 * rail is still growing when the first frames fire (the meters and the
+	 * verify-email card below the list have not laid out), so an early
+	 * scrollIntoView either no-ops or lands short and the row drifts back out of
+	 * view as the layout settles. Instead, scroll only when the active row is
+	 * actually out of view, and re-check whenever the rail changes size. That
+	 * makes repeated calls harmless and leaves a rail the user has scrolled
+	 * themselves alone.
+	 */
+	let navEl;
+	function rowIsVisible(row) {
+		const r = row.getBoundingClientRect();
+		const s = navEl.getBoundingClientRect();
+		return r.top >= s.top - 1 && r.bottom <= s.bottom + 1;
+	}
+	function revealActive() {
+		const row = navEl?.querySelector('[aria-current="page"]');
+		if (row && !rowIsVisible(row)) row.scrollIntoView({ block: 'nearest' });
+	}
+	afterNavigate(() => requestAnimationFrame(revealActive));
 
 	$: teamName = $currentTeam?.name || 'My workspace';
 	$: memberCount = $teamMembers?.length || 0;
 	$: planName = PLAN_DISPLAY_NAMES[$usageWidget?.plan] || 'Free';
 	$: subline = memberCount > 1 ? `${memberCount} members` : planName + ' plan';
-	$: keyMasked = $activeApiToken?.token
-		? `pic_live_••••${$activeApiToken.token.slice(-5)}`
-		: null;
+	$: keyMasked = $activeApiToken?.token ? `pic_live_••••${$activeApiToken.token.slice(-5)}` : null;
 
 	async function copyKey() {
 		if (!$activeApiToken?.token) return;
@@ -79,6 +125,12 @@
 		initializeTeamState();
 		initPLG();
 		getAPITokenAction().catch(() => {});
+		// Re-check as the rail settles: the meters and the verify-email card below
+		// the list arrive late and change how much of it is on screen.
+		const ro = new ResizeObserver(() => revealActive());
+		if (navEl) ro.observe(navEl);
+		revealActive();
+		return () => ro.disconnect();
 	});
 </script>
 
@@ -89,9 +141,11 @@
 	<div class="flex flex-1 flex-col gap-5 overflow-hidden">
 		<a href="/dashboard" class="flex items-center gap-2" aria-label="Pictify home">
 			<span class="flex h-6 w-6 items-center justify-center rounded-md bg-brand-ink">
-				<span class="block h-[9px] w-[9px] bg-brand-field"></span>
+				<span class="block h-[9px] w-[9px] bg-brand-field" />
 			</span>
-			<span class="font-display text-[19px] font-extrabold tracking-[-0.03em] text-brand-ink">Pictify</span>
+			<span class="font-display text-[19px] font-extrabold tracking-[-0.03em] text-brand-ink"
+				>Pictify</span
+			>
 		</a>
 
 		<!-- Team switcher: context, kept visually distinct from the active-nav card
@@ -104,20 +158,28 @@
 				aria-expanded={switcherOpen}
 			>
 				<span class="flex items-center gap-2">
-					<span class="flex h-[22px] w-[22px] items-center justify-center rounded-[5px] bg-brand-blue">
+					<span
+						class="flex h-[22px] w-[22px] items-center justify-center rounded-[5px] bg-brand-blue"
+					>
 						<span class="font-display text-[11px] font-extrabold text-white">
 							{teamName.charAt(0).toUpperCase()}
 						</span>
 					</span>
 					<span class="flex flex-col">
-						<span class="max-w-[110px] truncate font-sans text-[12.5px] font-bold text-brand-ink">{teamName}</span>
-						<span class="font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute">{subline}</span>
+						<span class="max-w-[110px] truncate font-sans text-[12.5px] font-bold text-brand-ink"
+							>{teamName}</span
+						>
+						<span class="font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute"
+							>{subline}</span
+						>
 					</span>
 				</span>
 				<span class="text-[11px] text-brand-mute">⌄</span>
 			</button>
 			{#if switcherOpen}
-				<div class="absolute left-0 right-0 top-full z-30 mt-1 flex flex-col overflow-hidden rounded-md border border-black/10 bg-white shadow-lg">
+				<div
+					class="absolute left-0 right-0 top-full z-30 mt-1 flex flex-col overflow-hidden rounded-md border border-black/10 bg-white shadow-lg"
+				>
 					{#each $teams as membership (membership.team?.uid)}
 						<button
 							type="button"
@@ -126,7 +188,10 @@
 						>
 							<span class="truncate">{membership.team?.name}</span>
 							{#if membership.team?.uid === $currentTeam?.uid}
-								<span class="ml-2 block h-2 w-2 flex-shrink-0 bg-brand-proof" aria-label="current team"></span>
+								<span
+									class="ml-2 block h-2 w-2 flex-shrink-0 bg-brand-proof"
+									aria-label="current team"
+								/>
 							{/if}
 						</button>
 					{/each}
@@ -140,10 +205,12 @@
 			{/if}
 		</div>
 
-		<div class="flex min-h-0 flex-col gap-1.5 overflow-y-auto">
-			<span class="px-2 pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute">Shop</span>
+		<div bind:this={navEl} class="flex min-h-0 flex-col gap-1.5 overflow-y-auto">
+			<span class="px-2 pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute"
+				>Shop</span
+			>
 			{#each SHOP as item (item.href)}
-				{@const active = isActive(item)}
+				{@const active = isActive(item, path)}
 				<a
 					href={item.href}
 					class="flex items-center gap-[9px] rounded-btn px-2 py-[7px] {active
@@ -152,13 +219,17 @@
 					aria-current={active ? 'page' : undefined}
 				>
 					<NavIcon name={item.icon} />
-					<span class="font-sans text-sm {active ? 'font-semibold text-brand-ink' : ''}">{item.label}</span>
+					<span class="font-sans text-sm {active ? 'font-semibold text-brand-ink' : ''}"
+						>{item.label}</span
+					>
 				</a>
 			{/each}
 
-			<span class="px-2 pb-1 pt-4 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute">Account</span>
+			<span class="px-2 pb-1 pt-4 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute"
+				>Account</span
+			>
 			{#each ACCOUNT as item (item.href)}
-				{@const active = isActive(item)}
+				{@const active = isActive(item, path)}
 				<a
 					href={item.href}
 					class="flex items-center gap-[9px] rounded-btn px-2 py-[7px] {active
@@ -167,20 +238,26 @@
 					aria-current={active ? 'page' : undefined}
 				>
 					<NavIcon name={item.icon} />
-					<span class="font-sans text-sm {active ? 'font-semibold text-brand-ink' : ''}">{item.label}</span>
+					<span class="font-sans text-sm {active ? 'font-semibold text-brand-ink' : ''}"
+						>{item.label}</span
+					>
 				</a>
 			{/each}
 
-			<details class="pt-4">
-				<summary class="cursor-pointer list-none px-2 pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute">
+			<details class="pt-4" open={moreHasActive}>
+				<summary
+					class="cursor-pointer list-none px-2 pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute"
+				>
 					More ▾
 				</summary>
 				{#each MORE as item (item.href)}
+					{@const active = isActive(item, path)}
 					<a
 						href={item.href}
-						class="flex items-center rounded-btn px-2 py-1.5 font-sans text-[13px] {isActive(item)
+						class="flex items-center rounded-btn px-2 py-1.5 font-sans text-[13px] {active
 							? 'bg-white/85 font-semibold text-brand-ink'
 							: 'text-brand-slate hover:bg-white/50'}"
+						aria-current={active ? 'page' : undefined}
 					>
 						{item.label}
 					</a>
