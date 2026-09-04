@@ -1078,12 +1078,14 @@
 		</LongformSection>
 
 		<!--
-			columns={1} keeps these four stacked, as they render today. The two-up
-			pair layout is a live design question (section 11 is a four-column
-			table), so it is not being decided here.
+			The compact sections pair up above 900px, which gives the end of the
+			column a different rhythm from the numbered spine above it. 10 and 11
+			span both columns: 11 is a four-column comparison table that clips
+			rather than scrolls at half width, and 10 alone in a half column would
+			leave a hole beside it.
 		-->
-		<LongformPair columns={1}>
-			<LongformSection index="10" id="why-choose" compact title="Why Choose This Tool?">
+		<LongformPair>
+			<LongformSection index="10" id="why-choose" compact span title="Why Choose This Tool?">
 				<ProseGroup
 					items={[
 						{
@@ -1103,6 +1105,7 @@
 				index="11"
 				id="vs-others"
 				compact
+				span
 				title={`${currentFormat.fullName} vs Others`}
 			>
 				<ComparisonTable columns={comparisonColumns} rows={comparisonRows} />
