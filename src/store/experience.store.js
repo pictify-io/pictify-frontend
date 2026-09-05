@@ -22,16 +22,41 @@ export const experience = writable('platform');
 /** True only for the campaigns shell, so templates can read one boolean. */
 export const isCampaignExperience = derived(experience, ($e) => $e === 'campaigns');
 
+/** True once the server has answered, so the rail can avoid a flash of default. */
+export const experienceLoaded = writable(false);
+
+let inflight = null;
+
 /**
- * Adopt the server's stored preference.
+ * Fetch the stored preference.
  *
- * Called with the user record once it loads. An absent or unknown value leaves
- * the default in place rather than guessing from, say, which page was opened —
- * a deep link into campaigns is a visit, not a decision to switch shells.
+ * It comes from GET /me/experience, NOT from the user record. The preference is
+ * per (user, team) — the same person can pilot campaigns in one workspace and
+ * use the platform in another — so it cannot live as a field on the user, and
+ * reading one there silently returns undefined and leaves everyone in the
+ * platform shell. That was the first version of this and the rail never
+ * switched.
+ *
+ * A failure leaves the default in place. Not being able to read a preference is
+ * not a reason to show an error; it is a reason to show the shipped product.
  */
-export function initExperience(userRecord) {
-	const stored = userRecord?.experience;
-	if (isExperience(stored)) experience.set(stored);
+export function initExperience() {
+	if (inflight) return inflight;
+	inflight = backend
+		.get('/me/experience')
+		.then((data) => {
+			if (isExperience(data?.experience)) experience.set(data.experience);
+			experienceLoaded.set(true);
+			return data;
+		})
+		.catch(() => {
+			experienceLoaded.set(true);
+			return null;
+		})
+		.finally(() => {
+			inflight = null;
+		});
+	return inflight;
 }
 
 /**

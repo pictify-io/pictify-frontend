@@ -125,20 +125,6 @@
 	$: subline = memberCount > 1 ? `${memberCount} members` : planName + ' plan';
 	$: keyMasked = $activeApiToken?.token ? `pic_live_••••${$activeApiToken.token.slice(-5)}` : null;
 
-	/**
-	 * Adopt the stored preference when the user record arrives, not at mount.
-	 * The user store resolves after the rail has already rendered, so reading it
-	 * once in onMount would leave every reload in the platform shell regardless
-	 * of what the buyer chose. Guarded so it happens once: after that the store
-	 * is the truth, and a later refresh of the same record must not undo a
-	 * switch the buyer just made.
-	 */
-	let experienceAdopted = false;
-	$: if (!experienceAdopted && $user) {
-		experienceAdopted = true;
-		initExperience($user);
-	}
-
 	$: campaignsMode = $isCampaignExperience;
 
 	/**
@@ -212,6 +198,10 @@
 		initializeTeamState();
 		initPLG();
 		getAPITokenAction().catch(() => {});
+		// Both are per-team server state. The preference decides which rail is
+		// drawn; a failure to read it leaves the platform shell, which is the
+		// shipped product and never the wrong thing to show.
+		initExperience();
 		// A 403 here means no pilot access, which is a state the rail renders as
 		// "no allowance card" rather than an error.
 		initCampaignCapabilities().catch(() => {});

@@ -36,17 +36,33 @@
 	 */
 	$: canCreate = $capabilities?.permissions?.canCreate !== false;
 
-	$: activeRows = campaigns.filter((c) => !c.archived);
-	$: archivedRows = campaigns.filter((c) => c.archived);
-	$: rows = tab === 'active' ? activeRows : tab === 'archived' ? archivedRows : campaigns;
+	/**
+	 * The sample sorts last wherever it appears. It is scaffolding, and a
+	 * fixture sitting above a buyer's real September run reads as though we
+	 * think it matters more than their work.
+	 */
+	const sampleLast = (rows) => [...rows].sort((a, b) => Number(a.sample) - Number(b.sample));
+
+	$: activeRows = sampleLast(campaigns.filter((c) => !c.archived));
+	$: archivedRows = sampleLast(campaigns.filter((c) => c.archived));
+	$: rows =
+		tab === 'active' ? activeRows : tab === 'archived' ? archivedRows : sampleLast(campaigns);
 
 	/**
 	 * The sample campaign is always labelled and never counted with live work.
 	 * A buyer must not be able to mistake the fixture for their own data, and a
 	 * count that includes it would be the first way that happens.
 	 */
-	$: activeCount = activeRows.filter((c) => !c.sample).length;
-	$: archivedCount = archivedRows.filter((c) => !c.sample).length;
+	/*
+	 * The sample IS counted in the tab totals — board `BPC-0` reads "Active 4"
+	 * over four active rows one of which is the sample. The spec line about
+	 * excluding it from "live lists' counts" is about the ALLOWANCE: a fixture
+	 * must never consume the buyer's pilot quota. Those are different numbers,
+	 * and the tab is just how many rows the tab shows. Counting it here and not
+	 * there is what makes both statements true.
+	 */
+	$: activeCount = activeRows.length;
+	$: archivedCount = archivedRows.length;
 
 	async function load() {
 		loading = true;
@@ -78,7 +94,7 @@
 
 <svelte:head><title>Campaigns · Pictify</title></svelte:head>
 
-<div class="px-11 pt-7">
+<div class="px-5 pt-6 md:px-11 md:pt-7">
 	<p class="font-mono text-[11px] uppercase tracking-[0.08em] text-brand-mute">
 		Pictify campaigns · Customer value updates
 	</p>
@@ -98,10 +114,10 @@
 		</div>
 
 		{#if canCreate}
-			<div class="flex flex-shrink-0 items-center gap-3">
+			<div class="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:flex-shrink-0">
 				<button
 					type="button"
-					class="h-11 rounded-btn border border-brand-rule bg-brand-paper px-4 font-sans text-[13.5px] text-brand-slate hover:bg-brand-subtle"
+					class="h-11 flex-1 rounded-btn border border-brand-rule bg-brand-paper px-4 font-sans text-[13.5px] text-brand-slate hover:bg-brand-subtle sm:flex-none"
 				>
 					Try sample data
 				</button>
@@ -109,7 +125,7 @@
 					<!-- One plum primary per screen (handoff §2 decision 2). -->
 					<button
 						type="button"
-						class="flex h-11 items-center gap-2.5 rounded-btn bg-brand-plum px-4 font-sans text-[13.5px] text-white"
+						class="flex h-11 flex-1 items-center justify-center gap-2.5 rounded-btn bg-brand-plum px-4 font-sans text-[13.5px] text-white sm:flex-none"
 					>
 						Create customer value update
 						<span class="block h-2 w-2 bg-brand-field" aria-hidden="true" />
@@ -117,7 +133,7 @@
 				{:else}
 					<a
 						href="/campaigns/customer-value-updates"
-						class="flex h-11 items-center rounded-btn bg-brand-plum px-4 font-sans text-[13.5px] text-white"
+						class="flex h-11 flex-1 items-center justify-center rounded-btn bg-brand-plum px-4 font-sans text-[13.5px] text-white sm:flex-none"
 					>
 						Request pilot access
 					</a>
