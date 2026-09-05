@@ -162,6 +162,16 @@ export const draftCampaignBrief = (description) =>
  * A GET with no body: the checks are derived from what is already stored, so
  * there is nothing for the client to send and nothing it could bias.
  */
+/**
+ * What the next period would reuse and what changed. AI-5.
+ *
+ * Read BEFORE the period exists: its job is to inform a choice made at
+ * creation, and a diff shown afterwards would describe a decision already
+ * taken.
+ */
+export const getNextPeriodPlan = (campaignUid, period) =>
+	backend.get(`/campaigns/${enc(campaignUid)}/editions/next?period=${enc(period)}`);
+
 export const getEditionReview = (campaignUid, editionUid) =>
 	backend.get(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/review`);
 

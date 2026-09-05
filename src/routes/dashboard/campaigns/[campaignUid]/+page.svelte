@@ -20,10 +20,12 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
+	import NewPeriodDialog from '$lib/components/campaigns/NewPeriodDialog.svelte';
 	import { campaignsHome, editionUrl } from '$lib/campaigns/nav';
 	import {
 		getCampaign,
 		createEdition,
+		getNextPeriodPlan,
 		archiveCampaign,
 		requestEditionDeletion,
 		getDeletion,
@@ -67,18 +69,74 @@
 	}
 	onMount(load);
 
-	async function newPeriod() {
+	/* ----------------------------------------------------------- AI-5 */
+
+	let periodOpen = false;
+	let periodPlan = null;
+	let nextPeriod = '';
+	let chosenRevision = null;
+	let periodError = null;
+
+	/**
+	 * The month AFTER the newest edition, or this month if there are none.
+	 *
+	 * Defaulting to the current month proposed a period that already existed,
+	 * so "New period" offered to resume September while the buyer was plainly
+	 * asking for October — and the dialog said "New period · September" and
+	 * "reuses September's approved setup" in the same breath.
+	 */
+	function suggestNextPeriod() {
+		const periods = editions
+			.map((e) => e.period)
+			.filter((p) => /^\d{4}-\d{2}$/.test(p || ''))
+			.sort();
+		const latest = periods[periods.length - 1];
+		const from = latest
+			? new Date(Number(latest.slice(0, 4)), Number(latest.slice(5, 7)), 1)
+			: new Date();
+		return `${from.getFullYear()}-${String(from.getMonth() + 1).padStart(2, '0')}`;
+	}
+
+	/**
+	 * Open the dialog and read what would change.
+	 *
+	 * This used to create an edition for the current month on the spot, with no
+	 * dialog and no choice — which meant the design revision was decided by
+	 * whatever the template happened to say at approval time. That is the exact
+	 * thing AN-05 exists to prevent.
+	 */
+	async function openNewPeriod() {
+		periodOpen = true;
+		periodError = null;
+		periodPlan = null;
+		chosenRevision = null;
+		nextPeriod = nextPeriod || suggestNextPeriod();
+		try {
+			periodPlan = await getNextPeriodPlan(campaignUid, nextPeriod);
+		} catch (err) {
+			periodError = campaignError(err).message;
+		}
+	}
+
+	async function createPeriod(event) {
+		const { period, designRevision } = event.detail;
 		busy = 'period';
-		error = null;
+		periodError = null;
 		try {
 			// The server returns an existing draft for the period rather than
 			// forking one, so clicking twice resumes instead of splitting work.
-			const period = new Date().toISOString().slice(0, 7);
-			const result = await createEdition(campaignUid, { period });
-			campaignNewPeriod({ resumed: Boolean(result?.resumed), editions: editions.length });
+			const result = await createEdition(campaignUid, { period, designRevision });
+			campaignNewPeriod({
+				resumed: Boolean(result?.resumed),
+				editions: editions.length,
+				// Whether they took the default or picked a newer design. Shapes
+				// only — never which revision, which is a fact about their design.
+				took_default: designRevision === periodPlan?.approvedRevision
+			});
+			periodOpen = false;
 			await goto(editionUrl(campaignUid, result.edition.uid, 'data'));
 		} catch (err) {
-			error = campaignError(err);
+			periodError = campaignError(err).message;
 		} finally {
 			busy = null;
 		}
@@ -182,7 +240,7 @@
 					>
 					<button
 						type="button"
-						on:click={newPeriod}
+						on:click={openNewPeriod}
 						disabled={busy !== null || campaign.archived}
 						class="flex h-11 items-center gap-2.5 rounded-btn bg-brand-plum px-4 font-sans text-[13.5px] text-white disabled:bg-brand-subtle disabled:text-brand-mute"
 					>
@@ -389,4 +447,16 @@
 			</div>
 		</div>
 	</div>
+{/if}
+
+{#if periodOpen}
+	<NewPeriodDialog
+		plan={periodPlan}
+		bind:period={nextPeriod}
+		bind:designRevision={chosenRevision}
+		busy={busy === 'period'}
+		error={periodError}
+		on:cancel={() => (periodOpen = false)}
+		on:create={createPeriod}
+	/>
 {/if}
