@@ -20,6 +20,8 @@
 	import LayersTree from '$lib/components/studio/v2/LayersTree.svelte';
 	import InputsRail from '$lib/components/studio/v2/InputsRail.svelte';
 	import BrandRail from '$lib/components/studio/v2/BrandRail.svelte';
+	import ConflictDialog from '$lib/components/studio/v2/ConflictDialog.svelte';
+	import { createSaveQueue } from '$lib/components/studio/v2/save-queue.js';
 	import { getBrandAssets, uploadBrandAsset } from '../../../api/brand-assets';
 	import { SAMPLE_CASES, valuesFor } from '$lib/components/studio/v2/samples.js';
 	import { summarize } from '$lib/components/studio/v2/overflow.js';
@@ -50,6 +52,10 @@
 	let bySample = {};
 	let activeSample = 'typical';
 	let missingAssets = [];
+	let saveQueue = null;
+	let conflict = null;
+	let resolvingConflict = false;
+	let recoveredDraft = null;
 	let brandAssets = [];
 	let uploadingAsset = false;
 
@@ -155,13 +161,31 @@
 					html: t.html || '',
 					width: t.width || 1200,
 					height: t.height || 800,
-					// Revisions arrive with B04-2; until then the studio reports 1
-					// rather than inventing a number other screens would contradict.
-					revision: 1
+					// The server's revision, which is what the optimistic lock is
+					// keyed on. Defaults to 1 for a design created before the field
+					// existed, matching how the save route treats a missing value.
+					revision: t.revision ?? 1
 				};
 				// The store owns the draft from here. Loading resets history, so
 				// undo can never walk back past what the server actually had.
 				editor.load({ html: design.html, revision: design.revision });
+
+				saveQueue?.stop();
+				saveQueue = createSaveQueue(editor, {
+					uid: designUid,
+					onConflict: (theirs) => (conflict = theirs)
+				});
+
+				/*
+				 * A draft this browser kept when a save could not reach the server.
+				 * Offered, never applied silently — the buyer may have moved on, and
+				 * restoring their old work over a newer server revision without
+				 * asking is the same mistake as a last-write-wins save.
+				 */
+				const recovered = saveQueue.recover(design.revision);
+				if (recovered?.html && recovered.html !== design.html) {
+					recoveredDraft = recovered;
+				}
 			}
 		} catch (err) {
 			loadError = 'Could not open that design.';
@@ -184,6 +208,41 @@
 	}
 
 	/** Returns to Setup, which is where "Use this design" is meaningful. */
+	/**
+	 * "Keep mine" re-saves against THEIR revision, which makes the buyer's
+	 * version the next one. Theirs is not lost — it is already a revision in
+	 * the history, which is exactly why this is safe to offer as the default.
+	 */
+	async function keepMine() {
+		resolvingConflict = true;
+		try {
+			const theirRevision = conflict?.revision ?? $editor.baseRevision;
+			await backend.patch(`/template-draft/${uid}`, {
+				html: $editor.html,
+				expectedRevision: theirRevision,
+				label: 'kept after conflict'
+			});
+			const res = await backend.get(`/templates/${uid}`);
+			editor.saved({ revision: res?.template?.revision, seq: $editor.localSeq });
+			saveQueue?.discardLocal($editor.baseRevision);
+			conflict = null;
+		} catch (err) {
+			// Still conflicted, or offline. The dialog stays; nothing is discarded.
+		} finally {
+			resolvingConflict = false;
+		}
+	}
+
+	/** Explicitly destructive, so it only ever happens on a direct click. */
+	function takeTheirs() {
+		if (!conflict?.html) return;
+		design = { ...design, html: conflict.html, revision: conflict.revision };
+		editor.load({ html: conflict.html, revision: conflict.revision });
+		saveQueue?.discardLocal($editor.baseRevision);
+		conflict = null;
+		refreshLayers();
+	}
+
 	const back = () =>
 		goto(inCampaign ? editionUrl(campaignUid, editionUid, 'setup') : '/dashboard/template');
 
@@ -211,6 +270,15 @@
 <svelte:head><title>{design?.name || 'Design'} · Pictify studio</title></svelte:head>
 
 <Toast />
+
+{#if conflict}
+	<ConflictDialog
+		theirs={conflict}
+		busy={resolvingConflict}
+		on:keep-mine={keepMine}
+		on:take-theirs={takeTheirs}
+	/>
+{/if}
 
 {#if loadError}
 	<div class="flex h-screen items-center justify-center bg-brand-canvas px-6">
@@ -303,6 +371,7 @@
 					on:transaction={(e) => {
 						editor.commit(e.detail.label, e.detail.html);
 						refreshLayers();
+						saveQueue?.nudge();
 					}}
 				/>
 			{:else if design}
