@@ -111,7 +111,14 @@
 					unit: m.unit || undefined,
 					precision: m.precision,
 					classification: m.kind,
-					methodNote: m.methodNote || undefined
+					methodNote: m.methodNote || undefined,
+					// The brief carries this as an enum and the campaign as a boolean.
+					// Dropping it lost the "vs last month" line the brief had already
+					// decided on, and the card would have come out without it.
+					comparison: m.comparison === 'prior_period'
+					// `desiredDirection` is deliberately NOT sent. The brief never asks
+					// which way is good news, so sending anything here would be this
+					// screen making that call on the buyer's behalf.
 				}))
 			});
 			if (!res?.campaign?.uid) throw new Error('no campaign returned');

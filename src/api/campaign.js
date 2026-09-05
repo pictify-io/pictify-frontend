@@ -270,8 +270,18 @@ export const listRunItems = (runId, { cursor, limit, status } = {}) =>
  * touched. `idempotencyKey` must come from `newIdempotencyKey()` at the moment
  * the buyer clicks, and be reused if the call has to be repeated.
  */
-export const retryRun = (runId, { itemIds, idempotencyKey }) =>
-	backend.post(`/campaign-runs/${enc(runId)}/retry`, { itemIds }, withKey(idempotencyKey));
+/**
+ * Retry a run. Omitting `itemIds` retries EVERY failure, which is what the
+ * "Retry the N failed" action means; sending `itemIds: undefined` explicitly
+ * would serialize away to the same thing, but only by accident — the shape is
+ * spelled out so the two intents are visibly different at the call site.
+ */
+export const retryRun = (runId, { itemIds, idempotencyKey } = {}) =>
+	backend.post(
+		`/campaign-runs/${enc(runId)}/retry`,
+		itemIds?.length ? { itemIds } : {},
+		withKey(idempotencyKey)
+	);
 
 /** `202` — a request, not an outcome. The settled state arrives via `getRun`. */
 export const cancelRun = (runId, { idempotencyKey }) =>

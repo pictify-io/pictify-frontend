@@ -107,12 +107,23 @@
 	onMount(begin);
 	onDestroy(() => clearTimeout(timer));
 
+	/**
+	 * Retry. `itemIds` names specific cards; `null` means every failure.
+	 *
+	 * Null is not a shortcut — it is the only correct value for "Retry the N
+	 * failed". The items table is one page of at most fifty, so retrying the
+	 * ids it happens to hold would requeue fifty of two hundred failures under
+	 * a button that says two hundred.
+	 */
 	async function doRetry(itemIds) {
 		busy = 'retry';
 		error = null;
 		try {
 			// One key per gesture, reused across network retries of that gesture.
-			await retryRun(run.runId, { itemIds, idempotencyKey: newIdempotencyKey() });
+			await retryRun(run.runId, {
+				...(itemIds ? { itemIds } : {}),
+				idempotencyKey: newIdempotencyKey()
+			});
 			await tick();
 		} catch (err) {
 			error = campaignError(err);
@@ -204,6 +215,27 @@
 		</div>
 	</div>
 
+	{#if counts.failed > 0}
+		<!--
+			A6. What a partial run means, stated where the failures are.
+			DELIBERATELY WITHOUT A BUTTON: the step's action bar at the foot already
+			owns Retry, and a second one here would be two primaries doing the same
+			thing on one screen — the rule this codebase keeps (handoff §2 decision
+			2). What this adds is the fact the foot does not state: a retry
+			re-renders only the failures, so pressing it is cheap and safe.
+		-->
+		<p class="mt-6 flex items-start gap-3 border-l-2 border-brand-alarm bg-brand-subtle p-4">
+			<span class="min-w-0">
+				<span class="block font-sans text-[14px] font-medium text-brand-ink">
+					{counts.ready} of {counts.total} cards verified · {counts.failed} failed
+				</span>
+				<span class="mt-0.5 block font-sans text-[13px] leading-[19px] text-brand-slate">
+					A retry re-renders only the {counts.failed}. Nothing already verified is made again.
+				</span>
+			</span>
+		</p>
+	{/if}
+
 	<div class="mt-6 flex flex-wrap items-center justify-between gap-3">
 		<div class="flex items-center rounded-btn border border-brand-rule bg-brand-paper p-0.5">
 			{#each [['failed', 'Failed', failed.length], ['ready', 'Ready', ready.length], ['all', 'All', counts.total]] as [key, label, n] (key)}
@@ -250,8 +282,16 @@
 						>
 						<td class="py-3 pr-3">
 							{#if item.status === 'failed'}
-								<!-- A code, never the renderer's message. -->
-								<StatusSquare tone="blocked" label={item.errorCode || 'render_failed'} />
+								<!--
+									The server's sentence, never the renderer's message and no
+									longer the raw enum. `render_failed` told a customer success
+									lead nothing about whether to retry, and the code is still
+									there under Details for anyone who needs it.
+								-->
+								<StatusSquare
+									tone="blocked"
+									label={item.reason || item.errorCode || 'The card could not be rendered'}
+								/>
 							{:else if item.status === 'ready'}
 								<StatusSquare tone="ready" label="Verified" />
 							{:else}
@@ -309,16 +349,21 @@
 					>{busy === 'cancel' ? 'Cancelling…' : 'Cancel run'}</button
 				>
 			{/if}
-			{#if failed.length}
+			<!--
+				`counts.failed`, not the loaded page. The items table holds at most
+				fifty rows, so a run with two hundred failures showed a button that
+				said fifty and requeued fifty of them.
+			-->
+			{#if counts.failed > 0}
 				<button
 					type="button"
-					on:click={() => doRetry(failed.map((i) => i.uid))}
+					on:click={() => doRetry(null)}
 					disabled={busy !== null}
 					class="flex h-11 items-center gap-2.5 rounded-btn bg-brand-plum px-4 font-sans text-[13.5px] text-white"
 				>
 					{busy === 'retry'
 						? 'Retrying…'
-						: `Retry ${failed.length} ${failed.length === 1 ? 'failure' : 'failures'}`}
+						: `Retry ${counts.failed} ${counts.failed === 1 ? 'failure' : 'failures'}`}
 					<span class="block h-2 w-2 bg-brand-field" aria-hidden="true" />
 				</button>
 			{:else}
