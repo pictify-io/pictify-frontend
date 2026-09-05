@@ -156,6 +156,15 @@ export const draftCampaignBrief = (description) =>
  * shown on screen is the buyer's own customer's data, and it has no business
  * in a request whose whole promise is that it does not travel.
  */
+/**
+ * The reviewer's checks. AI-4.
+ *
+ * A GET with no body: the checks are derived from what is already stored, so
+ * there is nothing for the client to send and nothing it could bias.
+ */
+export const getEditionReview = (campaignUid, editionUid) =>
+	backend.get(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/review`);
+
 export const suggestMapping = (campaignUid, editionUid, headers) =>
 	backend.post(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/mapping/suggest`, {
 		consent: true,

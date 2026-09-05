@@ -21,10 +21,12 @@
 	import { page } from '$app/stores';
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
 	import { editionUrl } from '$lib/campaigns/nav';
+	import ReviewerChecks from '$lib/components/campaigns/ReviewerChecks.svelte';
 	import {
 		getPreviewRun,
 		startPreviewRun,
 		approveEdition,
+		getEditionReview,
 		campaignError
 	} from '../../../../../../../api/campaign';
 	import { campaignApproved } from '$lib/campaigns/analytics';
@@ -43,6 +45,33 @@
 
 	/** The three acknowledgements. Each is a separate claim, so each is separate. */
 	let acks = { metrics: false, audience: false, reviewed: false };
+
+	/* ----------------------------------------------------------- AI-4 */
+
+	let review = null;
+	let reviewLoading = false;
+
+	/**
+	 * Load the checks whenever this screen is shown.
+	 *
+	 * Not cached across visits: the checks are a claim about the data and the
+	 * design as they stand, and a stale one would tell a buyer that something
+	 * they have since fixed is still wrong — or worse, that something they have
+	 * since broken is still fine.
+	 */
+	async function loadReview() {
+		reviewLoading = true;
+		try {
+			const res = await getEditionReview(campaignUid, editionUid);
+			review = res?.issues ? res : null;
+		} catch {
+			// A rail that could not load says so by staying empty; it must never
+			// render as "everything passed".
+			review = null;
+		} finally {
+			reviewLoading = false;
+		}
+	}
 	let externalRef = '';
 
 	$: samples = run?.samples || [];
@@ -82,7 +111,10 @@
 		}
 	}
 
-	onMount(begin);
+	onMount(() => {
+		begin();
+		loadReview();
+	});
 	onDestroy(() => clearTimeout(timer));
 
 	async function approve() {
@@ -266,6 +298,15 @@
 </div>
 
 <aside class="w-full flex-shrink-0 xl:w-[340px]">
+	<!--
+		AI-4. The checks come first in the rail, above the summary of what is
+		being approved: they are the reason to hesitate, and a reason to hesitate
+		placed under a summary gets read after the decision.
+	-->
+	<div class="mb-7">
+		<ReviewerChecks {review} loading={reviewLoading} revision={run?.snapshot?.revision ?? null} />
+	</div>
+
 	<p class="font-mono text-[10.5px] uppercase tracking-[0.08em] text-brand-mute">
 		What you are approving
 	</p>
