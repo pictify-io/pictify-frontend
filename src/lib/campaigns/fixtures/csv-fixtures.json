@@ -1,0 +1,187 @@
+{
+  "_comment": "Shared contract between service/campaign-csv.js (backend) and src/lib/campaigns/csv.js (frontend). Both test suites run these. The two implementations must agree case for case: if they drift, a file passes in the browser and is rejected after upload, which reads as the product being broken. Change a rule and you change this file, which fails the other repo's suite until it is updated — that is the point.",
+
+  "decimals": [
+    { "name": "plain integer",        "input": "42",          "ok": true,  "value": 42 },
+    { "name": "zero is a real value", "input": "0",           "ok": true,  "value": 0 },
+    { "name": "negative",             "input": "-17.5",       "ok": true,  "value": -17.5 },
+    { "name": "surrounding space",    "input": "  8.25  ",    "ok": true,  "value": 8.25 },
+    { "name": "blank",                "input": "",            "ok": false, "code": "blank" },
+    { "name": "thousands separator",  "input": "1,234",       "ok": false, "code": "grouping_or_locale" },
+    { "name": "currency symbol",      "input": "$99",         "ok": false, "code": "symbol_in_number" },
+    { "name": "percent sign",         "input": "12%",         "ok": false, "code": "symbol_in_number" },
+    { "name": "exponent rejected",    "input": "1e5",         "ok": false, "code": "symbol_in_number" },
+    { "name": "leading dot",          "input": ".5",          "ok": false, "code": "not_a_number" },
+    { "name": "leading zero number",  "input": "007",         "ok": false, "code": "not_a_number" },
+    { "name": "over magnitude",       "input": "1000000000000001", "ok": false, "code": "magnitude" }
+  ],
+
+  "accountIds": [
+    { "input": "00042",        "safe": true },
+    { "input": "acct-1",       "safe": true },
+    { "input": "a.b:c_d",      "safe": true },
+    { "input": "Z9",           "safe": true },
+    { "input": "",             "safe": false },
+    { "input": "-leading",     "safe": false },
+    { "input": ".leading",     "safe": false },
+    { "input": "has space",    "safe": false },
+    { "input": "semi;colon",   "safe": false },
+    { "input": "=formula",     "safe": false },
+    { "input": "unicodé",      "safe": false }
+  ],
+
+  "spreadsheetSafe": [
+    { "input": "=SUM(A1)",  "output": "'=SUM(A1)" },
+    { "input": "+1",        "output": "'+1" },
+    { "input": "-1",        "output": "'-1" },
+    { "input": "@handle",   "output": "'@handle" },
+    { "input": "Acme Ltd",  "output": "Acme Ltd" },
+    { "input": "00042",     "output": "00042" }
+  ],
+
+  "csvRows": [
+    { "input": ["00042", "Doe, Jane", "3"], "output": "00042,\"Doe, Jane\",3" },
+    { "input": ["a", "say \"hi\""],         "output": "a,\"say \"\"hi\"\"\"" },
+    { "input": ["=x", "b"],                 "output": "'=x,b" }
+  ],
+
+  "shapes": [
+    {
+      "name": "clean file",
+      "csv": "account_id,name,workflows\n00042,Acme,12\n00043,Beta,7\n",
+      "ok": true,
+      "header": ["account_id", "name", "workflows"],
+      "rowCount": 2
+    },
+    {
+      "name": "BOM is stripped from the first header",
+      "csv": "﻿account_id,name\n1,Acme\n",
+      "ok": true,
+      "header": ["account_id", "name"],
+      "rowCount": 1
+    },
+    {
+      "name": "duplicate headers block, case-insensitively",
+      "csv": "account_id,Name,name\n1,a,b\n",
+      "ok": false,
+      "errorCodes": ["duplicate_headers"]
+    },
+    {
+      "name": "blank header blocks",
+      "csv": "account_id,,name\n1,a,b\n",
+      "ok": false,
+      "errorCodes": ["blank_header"]
+    },
+    {
+      "name": "short row blocks rather than being padded",
+      "csv": "account_id,name,workflows\n1,Acme\n",
+      "ok": false,
+      "errorCodes": ["uneven_rows"]
+    },
+    {
+      "name": "unclosed quote is an error, not a field to end of file",
+      "csv": "account_id,name\n1,\"Acme\n",
+      "ok": false,
+      "errorCodes": ["unclosed_quote"]
+    },
+    {
+      "name": "empty file",
+      "csv": "\n\n",
+      "ok": false,
+      "errorCodes": ["empty_file"]
+    },
+    {
+      "name": "quoted field containing a newline is one field",
+      "csv": "account_id,name\n1,\"Acme\nLtd\"\n",
+      "ok": true,
+      "header": ["account_id", "name"],
+      "rowCount": 1
+    }
+  ],
+
+  "rowSets": [
+    {
+      "name": "counts are accounts, not rows: one id on three lines is one account",
+      "columns": [
+        { "key": "account_id" },
+        { "key": "workflows", "type": "number", "required": true }
+      ],
+      "records": [
+        { "account_id": "A1", "workflows": "1" },
+        { "account_id": "A1", "workflows": "2" },
+        { "account_id": "A1", "workflows": "3" },
+        { "account_id": "A2", "workflows": "4" }
+      ],
+      "counts": { "accounts": 2, "valid": 1, "issues": 1, "rows": 4 },
+      "duplicateIds": ["A1"],
+      "ok": false
+    },
+    {
+      "name": "a duplicate is one issue carrying every line",
+      "columns": [{ "key": "account_id" }],
+      "records": [
+        { "account_id": "B1" },
+        { "account_id": "B1" }
+      ],
+      "counts": { "accounts": 1, "valid": 0, "issues": 1, "rows": 2 },
+      "duplicateIds": ["B1"],
+      "duplicateLines": { "B1": [2, 3] },
+      "ok": false
+    },
+    {
+      "name": "blank optional metric is suppressed, not zeroed",
+      "columns": [
+        { "key": "account_id" },
+        { "key": "hours", "type": "number", "required": false }
+      ],
+      "records": [{ "account_id": "C1", "hours": "" }],
+      "counts": { "accounts": 1, "valid": 1, "issues": 0, "rows": 1 },
+      "expectValues": { "C1": { "hours": null } },
+      "ok": true
+    },
+    {
+      "name": "blank required metric is an error",
+      "columns": [
+        { "key": "account_id" },
+        { "key": "hours", "type": "number", "required": true }
+      ],
+      "records": [{ "account_id": "C2", "hours": "" }],
+      "counts": { "accounts": 1, "valid": 0, "issues": 1, "rows": 1 },
+      "ok": false
+    },
+    {
+      "name": "required zero is valid",
+      "columns": [
+        { "key": "account_id" },
+        { "key": "hours", "type": "number", "required": true }
+      ],
+      "records": [{ "account_id": "C3", "hours": "0" }],
+      "counts": { "accounts": 1, "valid": 1, "issues": 0, "rows": 1 },
+      "expectValues": { "C3": { "hours": 0 } },
+      "ok": true
+    },
+    {
+      "name": "leading zeroes survive as a string",
+      "columns": [{ "key": "account_id" }],
+      "records": [{ "account_id": "00042" }],
+      "counts": { "accounts": 1, "valid": 1, "issues": 0, "rows": 1 },
+      "expectIds": ["00042"],
+      "ok": true
+    },
+    {
+      "name": "unsafe id is reported, never rewritten",
+      "columns": [{ "key": "account_id" }],
+      "records": [{ "account_id": "=cmd" }],
+      "counts": { "accounts": 1, "valid": 0, "issues": 1, "rows": 1 },
+      "expectIssueCodes": ["unsafe_account_id"],
+      "ok": false
+    },
+    {
+      "name": "a row with no id gets its own line, not an account",
+      "columns": [{ "key": "account_id" }],
+      "records": [{ "account_id": "" }, { "account_id": "D1" }],
+      "counts": { "accounts": 2, "valid": 1, "issues": 1, "rows": 2 },
+      "ok": false
+    }
+  ]
+}
