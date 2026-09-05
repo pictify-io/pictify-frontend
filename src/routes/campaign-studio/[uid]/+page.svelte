@@ -16,6 +16,9 @@
 	import { goto } from '$app/navigation';
 	import StudioShell from '$lib/components/studio/v2/StudioShell.svelte';
 	import StudioStart from '$lib/components/studio/v2/StudioStart.svelte';
+	import StudioStage from '$lib/components/studio/v2/StudioStage.svelte';
+	import { editor, dirty } from '$lib/components/studio/v2/editor-store.js';
+	import { SAMPLE_VALUES } from '$lib/campaigns/starters';
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
 	import { editionUrl } from '$lib/campaigns/nav';
 	import backend from '../../../service/backend';
@@ -84,10 +87,13 @@
 					html: t.html || '',
 					width: t.width || 1200,
 					height: t.height || 800,
-					// Revisions arrive with B04; until then the studio reports 1
+					// Revisions arrive with B04-2; until then the studio reports 1
 					// rather than inventing a number other screens would contradict.
 					revision: 1
 				};
+				// The store owns the draft from here. Loading resets history, so
+				// undo can never walk back past what the server actually had.
+				editor.load({ html: design.html, revision: design.revision });
 			}
 		} catch (err) {
 			loadError = 'Could not open that design.';
@@ -151,11 +157,13 @@
 	</div>
 {:else}
 	<StudioShell
-		design={design || { name: 'New design', html: '', width: 1200, height: 800, revision: 1 }}
+		design={design
+			? { ...design, html: $editor.html || design.html }
+			: { name: 'New design', html: '', width: 1200, height: 800, revision: 1 }}
 		format={campaign?.format?.toUpperCase() || 'PNG'}
 		breadcrumb={campaign ? `${campaign.name} · Setup` : null}
 		campaignContext={inCampaign}
-		saveState={design ? 'saved' : 'unsaved'}
+		saveState={design ? $editor.saveState : 'unsaved'}
 		useDisabled={!design}
 		statusNote={design ? null : 'Nothing drawn yet · describe the card on the left or import HTML'}
 		{editionApproved}
@@ -173,6 +181,26 @@
 				<p class="font-sans text-[13.5px] text-brand-mute">
 					The layers tree arrives with the visual stage.
 				</p>
+			{/if}
+		</svelte:fragment>
+
+		<svelte:fragment slot="stage" let:mode let:zoom>
+			{#if design && mode !== 'proof'}
+				<StudioStage
+					html={$editor.html || design.html}
+					width={design.width}
+					height={design.height}
+					{zoom}
+					editable={mode === 'design'}
+					sampleValues={SAMPLE_VALUES}
+					on:transaction={(e) => editor.commit(e.detail.label, e.detail.html)}
+				/>
+			{:else if design}
+				<p class="font-sans text-[13.5px] text-brand-mute">
+					No proof yet. Render one to see exactly what the server produces.
+				</p>
+			{:else}
+				<p class="font-sans text-[13.5px] text-brand-mute">No design chosen yet.</p>
 			{/if}
 		</svelte:fragment>
 

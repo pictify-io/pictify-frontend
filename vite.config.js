@@ -70,6 +70,11 @@ export default defineConfig({
 			'@codemirror/lang-html',
 			// The playground's VARIABLES pane and its JSON linter.
 			'@codemirror/lang-json',
+			// The campaign studio's visual stage loads these from inside
+			// attachStage, so Vite meets them mid-gesture on a cold cache — the
+			// same 504 wall described above, on the first ever open of a design.
+			'moveable',
+			'selecto',
 			'@codemirror/lint',
 			'@codemirror/lang-css',
 			'@codemirror/lang-javascript',
