@@ -41,7 +41,23 @@ export const FORBIDDEN = new Set([
 	'usecase',
 	'use_case',
 	'note',
-	'reason'
+	'reason',
+	/*
+	 * AI-7. The buyer's own words are the highest-risk field on an AI event:
+	 * "make Contoso Freight's number bigger" is an instruction AND a customer
+	 * name. Short instructions would slip past the enumerated-string test, so
+	 * these are named rather than left to the shape check.
+	 */
+	'instruction',
+	'prompt',
+	'text',
+	'label',
+	'labels',
+	'summary',
+	'touches',
+	'selection',
+	'selectedlabel',
+	'selected_label'
 ]);
 
 /**

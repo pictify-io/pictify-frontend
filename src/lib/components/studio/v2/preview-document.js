@@ -69,3 +69,27 @@ export const previewHead = (extraCss = 'html,body{margin:0;padding:0}') =>
 /** A whole preview document, head policy included. */
 export const previewDocument = (body, extraCss) =>
 	`<!doctype html><html><head>${previewHead(extraCss)}</head><body>${body}</body></html>`;
+
+/**
+ * Put a preview document into a same-origin frame.
+ *
+ * `documentElement.innerHTML` rather than `doc.open()/write()/close()`: the
+ * write pair REPLACES the Document object, and this frame is rewritten on every
+ * committed transaction, so anything holding a reference across a remount ends
+ * up talking to a document that is no longer in the frame. Setting innerHTML
+ * keeps one Document for the life of the stage.
+ *
+ * (It does NOT silence Chrome's "Blocked script execution … the document's
+ * frame is sandboxed" line — that is logged once for any sandboxed frame
+ * without `allow-scripts`, whatever puts the content there. It is the sandbox
+ * announcing itself, not an error; see the iframe in StudioStage.)
+ *
+ * Synchronous on purpose: the editor attaches to `contentDocument` on the next
+ * line, and `srcdoc` would make that a load-event dance for no gain.
+ */
+export function writePreviewDocument(frame, body, extraCss) {
+	const doc = frame.contentDocument;
+	if (!doc?.documentElement) return null;
+	doc.documentElement.innerHTML = `<head>${previewHead(extraCss)}</head><body>${body}</body>`;
+	return doc;
+}

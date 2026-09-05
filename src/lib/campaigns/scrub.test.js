@@ -74,3 +74,44 @@ describe('analytics scrub', () => {
 		assert.deepEqual(scrub({ a: null, b: undefined }), {});
 	});
 });
+
+describe('AI-7 payloads', () => {
+	test('an instruction never leaves, however short', () => {
+		// The dangerous case is a SHORT instruction: long prose already fails the
+		// enumerated-string test, so a one-word customer name is what would slip.
+		const out = scrub({ instruction: 'bigger', scope: 'selection', changed: 1 });
+		assert.equal(out.instruction, undefined);
+		assert.equal(out.scope, 'selection');
+		assert.equal(out.changed, 1);
+	});
+
+	test('node labels never leave — a label is often a customer name', () => {
+		const out = scrub({
+			selectedLabel: 'Contoso Freight',
+			touches: ['Metrics row'],
+			labels: ['Heading'],
+			scopeKind: 'selection'
+		});
+		assert.equal(out.selectedLabel, undefined);
+		assert.equal(out.touches, undefined);
+		assert.equal(out.labels, undefined);
+		assert.equal(out.scopeKind, 'selection');
+	});
+
+	test('the counts that make the events useful still pass', () => {
+		const out = scrub({
+			changed_count: 3,
+			untouched_count: 12,
+			verified: true,
+			outcome: 'refused',
+			ms: 4210
+		});
+		assert.deepEqual(out, {
+			changed_count: 3,
+			untouched_count: 12,
+			verified: true,
+			outcome: 'refused',
+			ms: 4210
+		});
+	});
+})

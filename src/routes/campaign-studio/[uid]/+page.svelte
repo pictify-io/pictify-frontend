@@ -42,6 +42,16 @@
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
 	import { editionUrl } from '$lib/campaigns/nav';
 	import { setCampaignDesign, recordDesignProof } from '../../../api/campaign';
+	import {
+		aiEditRequested,
+		aiEditApplied,
+		aiEditRefused,
+		aiEditNoChange,
+		aiEditFailed,
+		aiProposalAccepted,
+		aiProposalDismissed,
+		aiProofRendered
+	} from '$lib/campaigns/analytics.js';
 	import backend from '../../../service/backend';
 	import { showToast } from '../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
@@ -174,6 +184,11 @@
 		 */
 		const scopedTo = activeSelection;
 		const scopeLabels = scopedTo ? [selectedLabel] : null;
+		const startedAt = Date.now();
+
+		// AI-7. The SHAPE of the request: whether it was scoped, and from where.
+		// Never the instruction, and never the label of what was selected.
+		aiEditRequested({ scope: scopedTo ? 'selection' : 'document' });
 
 		await editTemplateBySaying(uid, text, {
 			operationId,
@@ -188,6 +203,10 @@
 				 * earlier edit the buyer did not ask about.
 				 */
 				if (result?.noChange) {
+					aiEditNoChange({
+						scope: scopedTo ? 'selection' : 'document',
+						ms: Date.now() - startedAt
+					});
 					editor.endOperation();
 					receipt = result?.receipt || null;
 					receiptScope = scopeLabels;
@@ -238,6 +257,13 @@
 					// The client's label, not the server's: Layers and the receipt must
 					// call the same element by the same name.
 					receiptScope = scopeLabels || result?.scope || null;
+					aiEditApplied({
+						scope: scopedTo ? 'selection' : 'document',
+						changed_count: result?.receipt?.changed?.length ?? 0,
+						untouched_count: result?.receipt?.untouched?.nodes ?? 0,
+						verified: Boolean(result?.receipt?.untouched?.verified),
+						ms: Date.now() - startedAt
+					});
 				}
 				currentOperationId = null;
 			},
@@ -252,6 +278,14 @@
 				proposal = payload;
 				currentOperationId = null;
 				returnFocusToComposer();
+				aiEditRefused({
+					scope: 'selection',
+					// How many things it wanted to reach, not which. The count is what
+					// says whether the scoping is fighting people; the names would say
+					// what is on a customer's card.
+					touch_count: payload?.touches?.length ?? 0,
+					ms: Date.now() - startedAt
+				});
 			},
 			onError: (err) => {
 				// ST-04b: the draft AND the instruction survive, so the buyer can
@@ -260,6 +294,7 @@
 				aiError = err?.message || 'That change did not go through.';
 				currentOperationId = null;
 				returnFocusToComposer();
+				aiEditFailed({ code: err?.code || 'unknown', ms: Date.now() - startedAt });
 			}
 		});
 	}
@@ -340,6 +375,12 @@
 		 * from the one that happened to be rendered — a proof of the typical row
 		 * says nothing about the longest one.
 		 */
+		aiProofRendered({
+			ms: res.totalMs ?? 0,
+			bytes: res.bytes ?? 0,
+			format: res.format || 'png'
+		});
+
 		if (campaignUid && editionUid) {
 			await recordDesignProof(campaignUid, editionUid, {
 				revision: res.revision,
@@ -425,6 +466,7 @@
 	async function applyProposal() {
 		if (!proposal || applyingProposal) return;
 		applyingProposal = true;
+		aiProposalAccepted({ touch_count: proposal?.touches?.length ?? 0 });
 		const text = lastInstruction;
 		proposal = null;
 		scopeToSelection = false;
@@ -818,7 +860,10 @@
 							{proposal}
 							busy={applyingProposal}
 							on:apply={applyProposal}
-							on:dismiss={() => (proposal = null)}
+							on:dismiss={() => {
+								aiProposalDismissed({ touch_count: proposal?.touches?.length ?? 0 });
+								proposal = null;
+							}}
 						/>
 					</div>
 				{:else if receipt}

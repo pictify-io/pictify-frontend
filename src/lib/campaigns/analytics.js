@@ -44,6 +44,31 @@ export const campaignExportDownloaded = (props) => emit('campaign_export_downloa
 export const campaignHandoffAccepted = (props) => emit('campaign_handoff_accepted', props);
 export const campaignNewPeriod = (props) => emit('campaign_new_period', props);
 
+/* ------------------------------------------------------------------ AI-7 */
+
+/**
+ * AI surface telemetry, per spec §13.
+ *
+ * SHAPES ONLY, and here the rule bites harder than anywhere else: an
+ * instruction is the buyer's own sentence, and a sentence about a customer
+ * contains that customer. `scrub` drops the instruction and every label by
+ * name; what is left is what the product needs to know — whether people scope
+ * their edits, how often a scoped edit has to be widened, and how often a run
+ * produced nothing.
+ *
+ * The question these are here to answer is whether the scope contract is worth
+ * its cost. A high refusal rate with a low acceptance rate would mean the
+ * scoping is fighting people rather than protecting them.
+ */
+export const aiEditRequested = (props) => emit('ai_edit_requested', props);
+export const aiEditApplied = (props) => emit('ai_edit_applied', props);
+export const aiEditRefused = (props) => emit('ai_edit_refused', props);
+export const aiEditNoChange = (props) => emit('ai_edit_no_change', props);
+export const aiEditFailed = (props) => emit('ai_edit_failed', props);
+export const aiProposalAccepted = (props) => emit('ai_proposal_accepted', props);
+export const aiProposalDismissed = (props) => emit('ai_proposal_dismissed', props);
+export const aiProofRendered = (props) => emit('ai_proof_rendered', props);
+
 export { scrub };
 
 export default {

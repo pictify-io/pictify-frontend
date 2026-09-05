@@ -15,7 +15,7 @@
 	 */
 	import { onDestroy, createEventDispatcher } from 'svelte';
 	import { attachStage, cleanHtml } from './stage.js';
-	import { previewDocument } from './preview-document.js';
+	import { writePreviewDocument } from './preview-document.js';
 
 	export let html = '';
 	export let width = 1200;
@@ -64,11 +64,12 @@
 			stage.destroy();
 			stage = null;
 		}
-		const doc = frame.contentDocument;
 		const substituted = editable ? source : substitute(source, sampleValues);
-		doc.open();
-		doc.write(previewDocument(cleanHtml(substituted)));
-		doc.close();
+		const doc = writePreviewDocument(frame, cleanHtml(substituted));
+		if (!doc) {
+			status = 'The stage could not start. Reload to try again.';
+			return;
+		}
 
 		if (!editable) return;
 		try {
@@ -141,6 +142,13 @@
 			`sandbox=""` would break every drag. Everything else stays off, so a
 			script that got past the sanitizer still cannot run, and the document
 			cannot navigate the page it is embedded in.
+
+			Chrome logs "Blocked script execution … the document's frame is
+			sandboxed and the 'allow-scripts' permission is not set" once per mount.
+			That line is the sandbox working, not a fault: it is emitted for any
+			sandboxed frame without `allow-scripts`, and the editor is unaffected
+			because its code runs in the parent. Do not add `allow-scripts` to
+			quieten it — that is the whole control.
 		-->
 		<iframe
 			bind:this={frame}
