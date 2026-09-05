@@ -16,13 +16,30 @@
 	 * no paragraph in this component that is not attached to a specific check.
 	 */
 	import StatusSquare from './StatusSquare.svelte';
+	import RepairProposal from './RepairProposal.svelte';
 
 	/** `{ checkedAccounts, issues, blocking, needsYou }` from the review route. */
 	export let review = null;
 	export let loading = false;
 	export let revision = null;
 
-	const TONE = { block: 'blocked', warn: 'current', advisory: 'excluded', ok: 'ready' };
+	/*
+	 * The repair card (AI-4, board I30-0). This component stays presentational:
+	 * it decides WHERE the card belongs — under the check it repairs — and the
+	 * page above owns proposing, applying and the conflict that may follow.
+	 */
+	export let proposal = null;
+	export let proposalLoading = false;
+	export let applying = false;
+	export let conflict = false;
+
+	/*
+	 * Only offered against a check that is actually failing. A repair card under
+	 * a rule reading "0 of 248" would be offering to fix something that is not
+	 * broken, and the one thing this rail is for is not overstating.
+	 */
+	$: repairable =
+		review?.issues?.find((i) => i.id === 'name_overflow' && i.severity === 'block') || null;
 
 	/** "1 of 248", or NEEDS YOU when nothing was counted. */
 	const tally = (issue) =>
@@ -96,6 +113,19 @@
 				</li>
 			{/each}
 		</ul>
+
+		{#if repairable}
+			<RepairProposal
+				{proposal}
+				loading={proposalLoading}
+				{applying}
+				{conflict}
+				on:propose
+				on:apply
+				on:studio
+				on:dismiss
+			/>
+		{/if}
 
 		<!--
 			The one piece of prose in the rail, and it earns its place: it is what

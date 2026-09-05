@@ -22,13 +22,17 @@
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
 	import { editionUrl } from '$lib/campaigns/nav';
 	import ReviewerChecks from '$lib/components/campaigns/ReviewerChecks.svelte';
+	import RepairApplied from '$lib/components/campaigns/RepairApplied.svelte';
 	import {
 		getPreviewRun,
 		startPreviewRun,
 		approveEdition,
 		getEditionReview,
+		proposeRepair,
+		applyRepair,
 		campaignError
 	} from '../../../../../../../api/campaign';
+	import { restoreTemplateRevision } from '../../../../../../../api/template';
 	import { campaignApproved } from '$lib/campaigns/analytics';
 
 	const { edition, campaign, reload } = getContext('edition');
@@ -72,6 +76,107 @@
 			reviewLoading = false;
 		}
 	}
+	/* ------------------------------------------------- AI-4 repair, A8 toast */
+
+	let proposal = null;
+	let proposalLoading = false;
+	let applying = false;
+	let repairConflict = false;
+	/** `{ revision, accounts, remaining, note }` while the A8 toast is up. */
+	let repairApplied = null;
+
+	async function onPropose() {
+		proposalLoading = true;
+		repairConflict = false;
+		try {
+			proposal = await proposeRepair(campaignUid, editionUid, 'name_overflow');
+		} catch (err) {
+			// A card that cannot be measured says so; it must never render as a
+			// repair that is ready to apply.
+			proposal = { applicable: false, detail: campaignError(err) };
+		} finally {
+			proposalLoading = false;
+		}
+	}
+
+	/**
+	 * Apply, through the studio's own commit path.
+	 *
+	 * `expectedRevision` is the revision the proposal was MEASURED against, so a
+	 * design that moved underneath conflicts instead of applying. That is not
+	 * defensive coding — the fixtures, the chosen size and the re-check all
+	 * describe a document that would no longer exist, and committing them would
+	 * attach true numbers to the wrong design.
+	 */
+	async function onApply() {
+		if (!proposal?.applicable || applying) return;
+		applying = true;
+		repairConflict = false;
+		try {
+			const res = await applyRepair($campaign.templateRevisionUid, {
+				html: proposal.patch.html,
+				expectedRevision: proposal.baseRevision,
+				label: `Repair · name to ${proposal.patch.fontSizePx}px`
+			});
+
+			/*
+			 * The counts come from the re-check the proposal actually ran, and the
+			 * CAS above is what makes that honest: had the design moved, we would
+			 * be in the catch. So these numbers describe exactly the revision that
+			 * was just committed.
+			 */
+			repairApplied = {
+				revision: res.revision,
+				accounts: proposal.recheck.accounts,
+				remaining: proposal.recheck.remaining,
+				note: proposal.appliesTo?.repinRequired ? proposal.appliesTo.note : null,
+				undoTo: proposal.baseRevision
+			};
+			proposal = null;
+			// The design changed, so the checks are about to be about something
+			// else. Re-read rather than leave a stale rail on screen.
+			await loadReview();
+		} catch (err) {
+			if (err?.status === 409) {
+				/*
+				 * The card STAYS, carrying the conflict. Losing it here would make a
+				 * failure look like a successful dismissal — the buyer asked for
+				 * something and it did not happen. The measurement is deliberately
+				 * NOT re-run against the new revision: a design that moved may need
+				 * a different repair, or none, and quietly substituting one
+				 * proposal for another is the thing this card exists not to do.
+				 */
+				repairConflict = true;
+				await loadReview();
+			} else {
+				proposal = { applicable: false, detail: campaignError(err) };
+			}
+		} finally {
+			applying = false;
+		}
+	}
+
+	/**
+	 * Undo, through the Versions panel's own restore.
+	 *
+	 * Restoring creates a NEW revision rather than deleting one, which is why
+	 * this stays true after the toast expires: nothing here is a soft delete
+	 * waiting on a timer, so a buyer who misses the eight seconds has lost a
+	 * shortcut and not the ability to undo.
+	 */
+	async function onUndoRepair() {
+		const target = repairApplied?.undoTo;
+		if (!target) return;
+		try {
+			await restoreTemplateRevision($campaign.templateRevisionUid, target);
+			await loadReview();
+		} catch {
+			/* The studio's own history is the fallback, and it is one click away. */
+		} finally {
+			repairApplied = null;
+		}
+	}
+
 	let externalRef = '';
 
 	$: samples = run?.samples || [];
@@ -166,7 +271,12 @@
 			class="mt-6 grid grid-cols-1 gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-3"
 			aria-busy="true"
 		>
-			{#each Array(6) as _, i (i)}<div class="h-[210px] animate-pulse bg-brand-subtle" />{/each}
+			<!-- Six placeholder tiles. Keyed by index and iterated over the indices
+			     themselves: `as _, i` bound a value the loop never reads, which is
+			     an error under no-unused-vars. -->
+			{#each Array.from({ length: 6 }, (_, i) => i) as i (i)}
+				<div class="h-[210px] animate-pulse bg-brand-subtle" />
+			{/each}
 		</div>
 	{:else if error && !samples.length}
 		<div class="mt-6">
@@ -304,7 +414,22 @@
 		placed under a summary gets read after the decision.
 	-->
 	<div class="mb-7">
-		<ReviewerChecks {review} loading={reviewLoading} revision={run?.snapshot?.revision ?? null} />
+		<ReviewerChecks
+			{review}
+			loading={reviewLoading}
+			revision={run?.snapshot?.revision ?? null}
+			{proposal}
+			{proposalLoading}
+			{applying}
+			conflict={repairConflict}
+			on:propose={onPropose}
+			on:apply={onApply}
+			on:studio={() => goto(`/campaign-studio/${$campaign.templateRevisionUid}`)}
+			on:dismiss={() => {
+				proposal = null;
+				repairConflict = false;
+			}}
+		/>
 	</div>
 
 	<p class="font-mono text-[10.5px] uppercase tracking-[0.08em] text-brand-mute">
@@ -350,3 +475,13 @@
 		anything; “Generate summaries” is the next step.
 	</p>
 </aside>
+
+<!--
+	A8 (board IKS-0). Mounted at the page root rather than inside the rail so it
+	is not clipped by the aside's own stacking and scrolling.
+-->
+<RepairApplied
+	applied={repairApplied}
+	on:undo={onUndoRepair}
+	on:expire={() => (repairApplied = null)}
+/>

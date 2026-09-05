@@ -183,6 +183,53 @@ export const getNextPeriodPlan = (campaignUid, period) =>
 export const getEditionReview = (campaignUid, editionUid) =>
 	backend.get(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/review`);
 
+/**
+ * A repair for one check, measured and not applied. AI-4 (board I30-0).
+ *
+ * COMMITS NOTHING. The server renders the design against synthetic stress
+ * fixtures, finds the largest readable size at which they all fit, and hands
+ * back a candidate plus the evidence for it — so the buyer reads a proposal
+ * and decides, rather than finding out what an "auto-fix" did.
+ *
+ * `nodeId` is the element the CLIENT watched clip. Sending it is not required
+ * (the server can find the node bound to the account name), but it is the
+ * better answer when we have it: the client measured the actual failure.
+ *
+ * Resolves with `applicable: false` and a `reason` when there is nothing to
+ * propose — no element bound to the name, no readable size that fits, or a
+ * size that would rewrap the short names. Those are answers, not errors.
+ */
+export const proposeRepair = (campaignUid, editionUid, issueId, { nodeId } = {}) =>
+	backend.post(
+		`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/review/${enc(issueId)}/propose`,
+		nodeId ? { nodeId } : {}
+	);
+
+/**
+ * Apply a proposed repair, through the studio's own commit path.
+ *
+ * DELIBERATELY NOT A NEW ENDPOINT. `PATCH /template-draft/:uid` is what the
+ * studio saves through, so going via it means the applied change lands as one
+ * ordinary revision: the Versions panel lists it, Undo restores it, and the
+ * conflict semantics are the ones the buyer has already met. A bespoke
+ * "apply" route would have had to reimplement all three and would drift.
+ *
+ * `expectedRevision` is the revision the PROPOSAL was measured against. If the
+ * design moved in between, this 409s rather than applying — which is the
+ * behaviour we want: the fixtures, the chosen size and the re-check all
+ * describe a design that no longer exists, so applying them would attach true
+ * numbers to the wrong document.
+ *
+ * Throws HttpError; a conflict is `err.status === 409` with
+ * `err.data.current` carrying the other version.
+ */
+export const applyRepair = (templateUid, { html, expectedRevision, label }) =>
+	backend.patch(`/template-draft/${enc(templateUid)}`, {
+		html,
+		expectedRevision,
+		label: label || 'Repair from Review'
+	});
+
 export const suggestMapping = (campaignUid, editionUid, headers) =>
 	backend.post(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/mapping/suggest`, {
 		consent: true,
