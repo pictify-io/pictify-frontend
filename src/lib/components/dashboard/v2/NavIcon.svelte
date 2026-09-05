@@ -21,6 +21,10 @@
 		],
 		// Callers: traffic in and out.
 		callers: ['M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4'],
+		// Campaigns: a stack of summaries, one per account.
+		campaigns: [
+			'M8 4h11a1 1 0 011 1v11a1 1 0 01-1 1H8a1 1 0 01-1-1V5a1 1 0 011-1zM4 8v11a1 1 0 001 1h11'
+		],
 		// API playground: code brackets — the call you write, not the render.
 		playground: ['M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4'],
 		// Usage & billing: the bar chart.

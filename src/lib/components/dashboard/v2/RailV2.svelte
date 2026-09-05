@@ -23,6 +23,14 @@
 	} from '../../../../store/team.store';
 	import { usageWidget, initPLG, PLAN_DISPLAY_NAMES } from '../../../../store/plg.store';
 	import { user, activeApiToken, getAPITokenAction } from '../../../../store/user.store';
+	import {
+		isCampaignExperience,
+		initExperience,
+		setExperienceAction
+	} from '../../../../store/experience.store';
+	import { capabilities, initCampaignCapabilities } from '../../../../store/campaign.store';
+	import { campaignsHome } from '$lib/campaigns/nav';
+	import { goto } from '$app/navigation';
 
 	const SHOP = [
 		{ href: '/dashboard', icon: 'home', label: 'Home', exact: true },
@@ -46,8 +54,25 @@
 		{ href: '/dashboard/activity-logs', label: 'Activity logs' }
 	];
 
+	/**
+	 * The campaigns shell (board `BPD-0`). A different map, not a filtered one:
+	 * a buyer in a pilot has no use for renders, templates or the API, and
+	 * showing them greyed out would suggest a pilot is a limited version of the
+	 * platform rather than a different job.
+	 */
+	const CAMPAIGN_NAV = [
+		{ href: '/dashboard/campaigns', icon: 'campaigns', label: 'Campaigns' },
+		{ href: '/dashboard/brand-assets', icon: 'templates', label: 'Brand assets' }
+	];
+	const CAMPAIGN_ACCOUNT = [
+		{ href: '/dashboard/team', icon: 'team', label: 'Team & invites' },
+		{ href: '/dashboard/billing', icon: 'usage', label: 'Usage & billing' }
+	];
+
 	let switcherOpen = false;
 	let copied = false;
+	let switching = false;
+	let switchError = null;
 
 	$: path = $page.url.pathname;
 	/**
@@ -100,6 +125,67 @@
 	$: subline = memberCount > 1 ? `${memberCount} members` : planName + ' plan';
 	$: keyMasked = $activeApiToken?.token ? `pic_live_••••${$activeApiToken.token.slice(-5)}` : null;
 
+	/**
+	 * Adopt the stored preference when the user record arrives, not at mount.
+	 * The user store resolves after the rail has already rendered, so reading it
+	 * once in onMount would leave every reload in the platform shell regardless
+	 * of what the buyer chose. Guarded so it happens once: after that the store
+	 * is the truth, and a later refresh of the same record must not undo a
+	 * switch the buyer just made.
+	 */
+	let experienceAdopted = false;
+	$: if (!experienceAdopted && $user) {
+		experienceAdopted = true;
+		initExperience($user);
+	}
+
+	$: campaignsMode = $isCampaignExperience;
+
+	/**
+	 * The campaigns rail states both facts at once — the platform plan the team
+	 * is on AND whether the pilot is live — because they are independent and a
+	 * buyer in a pilot is still on a platform plan. Built only from what the
+	 * server sent; an unanswered capabilities call shows the platform subline
+	 * rather than inventing a pilot status.
+	 */
+	$: pilotStatus = $capabilities?.pilot?.status || null;
+	$: campaignSubline = pilotStatus
+		? `PLATFORM: ${planName} · PILOT: ${pilotStatus}`.toUpperCase()
+		: subline;
+
+	/**
+	 * The allowance card renders only when the server has stated every part of
+	 * it. A half-known allowance ("… / 250") is worse than none: it invites the
+	 * buyer to plan against a number nobody published.
+	 */
+	$: allowance = $capabilities?.allowance || null;
+	$: showAllowance =
+		allowance &&
+		allowance.label &&
+		Number.isFinite(allowance.limit) &&
+		Number.isFinite(allowance.used);
+
+	/**
+	 * Switching shells is a server-persisted preference, so the rail does not
+	 * change until the server agrees. Navigation happens after, and only after,
+	 * the switch is stored — landing on a campaigns route while the rail still
+	 * says platform is the confusing half-state this avoids.
+	 */
+	async function switchExperience(next) {
+		if (switching) return;
+		switching = true;
+		switchError = null;
+		try {
+			await setExperienceAction(next);
+			switcherOpen = false;
+			await goto(next === 'campaigns' ? campaignsHome() : '/dashboard');
+		} catch (err) {
+			switchError = err?.data?.message || 'Could not switch. Try again.';
+		} finally {
+			switching = false;
+		}
+	}
+
 	async function copyKey() {
 		if (!$activeApiToken?.token) return;
 		try {
@@ -126,6 +212,9 @@
 		initializeTeamState();
 		initPLG();
 		getAPITokenAction().catch(() => {});
+		// A 403 here means no pilot access, which is a state the rail renders as
+		// "no allowance card" rather than an error.
+		initCampaignCapabilities().catch(() => {});
 		// Re-check as the rail settles: the meters and the verify-email card below
 		// the list arrive late and change how much of it is on screen.
 		const ro = new ResizeObserver(() => revealActive());
@@ -169,7 +258,7 @@
 							>{teamName}</span
 						>
 						<span class="font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute"
-							>{subline}</span
+							>{campaignsMode ? campaignSubline : subline}</span
 						>
 					</span>
 				</span>
@@ -200,68 +289,128 @@
 					>
 						Invite a teammate →
 					</a>
+					<!-- The switch lives in the workspace menu because the experience is
+					     a property of how this person works, alongside which team they
+					     are in — not a navigation destination. -->
+					<button
+						type="button"
+						on:click={() => switchExperience(campaignsMode ? 'platform' : 'campaigns')}
+						disabled={switching}
+						class="flex items-center justify-between border-t border-black/[0.08] px-3 py-2 text-left font-sans text-[13px] text-brand-slate hover:bg-brand-canvas disabled:opacity-60"
+					>
+						<span>{campaignsMode ? 'Switch to Platform tools' : 'Switch to Campaigns'}</span>
+						<span class="font-mono text-[10px] text-brand-mute">⇄</span>
+					</button>
+					{#if switchError}
+						<span
+							class="border-t border-black/[0.08] px-3 py-2 font-sans text-[12px] text-brand-pink"
+							role="alert">{switchError}</span
+						>
+					{/if}
 				</div>
 			{/if}
 		</div>
 
 		<div bind:this={navEl} class="flex min-h-0 flex-col gap-1.5 overflow-y-auto">
-			<span class="px-2 pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute"
-				>Shop</span
-			>
-			{#each SHOP as item (item.href)}
-				{@const active = isActive(item, path)}
-				<a
-					href={item.href}
-					class="flex items-center gap-[9px] rounded-btn px-2 py-[7px] {active
-						? 'bg-white/85 text-brand-ink'
-						: 'text-brand-slate hover:bg-white/50'}"
-					aria-current={active ? 'page' : undefined}
+			{#if campaignsMode}
+				<span class="px-2 pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute"
+					>Campaigns</span
 				>
-					<NavIcon name={item.icon} />
-					<span class="font-sans text-sm {active ? 'font-semibold text-brand-ink' : ''}"
-						>{item.label}</span
-					>
-				</a>
-			{/each}
-
-			<span class="px-2 pb-1 pt-4 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute"
-				>Account</span
-			>
-			{#each ACCOUNT as item (item.href)}
-				{@const active = isActive(item, path)}
-				<a
-					href={item.href}
-					class="flex items-center gap-[9px] rounded-btn px-2 py-[7px] {active
-						? 'bg-white/85 text-brand-ink'
-						: 'text-brand-slate hover:bg-white/50'}"
-					aria-current={active ? 'page' : undefined}
-				>
-					<NavIcon name={item.icon} />
-					<span class="font-sans text-sm {active ? 'font-semibold text-brand-ink' : ''}"
-						>{item.label}</span
-					>
-				</a>
-			{/each}
-
-			<details class="pt-4" open={moreHasActive}>
-				<summary
-					class="cursor-pointer list-none px-2 pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute"
-				>
-					More ▾
-				</summary>
-				{#each MORE as item (item.href)}
+				{#each CAMPAIGN_NAV as item (item.href)}
 					{@const active = isActive(item, path)}
 					<a
 						href={item.href}
-						class="flex items-center rounded-btn px-2 py-1.5 font-sans text-[13px] {active
-							? 'bg-white/85 font-semibold text-brand-ink'
+						class="flex items-center gap-[9px] rounded-btn px-2 py-[7px] {active
+							? 'bg-white/85 text-brand-ink'
 							: 'text-brand-slate hover:bg-white/50'}"
 						aria-current={active ? 'page' : undefined}
 					>
-						{item.label}
+						<NavIcon name={item.icon} />
+						<span class="font-sans text-sm {active ? 'font-semibold text-brand-ink' : ''}"
+							>{item.label}</span
+						>
 					</a>
 				{/each}
-			</details>
+
+				<span
+					class="px-2 pb-1 pt-4 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute"
+					>Account</span
+				>
+				{#each CAMPAIGN_ACCOUNT as item (item.href)}
+					{@const active = isActive(item, path)}
+					<a
+						href={item.href}
+						class="flex items-center gap-[9px] rounded-btn px-2 py-[7px] {active
+							? 'bg-white/85 text-brand-ink'
+							: 'text-brand-slate hover:bg-white/50'}"
+						aria-current={active ? 'page' : undefined}
+					>
+						<NavIcon name={item.icon} />
+						<span class="font-sans text-sm {active ? 'font-semibold text-brand-ink' : ''}"
+							>{item.label}</span
+						>
+					</a>
+				{/each}
+			{:else}
+				<span class="px-2 pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute"
+					>Shop</span
+				>
+				{#each SHOP as item (item.href)}
+					{@const active = isActive(item, path)}
+					<a
+						href={item.href}
+						class="flex items-center gap-[9px] rounded-btn px-2 py-[7px] {active
+							? 'bg-white/85 text-brand-ink'
+							: 'text-brand-slate hover:bg-white/50'}"
+						aria-current={active ? 'page' : undefined}
+					>
+						<NavIcon name={item.icon} />
+						<span class="font-sans text-sm {active ? 'font-semibold text-brand-ink' : ''}"
+							>{item.label}</span
+						>
+					</a>
+				{/each}
+
+				<span
+					class="px-2 pb-1 pt-4 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute"
+					>Account</span
+				>
+				{#each ACCOUNT as item (item.href)}
+					{@const active = isActive(item, path)}
+					<a
+						href={item.href}
+						class="flex items-center gap-[9px] rounded-btn px-2 py-[7px] {active
+							? 'bg-white/85 text-brand-ink'
+							: 'text-brand-slate hover:bg-white/50'}"
+						aria-current={active ? 'page' : undefined}
+					>
+						<NavIcon name={item.icon} />
+						<span class="font-sans text-sm {active ? 'font-semibold text-brand-ink' : ''}"
+							>{item.label}</span
+						>
+					</a>
+				{/each}
+
+				<details class="pt-4" open={moreHasActive}>
+					<summary
+						class="cursor-pointer list-none px-2 pb-1 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute"
+					>
+						More ▾
+					</summary>
+					{#each MORE as item (item.href)}
+						{@const active = isActive(item, path)}
+						<a
+							href={item.href}
+							class="flex items-center rounded-btn px-2 py-1.5 font-sans text-[13px] {active
+								? 'bg-white/85 font-semibold text-brand-ink'
+								: 'text-brand-slate hover:bg-white/50'}"
+							aria-current={active ? 'page' : undefined}
+						>
+							{item.label}
+						</a>
+					{/each}
+				</details>
+			{/if}
 		</div>
 	</div>
 
@@ -269,34 +418,63 @@
 		{#if $user?.isEmailVerified === false}
 			<VerifyEmailCard email={$user?.email || ''} />
 		{/if}
-		<div class="flex flex-col gap-3 border-t border-black/10 pt-3.5">
-			<DitherMeter
-				label="Renders"
-				used={$usageWidget?.current ?? 0}
-				total={$usageWidget?.limit ?? 0}
-				fill="bg-brand-field"
-			/>
-			{#if $usageWidget?.aiCredits}
-				<DitherMeter
-					label="AI quota"
-					used={$usageWidget.aiCredits.used ?? 0}
-					total={$usageWidget.aiCredits.limit ?? 0}
-					fill="bg-brand-pink"
-				/>
+		{#if campaignsMode}
+			<!-- The campaigns rail carries the allowance rather than the render
+			     meters: a pilot is metered in accounts summarised, and showing a
+			     render count here would meter the wrong thing. Rendered only when
+			     the server has stated every part of it. -->
+			{#if showAllowance}
+				<div class="flex flex-col gap-1.5 rounded-md bg-white/85 px-3 py-2.5">
+					<span class="font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute"
+						>Campaign allowance</span
+					>
+					<span class="flex items-baseline justify-between gap-2">
+						<span class="font-sans text-[13px] text-brand-ink">{allowance.label}</span>
+						<span class="flex-shrink-0 font-mono text-[11px] text-brand-slate"
+							>{allowance.used} / {allowance.limit} used</span
+						>
+					</span>
+				</div>
 			{/if}
-		</div>
-		{#if keyMasked}
 			<button
 				type="button"
-				on:click={copyKey}
-				class="flex items-center justify-between rounded-btn bg-white/85 px-2.5 py-2 text-left"
-				title="Copy API key"
+				on:click={() => switchExperience('platform')}
+				disabled={switching}
+				class="flex h-9 items-center justify-between rounded-md border border-brand-rule bg-white/85 px-3 disabled:opacity-60"
 			>
-				<span class="font-mono text-[11px] text-brand-slate">{keyMasked}</span>
-				<span class="font-mono text-[10px] {copied ? 'text-brand-proof' : 'text-brand-mute'}">
-					{copied ? 'COPIED' : 'COPY'}
-				</span>
+				<span class="font-sans text-[12.5px] text-brand-slate">Switch to Platform tools</span>
+				<span class="font-mono text-[11px] text-brand-mute">⇄</span>
 			</button>
+		{:else}
+			<div class="flex flex-col gap-3 border-t border-black/10 pt-3.5">
+				<DitherMeter
+					label="Renders"
+					used={$usageWidget?.current ?? 0}
+					total={$usageWidget?.limit ?? 0}
+					fill="bg-brand-field"
+				/>
+				{#if $usageWidget?.aiCredits}
+					<DitherMeter
+						label="AI quota"
+						used={$usageWidget.aiCredits.used ?? 0}
+						total={$usageWidget.aiCredits.limit ?? 0}
+						fill="bg-brand-pink"
+					/>
+				{/if}
+			</div>
+			{#if keyMasked}
+				<button
+					type="button"
+					on:click={copyKey}
+					class="flex items-center justify-between rounded-btn bg-white/85 px-2.5 py-2 text-left"
+					title="Copy API key"
+				>
+					<span class="font-mono text-[11px] text-brand-slate">{keyMasked}</span>
+					<span class="font-mono text-[10px] {copied ? 'text-brand-proof' : 'text-brand-mute'}">
+						{copied ? 'COPIED' : 'COPY'}
+					</span>
+				</button>
+			{/if}
 		{/if}
 	</div>
 </nav>
