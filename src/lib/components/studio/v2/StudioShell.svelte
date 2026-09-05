@@ -19,6 +19,7 @@
 	import StudioTopBarV2 from './StudioTopBarV2.svelte';
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
 	import CardPreview from '$lib/components/campaigns/CardPreview.svelte';
+	import { saveState as saveStateOf } from './save-states.js';
 
 	export let design = { name: 'Untitled design', html: '', width: 1200, height: 800, revision: 1 };
 	export let format = 'PNG';
@@ -29,6 +30,8 @@
 	/** `{ revision, url, at, stale }` — null until B05 wires proofs. */
 	export let proof = null;
 	export let statusNote = null;
+	/** True when an approved edition is frozen against this design (S6). */
+	export let editionApproved = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -55,16 +58,72 @@
 	let zoom = 'fit';
 	const ZOOMS = ['fit', '50%', '100%'];
 
+	/**
+	 * B01-4 — the keyboard map.
+	 *
+	 * Typing is checked FIRST. A description containing "1" must not change the
+	 * mode mid-sentence, and an editor whose shortcuts fire inside its own text
+	 * fields is worse than one with no shortcuts at all.
+	 */
 	function onKey(event) {
 		if (event.target instanceof HTMLElement) {
 			const tag = event.target.tagName;
-			if (tag === 'INPUT' || tag === 'TEXTAREA' || event.target.isContentEditable) return;
+			if (tag === 'INPUT' || tag === 'TEXTAREA' || event.target.isContentEditable) {
+				// Escape still works while typing: it is how you get out.
+				if (event.key === 'Escape') event.target.blur();
+				return;
+			}
 		}
+		if (event.metaKey || event.ctrlKey || event.altKey) return;
+
 		const index = ['1', '2', '3'].indexOf(event.key);
 		if (index >= 0) {
 			mode = MODES[index].key;
 			event.preventDefault();
+			return;
 		}
+		if (event.key === 'Escape') {
+			dispatch('deselect');
+			event.preventDefault();
+		}
+	}
+
+	/**
+	 * B01-4 — live-region announcements.
+	 *
+	 * Mode, save state and stale-proof changes are all conveyed visually by a
+	 * chip or an underline moving. A screen reader user gets none of that, and
+	 * on a screen whose whole job is "are you sure about what you are about to
+	 * send", silently changing what the stage is showing is not acceptable.
+	 *
+	 * `polite` rather than `assertive`: these interrupt nothing urgent, and an
+	 * assertive region would talk over the buyer mid-instruction.
+	 */
+	let announcement = '';
+	let announceTimer;
+	function announce(message) {
+		clearTimeout(announceTimer);
+		// Re-announce an identical message by clearing first; some readers skip
+		// a region whose text has not changed.
+		announcement = '';
+		announceTimer = setTimeout(() => (announcement = message), 60);
+	}
+
+	const MODE_LABEL = {
+		design: 'Design mode. The canvas is editable.',
+		preview: 'Preview data mode. Sample values shown, editing is off.',
+		proof: 'Rendered proof mode. Showing a server render.'
+	};
+	let lastMode = mode;
+	$: if (mode !== lastMode) {
+		lastMode = mode;
+		announce(MODE_LABEL[mode]);
+	}
+
+	let lastSaveState = saveState;
+	$: if (saveState !== lastSaveState) {
+		lastSaveState = saveState;
+		announce(saveStateOf(saveState).label);
 	}
 
 	/**
@@ -78,6 +137,9 @@
 <svelte:window on:keydown={onKey} />
 
 <div class="flex h-screen flex-col overflow-hidden bg-brand-canvas">
+	<!-- Visually hidden, deliberately not `hidden`: a hidden region is not read. -->
+	<p aria-live="polite" class="sr-only">{announcement}</p>
+
 	<StudioTopBarV2
 		designName={design.name}
 		{breadcrumb}
@@ -93,6 +155,23 @@
 		onBack={() => dispatch('back')}
 		onPreview={() => (mode = 'preview')}
 	/>
+
+	{#if editionApproved}
+		<!--
+			S6. The buyer is editing a design an approved edition is already
+			frozen against. Saying so BEFORE they change anything is the whole
+			point: after the fact it is an explanation, before it is a choice.
+		-->
+		<div
+			class="flex flex-wrap items-center gap-2.5 border-b border-brand-rule bg-brand-field px-4 py-2.5"
+		>
+			<span class="block h-2 w-2 flex-shrink-0 bg-brand-ink" aria-hidden="true" />
+			<p class="font-sans text-[13px] text-brand-ink">
+				This design is used by an approved edition. Saving a change starts a new revision, and that
+				edition’s approval no longer applies — it has to be approved again before it can generate.
+			</p>
+		</div>
+	{/if}
 
 	<div class="flex min-h-0 flex-1 gap-4 p-4">
 		<!-- LEFT: Say it | Layers -->

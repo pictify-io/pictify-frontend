@@ -8,6 +8,7 @@
 	 * incremented locally in anticipation of a save.
 	 */
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
+	import { saveState as saveStateOf } from './save-states.js';
 
 	export let designName = 'Untitled design';
 	export let breadcrumb = null;
@@ -27,20 +28,7 @@
 	export let onRedo = null;
 	export let onPreview = null;
 
-	/**
-	 * The save line is a claim about the server, so each state says exactly what
-	 * is true. "Saving…" is not "saved", and offline says where the work is
-	 * rather than implying it is safe.
-	 */
-	const STATES = {
-		saved: { tone: 'ready', label: 'Saved' },
-		saving: { tone: 'current', label: 'Saving…' },
-		unsaved: { tone: 'current', label: 'Unsaved changes' },
-		offline: { tone: 'blocked', label: 'Offline · kept in this browser' },
-		conflict: { tone: 'blocked', label: 'Someone else saved · reload to merge' },
-		ai: { tone: 'current', label: 'AI working' }
-	};
-	$: state = STATES[saveState] || STATES.saved;
+	$: state = saveStateOf(saveState);
 </script>
 
 <header
