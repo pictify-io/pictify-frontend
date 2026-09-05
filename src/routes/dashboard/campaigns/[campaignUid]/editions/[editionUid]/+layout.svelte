@@ -25,6 +25,8 @@
 
 	$: campaignUid = $page.params.campaignUid;
 	$: editionUid = $page.params.editionUid;
+	/** Where the user is, from the URL — not where the server thinks they are. */
+	$: activeStep = $page.params.step || $page.url.pathname.split('/').filter(Boolean).pop();
 
 	/**
 	 * Refetch whenever the identifiers change. Named in the statement because
@@ -105,7 +107,7 @@
 		</div>
 
 		<div class="mt-4">
-			<StepStrip {steps} {campaignUid} {editionUid} />
+			<StepStrip {steps} {campaignUid} {editionUid} {activeStep} />
 		</div>
 
 		{#if $loading && !$edition}

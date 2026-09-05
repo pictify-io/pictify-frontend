@@ -223,6 +223,10 @@ export const startRun = (campaignUid, editionUid, { approvalId, expectedRevision
 
 export const getRun = (runId) => backend.get(`/campaign-runs/${enc(runId)}`);
 
+/** Per-account status for the Generate table. Safe error codes only. */
+export const listRunItems = (runId, { cursor, limit, status } = {}) =>
+	backend.get(`/campaign-runs/${enc(runId)}/items${q({ cursor, limit, status })}`);
+
 /**
  * Retry eligible failures on the same approved revision. Ready items are not
  * touched. `idempotencyKey` must come from `newIdempotencyKey()` at the moment

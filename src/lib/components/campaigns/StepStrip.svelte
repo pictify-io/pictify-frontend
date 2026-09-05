@@ -18,13 +18,24 @@
 	export let steps = [];
 	export let campaignUid;
 	export let editionUid;
+	/**
+	 * The step the user is actually LOOKING AT, from the URL.
+	 *
+	 * Distinct from the server's idea of where the edition has got to, and the
+	 * distinction matters: after a run settles the server says the edition's
+	 * current step is Export, but a buyer still reading the Generate page had
+	 * Export underlined while they were on Generate. The underline answers
+	 * "where am I", which only the URL knows; the server answers "what is done
+	 * and what may I reach", which only it knows.
+	 */
+	export let activeStep = null;
 
 	const href = (step) => editionUrl(campaignUid, editionUid, step.key);
 </script>
 
 <div class="flex flex-wrap items-stretch gap-x-7 gap-y-1 border-b border-brand-rule">
 	{#each steps as step, i (step.key)}
-		{@const active = step.state === 'current'}
+		{@const active = activeStep ? step.key === activeStep : step.state === 'current'}
 		<svelte:element
 			this={step.reachable && !active ? 'a' : 'div'}
 			href={step.reachable && !active ? href(step) : undefined}
@@ -45,7 +56,7 @@
 				{step.label}
 			</span>
 
-			{#if step.state === 'current' && step.note}
+			{#if active && step.state !== 'done' && step.note}
 				<!-- The current step's state is a field-green chip: it is where you
 				     are, and the chip says what is true right now. -->
 				<span
