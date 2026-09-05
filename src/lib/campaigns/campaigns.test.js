@@ -17,6 +17,7 @@ import {
 	isSafeReturnPath,
 	postAuthDestination,
 	safeIntent,
+	isSafeExternalUrl,
 	safeReturnPath
 } from './nav.js';
 import {
@@ -29,7 +30,8 @@ import {
 	spreadsheetSafe,
 	stripBom,
 	validateCsvShape,
-	validateRow
+	validateRow,
+	validateRows
 } from './csv.js';
 
 // ── nav ────────────────────────────────────────────────────────────────
@@ -240,4 +242,87 @@ test('human-facing output cannot execute in a spreadsheet', () => {
 	// `'=x` needs no quoting — it holds no comma, quote or newline — and the
 	// leading apostrophe is what stops the spreadsheet evaluating it.
 	assert.equal(csvRow(['00042', 'Doe, Jane', '=x']), '00042,"Doe, Jane",\'=x');
+});
+
+// ── csv: accounts, not rows ────────────────────────────────────────────
+test('counts are accounts, and a duplicate id is one issue spanning its rows', () => {
+	const columns = [
+		{ key: 'account_id', required: true, type: 'string' },
+		{ key: 'saved', required: true, type: 'number' }
+	];
+	const out = validateRows(
+		[
+			{ account_id: '00042', saved: '1' },
+			{ account_id: 'a2', saved: '2' },
+			{ account_id: '00042', saved: '3' },
+			{ account_id: '00042', saved: '4' }
+		],
+		columns
+	);
+
+	// Four rows, two accounts — the review screen counts accounts, and 00042
+	// occupying three lines is still one account.
+	assert.equal(out.counts.rows, 4);
+	assert.equal(out.counts.accounts, 2);
+
+	// One issue, not three, and it names every line the id occupies.
+	assert.equal(out.duplicates.length, 1);
+	assert.deepEqual(out.duplicates[0].lines, [2, 4, 5]);
+	assert.equal(out.duplicates[0].accountId, '00042');
+
+	// The duplicated account is not valid; the clean one is. One issue, because
+	// there is one ambiguous account — not three because it spans three lines.
+	assert.equal(out.counts.valid, 1);
+	assert.equal(out.counts.issues, 1);
+	assert.equal(out.ok, false);
+});
+
+test('a duplicate is blocked, never silently resolved to one winner', () => {
+	const columns = [
+		{ key: 'account_id', required: true, type: 'string' },
+		{ key: 'saved', required: true, type: 'number' }
+	];
+	const out = validateRows(
+		[
+			{ account_id: 'a1', saved: '10' },
+			{ account_id: 'a1', saved: '99' }
+		],
+		columns
+	);
+	const account = out.accounts.find((a) => a.id === 'a1');
+	assert.equal(account.ok, false);
+	assert.ok(account.issues.some((i) => i.code === 'duplicate_account_id'));
+	// Neither value has been chosen as the survivor.
+	assert.equal(out.counts.valid, 0);
+});
+
+test('a row whose id cannot be read is still counted, on its own line', () => {
+	const columns = [{ key: 'account_id', required: true, type: 'string' }];
+	const out = validateRows([{ account_id: '' }, { account_id: 'ok1' }], columns);
+	assert.equal(out.counts.accounts, 2);
+	assert.equal(out.counts.valid, 1);
+	assert.equal(out.accounts[0].id, null);
+	assert.deepEqual(out.accounts[0].lines, [2]);
+});
+
+// ── nav: the Next action destination ───────────────────────────────────
+test('the Next action takes external https only, and is not isSafeReturnPath', () => {
+	for (const good of ['https://acme.com', 'https://acme.com/renew?x=1', 'https://a.b.co.uk/x#y']) {
+		assert.equal(isSafeExternalUrl(good), true, `${good} should be allowed`);
+		// The two validators are inverses; neither can stand in for the other.
+		assert.equal(isSafeReturnPath(good), false);
+	}
+	for (const bad of [
+		'http://acme.com', // downgraded scheme
+		'javascript:alert(1)',
+		'data:text/html,x',
+		'https://user:pw@acme.com', // credentials would be rendered into an image
+		'https://localhost', // no dot: not reachable by a customer
+		'https://intranet',
+		'/dashboard/campaigns', // a path is not a destination
+		'acme.com',
+		''
+	]) {
+		assert.equal(isSafeExternalUrl(bad), false, `${bad} must be rejected`);
+	}
 });

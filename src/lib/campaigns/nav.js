@@ -102,3 +102,35 @@ export function authUrl(base, { redirect, intent } = {}) {
 	const qs = params.toString();
 	return qs ? `${base}?${qs}` : base;
 }
+
+/**
+ * Is this a usable destination for a campaign's Next action?
+ *
+ * NOT a variant of `isSafeReturnPath`, despite doing a similar-sounding job.
+ * That one accepts same-origin paths and rejects every absolute URL; this one
+ * is its inverse and accepts only absolute external https. Reusing either for
+ * the other's purpose rejects everything it should allow.
+ *
+ * https only: the destination is printed on a summary a customer will read and
+ * click from the buyer's email, so a downgrade to http is not something to
+ * shrug at. Credentials in the URL are refused because they would be rendered
+ * into an image and mailed out.
+ */
+export function isSafeExternalUrl(value) {
+	if (typeof value !== 'string' || value.length === 0 || value.length > 2048) return false;
+	if (/[\u0000-\u001F\u007F]/.test(value)) return false;
+
+	let url;
+	try {
+		url = new URL(value);
+	} catch {
+		return false;
+	}
+
+	if (url.protocol !== 'https:') return false;
+	// Credentials would be baked into a rendered image.
+	if (url.username || url.password) return false;
+	// A hostname with no dot is a local name, not somewhere a customer can reach.
+	if (!url.hostname.includes('.') || url.hostname.endsWith('.')) return false;
+	return true;
+}

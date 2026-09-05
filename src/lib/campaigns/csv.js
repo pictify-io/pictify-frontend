@@ -234,3 +234,74 @@ export function validateRow(record, columns, { accountIdKey = 'account_id' } = {
 
 	return { ok: issues.length === 0, value, issues };
 }
+
+/**
+ * Validate every mapped row together.
+ *
+ * Separate from `validateRow` because two of the rules cannot be seen one row
+ * at a time:
+ *
+ *   Counts are ACCOUNTS, not rows. The review screen says "12 accounts", so a
+ *   file where one account appears three times is 1 account, not 3.
+ *   A duplicate id is ONE issue spanning N rows. Reporting it three times would
+ *   make a single ambiguity look like three problems and inflate the count the
+ *   buyer is asked to reconcile.
+ *
+ * Duplicates block rather than resolving to a winner: nothing here can know
+ * which row the buyer meant, and picking one silently would publish a figure
+ * they never chose (INV-01).
+ */
+export function validateRows(records, columns, { accountIdKey = 'account_id' } = {}) {
+	const rows = [];
+	const byId = new Map();
+
+	records.forEach((record, index) => {
+		// Line 1 is the header, so the first record is line 2.
+		const line = index + 2;
+		const result = validateRow(record, columns, { accountIdKey });
+		const id = result.value[accountIdKey];
+		rows.push({ line, id: id ?? null, ...result });
+		if (id) {
+			if (!byId.has(id)) byId.set(id, []);
+			byId.get(id).push(line);
+		}
+	});
+
+	// One issue per duplicated id, carrying every line it occupies.
+	const duplicates = [];
+	for (const [id, lines] of byId) {
+		if (lines.length > 1) duplicates.push({ code: 'duplicate_account_id', accountId: id, lines });
+	}
+	const duplicatedIds = new Set(duplicates.map((d) => d.accountId));
+
+	// An account is the unit. A row whose id could not be read has no account to
+	// belong to, so it is counted on its own line.
+	const accounts = [];
+	const seen = new Set();
+	for (const row of rows) {
+		if (!row.id) {
+			accounts.push({ id: null, lines: [row.line], ok: false, issues: row.issues });
+			continue;
+		}
+		if (seen.has(row.id)) continue;
+		seen.add(row.id);
+		const lines = byId.get(row.id);
+		const isDuplicated = duplicatedIds.has(row.id);
+		accounts.push({
+			id: row.id,
+			lines,
+			ok: row.ok && !isDuplicated,
+			issues: isDuplicated
+				? [...row.issues, duplicates.find((d) => d.accountId === row.id)]
+				: row.issues
+		});
+	}
+
+	const valid = accounts.filter((a) => a.ok).length;
+	return {
+		ok: accounts.every((a) => a.ok),
+		accounts,
+		duplicates,
+		counts: { accounts: accounts.length, valid, issues: accounts.length - valid, rows: rows.length }
+	};
+}
