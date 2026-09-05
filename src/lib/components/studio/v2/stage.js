@@ -1,5 +1,6 @@
 import DOMPurify from 'dompurify';
 import { ATTR } from './node-ids.js';
+import { findOverflow } from './overflow.js';
 
 /**
  * The visual stage. B02.
@@ -485,6 +486,60 @@ export async function attachStage(frame, { onTransaction, onSelection, onStatus,
 		return true;
 	}
 
+	/* -------------------------------------------- B03 fields and fitting */
+
+	/** Field keys this design binds, read from the live document. */
+	function usedFields() {
+		const found = new Set();
+		for (const m of (doc.body.textContent || '').matchAll(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g)) {
+			found.add(m[1]);
+		}
+		return [...found];
+	}
+
+	/**
+	 * Check the design against EVERY sample, not just the one on screen.
+	 *
+	 * Substitution happens in a detached clone so the buyer's canvas is never
+	 * disturbed — running this on the live document would flicker their work and
+	 * could land mid-gesture. The clone is measured off-screen and removed.
+	 *
+	 * This is the check that catches the failure that only appears on someone
+	 * else's data: a card that fits every sample the designer looked at and
+	 * clips the one customer with a long name.
+	 */
+	function checkAllSamples(valuesBySample) {
+		const results = {};
+		const holder = doc.createElement('div');
+		holder.setAttribute(UI, 'measure');
+		// Off-screen but LAID OUT — display:none would report every size as zero
+		// and cheerfully declare that everything fits.
+		holder.style.cssText = 'position:absolute;left:-99999px;top:0;width:' + width + 'px';
+		doc.body.appendChild(holder);
+
+		const source = serialize(doc);
+		for (const [sampleId, values] of Object.entries(valuesBySample)) {
+			holder.innerHTML = source.replace(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g, (m, key) => {
+				const v = values[key];
+				if (v === null || v === undefined) return '';
+				return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+			});
+			results[sampleId] = findOverflow({ body: holder }, view);
+		}
+
+		holder.remove();
+		return results;
+	}
+
+	/** Apply a style patch as one transaction, so undo restores exactly. */
+	function applyStyles(id, patch) {
+		const el = byId(id);
+		if (!el || !patch) return false;
+		for (const [prop, value] of Object.entries(patch)) el.style.setProperty(prop, value);
+		commit('fix overflow');
+		return true;
+	}
+
 	doc.addEventListener('click', onClick, true);
 	doc.addEventListener('dblclick', onDoubleClick, true);
 
@@ -497,6 +552,9 @@ export async function attachStage(frame, { onTransaction, onSelection, onStatus,
 		duplicateSelected,
 		addElement,
 		tree,
+		usedFields,
+		checkAllSamples,
+		applyStyles,
 		toggleLock,
 		toggleHide,
 		rename,

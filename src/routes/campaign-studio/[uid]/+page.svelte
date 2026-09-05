@@ -18,6 +18,9 @@
 	import StudioStart from '$lib/components/studio/v2/StudioStart.svelte';
 	import StudioStage from '$lib/components/studio/v2/StudioStage.svelte';
 	import LayersTree from '$lib/components/studio/v2/LayersTree.svelte';
+	import InputsRail from '$lib/components/studio/v2/InputsRail.svelte';
+	import { SAMPLE_CASES, valuesFor } from '$lib/components/studio/v2/samples.js';
+	import { summarize } from '$lib/components/studio/v2/overflow.js';
 	import { editor, dirty } from '$lib/components/studio/v2/editor-store.js';
 	import { SAMPLE_VALUES } from '$lib/campaigns/starters';
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
@@ -41,10 +44,32 @@
 	let stageApi = null;
 	let layers = [];
 	let selectedId = null;
+	let usedFields = [];
+	let bySample = {};
+	let activeSample = 'typical';
+
+	/** Metric keys the campaign supplies, which is what a field may bind to. */
+	$: metricKeys = (campaign?.metrics || []).map((m) => m.key);
+	$: fitSummary = Object.keys(bySample).length ? summarize(bySample) : null;
+
+	/**
+	 * Re-check fit against EVERY sample after each transaction, not just the one
+	 * on screen. A design is only correct when the hardest row fits, and the
+	 * buyer should not have to click through five samples to discover that.
+	 */
+	function refreshFit() {
+		if (!stageApi) return;
+		usedFields = stageApi.usedFields();
+		const valuesBySample = Object.fromEntries(
+			SAMPLE_CASES.map((c) => [c.id, valuesFor(c, metricKeys)])
+		);
+		bySample = stageApi.checkAllSamples(valuesBySample);
+	}
 
 	/** Rebuilt after every transaction, because the tree IS the document. */
 	const refreshLayers = () => {
 		layers = stageApi ? stageApi.tree() : [];
+		refreshFit();
 	};
 
 	/**
@@ -175,7 +200,11 @@
 		campaignContext={inCampaign}
 		saveState={design ? $editor.saveState : 'unsaved'}
 		useDisabled={!design}
-		statusNote={design ? null : 'Nothing drawn yet · describe the card on the left or import HTML'}
+		statusNote={design
+			? fitSummary && !fitSummary.ok
+				? fitSummary.label
+				: null
+			: 'Nothing drawn yet · describe the card on the left or import HTML'}
 		{editionApproved}
 		on:back={back}
 		on:use={useThisDesign}
@@ -225,7 +254,13 @@
 					height={design.height}
 					{zoom}
 					editable={mode === 'design'}
-					sampleValues={SAMPLE_VALUES}
+					sampleValues={{
+						...SAMPLE_VALUES,
+						...valuesFor(
+							SAMPLE_CASES.find((c) => c.id === activeSample) || SAMPLE_CASES[0],
+							metricKeys
+						)
+					}}
 					on:ready={refreshLayers}
 					on:selection={(e) => (selectedId = e.detail?.count === 1 ? e.detail.id : null)}
 					on:transaction={(e) => {
@@ -239,6 +274,34 @@
 				</p>
 			{:else}
 				<p class="font-sans text-[13.5px] text-brand-mute">No design chosen yet.</p>
+			{/if}
+		</svelte:fragment>
+
+		<svelte:fragment slot="right" let:rightTab>
+			{#if rightTab === 'inputs'}
+				<InputsRail
+					used={usedFields}
+					available={metricKeys}
+					{bySample}
+					{activeSample}
+					on:sample={(e) => (activeSample = e.detail.id)}
+					on:insert={(e) => {
+						stageApi?.addElement('field', { field: e.detail.field });
+						refreshLayers();
+					}}
+				/>
+			{:else if rightTab === 'brand'}
+				<p class="font-sans text-[13.5px] text-brand-mute">Brand assets arrive with B03-4.</p>
+			{:else}
+				<p class="font-mono text-[10px] uppercase tracking-[0.06em] text-brand-mute">Document</p>
+				<dl class="mt-2 border-t border-brand-rule">
+					{#each [['Size', `${design?.width ?? 1200} × ${design?.height ?? 800}`], ['Fields bound', String(usedFields.length)], ['Revision', `rev ${design?.revision ?? 1}`]] as [label, value] (label)}
+						<div class="flex items-baseline justify-between gap-3 border-b border-brand-rule py-2">
+							<dt class="font-sans text-[13px] text-brand-slate">{label}</dt>
+							<dd class="font-mono text-[11.5px] text-brand-ink">{value}</dd>
+						</div>
+					{/each}
+				</dl>
 			{/if}
 		</svelte:fragment>
 
