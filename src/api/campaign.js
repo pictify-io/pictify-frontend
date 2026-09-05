@@ -159,13 +159,27 @@ export function uploadEditionData(campaignUid, editionUid, file) {
 export const validateEdition = (campaignUid, editionUid, body = {}) =>
 	backend.post(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/validate`, body);
 
-export const listEditionItems = (campaignUid, editionUid, { cursor, limit, filter } = {}) =>
+export const listEditionItems = (campaignUid, editionUid, { cursor, limit, status } = {}) =>
 	backend.get(
 		`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/items${q({
 			cursor,
 			limit,
-			filter
+			status
 		})}`
+	);
+
+/**
+ * Record a decision about one account: exclude (with a reason), include again,
+ * neutral narrative variant, or a shorter display name.
+ *
+ * Deliberately cannot change a figure. A resolution that edited a value would
+ * make "fix the issues" mean "make the data say something else", and every
+ * approval downstream would be describing data nobody uploaded.
+ */
+export const updateItem = (campaignUid, editionUid, itemUid, decision) =>
+	backend.patch(
+		`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/items/${enc(itemUid)}`,
+		decision
 	);
 
 /* ----------------------------------------------------------- previews */
