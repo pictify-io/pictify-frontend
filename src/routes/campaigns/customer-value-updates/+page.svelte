@@ -35,7 +35,6 @@
 		ROWS,
 		TOTAL_CUSTOMERS,
 		byLine,
-		num,
 		comparison
 	} from '$lib/campaigns/marketing-fixture.js';
 	import { authUrl } from '$lib/campaigns/nav.js';

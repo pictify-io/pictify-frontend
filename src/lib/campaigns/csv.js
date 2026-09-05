@@ -48,7 +48,7 @@ export function parseDecimal(raw) {
 	if (text === '') return { ok: false, code: 'blank' };
 	if (!DECIMAL.test(text)) {
 		if (/[,\s]/.test(text)) return { ok: false, code: 'grouping_or_locale' };
-		if (/[^0-9.\-]/.test(text)) return { ok: false, code: 'symbol_in_number' };
+		if (/[^0-9.-]/.test(text)) return { ok: false, code: 'symbol_in_number' };
 		return { ok: false, code: 'not_a_number' };
 	}
 	const value = Number(text);

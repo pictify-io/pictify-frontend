@@ -16,7 +16,7 @@
 	 * are never carried over — presenting August's numbers as September's is the
 	 * worst thing this product could do, so there is no path that does it.
 	 */
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
@@ -46,7 +46,14 @@
 	let deleting = null;
 	let typed = '';
 	let deletionStatus = null;
-	let statusTimer;
+	/**
+	 * The deletion poll's pending timer.
+	 *
+	 * Held so it can be CLEARED. Without that this loop outlives the page: the
+	 * buyer navigates away mid-purge and a `getDeletion` fires every three
+	 * seconds forever, writing into a component that is gone.
+	 */
+	let statusTimer = null;
 
 	$: canPurge = $capabilities?.permissions?.canPurge === true;
 	$: canEdit = $capabilities?.permissions?.canEdit === true;
@@ -68,6 +75,7 @@
 		}
 	}
 	onMount(load);
+	onDestroy(() => clearTimeout(statusTimer));
 
 	/* ----------------------------------------------------------- AI-5 */
 
@@ -185,6 +193,9 @@
 			const status = await getDeletion(deletionId);
 			deletionStatus = status;
 			if (!['purged', 'purge_failed'].includes(status.state)) {
+				// Re-arm from a known-clear state, so two overlapping polls cannot
+				// both hold a timer and double the request rate.
+				clearTimeout(statusTimer);
 				statusTimer = setTimeout(() => pollDeletion(deletionId), 3000);
 			} else {
 				await load();

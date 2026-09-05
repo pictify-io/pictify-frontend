@@ -216,7 +216,7 @@
 
 	{#if loading}
 		<div class="mt-6 flex flex-col gap-px" aria-busy="true">
-			{#each Array(5) as _, i (i)}<div class="h-[52px] animate-pulse bg-brand-subtle" />{/each}
+			{#each Array.from({ length: 5 }, (_, i) => i) as i (i)}<div class="h-[52px] animate-pulse bg-brand-subtle" />{/each}
 		</div>
 	{:else}
 		<div class="mt-5 overflow-x-auto">

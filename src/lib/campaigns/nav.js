@@ -68,6 +68,7 @@ export function isSafeReturnPath(path) {
 	if (path.startsWith('//') || path.startsWith('/\\')) return false;
 	// Control characters, including the tab/newline/CR some parsers strip before
 	// re-reading the value — `/\thttps://evil.com` must not survive that trim.
+	// eslint-disable-next-line no-control-regex -- matching control characters is the check
 	if (/[\u0000-\u001F\u007F]/.test(path)) return false;
 	// A colon inside the first segment would make this a scheme.
 	const firstSegment = path.slice(1).split(/[/?#]/)[0];
@@ -118,6 +119,7 @@ export function authUrl(base, { redirect, intent } = {}) {
  */
 export function isSafeExternalUrl(value) {
 	if (typeof value !== 'string' || value.length === 0 || value.length > 2048) return false;
+	// eslint-disable-next-line no-control-regex -- matching control characters is the check
 	if (/[\u0000-\u001F\u007F]/.test(value)) return false;
 
 	let url;

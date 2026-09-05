@@ -19,11 +19,7 @@
 	import { listCampaigns, createSampleCampaign, campaignError } from '../../../api/campaign';
 	import { user } from '../../../store/user.store';
 	import { currentTeam } from '../../../store/team.store';
-	import {
-		capabilities,
-		capabilitiesError,
-		initCampaignCapabilities
-	} from '../../../store/campaign.store';
+	import { capabilities, initCampaignCapabilities } from '../../../store/campaign.store';
 	import { campaignIntentClicked } from '$lib/campaigns/analytics';
 
 	let loading = true;
@@ -175,7 +171,7 @@
 		<!-- Four skeleton rows at 64px: the table's real height, so the page does
 		     not jump when the answer arrives. -->
 		<div class="mt-8 flex flex-col gap-px" aria-busy="true" aria-label="Loading campaigns">
-			{#each Array(4) as _, i (i)}
+			{#each Array.from({ length: 4 }, (_, i) => i) as i (i)}
 				<div class="h-16 animate-pulse bg-brand-subtle" />
 			{/each}
 		</div>
