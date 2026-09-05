@@ -181,8 +181,14 @@ export const suggestMapping = (campaignUid, editionUid, headers) =>
 		headers
 	});
 
-export const setCampaignDesign = (campaignUid, templateRevisionUid) =>
-	backend.patch(`/campaigns/${enc(campaignUid)}/design`, { templateRevisionUid });
+export const setCampaignDesign = (campaignUid, templateRevisionUid, editionUid) =>
+	backend.patch(`/campaigns/${enc(campaignUid)}/design`, {
+		templateRevisionUid,
+		// The draft edition the buyer came from moves with the campaign. Without
+		// it "Use this design" would repin the campaign and leave the very
+		// edition it was pressed from rendering the previous revision.
+		...(editionUid ? { editionUid } : {})
+	});
 
 /**
  * Record that a proof was rendered for this edition's design, and of which

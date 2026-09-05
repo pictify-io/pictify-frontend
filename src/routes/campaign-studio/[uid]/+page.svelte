@@ -745,7 +745,7 @@
 	async function useThisDesign() {
 		if (!design || useBlocked || usingDesign) return;
 		usingDesign = true;
-		const res = await setCampaignDesign(campaignUid, uid);
+		const res = await setCampaignDesign(campaignUid, uid, editionUid);
 		usingDesign = false;
 
 		if (!res?.campaign) {
@@ -758,6 +758,11 @@
 		showToast(
 			editionApproved
 				? `Using rev ${recorded}. This edition needs approving again.`
+				: res.edition?.moved === false
+				? // The edition has frozen a snapshot, so it keeps the revision it
+				  // was approved against. Saying "using rev N for this edition"
+				  // there would be false.
+				  `Campaign now uses rev ${recorded}. This edition keeps the revision it approved.`
 				: `Using rev ${recorded} for this edition.`,
 			editionApproved ? 'error' : 'default',
 			4000
