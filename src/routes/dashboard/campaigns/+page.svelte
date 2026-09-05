@@ -14,8 +14,11 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
+	import AccessRequestCard from '$lib/components/campaigns/AccessRequestCard.svelte';
 	import { campaignUrl, editionUrl } from '$lib/campaigns/nav';
-	import { listCampaigns, campaignError } from '../../../api/campaign';
+	import { listCampaigns, createSampleCampaign, campaignError } from '../../../api/campaign';
+	import { user } from '../../../store/user.store';
+	import { currentTeam } from '../../../store/team.store';
 	import {
 		capabilities,
 		capabilitiesError,
@@ -27,6 +30,25 @@
 	let loadError = null;
 	let campaigns = [];
 	let tab = 'active';
+	let seeding = false;
+
+	/**
+	 * Seed or reopen the sample. Available without entitlement, because it is
+	 * how someone decides whether they want the pilot — gating it behind the
+	 * pilot would be a closed loop.
+	 */
+	async function trySample() {
+		seeding = true;
+		try {
+			const result = await createSampleCampaign();
+			await load();
+			if (result?.campaign?.uid) await goto(campaignUrl(result.campaign.uid));
+		} catch (err) {
+			loadError = campaignError(err);
+		} finally {
+			seeding = false;
+		}
+	}
 
 	$: enabled = $capabilities?.enabled === true;
 	/**
@@ -117,9 +139,11 @@
 			<div class="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:flex-shrink-0">
 				<button
 					type="button"
+					on:click={trySample}
+					disabled={seeding}
 					class="h-11 flex-1 rounded-btn border border-brand-rule bg-brand-paper px-4 font-sans text-[13.5px] text-brand-slate hover:bg-brand-subtle sm:flex-none"
 				>
-					Try sample data
+					{seeding ? 'Opening…' : 'Try sample data'}
 				</button>
 				{#if enabled}
 					<!-- One plum primary per screen (handoff §2 decision 2). -->
@@ -130,14 +154,13 @@
 						Create customer value update
 						<span class="block h-2 w-2 bg-brand-field" aria-hidden="true" />
 					</button>
-				{:else}
-					<a
-						href="/campaigns/customer-value-updates"
-						class="flex h-11 flex-1 items-center justify-center rounded-btn bg-brand-plum px-4 font-sans text-[13.5px] text-white sm:flex-none"
-					>
-						Request pilot access
-					</a>
 				{/if}
+				<!--
+					No header "Request pilot access" when the access card is on
+					screen. Two identical primaries doing the same thing makes the
+					page look like it is asking twice, and one plum primary per
+					screen is the rule (handoff §2 decision 2).
+				-->
 			</div>
 		{/if}
 	</div>
@@ -165,14 +188,12 @@
 		</div>
 	{:else if !enabled}
 		<!-- Not an error. The pilot is closed; say so and show the way in. -->
-		<div class="mt-8 max-w-[560px] border-t border-brand-ink pt-6">
-			<h2 class="font-display text-[19px] font-bold text-brand-ink">
-				Campaigns is in private pilot.
-			</h2>
-			<p class="mt-2 font-sans text-[14px] text-brand-slate">
-				Ask for access and we will get back to you. You can look through the sample campaign in the
-				meantime — it uses synthetic data and is never mixed with live editions.
-			</p>
+		<div class="mt-8">
+			<AccessRequestCard
+				email={$user?.email || ''}
+				teamName={$currentTeam?.name || ''}
+				onTrySample={trySample}
+			/>
 		</div>
 	{:else if campaigns.length === 0}
 		<div class="mt-8 max-w-[560px] border-t border-brand-ink pt-6">

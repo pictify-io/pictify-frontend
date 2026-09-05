@@ -103,6 +103,19 @@ const enc = encodeURIComponent;
 /** Authoritative limits and entitlement. Never cache this past a step change. */
 export const getCapabilities = () => backend.get('/campaigns/capabilities');
 
+/**
+ * Ask for pilot access, and seed the sample campaign.
+ *
+ * `requestPilotAccess` deliberately has no parameter for customer data — the
+ * server has no field to put it in either. The caller sends what the buyer said
+ * about their own workflow, nothing about the people they intend to write to.
+ */
+export const requestPilotAccess = ({ useCase, sendingTool, accountsEstimate } = {}) =>
+	backend.post('/campaigns/access-request', { useCase, sendingTool, accountsEstimate });
+
+/** Create or reopen the team's sample campaign. Idempotent, never metered. */
+export const createSampleCampaign = () => backend.post('/campaigns/sample', {});
+
 /* ---------------------------------------------------------- campaigns */
 
 export const createCampaign = (config) => backend.post('/campaigns', config);

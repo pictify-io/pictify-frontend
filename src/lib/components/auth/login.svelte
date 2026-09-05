@@ -4,6 +4,8 @@
 	import BrandMark from '$lib/components/BrandMark.svelte';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { goto } from '$app/navigation';
+	import { safeIntent, campaignsHome } from '$lib/campaigns/nav';
+	import { setExperienceAction } from '../../../store/experience.store';
 	import { onMount } from 'svelte';
 	import { loginAction, signupAction, getUser, isLoggedIn } from '../../../store/user.store';
 	import { forgotPassword } from '../../../api/user';
@@ -15,6 +17,17 @@
 	let password = '';
 	let errorMessage;
 	let redirectUrl;
+	/**
+	 * The experience someone arrived wanting, from `?intent=`. FE-5.
+	 *
+	 * Validated against the allowlist in $lib/campaigns/nav — an intent selects
+	 * a whole product experience, so it is a closed set rather than a pattern,
+	 * and anything off the list is dropped rather than forwarded.
+	 *
+	 * It is NOT an entitlement and never grants access: someone arriving with
+	 * campaign intent but no pilot grant lands on the access-request card.
+	 */
+	let campaignIntent = null;
 	let showPassword = false;
 	let submitting = false;
 	/** Recovery is its own view now — it used to hijack the email field and
@@ -42,6 +55,21 @@
 		return null;
 	}
 
+	/**
+	 * Record the intent so onboarding does not have to ask again.
+	 *
+	 * Best-effort: a failure here must never block a successful login. Landing
+	 * in the platform shell is the shipped product, not an error state.
+	 */
+	async function persistIntent() {
+		if (!campaignIntent) return;
+		try {
+			await setExperienceAction('campaigns');
+		} catch (e) {
+			// Non-fatal; the preference simply stays at its default.
+		}
+	}
+
 	async function safeRedirect({ justSignedUp = false } = {}) {
 		/*
 		 * New accounts go straight into onboarding. This replaces the /welcome
@@ -54,9 +82,22 @@
 		 * specific page meant to end up back there, and hijacking that to show
 		 * onboarding would lose whatever they were actually doing.
 		 */
+		await persistIntent();
+
 		if (justSignedUp) {
 			const pending = validateRedirectUrl(redirectUrl);
 			if (!pending) {
+				/*
+				 * A validated deep link wins over intent (handled above), but
+				 * intent wins over the generic onboarding: someone who followed a
+				 * campaigns link asked for a specific experience, and dropping
+				 * them into the platform first-run loses the thing they came for.
+				 */
+				if (campaignIntent) {
+					analytics.track('campaign_intent_signup', { intent: campaignIntent });
+					goto(campaignsHome());
+					return;
+				}
 				analytics.track('onboarding_entered', { from: 'signup' });
 				goto('/onboarding');
 				return;
@@ -71,13 +112,18 @@
 			} else {
 				goto(safeUrl);
 			}
+		} else if (campaignIntent) {
+			goto(campaignsHome());
 		} else {
 			goto('/dashboard');
 		}
 	}
 
 	onMount(async () => {
-		redirectUrl = new URLSearchParams(window.location.search).get('redirect');
+		const params = new URLSearchParams(window.location.search);
+		redirectUrl = params.get('redirect');
+		// `null` for anything off the allowlist, so junk cannot be forwarded.
+		campaignIntent = safeIntent(params.get('intent'));
 		if (!isLogin) {
 			const emailFromParams = new URLSearchParams(window.location.search).get('email');
 			if (emailFromParams) {
