@@ -41,6 +41,26 @@
 
 	/** "rev 4", or "unpinned" when there is no revision to name. */
 	$: revLabel = design?.revision != null ? `rev ${design.revision}` : 'no revision pinned';
+
+	/**
+	 * Why a proof is not current, as a sentence that only names what is known.
+	 *
+	 * There are two ways to fail `proofCurrent` and they are not the same
+	 * problem. Writing one sentence for both produced "Proof is from rev
+	 * undefined; the design is now no revision pinned" — a raw `undefined` in
+	 * front of a buyer, inside a clause that had already stopped being English.
+	 *
+	 * A proof recorded before anything was pinned has no revision to name, and
+	 * a design with nothing pinned has no revision to compare against. In both
+	 * cases the honest sentence says what to DO, and names a revision only when
+	 * there is one.
+	 */
+	$: staleProofReason =
+		design?.revision == null
+			? 'The design has no pinned revision yet. Pin one and re-proof before approving.'
+			: proof?.revision == null
+			? `This proof predates ${revLabel}. Re-proof before approving.`
+			: `Proof is from rev ${proof.revision}; the design is now ${revLabel}. Re-proof before approving.`;
 	$: fieldsResolved = Boolean(fields && fields.used > 0 && fields.used === fields.mapped);
 	$: ready = Boolean(design) && proofCurrent && fieldsResolved;
 
@@ -121,10 +141,7 @@
 						{:else if proof}
 							<!-- Stale, not missing. Naming the two revisions is what makes
 							     it actionable rather than alarming. -->
-							<StatusSquare
-								tone="blocked"
-								label={`Proof is from rev ${proof.revision}; the design is now ${revLabel}. Re-proof before approving.`}
-							/>
+							<StatusSquare tone="blocked" label={staleProofReason} />
 						{:else}
 							<StatusSquare tone="current" label="Not proofed yet · render one before approving" />
 						{/if}
