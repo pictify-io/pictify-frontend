@@ -12,11 +12,10 @@
 	const DEMO_TEMPLATE_UID = '6E3AHG9PYB';
 
 	// Live demo state — spreadsheet columns; name/course/date render the
-	// document, email drives the delivery chip in the chrome bar.
+	// document and name the output file shown in the chrome bar.
 	let name = 'Ada Lovelace';
 	let course = 'Advanced Analytics Bootcamp';
 	let date = 'August 4, 2026';
-	let email = 'ada@acme.com';
 
 	// Image state
 	let imageSrc = '';
@@ -55,9 +54,8 @@
 		}, 600);
 	}
 
-	// Delivery chip mirrors the row: filename from the name column
+	// Output chip mirrors the row: filename from the name column
 	$: chipFile = `${(name || 'row-1').trim().split(/\s+/)[0].toLowerCase() || 'row-1'}-certificate.pdf`;
-	$: chipEmail = (email || '').trim() || 'ada@acme.com';
 
 	// Mobile auto-cycle through preset data
 	let mobilePresetIndex = 0;
@@ -191,14 +189,14 @@
 					>
 						<path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
 					</svg>
-				</span>. Delivered.
+				</span>. At scale.
 			</h1>
 
 			<!-- Subheadline -->
 			<p class="text-lg lg:text-base xl:text-lg text-gray-700 max-w-2xl mx-auto font-medium mb-8 lg:mb-6">
 				Upload a spreadsheet, point a webhook, or call the API. Every row becomes a branded
-				certificate, badge, report or personalized video, rendered and emailed to each recipient
-				with per-person delivery status.
+				certificate, badge, report or personalized video, rendered from one template with
+				per-row status.
 			</p>
 
 			<!-- CTAs -->
@@ -324,18 +322,6 @@
 									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-brutal-sm transition-all"
 								/>
 							</div>
-							<div class="flex flex-col gap-1.5">
-								<label
-									for="hero-email"
-									class="text-[10px] font-black uppercase text-gray-600 tracking-wider"
-									>Email (delivery)</label
-								>
-								<input
-									id="hero-email"
-									bind:value={email}
-									class="px-4 py-3 bg-gray-50 border-[2px] border-gray-900 rounded-lg text-sm font-bold text-gray-900 w-full focus:outline-none focus:bg-white focus:border-brand-danger focus:ring-4 focus:ring-brand-danger/20 shadow-inner focus:shadow-brutal-sm transition-all"
-								/>
-							</div>
 						</div>
 					</div>
 				</div>
@@ -369,7 +355,7 @@
 							</div>
 							<div
 								class="flex-1 border-l-[3px] border-gray-900 bg-white px-5 py-3 font-mono text-[10px] sm:text-xs text-gray-800 font-bold flex items-center gap-2 truncate"
-								title="Row 1 of 240, rendered and emailed"
+								title="Row 1 of 240, rendered"
 							>
 								<svg
 									class="w-4 h-4 shrink-0 text-[#1f2937]"
@@ -380,13 +366,13 @@
 										stroke-linecap="round"
 										stroke-linejoin="round"
 										stroke-width="3"
-										d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+										d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
 									/></svg
 								>
-								<span class="truncate">{chipFile} &rarr; {chipEmail}</span>
+								<span class="truncate">Row 1 of 240 &rarr; {chipFile}</span>
 								<span
 									class="ml-auto shrink-0 px-2 py-0.5 rounded bg-data-green border-[2px] border-gray-900 text-[9px] font-black uppercase tracking-wider"
-									>Delivered</span
+									>Rendered</span
 								>
 							</div>
 						</div>

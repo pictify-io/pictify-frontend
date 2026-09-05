@@ -43,7 +43,7 @@
 			<h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-[1.1] mb-6">
 				From Data to <br class="hidden md:block" />
 				<span class="relative inline-block text-brand-danger mt-2 transform rotate-1">
-					Delivered
+					Documents
 					<svg
 						class="absolute w-full h-4 sm:h-5 -bottom-2 left-0 text-gray-900 opacity-20"
 						viewBox="0 0 100 10"
@@ -55,7 +55,7 @@
 			</h2>
 			<p class="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto font-medium">
 				Template in. CSV or webhook data in. <br class="hidden md:block" />
-				Rendered documents out, delivered.
+				One rendered document per row out.
 			</p>
 		</div>
 
@@ -160,13 +160,13 @@
 						>
 							3
 						</div>
-						<h3 class="text-3xl md:text-4xl font-black text-gray-900">Rendered & Delivered</h3>
+						<h3 class="text-3xl md:text-4xl font-black text-gray-900">Rendered & Tracked</h3>
 					</div>
 					<p
 						class="text-lg text-gray-700 font-medium pl-22 border-l-[3px] border-gray-200 ml-8 pl-8 relative"
 					>
-						Every document is emailed to its recipient with per-row delivered/bounced status and
-						one-click re-send, or ready to download as PDF, PNG or ZIP.
+						Every row reports its own status and its own hosted URL, with one-click re-run for any
+						row that failed. Download the results as PDF, PNG or ZIP.
 						{#if activeStep === 2 && !isPaused}
 							<span
 								class="absolute bottom-0 left-[-3px] w-[3px] bg-gray-900 h-full animate-[progress_3s_linear_origin-bottom]"

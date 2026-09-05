@@ -15,7 +15,6 @@
 	import { showToast } from '../../../store/toast.store.js';
 	import { timeAgo } from '$lib/utils/format.js';
 	import Toast from '$lib/components/Toast.svelte';
-	import SendingDomainCard from '$lib/components/dashboard/v2/SendingDomainCard.svelte';
 	import {
 		getTeamMembers,
 		getTeamInvitations,
@@ -280,17 +279,6 @@
 					</div>
 				{/each}
 			{/if}
-		</section>
-
-		<!-- Sending domain -->
-		<section class="flex w-full flex-col pt-4">
-			<div class="flex items-center gap-3 pb-3">
-				<h2 class="font-mono text-xs font-medium uppercase tracking-[0.06em] text-brand-ink">
-					Sending domain
-				</h2>
-				<span class="h-0.5 flex-1 bg-brand-ink/[0.08]"></span>
-			</div>
-			<SendingDomainCard />
 		</section>
 	</div>
 </div>

@@ -6,9 +6,9 @@
 	$: pillar = data.solutions.find((s) => s.isPillar);
 	$: others = data.solutions.filter((s) => !s.isPillar);
 
-	const title = 'Solutions: Documents & Videos Generated and Delivered | Pictify';
+	const title = 'Solutions: Documents & Videos Generated at Scale | Pictify';
 	const description =
-		'Guides for turning spreadsheet rows into delivered documents: mail merge with real attachments, bulk certificates, personalized PDFs and video, emailed per recipient.';
+		'Guides for turning spreadsheet rows into branded documents: bulk certificates, badges, personalized PDFs and video, rendered one per row over an API.';
 	const canonical = 'https://pictify.io/solutions';
 </script>
 
@@ -26,7 +26,7 @@
 	<meta property="og:image:height" content="630" />
 	<meta
 		property="og:image:alt"
-		content="Documents and videos generated and delivered | Pictify Solutions"
+		content="Documents and videos generated at scale | Pictify Solutions"
 	/>
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
@@ -52,11 +52,11 @@
 		<header class="text-center mb-16">
 			<h1 class="text-5xl md:text-6xl font-black text-gray-900 leading-[0.95] mb-6">
 				Data in.<br />
-				<span class="text-brand-danger">Delivered documents out.</span>
+				<span class="text-brand-danger">Branded documents out.</span>
 			</h1>
 			<p class="text-xl text-gray-700 font-medium max-w-2xl mx-auto">
-				Guides for every workflow that ends in an inbox: certificates, personalized PDFs, badges,
-				and video, rendered per row and emailed per recipient.
+				Guides for every workflow that turns rows into documents: certificates, personalized PDFs,
+				badges, and video, rendered one per row over an API.
 			</p>
 		</header>
 

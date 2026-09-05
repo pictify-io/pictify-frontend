@@ -10,10 +10,9 @@
  * - AI Template Maker (describe a document/video, get an editable template)
  * - Video templates: timeline editor, code authoring, MP4/GIF rendering
  *
- * WORKFLOWS & DELIVERY:
+ * WORKFLOWS:
  * - Workflow runs: CSV upload or signed webhook in, rendered documents out
- * - Batch runs with a per-row result, a CDN link per render and a webhook,
- *   automated suppression, one-row re-send (own sending domain)
+ * - Batch runs with a per-row result, a CDN link per render and a webhook
  * - Batch rendering (up to 500 items) with per-item results
  *
  * EXTRAS:
@@ -24,7 +23,9 @@
  * - First-party MCP server for AI agents, CDN hosting, API tokens
  *
  * DO NOT claim: canvas editor, A/B testing/experiments, smart links,
- * "Dynamic Links", agent screenshots (all retired 2026).
+ * "Dynamic Links", agent screenshots (all retired 2026), or anything about
+ * email delivery — per-recipient sending, delivered/bounced status, bounce
+ * suppression, sending domains. Pictify renders; it does not send.
  */
 
 export const comparisons = [
@@ -2264,9 +2265,9 @@ export const comparisons = [
 		tldr: "Autocrat is a free Google Sheets add-on that merges rows into Docs and PDFs inside Google Workspace. It rides Apps Script (6-minute execution ceiling) and sends through your own Gmail, which caps at 500 emails a day on free accounts and 1,500 on Workspace. In June 2026, Google's Rhino-to-V8 Apps Script migration broke Autocrat workflows across its 81-million-install base, with complaint threads running into July and no support line to call. Pictify runs the merge on managed rendering infrastructure with no execution ceiling, and returns every document on its own CDN link with a webhook when the run finishes.",
 		advantages: [
 			'Managed rendering: no Apps Script 6-minute timeouts or breaking runtime migrations',
-			'Email delivery never touches your Gmail quota (500–1,500/day caps)',
+			'No six-minute execution ceiling: runs are not killed mid-batch',
 			'A per-row result with a CDN link, and a webhook when the run finishes',
-			'Automated bounce suppression protects your sender reputation',
+			'REST API, signed webhooks, SDKs, and an MCP server on every plan',
 			'HTML-native templates plus the AI Template Maker: no Google Docs formatting fights',
 			'One engine renders PDFs, images, and personalized video'
 		],
@@ -2278,7 +2279,7 @@ export const comparisons = [
 		],
 		bestFor: {
 			pictify:
-				'Teachers, HR teams, and event organizers who need documents generated AND delivered, with proof per person',
+				'Teachers, HR teams, and event organizers who need reliable bulk document generation with per-row proof',
 			competitor:
 				'Small one-off merges inside Google Workspace where Gmail caps and Apps Script timeouts do not bite'
 		},
@@ -2306,8 +2307,8 @@ export const comparisons = [
 				a: 'Google migrated Apps Script from the Rhino runtime to V8 and retired Rhino. Add-ons built on legacy runtime behavior (Autocrat among them, with roughly 81 million installs) broke for many users mid-2026, with complaint threads continuing into July. As a free add-on, there is no support contract; you wait for a fix. Pictify runs on its own managed infrastructure, so a Google runtime change cannot take your certificate workflow down.'
 			},
 			{
-				q: 'Does Pictify send from my Gmail account?',
-				a: 'No, and that is the point. Autocrat-based workflows send through your Gmail, which caps at 500 emails/day on free accounts and 1,500/day via Workspace, and can lock you out mid-batch. Pictify sends from its own isolated sending domain (dedicated per-workspace subdomains on paid plans), with bounce handling and suppression built in. Your Gmail reputation is never at stake.'
+				q: 'Does Pictify have a six-minute timeout like Apps Script?',
+				a: 'No. Runs execute on Pictify\'s own rendering infrastructure rather than inside Apps Script, so a long batch is not killed partway through. Every row reports its own status, and a single failed row can be re-run without repeating the whole batch.'
 			},
 			{
 				q: 'Can Pictify pull data from Google Sheets?',
@@ -2325,17 +2326,17 @@ export const comparisons = [
 	},
 	{
 		slug: 'pictify-vs-canva-bulk-create',
-		title: 'Canva Bulk Create Alternative: With Email Delivery',
+		title: 'Canva Bulk Create Alternative: With an API',
 		competitor: 'Canva Bulk Create',
 		competitorDescription: 'Canva feature that generates design variants from a data table',
-		audienceLabel: 'With Email Delivery',
+		audienceLabel: 'With an API',
 		subhead:
 			'Bulk Create generates hundreds of beautiful variants, then stops at a zip file. Pictify renders every row through an API and hands back a CDN link per document.',
 		metaDescription:
 			'Canva Bulk Create stops at download. Pictify turns every data row into a branded document your own system can fetch, by API, from a CDN link per row.',
-		tldr: "Canva's Bulk Create turns a data table into hundreds of on-brand design variants, genuinely good at what it does. But the job ends at download: Canva has no email delivery of any kind, so your certificates land in a zip file you still have to split, attach, and send yourself. Pictify treats the batch as the unit: every row becomes its own document on its own CDN link, with a per-row status and a webhook when the run finishes, so whatever already talks to your customers can pick them up.",
+		tldr: "Canva's Bulk Create turns a data table into hundreds of on-brand design variants, genuinely good at what it does. But it is a UI feature: you open the editor, upload the table, and generate by hand, with no API to call and nothing to trigger it but you. Pictify treats the batch as the unit: every row becomes its own document on its own CDN link, with a per-row status and a webhook when the run finishes, so whatever already talks to your customers can pick them up.",
 		advantages: [
-			'Email delivery is part of the run; Canva has none, at any plan level',
+			'Runs trigger from your backend, Zapier, Make, or n8n, not by hand',
 			'A per-row result with a CDN link, and a webhook when the batch finishes',
 			'REST API, webhooks, and MCP server; Bulk Create is UI-only',
 			'HTML-native templates with real logic: conditionals, loops, expressions',
@@ -2417,7 +2418,7 @@ export const comparisons = [
 		],
 		bestFor: {
 			pictify:
-				'Course creators and event teams who need branded documents delivered at a price that scales with actual usage',
+				'Course creators and event teams who need branded documents rendered at a price that scales with actual usage',
 			competitor:
 				'Accredited programs that need formal credential verification, expiry, and revocation infrastructure'
 		},
@@ -2529,8 +2530,8 @@ export const comparisons = [
 				a: 'MP4 video, GIF, plus the document side: PNG, JPG, WebP, and multi-page PDF, all from one API token and one template contract. A course platform can render the certificate and the congratulation video from the same run.'
 			},
 			{
-				q: 'Can videos be delivered by email automatically?',
-				a: 'Yes. A batch run renders every row of a CSV or every webhook event, gives you a per-row result with a CDN link, and fires a webhook when the run finishes, the same loop Pictify uses for documents.'
+				q: 'How do I get the rendered videos out?',
+				a: 'A batch run renders every row of a CSV or every webhook event, gives you a per-row result with a CDN link, and fires a webhook when the run finishes, the same loop Pictify uses for documents.'
 			}
 		]
 	},

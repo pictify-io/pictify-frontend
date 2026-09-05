@@ -25,7 +25,7 @@
 		url: 'https://pictify.io',
 		logo: 'https://pictify.io/logo.png',
 		description:
-			'API-first image, document, and video generation. Every row of a spreadsheet or webhook becomes a rendered, personalized certificate, badge, report, or video, delivered by email.',
+			'API-first image, document, and video generation. Every row of a spreadsheet or webhook becomes a rendered, personalized certificate, badge, report, or video.',
 		sameAs: ['https://github.com/pictify-io']
 	};
 </script>
