@@ -140,7 +140,7 @@
 	/** Open the studio in campaign context; "Use this design" returns here. */
 	const openStudio = (mode) =>
 		goto(
-			`/template-workspace/html/${
+			`/campaign-studio/${
 				$campaign.templateRevisionUid
 			}?campaign=${campaignUid}&edition=${editionUid}${mode ? `&mode=${mode}` : ''}`
 		);
