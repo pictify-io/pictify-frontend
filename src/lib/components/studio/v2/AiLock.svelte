@@ -11,7 +11,7 @@
 	 * buyer unable to tell whether it is doing anything, and every other surface
 	 * in campaigns names the revision too.
 	 */
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 
 	export let stage = 'read';
 	export let fromRevision = 1;
@@ -31,6 +31,17 @@
 		0,
 		STAGES.findIndex((s) => s.key === stage)
 	);
+
+	/*
+	 * Focus moves to Cancel. B06-2.
+	 *
+	 * While a run holds the document, Cancel is the only thing anyone can
+	 * usefully do — so it is where focus belongs. Leaving focus in the composer
+	 * behind the overlay would leave a keyboard user tabbing through a stage
+	 * they cannot act on to reach the one control that works.
+	 */
+	let cancelButton = null;
+	onMount(() => cancelButton?.focus());
 </script>
 
 <div
@@ -66,6 +77,7 @@
 		</ol>
 
 		<button
+			bind:this={cancelButton}
 			type="button"
 			on:click={() => dispatch('cancel')}
 			disabled={cancelling}

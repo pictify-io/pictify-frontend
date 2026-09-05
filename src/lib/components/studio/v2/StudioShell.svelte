@@ -95,7 +95,7 @@
 		// anything else — otherwise Escape would deselect on the stage behind a
 		// panel the buyer is looking at.
 		if (event.key === 'Escape' && versionsOpen) {
-			onRevisionClick?.();
+			closeVersions();
 			event.preventDefault();
 			return;
 		}
@@ -156,11 +156,57 @@
 	 * Design mode still knows the render they last looked at no longer matches.
 	 */
 	$: proofStale = Boolean(proof && proof.revision !== design.revision);
+
+	/*
+	 * A new proof is a result, and results get announced. Switching to Rendered
+	 * proof and waiting four seconds for an image to appear tells a sighted user
+	 * everything and a screen reader user nothing.
+	 */
+	let lastProofAnnounced = null;
+	$: if (proof && proof.at !== lastProofAnnounced) {
+		lastProofAnnounced = proof.at;
+		announce(
+			proofStale
+				? `Proof rendered for revision ${proof.revision}. The design is now revision ${design.revision}.`
+				: `Proof rendered for revision ${proof.revision}. It matches the design.`
+		);
+	}
+
+	/*
+	 * Focus for the Versions popover. B06-2.
+	 *
+	 * Three things, and the third is the one that is usually missed: focus moves
+	 * INTO the panel when it opens, Escape closes it, and focus RETURNS to the
+	 * revision label. Without the return, a keyboard user who closes the panel
+	 * is dropped at the top of the document and has to tab back through the
+	 * whole shell to get where they were.
+	 */
+	let versionsHolder = null;
+	let restoreFocusTo = null;
+
+	function focusVersions(node) {
+		const first = node.querySelector(
+			'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+		);
+		(first || node).focus?.();
+	}
+
+	$: if (versionsOpen && versionsHolder) focusVersions(versionsHolder);
+
+	function rememberTrigger(event) {
+		// Captured before the panel opens, because opening moves focus away.
+		restoreFocusTo = event?.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+	}
+
+	function closeVersions() {
+		onRevisionClick?.();
+		restoreFocusTo?.focus?.();
+	}
 </script>
 
 <svelte:window on:keydown={onKey} />
 
-<div class="relative flex h-screen flex-col overflow-hidden bg-brand-canvas">
+<div data-v2 class="relative flex h-screen flex-col overflow-hidden bg-brand-canvas">
 	<!-- Visually hidden, deliberately not `hidden`: a hidden region is not read. -->
 	<p aria-live="polite" class="sr-only">{announcement}</p>
 
@@ -176,7 +222,12 @@
 		{canRedo}
 		onUndo={() => onUndo?.()}
 		onRedo={() => onRedo?.()}
-		{onRevisionClick}
+		onRevisionClick={onRevisionClick
+			? (event) => {
+					if (!versionsOpen) rememberTrigger(event);
+					onRevisionClick();
+			  }
+			: null}
 		{versionsOpen}
 		onUseThisDesign={campaignContext ? () => dispatch('use') : null}
 		{useDisabled}
@@ -196,9 +247,15 @@
 		<div
 			class="absolute inset-x-0 bottom-0 top-[54px] z-20"
 			role="presentation"
-			on:click={() => onRevisionClick?.()}
+			on:click={closeVersions}
 		/>
-		<div class="absolute left-4 top-[54px] z-30 shadow-[4px_4px_0_0_rgba(0,0,0,0.08)]">
+		<div
+			bind:this={versionsHolder}
+			class="absolute left-4 top-[54px] z-30 shadow-[4px_4px_0_0_rgba(0,0,0,0.08)]"
+			role="dialog"
+			aria-label="Versions"
+			tabindex="-1"
+		>
 			<slot name="versions" />
 		</div>
 	{/if}

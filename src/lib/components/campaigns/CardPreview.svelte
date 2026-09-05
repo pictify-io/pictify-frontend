@@ -14,6 +14,8 @@
 	 * worst a hostile design can do is look wrong.
 	 */
 	import { SAMPLE_VALUES } from '$lib/campaigns/starters';
+	import { previewDocument } from '$lib/components/studio/v2/preview-document.js';
+	import { cleanHtml } from '$lib/components/studio/v2/stage.js';
 
 	export let html = '';
 	export let width = 1200;
@@ -40,7 +42,13 @@
 		return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 	});
 
-	$: doc = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;overflow:hidden}</style></head><body>${substituted}</body></html>`;
+	/*
+	 * Sanitised AND policed. `sandbox=""` already stops scripts from running, but
+	 * it does not stop a remote image or an `@import` from being fetched — the
+	 * markup here can come from an AI result or an imported file, so those
+	 * requests would go to a host the buyer never chose. See preview-document.js.
+	 */
+	$: doc = previewDocument(cleanHtml(substituted), 'html,body{margin:0;padding:0;overflow:hidden}');
 </script>
 
 <div

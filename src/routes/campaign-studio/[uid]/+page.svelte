@@ -11,6 +11,7 @@
 	 * Full-bleed, outside the dashboard rail: this is a three-zone editing
 	 * surface, not a page inside a shell.
 	 */
+	import { tick } from 'svelte';
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
@@ -72,6 +73,44 @@
 
 	/** The run's own id, so a retry reconciles rather than starting a second. */
 	let currentOperationId = null;
+	let composerInput = null;
+
+	/*
+	 * Focus comes back to the composer when a run ends. B06-2.
+	 *
+	 * The lock took focus to Cancel; when the lock goes away that element goes
+	 * with it, and focus would fall to the document body — leaving a keyboard
+	 * user at the top of the page after every AI edit.
+	 *
+	 * `await tick()` is load-bearing, not defensive. The composer is disabled
+	 * while a run holds the document, and clearing the operation does not undo
+	 * that attribute until Svelte flushes — so focusing on the same turn is a
+	 * silent no-op against a still-disabled input. Measured: focus landed on
+	 * BODY every time without it.
+	 */
+	const returnFocusToComposer = async () => {
+		await tick();
+		composerInput?.focus?.();
+	};
+
+	/**
+	 * Every document mutation goes through here while a run may be in flight.
+	 * B06-1/B06-2.
+	 *
+	 * The AI lock covers the STAGE. It does not cover the rails, so adding a
+	 * field or replacing a logo from them still reached the document underneath
+	 * a run — and the result, computed from the html the agent was given, would
+	 * then overwrite that edit without a trace. The lock was preventing the
+	 * hazard visually and not actually.
+	 *
+	 * Refusing silently is right here: the controls are already visibly locked,
+	 * so the only way to reach this is a keyboard user tabbing past the overlay,
+	 * and an error message would explain a state they can see.
+	 */
+	function whileUnlocked(run) {
+		if ($editor.operation) return;
+		run();
+	}
 
 	/**
 	 * Ask the AI for a change. B04-3.
@@ -127,6 +166,7 @@
 				 * they did not intend.
 				 */
 				const applied = editor.completeOperation(operationId, html);
+				returnFocusToComposer();
 				if (applied.applied) {
 					instruction = '';
 					refreshLayers();
@@ -145,6 +185,7 @@
 				editor.endOperation();
 				aiError = err?.message || 'That change did not go through.';
 				currentOperationId = null;
+				returnFocusToComposer();
 			}
 		});
 	}
@@ -310,6 +351,7 @@
 			editor.endOperation();
 			currentOperationId = null;
 			aiCancelling = false;
+			returnFocusToComposer();
 		}
 	}
 	let brandAssets = [];
@@ -642,8 +684,10 @@
 		on:back={back}
 		on:use={useThisDesign}
 		on:add={(e) => {
-			stageApi?.addElement(e.detail.kind);
-			refreshLayers();
+			whileUnlocked(() => {
+				stageApi?.addElement(e.detail.kind);
+				refreshLayers();
+			});
 		}}
 	>
 		<svelte:fragment slot="left" let:leftTab>
@@ -657,20 +701,24 @@
 				<LayersTree
 					rows={layers}
 					{selectedId}
-					on:select={(e) => stageApi?.selectById(e.detail.id)}
+					on:select={(e) => whileUnlocked(() => stageApi?.selectById(e.detail.id))}
 					on:toggle-lock={(e) => {
+						if ($editor.operation) return;
 						stageApi?.toggleLock(e.detail.id);
 						refreshLayers();
 					}}
 					on:toggle-hide={(e) => {
+						if ($editor.operation) return;
 						stageApi?.toggleHide(e.detail.id);
 						refreshLayers();
 					}}
 					on:rename={(e) => {
+						if ($editor.operation) return;
 						stageApi?.rename(e.detail.id, e.detail.label);
 						refreshLayers();
 					}}
 					on:reorder={(e) => {
+						if ($editor.operation) return;
 						stageApi?.reorder(e.detail.id, e.detail.beforeId);
 						refreshLayers();
 					}}
@@ -738,6 +786,7 @@
 					{activeSample}
 					on:sample={(e) => (activeSample = e.detail.id)}
 					on:insert={(e) => {
+						if ($editor.operation) return;
 						stageApi?.addElement('field', { field: e.detail.field });
 						refreshLayers();
 					}}
@@ -750,6 +799,7 @@
 					uploading={uploadingAsset}
 					on:upload={(e) => onUploadAsset(e.detail.file)}
 					on:replace={(e) => {
+						if ($editor.operation) return;
 						stageApi?.setAssetSrc(e.detail.id, e.detail.asset.url, e.detail.asset.name);
 						refreshLayers();
 					}}
@@ -793,6 +843,7 @@
 		<svelte:fragment slot="composer">
 			{#if design}
 				<input
+					bind:this={composerInput}
 					bind:value={instruction}
 					on:keydown={(e) => {
 						if (e.key === 'Enter' && !e.shiftKey) {

@@ -53,7 +53,7 @@
 	$: steps = $edition?.steps || [];
 </script>
 
-<div class="px-5 pt-6 md:px-11 md:pt-7">
+<div data-v2 class="px-5 pt-6 md:px-11 md:pt-7">
 	{#if $loadError}
 		<div class="border-t border-brand-ink pt-6">
 			<span class="flex items-center gap-2">

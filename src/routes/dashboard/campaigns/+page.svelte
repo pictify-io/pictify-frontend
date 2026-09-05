@@ -118,7 +118,7 @@
 
 <svelte:head><title>Campaigns · Pictify</title></svelte:head>
 
-<div class="px-5 pt-6 md:px-11 md:pt-7">
+<div data-v2 class="px-5 pt-6 md:px-11 md:pt-7">
 	<p class="font-mono text-[11px] uppercase tracking-[0.08em] text-brand-mute">
 		Pictify campaigns · Customer value updates
 	</p>

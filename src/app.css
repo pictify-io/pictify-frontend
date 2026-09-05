@@ -197,6 +197,24 @@ html:has(.onboarding-v2) {
 	}
 }
 
+/*
+ * v2 focus ring. B06-2.
+ *
+ * Scoped to `[data-v2]` rather than applied globally: the old-brand surfaces
+ * still use `.focus-brutal` and its orange, and one app with two focus colours
+ * that appear at random would be worse than the browser default.
+ *
+ * `:focus-visible`, so a mouse user does not get a ring on every click while a
+ * keyboard user always does. `outline` rather than `box-shadow` so it survives
+ * on elements that already carry a shadow, and `outline-offset` so it never
+ * sits on top of the control's own border.
+ */
+[data-v2] :focus-visible {
+	outline: 2px solid #0054a6;
+	outline-offset: 2px;
+	border-radius: 2px;
+}
+
 /* Neobrutalist focus ring — replaces Tailwind's default outline/ring for
  * interactive elements in the HTML editor. Single 3px accent-colored
  * outer shadow keyed to `focus-visible` so mouse users don't see the ring

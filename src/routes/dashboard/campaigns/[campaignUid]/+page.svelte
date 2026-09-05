@@ -139,7 +139,7 @@
 
 <svelte:head><title>{campaign?.name || 'Campaign'} · Pictify</title></svelte:head>
 
-<div class="px-5 pt-6 md:px-11 md:pt-7">
+<div data-v2 class="px-5 pt-6 md:px-11 md:pt-7">
 	{#if loading}
 		<div class="h-64 animate-pulse bg-brand-subtle" aria-busy="true" />
 	{:else if error && !campaign}

@@ -15,6 +15,7 @@
 	 */
 	import { onDestroy, createEventDispatcher } from 'svelte';
 	import { attachStage, cleanHtml } from './stage.js';
+	import { previewDocument } from './preview-document.js';
 
 	export let html = '';
 	export let width = 1200;
@@ -66,11 +67,7 @@
 		const doc = frame.contentDocument;
 		const substituted = editable ? source : substitute(source, sampleValues);
 		doc.open();
-		doc.write(
-			`<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0}</style></head><body>${cleanHtml(
-				substituted
-			)}</body></html>`
-		);
+		doc.write(previewDocument(cleanHtml(substituted)));
 		doc.close();
 
 		if (!editable) return;
@@ -138,9 +135,17 @@
 		class="relative overflow-hidden border border-brand-rule bg-white shadow-[4px_4px_0_0_rgba(0,0,0,0.08)]"
 		style="width:{Math.round(width * scale)}px;height:{Math.round(height * scale)}px"
 	>
+		<!--
+			`allow-same-origin` and nothing else. The stage needs same-origin access
+			because the editor reads and writes `contentDocument` directly — a full
+			`sandbox=""` would break every drag. Everything else stays off, so a
+			script that got past the sanitizer still cannot run, and the document
+			cannot navigate the page it is embedded in.
+		-->
 		<iframe
 			bind:this={frame}
 			title="Design stage"
+			sandbox="allow-same-origin"
 			class="absolute left-0 top-0 origin-top-left border-0"
 			style="width:{width}px;height:{height}px;transform:scale({scale})"
 		/>
