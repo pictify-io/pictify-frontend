@@ -197,7 +197,11 @@ const batchRenderTemplate = async (uid, variableSets, options = {}) => {
 				format: options.format || 'png',
 				quality: options.quality || 0.9,
 				concurrency: options.concurrency || 5,
-				...(options.layouts ? { layouts: options.layouts } : options.layout ? { layout: options.layout } : {})
+				...(options.layouts
+					? { layouts: options.layouts }
+					: options.layout
+					? { layout: options.layout }
+					: {})
 			},
 			{
 				headers: options.headers || {}
@@ -253,7 +257,11 @@ const batchRenderFromCsv = async (uid, csvUrl, mappings, options = {}) => {
 				format: options.format || 'png',
 				quality: options.quality || 0.9,
 				concurrency: options.concurrency || 5,
-				...(options.layouts ? { layouts: options.layouts } : options.layout ? { layout: options.layout } : {})
+				...(options.layouts
+					? { layouts: options.layouts }
+					: options.layout
+					? { layout: options.layout }
+					: {})
 			},
 			{
 				headers: options.headers || {}
@@ -441,18 +449,34 @@ const renderMultiPagePdf = async (templateUid, variableSets = [], options = {}) 
  * @param {(err: object) => void} handlers.onError
  * @param {AbortSignal} [handlers.signal]
  */
-const editTemplateBySaying = async (uid, instruction, { onStage, onDone, onError, signal } = {}) => {
+const editTemplateBySaying = async (
+	uid,
+	instruction,
+	{ onStage, onDone, onError, signal, operationId, baseRevision } = {}
+) => {
 	let response;
 	try {
 		response = await fetch(`${PUBLIC_BACKEND_URL}/template-studio/${uid}/edit`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ instruction }),
+			/*
+			 * operationId and baseRevision are sent only when the caller supplies
+			 * them. The platform studio passes neither and keeps its existing
+			 * behaviour; the campaign studio passes both so a retry reconciles
+			 * instead of charging twice, and a stale run is refused before any
+			 * AI work happens.
+			 */
+			body: JSON.stringify({
+				instruction,
+				...(operationId ? { operationId } : {}),
+				...(Number.isInteger(baseRevision) ? { baseRevision } : {})
+			}),
 			signal
 		});
 	} catch (e) {
-		if (e?.name !== 'AbortError') onError?.({ message: "Couldn't reach the server.", code: 'network' });
+		if (e?.name !== 'AbortError')
+			onError?.({ message: "Couldn't reach the server.", code: 'network' });
 		return;
 	}
 
@@ -467,6 +491,31 @@ const editTemplateBySaying = async (uid, instruction, { onStage, onDone, onError
 			message: payload?.message || "That change didn't go through.",
 			code: payload?.code || 'bad_response'
 		});
+		return;
+	}
+
+	/*
+	 * A reconciled retry answers with ordinary JSON, not a stream: the run
+	 * already finished, so there is no progress left to send. Read as SSE it
+	 * would yield no frames at all and be reported as "the edit stopped early"
+	 * — the exact opposite of what happened. There is no html in that reply
+	 * (the server did not re-run the agent), so `replayed` tells the caller to
+	 * take the result from the server rather than from this payload.
+	 */
+	const contentType = response.headers.get('content-type') || '';
+	if (!contentType.includes('text/event-stream')) {
+		let payload = null;
+		try {
+			payload = await response.json();
+		} catch {
+			payload = null;
+		}
+		if (payload?.state === 'completed') onDone?.({ ...payload, replayed: true });
+		else
+			onError?.({
+				message: payload?.message || 'That edit did not finish.',
+				code: payload?.code || 'unexpected_response'
+			});
 		return;
 	}
 

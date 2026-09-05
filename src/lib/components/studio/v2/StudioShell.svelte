@@ -29,6 +29,17 @@
 	export let useDisabled = true;
 	/** `{ revision, url, at, stale }` — null until B05 wires proofs. */
 	export let proof = null;
+
+	/*
+	 * History comes in as props rather than being read from the editor store
+	 * here, because the shell is also used by surfaces that have no store — and
+	 * a shell that reached for a singleton would work in the studio and break
+	 * everywhere else.
+	 */
+	export let canUndo = false;
+	export let canRedo = false;
+	export let onUndo = null;
+	export let onRedo = null;
 	export let statusNote = null;
 	/** True when an approved edition is frozen against this design (S6). */
 	export let editionApproved = false;
@@ -148,8 +159,10 @@
 		{format}
 		width={design.width}
 		height={design.height}
-		canUndo={false}
-		canRedo={false}
+		{canUndo}
+		{canRedo}
+		onUndo={() => onUndo?.()}
+		onRedo={() => onRedo?.()}
 		onUseThisDesign={campaignContext ? () => dispatch('use') : null}
 		{useDisabled}
 		onBack={() => dispatch('back')}
@@ -250,8 +263,9 @@
 				</span>
 			</div>
 
+			<!-- `relative` so the AI lock can cover the stage and nothing else. -->
 			<div
-				class="flex min-h-0 flex-1 items-center justify-center overflow-auto bg-brand-canvas p-8"
+				class="relative flex min-h-0 flex-1 items-center justify-center overflow-auto bg-brand-canvas p-8"
 			>
 				<slot name="stage" {mode} {zoom}>
 					{#if mode === 'proof'}

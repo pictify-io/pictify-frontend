@@ -21,6 +21,8 @@
 	import InputsRail from '$lib/components/studio/v2/InputsRail.svelte';
 	import BrandRail from '$lib/components/studio/v2/BrandRail.svelte';
 	import ConflictDialog from '$lib/components/studio/v2/ConflictDialog.svelte';
+	import AiLock from '$lib/components/studio/v2/AiLock.svelte';
+	import { editTemplateBySaying } from '../../../api/template';
 	import { createSaveQueue } from '$lib/components/studio/v2/save-queue.js';
 	import { getBrandAssets, uploadBrandAsset } from '../../../api/brand-assets';
 	import { SAMPLE_CASES, valuesFor } from '$lib/components/studio/v2/samples.js';
@@ -56,6 +58,116 @@
 	let conflict = null;
 	let resolvingConflict = false;
 	let recoveredDraft = null;
+	let instruction = '';
+	let aiCancelling = false;
+	let aiError = null;
+
+	/** The run's own id, so a retry reconciles rather than starting a second. */
+	let currentOperationId = null;
+
+	/**
+	 * Ask the AI for a change. B04-3.
+	 *
+	 * FLUSH FIRST, then save, then submit. The agent is given the document the
+	 * buyer can actually see; submitting while local edits are unsaved would
+	 * have it work from a version that exists nowhere, and its result would
+	 * silently discard whatever was pending.
+	 */
+	async function runAi() {
+		const text = instruction.trim();
+		if (!text || $editor.operation) return;
+		aiError = null;
+
+		// Await the save so baseRevision is a revision the server actually has.
+		await saveQueue?.flushNow();
+		if ($editor.saveState === 'conflict' || $editor.saveState === 'offline') {
+			aiError = 'Save your changes first — the design could not be saved.';
+			return;
+		}
+
+		const operationId =
+			globalThis.crypto?.randomUUID?.() ??
+			`op_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+		currentOperationId = operationId;
+		editor.beginOperation(operationId);
+
+		await editTemplateBySaying(uid, text, {
+			operationId,
+			baseRevision: $editor.baseRevision,
+			onStage: (s) => editor.operationStage(s?.stage || 'plan'),
+			onDone: async (result) => {
+				/*
+				 * A reconciled retry carries no html — the server did not re-run
+				 * the agent, it just told us the run had already finished. Fetch
+				 * the saved design instead of committing an empty document.
+				 */
+				let html = result?.html;
+				if (!html) {
+					const fresh = await backend.get(`/templates/${uid}`);
+					html = fresh?.template?.html;
+					if (!html) {
+						editor.endOperation();
+						aiError = 'That edit finished, but the design could not be loaded. Reload the page.';
+						currentOperationId = null;
+						return;
+					}
+				}
+
+				/*
+				 * ONE transaction, so undo rejects the whole AI edit in a single
+				 * step — the most likely thing a buyer wants after seeing a result
+				 * they did not intend.
+				 */
+				const applied = editor.completeOperation(operationId, html);
+				if (applied.applied) {
+					instruction = '';
+					refreshLayers();
+					/*
+					 * The server has already saved this, so the draft is clean at
+					 * the revision the SERVER reports. Guessing base+1 here would
+					 * desync the optimistic lock and 409 every later save.
+					 */
+					editor.saved({ revision: result?.revision, seq: $editor.localSeq });
+				}
+				currentOperationId = null;
+			},
+			onError: (err) => {
+				// ST-04b: the draft AND the instruction survive, so the buyer can
+				// reword rather than retype.
+				editor.endOperation();
+				aiError = err?.message || 'That change did not go through.';
+				currentOperationId = null;
+			}
+		});
+	}
+
+	/**
+	 * Undo/redo. Both replace the whole document, so the stage is re-read and a
+	 * save is queued — an undone edit that never reaches the server would come
+	 * back on the next reload.
+	 */
+	const stepHistory = (direction) => () => {
+		if ($editor.operation) return;
+		if (!(direction === 'undo' ? editor.undo() : editor.redo())) return;
+		// The stage re-mounts off the `html` prop, so nothing pushes it here.
+		refreshLayers();
+		saveQueue?.nudge();
+	};
+
+	/** Cancel is a server operation; a closed socket cancels nothing. */
+	async function cancelAi() {
+		if (!currentOperationId) return;
+		aiCancelling = true;
+		try {
+			await backend.post(`/template-studio/${uid}/operations/${currentOperationId}/cancel`, {});
+		} catch (err) {
+			/* already settled; the state below reports the truth */
+		} finally {
+			editor.endOperation();
+			currentOperationId = null;
+			aiCancelling = false;
+		}
+	}
 	let brandAssets = [];
 	let uploadingAsset = false;
 
@@ -259,8 +371,10 @@
 		await goto(editionUrl(campaignUid, editionUid, 'setup'));
 		showToast(
 			editionApproved
-				? `Using rev ${design.revision}. This edition needs approving again.`
-				: `Using rev ${design.revision} for this edition.`,
+				? `Using rev ${
+						$editor.baseRevision || design.revision
+				  }. This edition needs approving again.`
+				: `Using rev ${$editor.baseRevision || design.revision} for this edition.`,
 			editionApproved ? 'error' : 'default',
 			4000
 		);
@@ -294,12 +408,28 @@
 {:else}
 	<StudioShell
 		design={design
-			? { ...design, html: $editor.html || design.html }
+			? {
+					...design,
+					html: $editor.html || design.html,
+					/*
+					 * From the store, not from `design`: `design` is the document as
+					 * it was when the page opened, so after any save its revision is
+					 * a number from the past. The shell compares it against the
+					 * proof's revision to decide staleness, and the "Use this design"
+					 * toast names it, so a frozen value is wrong in two places at
+					 * once.
+					 */
+					revision: $editor.baseRevision || design.revision
+			  }
 			: { name: 'New design', html: '', width: 1200, height: 800, revision: 1 }}
 		format={campaign?.format?.toUpperCase() || 'PNG'}
 		breadcrumb={campaign ? `${campaign.name} · Setup` : null}
 		campaignContext={inCampaign}
 		saveState={design ? $editor.saveState : 'unsaved'}
+		canUndo={$editor.canUndo && !$editor.operation}
+		canRedo={$editor.canRedo && !$editor.operation}
+		onUndo={stepHistory('undo')}
+		onRedo={stepHistory('redo')}
 		useDisabled={useBlocked}
 		statusNote={design
 			? missingAssets.length
@@ -351,6 +481,21 @@
 		</svelte:fragment>
 
 		<svelte:fragment slot="stage" let:mode let:zoom>
+			<!--
+				The lock sits OVER the stage rather than replacing it, so the design
+				stays on screen while the AI works. Swapping it for a spinner would
+				hide the very thing the buyer is about to compare the result against,
+				and an edit that changes little would be indistinguishable from one
+				that did nothing.
+			-->
+			{#if $editor.operation}
+				<AiLock
+					stage={$editor.operation.stage}
+					fromRevision={$editor.baseRevision}
+					cancelling={aiCancelling}
+					on:cancel={cancelAi}
+				/>
+			{/if}
 			{#if design && mode !== 'proof'}
 				<StudioStage
 					bind:api={stageApi}
@@ -358,7 +503,7 @@
 					width={design.width}
 					height={design.height}
 					{zoom}
-					editable={mode === 'design'}
+					editable={mode === 'design' && !$editor.operation}
 					sampleValues={{
 						...SAMPLE_VALUES,
 						...valuesFor(
@@ -424,9 +569,23 @@
 		<svelte:fragment slot="composer">
 			{#if design}
 				<input
+					bind:value={instruction}
+					on:keydown={(e) => {
+						if (e.key === 'Enter' && !e.shiftKey) {
+							e.preventDefault();
+							runAi();
+						}
+					}}
+					disabled={Boolean($editor.operation)}
 					placeholder="Describe a change…"
-					class="h-10 w-full rounded-btn border border-brand-rule px-3 font-sans text-[13.5px] text-brand-ink placeholder:text-brand-mute"
+					class="h-10 w-full rounded-btn border border-brand-rule px-3 font-sans text-[13.5px] text-brand-ink placeholder:text-brand-mute disabled:bg-brand-subtle"
 				/>
+				{#if aiError}
+					<p class="mt-2 flex items-start gap-2">
+						<span class="mt-1.5 block h-2 w-2 flex-shrink-0 bg-brand-alarm" aria-hidden="true" />
+						<span class="font-sans text-[12.5px] text-brand-slate">{aiError}</span>
+					</p>
+				{/if}
 			{/if}
 		</svelte:fragment>
 	</StudioShell>

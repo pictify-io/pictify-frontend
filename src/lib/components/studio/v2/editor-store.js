@@ -40,7 +40,17 @@ const emptyState = () => ({
 	/** 'saved' | 'saving' | 'unsaved' | 'offline' | 'conflict' | 'ai' */
 	saveState: 'saved',
 	/** Set on 409 so the conflict dialog can show both sides. */
-	conflict: null
+	conflict: null,
+	/*
+	 * History position, mirrored into the store rather than left as functions.
+	 *
+	 * `canUndo()` is not a reactive dependency, so a top bar that called it read
+	 * the value once and never again — the buttons stayed disabled for the whole
+	 * session no matter how much was edited. Anything the UI renders has to live
+	 * in the state it subscribes to.
+	 */
+	canUndo: false,
+	canRedo: false
 });
 
 function createEditorStore() {
@@ -66,6 +76,7 @@ function createEditorStore() {
 			baseRevision: revision ?? 0,
 			saveState: 'saved'
 		});
+		syncHistoryFlags();
 		return identified;
 	}
 
@@ -97,11 +108,16 @@ function createEditorStore() {
 			localSeq: s.localSeq + 1,
 			saveState: s.operation ? 'ai' : 'unsaved'
 		}));
+		syncHistoryFlags();
 		return { changed: true, assigned: identified.assigned, deduped: identified.deduped };
 	}
 
 	const canUndo = () => cursor > 0;
 	const canRedo = () => cursor < history.length - 1;
+
+	/** Push the position into the store, after every move of `cursor`. */
+	const syncHistoryFlags = () =>
+		state.update((s) => ({ ...s, canUndo: canUndo(), canRedo: canRedo() }));
 
 	function undo() {
 		if (!canUndo()) return false;
@@ -112,6 +128,7 @@ function createEditorStore() {
 			localSeq: s.localSeq + 1,
 			saveState: 'unsaved'
 		}));
+		syncHistoryFlags();
 		return true;
 	}
 
@@ -124,6 +141,7 @@ function createEditorStore() {
 			localSeq: s.localSeq + 1,
 			saveState: 'unsaved'
 		}));
+		syncHistoryFlags();
 		return true;
 	}
 
