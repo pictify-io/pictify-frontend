@@ -20,7 +20,12 @@
 	 * that were never the AI's to make.
 	 */
 	import { goto } from '$app/navigation';
-	import { draftCampaignBrief, createCampaign, campaignError } from '../../../../api/campaign';
+	import {
+		draftCampaignBrief,
+		createCampaign,
+		detectBrand,
+		campaignError
+	} from '../../../../api/campaign';
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
 	import { campaignsHome, campaignUrl } from '$lib/campaigns/nav.js';
 
@@ -29,6 +34,40 @@
 	let drafted = null;
 	let error = null;
 	let creating = false;
+
+	/* --------------------------------------------------------- AI-6 A4 */
+
+	/** A brand is a colour or a typeface. The account's name is neither. */
+	$: brandSet = Boolean(brief?.brand?.color || brief?.brand?.font);
+
+	let brandOpen = false;
+	let brandDomain = '';
+	let detecting = false;
+	let detected = null;
+	let brandError = null;
+
+	/**
+	 * Read a colour off the buyer's own homepage.
+	 *
+	 * Nothing is saved by this — the route returns a proposal and the buyer
+	 * presses "Use this colour", which is the confirmation the caption promises.
+	 * A colour that comes back unusable (a mostly-white page) is shown WITH its
+	 * reason rather than hidden: the buyer may still take it if they know better
+	 * than the detector, and they usually do.
+	 */
+	async function detectFromSite() {
+		if (detecting) return;
+		detecting = true;
+		brandError = null;
+		detected = null;
+		try {
+			detected = await detectBrand(brandDomain.trim());
+		} catch (err) {
+			brandError = campaignError(err).message;
+		} finally {
+			detecting = false;
+		}
+	}
 
 	/** Editable copy of the draft; the response is never mutated in place. */
 	let brief = null;
@@ -275,27 +314,112 @@
 						<dt class="font-sans text-[13.5px] text-brand-slate">Brand</dt>
 						<dd class="flex flex-wrap items-center justify-between gap-3">
 							<span class="flex min-w-0 items-center gap-2.5">
-								{#if brief.brand.color}
+								{#if !brandSet}
+									<!--
+										A4. Keyed on a COLOUR OR A TYPEFACE, never on the name:
+										`brand.name` is the account's name, which every team has,
+										so keying on it meant this state could never appear.
+
+										The missing state is a row like any other, not an error —
+										a brief without a brand is a perfectly good draft, and
+										Review is where it becomes advisory.
+									-->
+									<span class="block h-2 w-2 flex-shrink-0 bg-brand-alarm" aria-hidden="true" />
+									<span class="font-sans text-[14px] text-brand-ink">No brand yet</span>
+								{:else if brief.brand.color}
 									<span
 										class="block h-5 w-5 flex-shrink-0 border border-brand-rule"
 										style="background:{brief.brand.color}"
 										aria-hidden="true"
 									/>
 								{/if}
-								<span class="truncate font-sans text-[14px] font-medium text-brand-ink"
-									>{brief.brand.name || 'No brand yet'}</span
-								>
+								{#if brandSet}
+									<!-- The account's name only belongs here once there is a
+									     brand for it to name. Beside "No brand yet" it reads as
+									     a brand that exists. -->
+									<span class="truncate font-sans text-[14px] font-medium text-brand-ink"
+										>{brief.brand.name}</span
+									>
+								{/if}
 								<span class="truncate font-mono text-[11.5px] text-brand-slate">
 									{[brief.brand.color, brief.brand.font].filter(Boolean).join(' · ')}
 								</span>
 							</span>
-							<a
-								href="/dashboard/brand-assets"
-								class="flex-shrink-0 font-sans text-[13px] text-brand-blue hover:underline"
-								>Change</a
-							>
+							{#if !brandSet}
+								<button
+									type="button"
+									on:click={() => (brandOpen = !brandOpen)}
+									aria-expanded={brandOpen}
+									class="h-8 flex-shrink-0 border border-brand-ink bg-white px-3 font-sans text-[12.5px] font-semibold text-brand-ink"
+									>Add brand</button
+								>
+							{:else}
+								<a
+									href="/dashboard/brand-assets"
+									class="flex-shrink-0 font-sans text-[13px] text-brand-blue hover:underline"
+									>Change</a
+								>
+							{/if}
 						</dd>
 					</div>
+
+					{#if brandOpen}
+						<!--
+							A4. Two paths and one caption. The caption is the promise the
+							route keeps: only the public origin is fetched, nothing is
+							saved, and what comes back is a suggestion the buyer accepts.
+						-->
+						<div class="border-b border-brand-rule bg-brand-subtle p-4">
+							<p class="font-sans text-[14px] font-medium text-brand-ink">Set up your brand</p>
+							<div class="mt-3 flex flex-wrap items-center gap-2.5">
+								<input
+									bind:value={brandDomain}
+									placeholder="yourcompany.com"
+									aria-label="Your website address"
+									class="h-9 w-[200px] border border-brand-rule bg-white px-2 font-mono text-[12.5px] text-brand-ink"
+								/>
+								<button
+									type="button"
+									on:click={detectFromSite}
+									disabled={detecting || brandDomain.trim().length < 4}
+									class="h-9 border border-brand-ink bg-white px-3 font-sans text-[12.5px] font-semibold text-brand-ink disabled:border-brand-rule disabled:text-brand-mute"
+									>{detecting ? 'Reading…' : 'Detect from site'}</button
+								>
+								<a
+									href="/dashboard/brand-assets"
+									class="h-9 px-2 font-sans text-[12.5px] leading-9 text-brand-slate">Upload logo</a
+								>
+							</div>
+							<p class="mt-2 font-sans text-[12.5px] text-brand-slate">
+								Fetches the public site only. You confirm before use.
+							</p>
+
+							{#if brandError}
+								<p class="mt-2"><StatusSquare tone="blocked" label={brandError} /></p>
+							{:else if detected}
+								<div class="mt-3 flex flex-wrap items-center gap-3">
+									<span
+										class="block h-6 w-6 flex-shrink-0 border border-brand-rule"
+										style="background:{detected.color}"
+										aria-hidden="true"
+									/>
+									<span class="font-mono text-[12px] text-brand-ink">{detected.color}</span>
+									<button
+										type="button"
+										on:click={() => {
+											brief.brand = { ...brief.brand, color: detected.color };
+											brandOpen = false;
+										}}
+										class="h-8 bg-brand-ink px-3 font-sans text-[12.5px] font-semibold text-white"
+										>Use this colour</button
+									>
+								</div>
+								<p class="mt-2 font-sans text-[12.5px] leading-[18px] text-brand-slate">
+									{detected.note}
+								</p>
+							{/if}
+						</div>
+					{/if}
 
 					<!-- Metrics -->
 					<div class="grid gap-2 border-b border-brand-rule p-4 sm:grid-cols-[130px_minmax(0,1fr)]">
@@ -438,7 +562,7 @@
 					described what was sent by summarising it would be a claim about a
 					transfer, written by the thing that made the transfer.
 				-->
-				{#each [['Your description', drafted ? 'ready' : 'excluded'], ['Your brand', drafted?.brief?.brand?.name ? 'ready' : 'excluded']] as [label, tone] (label)}
+				{#each [['Your description', drafted ? 'ready' : 'excluded'], ['Your brand', brandSet ? 'ready' : 'excluded']] as [label, tone] (label)}
 					<div class="flex items-center justify-between gap-3 border-b border-brand-rule py-2.5">
 						<dt class="font-sans text-[13.5px] text-brand-ink">{label}</dt>
 						<dd>

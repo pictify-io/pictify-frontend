@@ -169,6 +169,14 @@ export const draftCampaignBrief = (description) =>
  * creation, and a diff shown afterwards would describe a decision already
  * taken.
  */
+/**
+ * Read a brand colour off a public homepage. AI-6 A4.
+ *
+ * Returns a PROPOSAL and writes nothing — the buyer confirms and the
+ * brand-asset routes do the saving.
+ */
+export const detectBrand = (domain) => backend.post('/campaigns/brand/detect', { domain });
+
 export const getNextPeriodPlan = (campaignUid, period) =>
 	backend.get(`/campaigns/${enc(campaignUid)}/editions/next?period=${enc(period)}`);
 
