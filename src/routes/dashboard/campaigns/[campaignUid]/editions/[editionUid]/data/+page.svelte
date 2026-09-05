@@ -23,6 +23,7 @@
 		uploadEditionData,
 		updateEdition,
 		validateEdition,
+		suggestMapping,
 		campaignError
 	} from '../../../../../../../api/campaign';
 	import { campaignDataValidated } from '$lib/campaigns/analytics';
@@ -40,6 +41,87 @@
 	let mapping = {};
 	/** Headers whose destination was suggested and not yet confirmed by a human. */
 	let unconfirmed = new Set();
+
+	/* ----------------------------------------------------------- AI-3 */
+
+	/**
+	 * Consent for column-name suggestions.
+	 *
+	 * `null` is "not asked yet", and it is the only state that shows the
+	 * choice. The rules have already run by then, so declining costs the buyer
+	 * the leftovers and not the mapping — which is the difference between a
+	 * choice and a toll gate.
+	 */
+	let mappingConsent = null;
+	let suggesting = false;
+	let mappingError = null;
+	/** `{ [header]: sentence }` — why a destination was suggested, or why none. */
+	let why = {};
+	let unresolved = new Set();
+	let sent = null;
+	let suggestedByAi = 0;
+
+	/** Columns no local rule could place. The only ones ever sent. */
+	$: unmatchedHeaders = (upload?.header || []).filter((h) => !mapping[h] && !unresolved.has(h));
+
+	async function askForSuggestions() {
+		if (suggesting) return;
+		suggesting = true;
+		mappingError = null;
+		try {
+			/*
+			 * Names and TYPES only — assembled here rather than passing the upload
+			 * through, so the request cannot pick up a sample value by accident.
+			 * The strip promises this; this line is where the promise is kept.
+			 */
+			const headers = unmatchedHeaders.map((name) => ({
+				name,
+				type: typeOf(name)
+			}));
+			const res = await suggestMapping(campaignUid, editionUid, headers);
+			if (!res?.suggestions) throw new Error('no suggestions');
+
+			sent = res.sent;
+			suggestedByAi = res.suggestions.filter((r) => r.source === 'ai').length;
+
+			for (const row of res.suggestions) {
+				if (row.why) why[row.header] = row.why;
+				if (row.state === 'unresolved') unresolved.add(row.header);
+				if (row.state === 'suggested' && row.field && !mapping[row.header]) {
+					mapping[row.header] = row.field;
+					// Suggested, never adopted: the buyer confirms each one, exactly as
+					// they do for a rule's suggestion.
+					unconfirmed.add(row.header);
+				}
+			}
+			why = why;
+			unresolved = unresolved;
+			mapping = mapping;
+			unconfirmed = unconfirmed;
+			mappingConsent = true;
+		} catch (err) {
+			mappingError = campaignError(err).message;
+			// Consent stays unasked, so the buyer can try again or map by hand.
+			mappingConsent = null;
+		} finally {
+			suggesting = false;
+		}
+	}
+
+	/**
+	 * The type of a column, from the values already parsed in the browser.
+	 *
+	 * Derived from the sample rather than declared by the server, because it is
+	 * the only thing about the data that travels — so it is worth being right,
+	 * and worth being computed where the data already is.
+	 */
+	function typeOf(header) {
+		const sample = String(sampleFor(header) ?? '').trim();
+		if (!sample) return 'unknown';
+		if (/^-?\d+(\.\d+)?$/.test(sample)) return 'number';
+		if (/^\d{4}-\d{2}(-\d{2})?$/.test(sample)) return 'date';
+		return 'text';
+	}
 
 	/**
 	 * Destinations come from the campaign's metric contract, not from the file.
@@ -220,6 +302,79 @@
 			</span>
 		</p>
 
+		<!--
+			AI-3 · the consent strip. A strip, not a modal, and it sits above the
+			table it changes.
+
+			The rules have ALREADY run by the time this is on screen — every match
+			below came from a local rule, with no network call. So this asks for
+			one thing only: whether the leftovers may be sent, as names and types,
+			to be matched. Declining costs the buyer the leftovers, not the mapping,
+			which is what makes the choice a real one.
+		-->
+		<!--
+			Stays on screen after the answer, not only before the question. The
+			first version showed the strip while there were unmatched columns and
+			hid it the moment they were resolved — which took the "N of M matched ·
+			Sent: 3 names, 0 rows, 0 values" line away at exactly the moment it
+			became a statement about something that had happened.
+		-->
+		{#if unmatchedHeaders.length || mappingConsent !== null}
+			<div
+				class="mt-7 flex flex-wrap items-start justify-between gap-4 border border-brand-rule bg-brand-subtle p-4"
+			>
+				<span class="min-w-0">
+					{#if mappingConsent === null}
+						<span class="block font-sans text-[14px] font-medium text-brand-ink">
+							{unmatchedHeaders.length}
+							{unmatchedHeaders.length === 1 ? 'column has' : 'columns have'} no obvious match
+						</span>
+						<span class="mt-0.5 block font-sans text-[13px] leading-[19px] text-brand-slate">
+							Pictify can suggest where they go. It would send the column names and their types —
+							never a row, a value or a customer.
+						</span>
+					{:else if suggesting}
+						<span class="block font-sans text-[14px] text-brand-ink">Matching column names…</span>
+					{:else if mappingConsent === false}
+						<span class="block font-sans text-[14px] text-brand-ink">Mapping by hand</span>
+						<span class="mt-0.5 block font-sans text-[13px] text-brand-slate">
+							Nothing was sent. Pick a destination for each column below.
+						</span>
+					{:else}
+						<!-- After consent, the strip states what actually left. -->
+						<span class="block font-sans text-[14px] font-medium text-brand-ink">
+							{suggestedByAi} of {sent?.names ?? 0} columns matched from their names
+						</span>
+						<span class="mt-0.5 block font-mono text-[11px] text-brand-slate">
+							Sent: {sent?.names ?? 0} names and types · {sent?.rows ?? 0} rows · {sent?.values ??
+								0} values
+						</span>
+					{/if}
+				</span>
+
+				{#if mappingConsent === null}
+					<span class="flex flex-shrink-0 items-center gap-2.5">
+						<button
+							type="button"
+							on:click={askForSuggestions}
+							disabled={suggesting}
+							class="h-9 border border-brand-ink bg-white px-3 font-sans text-[13px] font-semibold text-brand-ink disabled:border-brand-rule disabled:text-brand-mute"
+							>Suggest matches</button
+						>
+						<button
+							type="button"
+							on:click={() => (mappingConsent = false)}
+							class="h-9 px-2 font-sans text-[13px] text-brand-slate">I’ll map by hand</button
+						>
+					</span>
+				{/if}
+			</div>
+
+			{#if mappingError}
+				<p class="mt-3"><StatusSquare tone="blocked" label={mappingError} /></p>
+			{/if}
+		{/if}
+
 		<div class="mt-7 flex flex-wrap items-baseline justify-between gap-2">
 			<h2 class="font-display text-[17px] font-bold text-brand-ink">Map columns</h2>
 			<p class="font-sans text-[13px] text-brand-mute">
@@ -271,11 +426,30 @@
 									{/each}
 								</select>
 							</td>
-							<td class="py-3 pr-4 font-mono text-[11.5px] text-brand-slate">
-								{def ? `${def.type} · ${def.required ? 'req' : 'opt'}` : '—'}
+							<td class="py-3 pr-4">
+								<span class="block font-mono text-[11.5px] text-brand-slate">
+									{def ? `${def.type} · ${def.required ? 'req' : 'opt'}` : '—'}
+								</span>
+								{#if why[header]}
+									<!--
+										WHY, under the suggestion it explains. A destination a
+										buyer is asked to confirm is a question, and a question
+										with no reasoning behind it gets answered by clicking.
+									-->
+									<span
+										class="mt-1 block max-w-[260px] font-sans text-[12px] leading-[17px] text-brand-mute"
+									>
+										{why[header]}
+									</span>
+								{/if}
 							</td>
 							<td class="py-3">
-								{#if !dest}
+								{#if !dest && unresolved.has(header)}
+									<!-- Unresolved is not the same as ignored: nothing could
+									     place it, and the reason is beside it. No confidence
+									     number, because there is nothing behind one. -->
+									<StatusSquare tone="blocked" label="Unresolved" />
+								{:else if !dest}
 									<StatusSquare tone="excluded" label="Not stored" />
 								{:else if pending}
 									<span class="flex items-center gap-3">

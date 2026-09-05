@@ -145,6 +145,23 @@ export const getCampaign = (campaignUid) => backend.get(`/campaigns/${enc(campai
 export const draftCampaignBrief = (description) =>
 	backend.post('/campaigns/brief', { description });
 
+/**
+ * Ask for column-mapping suggestions. AI-3.
+ *
+ * `consent` is required by the server, not merely expected — calling without
+ * it is refused rather than answered from the rule tier, so the consent strip
+ * cannot become a decoration over a call that happens anyway.
+ *
+ * `headers` carries names and TYPES only. Never a sample value: the sample
+ * shown on screen is the buyer's own customer's data, and it has no business
+ * in a request whose whole promise is that it does not travel.
+ */
+export const suggestMapping = (campaignUid, editionUid, headers) =>
+	backend.post(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/mapping/suggest`, {
+		consent: true,
+		headers
+	});
+
 export const setCampaignDesign = (campaignUid, templateRevisionUid) =>
 	backend.patch(`/campaigns/${enc(campaignUid)}/design`, { templateRevisionUid });
 
