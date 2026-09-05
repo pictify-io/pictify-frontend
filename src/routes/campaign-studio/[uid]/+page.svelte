@@ -24,6 +24,8 @@
 	import ConflictDialog from '$lib/components/studio/v2/ConflictDialog.svelte';
 	import AiLock from '$lib/components/studio/v2/AiLock.svelte';
 	import VersionsPanel from '$lib/components/studio/v2/VersionsPanel.svelte';
+	import EditReceipt from '$lib/components/studio/v2/EditReceipt.svelte';
+	import ScopeProposal from '$lib/components/studio/v2/ScopeProposal.svelte';
 	import ProofView from '$lib/components/studio/v2/ProofView.svelte';
 	import {
 		editTemplateBySaying,
@@ -71,9 +73,31 @@
 	let aiCancelling = false;
 	let aiError = null;
 
+	/* --------------------------------------------------------------- AI-2 */
+
+	/** The last receipt and the last refusal. Only ever one of them is shown. */
+	let receipt = null;
+	let receiptScope = null;
+	let proposal = null;
+	let applyingProposal = false;
+
+	/**
+	 * Whether the next instruction is scoped to the selection.
+	 *
+	 * Defaults to ON whenever something is selected: someone who clicked an
+	 * element and then started typing is talking about that element. The switch
+	 * exists so they can say otherwise, not so they have to opt in to the safe
+	 * behaviour.
+	 */
+	let scopeToSelection = true;
+	$: activeSelection = scopeToSelection && selectedId ? selectedId : null;
+	$: selectedLabel = layers.find((l) => l.id === selectedId)?.label || 'the selection';
+
 	/** The run's own id, so a retry reconciles rather than starting a second. */
 	let currentOperationId = null;
 	let composerInput = null;
+	/** Kept so a wider-scope proposal can re-run the same words. */
+	let lastInstruction = '';
 
 	/*
 	 * Focus comes back to the composer when a run ends. B06-2.
@@ -124,6 +148,7 @@
 		const text = instruction.trim();
 		if (!text || $editor.operation) return;
 		aiError = null;
+		lastInstruction = text;
 
 		// Await the save so baseRevision is a revision the server actually has.
 		await saveQueue?.flushNow();
@@ -136,13 +161,46 @@
 			globalThis.crypto?.randomUUID?.() ??
 			`op_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 		currentOperationId = operationId;
+		// A new run supersedes whatever the last one said about itself.
+		receipt = null;
+		proposal = null;
 		editor.beginOperation(operationId);
+
+		/*
+		 * Captured now, not read inside the callbacks. The buyer can click
+		 * somewhere else while the run is in flight, and the result belongs to the
+		 * scope the instruction was given under — not to whatever is selected when
+		 * it lands.
+		 */
+		const scopedTo = activeSelection;
+		const scopeLabels = scopedTo ? [selectedLabel] : null;
 
 		await editTemplateBySaying(uid, text, {
 			operationId,
 			baseRevision: $editor.baseRevision,
+			...(scopedTo ? { selectedNodeIds: [scopedTo], allowedScope: 'selection' } : {}),
 			onStage: (s) => editor.operationStage(s?.stage || 'plan'),
 			onDone: async (result) => {
+				/*
+				 * The run finished and nothing changed. The server did not commit it,
+				 * so there is no revision to adopt and nothing to undo — treating it
+				 * like a normal result would show an Undo button that undoes an
+				 * earlier edit the buyer did not ask about.
+				 */
+				if (result?.noChange) {
+					editor.endOperation();
+					receipt = result?.receipt || null;
+					receiptScope = scopeLabels;
+					aiError = scopedTo
+						? `Nothing changed — that could not be done inside ${
+								scopeLabels?.[0] || 'the selection'
+						  }. Switch to Whole design to let it reach further.`
+						: 'Nothing changed. Try describing it differently.';
+					currentOperationId = null;
+					returnFocusToComposer();
+					return;
+				}
+
 				/*
 				 * A reconciled retry carries no html — the server did not re-run
 				 * the agent, it just told us the run had already finished. Fetch
@@ -176,8 +234,24 @@
 					 * desync the optimistic lock and 409 every later save.
 					 */
 					editor.saved({ revision: result?.revision, seq: $editor.localSeq });
+					receipt = result?.receipt || null;
+					// The client's label, not the server's: Layers and the receipt must
+					// call the same element by the same name.
+					receiptScope = scopeLabels || result?.scope || null;
 				}
 				currentOperationId = null;
+			},
+			onProposal: (payload) => {
+				/*
+				 * The run finished and the server refused to apply it. NOT an error:
+				 * the draft is untouched, nothing was charged, and the buyer is being
+				 * asked a question. The instruction is kept so "Apply" can re-run it
+				 * with the scope lifted.
+				 */
+				editor.endOperation();
+				proposal = payload;
+				currentOperationId = null;
+				returnFocusToComposer();
 			},
 			onError: (err) => {
 				// ST-04b: the draft AND the instruction survive, so the buyer can
@@ -337,6 +411,28 @@
 		refreshLayers();
 		await loadVersions();
 		showToast(`Restored rev ${revision} as rev ${res.revision}.`, 'default', 4000);
+	}
+
+	/**
+	 * Accept the wider change. AI-2.
+	 *
+	 * Re-runs the SAME instruction with the scope lifted, rather than applying a
+	 * stored candidate. The refused result was never committed anywhere, and
+	 * keeping a server-side draft of a rejected edit so it could be replayed
+	 * would mean storing a document the buyer has not agreed to — which is the
+	 * thing the refusal exists to avoid.
+	 */
+	async function applyProposal() {
+		if (!proposal || applyingProposal) return;
+		applyingProposal = true;
+		const text = lastInstruction;
+		proposal = null;
+		scopeToSelection = false;
+		instruction = text;
+		await runAi();
+		applyingProposal = false;
+		// Back on afterwards: the next instruction is a fresh decision.
+		scopeToSelection = true;
 	}
 
 	/** Cancel is a server operation; a closed socket cancels nothing. */
@@ -694,9 +790,48 @@
 			{#if leftTab === 'say' && !design}
 				<StudioStart {availableFields} {busy} />
 			{:else if leftTab === 'say'}
-				<p class="font-sans text-[13.5px] text-brand-slate">
-					Describe a change. It starts from what you see now.
+				<p class="font-sans text-[13.5px] leading-[19px] text-brand-slate">
+					{activeSelection
+						? 'Describe a change. Selected: only that part changes.'
+						: 'Describe a change. It starts from what you see now.'}
 				</p>
+
+				{#if lastInstruction && (receipt || proposal)}
+					<!--
+						The instruction, then what came of it. Kept in that order because
+						the receipt is only meaningful as the answer to something the
+						buyer said — a diff on its own is a list of numbers.
+					-->
+					<div class="mt-5 bg-brand-subtle p-3">
+						<p class="font-mono text-[10px] uppercase tracking-[0.06em] text-brand-mute">
+							{receiptScope?.length ? receiptScope.join(', ') : 'Whole design'} · rev {$editor.baseRevision}
+						</p>
+						<p class="mt-1 font-sans text-[13.5px] leading-[19px] text-brand-ink">
+							{lastInstruction}
+						</p>
+					</div>
+				{/if}
+
+				{#if proposal}
+					<div class="mt-3">
+						<ScopeProposal
+							{proposal}
+							busy={applyingProposal}
+							on:apply={applyProposal}
+							on:dismiss={() => (proposal = null)}
+						/>
+					</div>
+				{:else if receipt}
+					<div class="mt-3">
+						<EditReceipt
+							{receipt}
+							{layers}
+							scope={receiptScope}
+							canUndo={$editor.canUndo}
+							on:undo={stepHistory('undo')}
+						/>
+					</div>
+				{/if}
 			{:else}
 				<LayersTree
 					rows={layers}
@@ -842,6 +977,34 @@
 
 		<svelte:fragment slot="composer">
 			{#if design}
+				{#if selectedId}
+					<!--
+						Scope is visible and switchable (locked decision 4). The chip is
+						the state, not a setting buried in a menu — a buyer who cannot
+						see the scope cannot know why their instruction was refused.
+					-->
+					<p class="mb-2 flex flex-wrap items-center gap-1.5">
+						<button
+							type="button"
+							on:click={() => (scopeToSelection = true)}
+							aria-pressed={scopeToSelection}
+							class="flex h-7 items-center gap-2 px-2 font-sans text-[12px] {scopeToSelection
+								? 'bg-brand-powder font-semibold text-brand-ink'
+								: 'text-brand-slate'}"
+						>
+							<span class="block h-2 w-2 flex-shrink-0 bg-brand-royal" aria-hidden="true" />
+							Selected: {selectedLabel}
+						</button>
+						<button
+							type="button"
+							on:click={() => (scopeToSelection = false)}
+							aria-pressed={!scopeToSelection}
+							class="h-7 px-2 font-sans text-[12px] {scopeToSelection
+								? 'text-brand-slate'
+								: 'bg-brand-powder font-semibold text-brand-ink'}">Whole design</button
+						>
+					</p>
+				{/if}
 				<input
 					bind:this={composerInput}
 					bind:value={instruction}
@@ -852,7 +1015,9 @@
 						}
 					}}
 					disabled={Boolean($editor.operation)}
-					placeholder="Describe a change…"
+					placeholder={activeSelection
+						? `Describe a change to ${selectedLabel}…`
+						: 'Describe a change…'}
 					class="h-10 w-full rounded-btn border border-brand-rule px-3 font-sans text-[13.5px] text-brand-ink placeholder:text-brand-mute disabled:bg-brand-subtle"
 				/>
 				{#if aiError}

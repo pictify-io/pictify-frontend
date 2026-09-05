@@ -452,7 +452,17 @@ const renderMultiPagePdf = async (templateUid, variableSets = [], options = {}) 
 const editTemplateBySaying = async (
 	uid,
 	instruction,
-	{ onStage, onDone, onError, signal, operationId, baseRevision } = {}
+	{
+		onStage,
+		onDone,
+		onError,
+		onProposal,
+		signal,
+		operationId,
+		baseRevision,
+		selectedNodeIds,
+		allowedScope
+	} = {}
 ) => {
 	let response;
 	try {
@@ -470,7 +480,11 @@ const editTemplateBySaying = async (
 			body: JSON.stringify({
 				instruction,
 				...(operationId ? { operationId } : {}),
-				...(Number.isInteger(baseRevision) ? { baseRevision } : {})
+				...(Number.isInteger(baseRevision) ? { baseRevision } : {}),
+				// AI-2. Sent only when a selection is in force, so the platform
+				// studio's whole-design edits are unaffected.
+				...(selectedNodeIds?.length ? { selectedNodeIds } : {}),
+				...(allowedScope ? { allowedScope } : {})
 			}),
 			signal
 		});
@@ -552,6 +566,15 @@ const editTemplateBySaying = async (
 				else if (event === 'done') {
 					settled = true;
 					onDone?.(payload);
+				} else if (event === 'proposal') {
+					/*
+					 * A settled outcome, not an error. The run finished, the server
+					 * refused to apply it, and the buyer is being asked a question —
+					 * treating it as a failure would show "that didn't go through"
+					 * over a card that is working exactly as designed.
+					 */
+					settled = true;
+					onProposal?.(payload);
 				} else if (event === 'error') {
 					settled = true;
 					onError?.(payload);
