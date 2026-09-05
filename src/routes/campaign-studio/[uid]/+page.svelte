@@ -24,6 +24,7 @@
 	import ConflictDialog from '$lib/components/studio/v2/ConflictDialog.svelte';
 	import AiLock from '$lib/components/studio/v2/AiLock.svelte';
 	import VersionsPanel from '$lib/components/studio/v2/VersionsPanel.svelte';
+	import UsingLine from '$lib/components/campaigns/UsingLine.svelte';
 	import EditReceipt from '$lib/components/studio/v2/EditReceipt.svelte';
 	import ScopeProposal from '$lib/components/studio/v2/ScopeProposal.svelte';
 	import ProofView from '$lib/components/studio/v2/ProofView.svelte';
@@ -1022,6 +1023,23 @@
 
 		<svelte:fragment slot="composer">
 			{#if design}
+				<!--
+					A1. Above the instruction, every time, and assembled from counts
+					rather than phrased. What the agent gets is the markup, the brand
+					and the FIELD NAMES — never a customer's values, because the stage
+					substitutes synthetic samples and the agent is handed the document
+					with its {{tokens}} intact.
+				-->
+				<div class="mb-2">
+					<UsingLine
+						sends={[
+							campaign?.brand?.name ? `${campaign.brand.name} brand` : 'your brand',
+							'synthetic samples',
+							`${availableFields.length} field ${availableFields.length === 1 ? 'name' : 'names'}`
+						]}
+						withheld={['no customer values']}
+					/>
+				</div>
 				{#if selectedId}
 					<!--
 						Scope is visible and switchable (locked decision 4). The chip is
