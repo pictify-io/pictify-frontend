@@ -30,6 +30,7 @@
 		campaignError
 	} from '../../../../api/campaign';
 	import { capabilities, initCampaignCapabilities } from '../../../../store/campaign.store';
+	import { campaignNewPeriod } from '$lib/campaigns/analytics';
 
 	$: campaignUid = $page.params.campaignUid;
 
@@ -74,6 +75,7 @@
 			// forking one, so clicking twice resumes instead of splitting work.
 			const period = new Date().toISOString().slice(0, 7);
 			const result = await createEdition(campaignUid, { period });
+			campaignNewPeriod({ resumed: Boolean(result?.resumed), editions: editions.length });
 			await goto(editionUrl(campaignUid, result.edition.uid, 'data'));
 		} catch (err) {
 			error = campaignError(err);

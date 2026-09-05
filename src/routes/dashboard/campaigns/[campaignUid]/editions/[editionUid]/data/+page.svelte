@@ -25,6 +25,7 @@
 		validateEdition,
 		campaignError
 	} from '../../../../../../../api/campaign';
+	import { campaignDataValidated } from '$lib/campaigns/analytics';
 
 	const { edition, campaign, reload } = getContext('edition');
 
@@ -135,7 +136,15 @@
 		uploadError = null;
 		try {
 			await updateEdition(campaignUid, editionUid, { fieldMapping: mapping }, $edition.version);
-			await validateEdition(campaignUid, editionUid, { fieldMapping: mapping });
+			const result = await validateEdition(campaignUid, editionUid, { fieldMapping: mapping });
+			// Shapes only: how many accounts, how many problems. Never a row.
+			campaignDataValidated({
+				accounts: result?.counts?.accounts,
+				valid: result?.counts?.valid,
+				issues: result?.counts?.issues,
+				columns_mapped: mappedCount,
+				columns_ignored: ignoredHeaders.length
+			});
 			await goto(editionUrl(campaignUid, editionUid, 'review'));
 		} catch (err) {
 			uploadError = campaignError(err);

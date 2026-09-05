@@ -27,6 +27,7 @@
 		newIdempotencyKey,
 		campaignError
 	} from '../../../../../../../api/campaign';
+	import { campaignRunStarted } from '$lib/campaigns/analytics';
 
 	const { edition, reload } = getContext('edition');
 
@@ -78,6 +79,7 @@
 				expectedRevision: $edition?.revision
 			});
 			run = { runId: started.runId, state: started.status, counts };
+			campaignRunStarted({ state: started.status });
 			await tick();
 		} catch (err) {
 			error = campaignError(err);

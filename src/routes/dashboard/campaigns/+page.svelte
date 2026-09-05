@@ -24,6 +24,7 @@
 		capabilitiesError,
 		initCampaignCapabilities
 	} from '../../../store/campaign.store';
+	import { campaignIntentClicked } from '$lib/campaigns/analytics';
 
 	let loading = true;
 	/** Distinct from `error`: no pilot access is a state, not a failure. */
@@ -39,6 +40,7 @@
 	 */
 	async function trySample() {
 		seeding = true;
+		campaignIntentClicked({ action: 'try_sample', entitled: enabled });
 		try {
 			const result = await createSampleCampaign();
 			await load();

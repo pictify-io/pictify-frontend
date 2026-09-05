@@ -14,6 +14,7 @@
 	 */
 	import StatusSquare from './StatusSquare.svelte';
 	import { requestPilotAccess, campaignError } from '../../../api/campaign';
+	import { campaignAccessRequested } from '../../campaigns/analytics';
 
 	export let email = '';
 	export let teamName = '';
@@ -45,6 +46,12 @@
 				accountsEstimate: MIDPOINT[accountsEstimate]
 			});
 			sent = true;
+			// Booleans and a band, never the buyer's words or their email.
+			campaignAccessRequested({
+				has_tool: Boolean(sendingTool),
+				has_company: Boolean(company),
+				size_band: accountsEstimate || 'unstated'
+			});
 		} catch (err) {
 			error = campaignError(err);
 		} finally {

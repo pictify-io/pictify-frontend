@@ -27,6 +27,7 @@
 		approveEdition,
 		campaignError
 	} from '../../../../../../../api/campaign';
+	import { campaignApproved } from '$lib/campaigns/analytics';
 
 	const { edition, campaign, reload } = getContext('edition');
 
@@ -96,6 +97,12 @@
 					.filter(([, v]) => v)
 					.map(([k]) => k),
 				externalApprovalRef: externalRef.trim() || undefined
+			});
+			campaignApproved({
+				accounts: run?.approval?.eligibleAccounts,
+				previews: verified.length,
+				clipped: clipped.length,
+				external_ref: Boolean(externalRef.trim())
 			});
 			await reload();
 			await goto(editionUrl(campaignUid, editionUid, 'generate'));

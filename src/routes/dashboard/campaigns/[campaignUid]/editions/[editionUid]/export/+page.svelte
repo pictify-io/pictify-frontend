@@ -24,6 +24,7 @@
 		recordHandoffConfirmation,
 		campaignError
 	} from '../../../../../../../api/campaign';
+	import { campaignExportDownloaded, campaignHandoffAccepted } from '$lib/campaigns/analytics';
 
 	const { edition, campaign, reload } = getContext('edition');
 
@@ -68,6 +69,8 @@
 			a.download = filename || `${$campaign?.name || 'campaign'}-${$edition?.period || ''}.zip`;
 			a.click();
 			URL.revokeObjectURL(url);
+			// The size is a shape; the filename would carry the campaign name.
+			campaignExportDownloaded({ accounts: pkg?.accountCount, bytes: blob.size });
 		} catch (err) {
 			error = campaignError(err);
 		} finally {
@@ -94,6 +97,7 @@
 		error = null;
 		try {
 			accepted = await recordHandoffConfirmation(campaignUid, editionUid, { exportId });
+			campaignHandoffAccepted({ accounts: pkg?.accountCount });
 			await reload();
 		} catch (err) {
 			error = campaignError(err);
