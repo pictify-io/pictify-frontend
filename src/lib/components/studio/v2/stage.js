@@ -531,6 +531,48 @@ export async function attachStage(frame, { onTransaction, onSelection, onStatus,
 		return results;
 	}
 
+	/**
+	 * Images the renderer cannot resolve. B03-4 / state S4.
+	 *
+	 * Three kinds, and each blocks for a different reason:
+	 *
+	 *   `empty`  — no src at all: renders as a broken-image box on a customer's
+	 *              card.
+	 *   `remote` — points at someone else's host: the render depends on their
+	 *              uptime, and they can change what a customer sees after the
+	 *              design was approved.
+	 *   `data`   — an inline data URI: it survives, but it is not a managed
+	 *              asset, so it cannot be replaced across designs later.
+	 *
+	 * Returned rather than thrown, because the buyer fixes them one at a time
+	 * and needs to see all of them at once.
+	 */
+	function missingAssets() {
+		const issues = [];
+		for (const img of doc.body.querySelectorAll('img')) {
+			if (img.closest(`[${UI}]`)) continue;
+			const src = img.getAttribute('src') || '';
+			const id = img.getAttribute(ATTR);
+			if (!src) issues.push({ id, kind: 'empty', label: 'Image with no source' });
+			else if (/^\s*(https?:)?\/\//i.test(src)) {
+				issues.push({ id, kind: 'remote', label: 'Image loaded from another site' });
+			} else if (/^\s*data:/i.test(src)) {
+				issues.push({ id, kind: 'data', label: 'Inline image — upload it to Brand assets' });
+			}
+		}
+		return issues;
+	}
+
+	/** Point an image at a managed asset, as one transaction. */
+	function setAssetSrc(id, src, alt) {
+		const el = byId(id);
+		if (!el || el.tagName !== 'IMG') return false;
+		el.setAttribute('src', src);
+		if (alt) el.setAttribute('alt', alt);
+		commit('replace image');
+		return true;
+	}
+
 	/** Apply a style patch as one transaction, so undo restores exactly. */
 	function applyStyles(id, patch) {
 		const el = byId(id);
@@ -553,6 +595,8 @@ export async function attachStage(frame, { onTransaction, onSelection, onStatus,
 		addElement,
 		tree,
 		usedFields,
+		missingAssets,
+		setAssetSrc,
 		checkAllSamples,
 		applyStyles,
 		toggleLock,

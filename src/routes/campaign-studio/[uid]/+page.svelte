@@ -19,6 +19,8 @@
 	import StudioStage from '$lib/components/studio/v2/StudioStage.svelte';
 	import LayersTree from '$lib/components/studio/v2/LayersTree.svelte';
 	import InputsRail from '$lib/components/studio/v2/InputsRail.svelte';
+	import BrandRail from '$lib/components/studio/v2/BrandRail.svelte';
+	import { getBrandAssets, uploadBrandAsset } from '../../../api/brand-assets';
 	import { SAMPLE_CASES, valuesFor } from '$lib/components/studio/v2/samples.js';
 	import { summarize } from '$lib/components/studio/v2/overflow.js';
 	import { editor, dirty } from '$lib/components/studio/v2/editor-store.js';
@@ -47,6 +49,19 @@
 	let usedFields = [];
 	let bySample = {};
 	let activeSample = 'typical';
+	let missingAssets = [];
+	let brandAssets = [];
+	let uploadingAsset = false;
+
+	/**
+	 * S4 — "Use this design" is blocked while any image cannot be resolved.
+	 *
+	 * A design with a broken or remote image does not fail loudly at render
+	 * time. It produces one card per account with a hole where the logo should
+	 * be, and nobody finds out until a customer says so. Blocking here is the
+	 * only cheap moment to catch it.
+	 */
+	$: useBlocked = !design || missingAssets.length > 0;
 
 	/** Metric keys the campaign supplies, which is what a field may bind to. */
 	$: metricKeys = (campaign?.metrics || []).map((m) => m.key);
@@ -69,8 +84,25 @@
 	/** Rebuilt after every transaction, because the tree IS the document. */
 	const refreshLayers = () => {
 		layers = stageApi ? stageApi.tree() : [];
+		missingAssets = stageApi ? stageApi.missingAssets() : [];
 		refreshFit();
 	};
+
+	/** Loaded once so the picker has something to offer. */
+	async function loadBrandAssets() {
+		const res = await getBrandAssets({ type: 'image', limit: 24 });
+		brandAssets = (res?.assets || []).map((a) => ({ uid: a.uid, name: a.name, url: a.url }));
+	}
+
+	async function onUploadAsset(file) {
+		uploadingAsset = true;
+		try {
+			await uploadBrandAsset(file, { type: 'image' });
+			await loadBrandAssets();
+		} finally {
+			uploadingAsset = false;
+		}
+	}
 
 	/**
 	 * S6 — an approved edition is frozen against this design.
@@ -110,6 +142,7 @@
 	 * none of them is written by load().
 	 */
 	$: if (browser && uid) load(uid, campaignUid, editionUid);
+	$: if (browser) loadBrandAssets();
 
 	async function load(designUid, cUid, eUid) {
 		loadError = null;
@@ -199,9 +232,13 @@
 		breadcrumb={campaign ? `${campaign.name} · Setup` : null}
 		campaignContext={inCampaign}
 		saveState={design ? $editor.saveState : 'unsaved'}
-		useDisabled={!design}
+		useDisabled={useBlocked}
 		statusNote={design
-			? fitSummary && !fitSummary.ok
+			? missingAssets.length
+				? `${missingAssets.length} ${
+						missingAssets.length === 1 ? 'image cannot' : 'images cannot'
+				  } be resolved · fix in Brand before using this design`
+				: fitSummary && !fitSummary.ok
 				? fitSummary.label
 				: null
 			: 'Nothing drawn yet · describe the card on the left or import HTML'}
@@ -291,7 +328,17 @@
 					}}
 				/>
 			{:else if rightTab === 'brand'}
-				<p class="font-sans text-[13.5px] text-brand-mute">Brand assets arrive with B03-4.</p>
+				<BrandRail
+					missing={missingAssets}
+					assets={brandAssets}
+					brandName={campaign?.brand?.name || campaign?.name || ''}
+					uploading={uploadingAsset}
+					on:upload={(e) => onUploadAsset(e.detail.file)}
+					on:replace={(e) => {
+						stageApi?.setAssetSrc(e.detail.id, e.detail.asset.url, e.detail.asset.name);
+						refreshLayers();
+					}}
+				/>
 			{:else}
 				<p class="font-mono text-[10px] uppercase tracking-[0.06em] text-brand-mute">Document</p>
 				<dl class="mt-2 border-t border-brand-rule">
