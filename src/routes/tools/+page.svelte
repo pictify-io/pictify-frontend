@@ -117,10 +117,10 @@
 		property="og:description"
 		content="Eighteen free tools built on the Pictify render API. Every one of them is one API call underneath."
 	/>
-	<meta property="og:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
+	<meta property="og:image" content="https://pictify.io/og/v2/tools.png" />
 	<meta property="og:url" content="https://pictify.io/tools" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
+	<meta name="twitter:image" content="https://pictify.io/og/v2/tools.png" />
 	{@html `<script type="application/ld+json">${JSON.stringify(itemListStructuredData)}</script>`}
 </svelte:head>
 

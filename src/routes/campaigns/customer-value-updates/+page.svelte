@@ -152,6 +152,19 @@
 		content="Turn the numbers your team already tracks per account into a branded card for every customer, ready to drop into the emails you already send. Private pilot for customer success and lifecycle teams."
 	/>
 	<link rel="canonical" href="https://pictify.io/campaigns/customer-value-updates" />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://pictify.io/campaigns/customer-value-updates" />
+	<meta property="og:title" content="Customer value updates · Pictify Campaigns" />
+	<meta
+		property="og:description"
+		content="A spreadsheet in, one branded card per customer out. Your tool sends. Private pilot for customer success and lifecycle teams."
+	/>
+	<meta property="og:image" content="https://pictify.io/og/v2/campaigns.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="Pictify Campaigns: show customers what they got" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:image" content="https://pictify.io/og/v2/campaigns.png" />
 </svelte:head>
 
 <div data-v2>

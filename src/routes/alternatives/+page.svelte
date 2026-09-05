@@ -61,7 +61,7 @@
 	<meta property="og:url" content={canonical} />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="Pictify" />
-	<meta property="og:image" content="https://pictify.io/og/alternatives/index.png" />
+	<meta property="og:image" content="https://pictify.io/og/v2/alternatives.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
 	<meta property="og:image:alt" content="Pictify alternatives: 34 tools compared" />
@@ -70,7 +70,7 @@
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={description} />
-	<meta name="twitter:image" content="https://pictify.io/og/alternatives/index.png" />
+	<meta name="twitter:image" content="https://pictify.io/og/v2/alternatives.png" />
 	<meta name="twitter:image:alt" content="Pictify alternatives: 34 tools compared" />
 </svelte:head>
 

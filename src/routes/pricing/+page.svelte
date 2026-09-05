@@ -347,8 +347,8 @@
 </script>
 
 <svelte:head>
-	<meta property="og:image" content="https://media.pictify.io/cmnij-1775406943351.png" />
-	<meta name="twitter:image" content="https://media.pictify.io/cmnij-1775406943351.png" />
+	<meta property="og:image" content="https://pictify.io/og/v2/pricing.png" />
+	<meta name="twitter:image" content="https://pictify.io/og/v2/pricing.png" />
 </svelte:head>
 
 <div class="landing-v2 flex min-h-screen w-full flex-col bg-brand-canvas">

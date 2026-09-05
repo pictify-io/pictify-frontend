@@ -20,7 +20,7 @@
 	export let title = '';
 	export let description = '';
 	export let canonical = '';
-	export let ogImage = 'https://media.pictify.io/k2oq1-1776144080510.png';
+	export let ogImage = 'https://pictify.io/og/v2/solutions.png';
 	export let ogImageAlt = '';
 	export let ogImageWidth = 1200;
 	export let ogImageHeight = 630;

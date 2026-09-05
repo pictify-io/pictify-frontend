@@ -21,7 +21,7 @@
 	<meta property="og:url" content={canonical} />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="Pictify" />
-	<meta property="og:image" content="https://pictify.io/og/solutions/index.png" />
+	<meta property="og:image" content="https://pictify.io/og/v2/solutions.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
 	<meta
@@ -31,7 +31,7 @@
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={description} />
-	<meta name="twitter:image" content="https://pictify.io/og/solutions/index.png" />
+	<meta name="twitter:image" content="https://pictify.io/og/v2/solutions.png" />
 	<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
 </svelte:head>
 

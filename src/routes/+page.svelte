@@ -67,7 +67,7 @@
 		property="og:description"
 		content="One HTML template declares its variables. Anything that can fill them makes a file — PNG, JPG, PDF, GIF or MP4."
 	/>
-	<meta property="og:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
+	<meta property="og:image" content="https://pictify.io/og/v2/home.png" />
 	<meta property="og:url" content="https://pictify.io" />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="Pictify.io" />
@@ -78,7 +78,7 @@
 		name="twitter:description"
 		content="One HTML template declares its variables. Anything that can fill them makes a file — PNG, JPG, PDF, GIF or MP4."
 	/>
-	<meta name="twitter:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
+	<meta name="twitter:image" content="https://pictify.io/og/v2/home.png" />
 	<meta name="twitter:site" content="@pictify_io" />
 	<link rel="canonical" href="https://pictify.io/" />
 	{@html `<script type="application/ld+json">${JSON.stringify({
@@ -86,7 +86,7 @@
 		'@type': 'SoftwareApplication',
 		name: 'Pictify.io',
 		url: 'https://pictify.io',
-		image: 'https://media.pictify.io/v3g37-1775406808141.png',
+		image: 'https://pictify.io/og/v2/home.png',
 		description:
 			'Templated media API. Write one HTML template that declares its variables, then let anything fill them — your code, a spreadsheet, a webhook, a person or an AI agent — and get back a PNG, JPG, PDF, GIF or MP4.',
 		applicationCategory: ['DeveloperApplication', 'DesignApplication', 'Utility'],
