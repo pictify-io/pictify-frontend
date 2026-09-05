@@ -186,7 +186,10 @@ export async function attachStage(frame, { onTransaction, onSelection, onStatus,
 	function select(elements) {
 		targets = elements.filter((el) => el && el !== doc.body && !el.closest(`[${UI}]`));
 		// An element the renderer cannot reproduce a move for gets no handles.
-		const blocked = targets.length === 1 && blockedReason(targets[0], view);
+		const locked = targets.some((t) => t.hasAttribute('data-locked'));
+		const blocked =
+			(targets.length === 1 && blockedReason(targets[0], view)) ||
+			(locked ? 'Locked. Unlock it in Layers to move it.' : null);
 		moveable.draggable = !blocked;
 		moveable.resizable = !blocked;
 		moveable.target = targets.length === 1 ? targets[0] : targets;
@@ -333,15 +336,171 @@ export async function attachStage(frame, { onTransaction, onSelection, onStatus,
 		commit('duplicate');
 	}
 
+	/* ------------------------------------------------------ B02-5 tools */
+
+	/**
+	 * Add an element.
+	 *
+	 * Appended to the SELECTED container when one is selected, otherwise to the
+	 * artboard. Dropping everything at the root would make a nested design
+	 * unusable — the buyer would have to drag every new element into place.
+	 */
+	function addElement(kind, { field } = {}) {
+		const parent =
+			targets.length === 1 && targets[0].childElementCount >= 0 && !ATOMIC.has(targets[0].tagName)
+				? targets[0]
+				: doc.body;
+
+		let el;
+		if (kind === 'text') {
+			el = doc.createElement('div');
+			el.textContent = 'New text';
+			el.style.cssText = 'font-size:24px;color:#000';
+		} else if (kind === 'field') {
+			el = doc.createElement('div');
+			// A field is inserted as a BINDING, not as its sample value, so what
+			// is on the canvas is what will render for every account.
+			el.textContent = `{{${field || 'account_name'}}}`;
+			el.style.cssText = 'font-size:24px;color:#000';
+		} else if (kind === 'image') {
+			el = doc.createElement('img');
+			// No src: an image is chosen from Brand assets (B03-4). A placeholder
+			// URL would be a remote fetch at render time that nobody approved.
+			el.setAttribute('alt', 'Image placeholder');
+			el.style.cssText = 'width:160px;height:160px;background:#E5E7EB;display:block';
+		} else {
+			el = doc.createElement('div');
+			el.style.cssText = 'width:160px;height:80px;background:#D8F34A';
+		}
+
+		parent.appendChild(el);
+		commit(`add ${kind}`);
+		// Select it so the next thing the buyer does acts on what they just made.
+		select([el]);
+	}
+
+	/* ------------------------------------------------- B02-4 layers tree */
+
+	/** Depth-first tree of addressable elements, for the Layers rail. */
+	function tree() {
+		const walk = (el, depth) =>
+			[...el.children]
+				.filter((child) => child.hasAttribute(ATTR))
+				.flatMap((child) => [
+					{
+						id: child.getAttribute(ATTR),
+						tag: child.tagName.toLowerCase(),
+						depth,
+						label: child.getAttribute('data-label') || labelFor(child),
+						locked: child.hasAttribute('data-locked'),
+						hidden: child.style.display === 'none',
+						hasChildren: [...child.children].some((c) => c.hasAttribute(ATTR))
+					},
+					...walk(child, depth + 1)
+				]);
+		return walk(doc.body, 0);
+	}
+
+	/**
+	 * A name the buyer recognises.
+	 *
+	 * Only a LEAF is named after its content. A container's textContent
+	 * includes everything beneath it, so naming it that way labelled the
+	 * artboard "period" — the first binding in its subtree — and produced two
+	 * rows with the same name, which is precisely the confusion naming rows was
+	 * supposed to remove.
+	 */
+	function labelFor(el) {
+		const isLeaf = !el.childElementCount;
+		if (isLeaf) {
+			const text = (el.textContent || '').trim();
+			const binding = /\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/.exec(text);
+			if (binding) return binding[1];
+			if (text) return text.slice(0, 28);
+		}
+		// A container is named by what it is, and how much it holds.
+		const kids = [...el.children].filter((c) => c.hasAttribute(ATTR)).length;
+		return kids ? `Group · ${kids}` : el.tagName.toLowerCase();
+	}
+
+	const byId = (id) => doc.querySelector(`[${ATTR}="${CSS.escape(id)}"]`);
+
+	function selectById(id) {
+		const el = byId(id);
+		if (el) select([el]);
+	}
+
+	/**
+	 * Lock is an editor concept, so it is stored as an attribute the serializer
+	 * keeps — a lock that vanished on reload would be worse than none.
+	 */
+	function toggleLock(id) {
+		const el = byId(id);
+		if (!el) return;
+		if (el.hasAttribute('data-locked')) el.removeAttribute('data-locked');
+		else {
+			el.setAttribute('data-locked', '');
+			if (targets.includes(el)) select([]);
+		}
+		commit('lock');
+	}
+
+	/**
+	 * Hide sets display:none, which the RENDERER honours too. That is
+	 * deliberate: a "hidden" element that still appeared in the output would be
+	 * the worst possible meaning of the word.
+	 */
+	function toggleHide(id) {
+		const el = byId(id);
+		if (!el) return;
+		el.style.display = el.style.display === 'none' ? '' : 'none';
+		commit('hide');
+	}
+
+	function rename(id, label) {
+		const el = byId(id);
+		if (!el) return;
+		const trimmed = String(label || '')
+			.trim()
+			.slice(0, 60);
+		if (trimmed) el.setAttribute('data-label', trimmed);
+		else el.removeAttribute('data-label');
+		commit('rename');
+	}
+
+	/**
+	 * Reorder within the same parent only.
+	 *
+	 * Moving a node between parents changes the layout it participates in, which
+	 * a drag in a list cannot express safely — the buyer would see a reorder and
+	 * get a reparent.
+	 */
+	function reorder(id, beforeId) {
+		const el = byId(id);
+		const before = beforeId ? byId(beforeId) : null;
+		if (!el || (before && before.parentElement !== el.parentElement)) return false;
+		if (before) el.parentElement.insertBefore(el, before);
+		else el.parentElement.appendChild(el);
+		commit('reorder');
+		return true;
+	}
+
 	doc.addEventListener('click', onClick, true);
 	doc.addEventListener('dblclick', onDoubleClick, true);
 
 	return {
 		select,
 		selectParent,
+		selectById,
 		nudge,
 		removeSelected,
 		duplicateSelected,
+		addElement,
+		tree,
+		toggleLock,
+		toggleHide,
+		rename,
+		reorder,
 		serialize: () => serialize(doc),
 		destroy() {
 			doc.removeEventListener('click', onClick, true);

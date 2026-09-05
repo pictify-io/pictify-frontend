@@ -17,6 +17,7 @@
 	import StudioShell from '$lib/components/studio/v2/StudioShell.svelte';
 	import StudioStart from '$lib/components/studio/v2/StudioStart.svelte';
 	import StudioStage from '$lib/components/studio/v2/StudioStage.svelte';
+	import LayersTree from '$lib/components/studio/v2/LayersTree.svelte';
 	import { editor, dirty } from '$lib/components/studio/v2/editor-store.js';
 	import { SAMPLE_VALUES } from '$lib/campaigns/starters';
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
@@ -36,6 +37,15 @@
 	let edition = null;
 	let loadError = null;
 	let busy = false;
+	/** The live stage, so the rails can drive the canvas. */
+	let stageApi = null;
+	let layers = [];
+	let selectedId = null;
+
+	/** Rebuilt after every transaction, because the tree IS the document. */
+	const refreshLayers = () => {
+		layers = stageApi ? stageApi.tree() : [];
+	};
 
 	/**
 	 * S6 — an approved edition is frozen against this design.
@@ -169,6 +179,10 @@
 		{editionApproved}
 		on:back={back}
 		on:use={useThisDesign}
+		on:add={(e) => {
+			stageApi?.addElement(e.detail.kind);
+			refreshLayers();
+		}}
 	>
 		<svelte:fragment slot="left" let:leftTab>
 			{#if leftTab === 'say' && !design}
@@ -178,22 +192,46 @@
 					Describe a change. It starts from what you see now.
 				</p>
 			{:else}
-				<p class="font-sans text-[13.5px] text-brand-mute">
-					The layers tree arrives with the visual stage.
-				</p>
+				<LayersTree
+					rows={layers}
+					{selectedId}
+					on:select={(e) => stageApi?.selectById(e.detail.id)}
+					on:toggle-lock={(e) => {
+						stageApi?.toggleLock(e.detail.id);
+						refreshLayers();
+					}}
+					on:toggle-hide={(e) => {
+						stageApi?.toggleHide(e.detail.id);
+						refreshLayers();
+					}}
+					on:rename={(e) => {
+						stageApi?.rename(e.detail.id, e.detail.label);
+						refreshLayers();
+					}}
+					on:reorder={(e) => {
+						stageApi?.reorder(e.detail.id, e.detail.beforeId);
+						refreshLayers();
+					}}
+				/>
 			{/if}
 		</svelte:fragment>
 
 		<svelte:fragment slot="stage" let:mode let:zoom>
 			{#if design && mode !== 'proof'}
 				<StudioStage
+					bind:api={stageApi}
 					html={$editor.html || design.html}
 					width={design.width}
 					height={design.height}
 					{zoom}
 					editable={mode === 'design'}
 					sampleValues={SAMPLE_VALUES}
-					on:transaction={(e) => editor.commit(e.detail.label, e.detail.html)}
+					on:ready={refreshLayers}
+					on:selection={(e) => (selectedId = e.detail?.count === 1 ? e.detail.id : null)}
+					on:transaction={(e) => {
+						editor.commit(e.detail.label, e.detail.html);
+						refreshLayers();
+					}}
 				/>
 			{:else if design}
 				<p class="font-sans text-[13.5px] text-brand-mute">

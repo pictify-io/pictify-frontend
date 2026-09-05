@@ -229,6 +229,7 @@
 						<button
 							type="button"
 							disabled={mode !== 'design'}
+							on:click={() => dispatch('add', { kind: tool.toLowerCase() })}
 							class="h-8 rounded-btn border border-brand-rule px-2.5 font-sans text-[13px] text-brand-slate disabled:text-brand-rule"
 							>+ {tool}</button
 						>

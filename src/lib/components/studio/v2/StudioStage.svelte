@@ -23,6 +23,12 @@
 	/** Read-only in Preview data and Rendered proof. */
 	export let editable = true;
 	export let sampleValues = {};
+	/**
+	 * The live stage API, bound outward so the rails can drive the canvas.
+	 * Every canvas action has a rail equivalent (locked decision 3), and the
+	 * rails cannot honour that without a handle on the stage.
+	 */
+	export let api = null;
 
 	const dispatch = createEventDispatcher();
 
@@ -79,7 +85,10 @@
 				},
 				onStatus: (message) => (status = message)
 			});
+			api = stage;
+			dispatch('ready');
 		} catch (err) {
+			api = null;
 			status = 'The stage could not start. Reload to try again.';
 		}
 	}
@@ -116,7 +125,10 @@
 		}
 	}
 
-	onDestroy(() => stage?.destroy());
+	onDestroy(() => {
+		stage?.destroy();
+		api = null;
+	});
 </script>
 
 <svelte:window on:keydown={onKey} />
