@@ -574,6 +574,13 @@ const editTemplateBySaying = async (
 /** Pop the newest snapshot back onto the template. */
 const undoTemplateEdit = async (uid) => backend.post(`/template-studio/${uid}/undo`, {});
 
+/** The durable history: `{ current, head, revisions }`. Never carries html. */
+const getTemplateRevisions = async (uid) => backend.get(`/template-draft/${uid}/revisions`);
+
+/** Restore creates a NEW revision; the response says which. */
+const restoreTemplateRevision = async (uid, revision) =>
+	backend.post(`/template-draft/${uid}/revisions/${revision}/restore`, {});
+
 /**
  * Live proof. Renders ad-hoc html with the studio's sample values — never
  * persisted, and it returns the render time the proof bar shows.
@@ -585,6 +592,8 @@ const previewTemplateHtml = async (body, options = {}) =>
 export {
 	editTemplateBySaying,
 	undoTemplateEdit,
+	getTemplateRevisions,
+	restoreTemplateRevision,
 	previewTemplateHtml,
 	getTemplate,
 	getTemplates,

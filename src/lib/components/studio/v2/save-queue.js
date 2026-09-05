@@ -72,10 +72,24 @@ export function createSaveQueue(editor, { uid, onConflict }) {
 		editor.saving();
 
 		try {
+			/*
+			 * What this save is actually saving. A save can cover several gestures,
+			 * so a single label would name one of them and quietly disown the rest
+			 * — the count says so instead. "edit" is the fallback for a save with
+			 * no recorded labels at all, not the usual answer.
+			 */
+			const covered = state.unsavedLabels.filter((entry) => entry.seq <= seq);
+			const label =
+				covered.length === 1
+					? covered[0].label
+					: covered.length > 1
+					? `${covered.length} edits`
+					: 'edit';
+
 			const res = await backend.patch(`/template-draft/${uid}`, {
 				html: state.html,
 				expectedRevision: base,
-				label: 'edit'
+				label
 			});
 			editor.saved({ revision: res.revision, seq });
 			local.clear(base);

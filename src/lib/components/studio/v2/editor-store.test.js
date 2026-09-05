@@ -145,3 +145,49 @@ describe('editor store — AI operations', () => {
 		assert.equal(get(e).html, '<div>mine</div>');
 	});
 });
+
+describe('history position and save labels', () => {
+	test('canUndo is state, not a function the UI has to poll', () => {
+		const e = fresh();
+		assert.equal(get(e).canUndo, false, 'nothing to undo at the opened document');
+		e.commit('moved headline', '<div>b</div>');
+		assert.equal(get(e).canUndo, true);
+		assert.equal(get(e).canRedo, false);
+		e.undo();
+		assert.equal(get(e).canUndo, false);
+		assert.equal(get(e).canRedo, true);
+	});
+
+	test('an AI result is one entry, so one undo rejects the whole edit', () => {
+		const e = fresh();
+		e.beginOperation('op1');
+		e.completeOperation('op1', '<div>ai wrote a lot</div>');
+		e.undo();
+		assert.equal(get(e).html, '<div>a</div>');
+		assert.equal(get(e).canUndo, false);
+	});
+
+	test('a save carries the gestures it covered, not the word "edit"', () => {
+		const e = fresh();
+		e.commit('moved headline', '<div>b</div>');
+		assert.deepEqual(
+			get(e).unsavedLabels.map((l) => l.label),
+			['moved headline']
+		);
+	});
+
+	test('work committed while a save is in flight keeps its own label', () => {
+		const e = fresh();
+		e.commit('first', '<div>b</div>');
+		const seq = get(e).localSeq;
+		e.commit('second', '<div>c</div>');
+		// The server acknowledges the FIRST save only.
+		e.saved({ revision: 4, seq });
+		assert.deepEqual(
+			get(e).unsavedLabels.map((l) => l.label),
+			['second'],
+			'the label for unsaved work must survive an acknowledgement of earlier work'
+		);
+		assert.equal(get(e).saveState, 'unsaved');
+	});
+});

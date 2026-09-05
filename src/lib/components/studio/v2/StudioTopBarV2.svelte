@@ -18,6 +18,14 @@
 	export let format = 'PNG';
 	export let width = 1200;
 	export let height = 800;
+	/**
+	 * Opens the Versions panel. The revision label IS the affordance — there is
+	 * no second button — because the number is what a buyer is looking at when
+	 * the question "what changed?" occurs to them.
+	 */
+	export let onRevisionClick = null;
+	export let versionsOpen = false;
+
 	export let canUndo = false;
 	export let canRedo = false;
 	/** Campaign context only. Null on the standalone route. */
@@ -49,9 +57,19 @@
 		<span class="truncate font-sans text-[16px] font-bold text-brand-ink">{designName}</span>
 		<span class="flex flex-shrink-0 items-center gap-2">
 			<StatusSquare tone={state.tone} label={state.label} />
-			<span class="font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-mute"
-				>· Rev {revision}</span
-			>
+			{#if onRevisionClick}
+				<button
+					type="button"
+					on:click={onRevisionClick}
+					aria-expanded={versionsOpen}
+					class="rounded-btn font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-mute underline-offset-2 hover:text-brand-ink hover:underline"
+					>· Rev {revision}</button
+				>
+			{:else}
+				<span class="font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-mute"
+					>· Rev {revision}</span
+				>
+			{/if}
 		</span>
 	</div>
 

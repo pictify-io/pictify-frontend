@@ -40,6 +40,10 @@
 	export let canRedo = false;
 	export let onUndo = null;
 	export let onRedo = null;
+
+	/** Versions opens from the revision label; the panel itself is a slot. */
+	export let onRevisionClick = null;
+	export let versionsOpen = false;
 	export let statusNote = null;
 	/** True when an approved edition is frozen against this design (S6). */
 	export let editionApproved = false;
@@ -86,6 +90,15 @@
 			}
 		}
 		if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+		// The popover is the innermost layer, so Escape closes it before it means
+		// anything else — otherwise Escape would deselect on the stage behind a
+		// panel the buyer is looking at.
+		if (event.key === 'Escape' && versionsOpen) {
+			onRevisionClick?.();
+			event.preventDefault();
+			return;
+		}
 
 		const index = ['1', '2', '3'].indexOf(event.key);
 		if (index >= 0) {
@@ -147,7 +160,7 @@
 
 <svelte:window on:keydown={onKey} />
 
-<div class="flex h-screen flex-col overflow-hidden bg-brand-canvas">
+<div class="relative flex h-screen flex-col overflow-hidden bg-brand-canvas">
 	<!-- Visually hidden, deliberately not `hidden`: a hidden region is not read. -->
 	<p aria-live="polite" class="sr-only">{announcement}</p>
 
@@ -163,11 +176,32 @@
 		{canRedo}
 		onUndo={() => onUndo?.()}
 		onRedo={() => onRedo?.()}
+		{onRevisionClick}
+		{versionsOpen}
 		onUseThisDesign={campaignContext ? () => dispatch('use') : null}
 		{useDisabled}
 		onBack={() => dispatch('back')}
 		onPreview={() => (mode = 'preview')}
 	/>
+
+	{#if versionsOpen}
+		<!--
+			A click anywhere else closes it. Rendered before the panel and behind
+			it, so the panel's own buttons are never intercepted by the catcher.
+			Not focusable and not announced: Escape is the keyboard equivalent, so
+			this exists only for the pointer. It starts BELOW the top bar so the
+			revision label that opened the panel is still clickable — a trigger
+			covered by its own dismiss layer cannot be pressed a second time.
+		-->
+		<div
+			class="absolute inset-x-0 bottom-0 top-[54px] z-20"
+			role="presentation"
+			on:click={() => onRevisionClick?.()}
+		/>
+		<div class="absolute left-4 top-[54px] z-30 shadow-[4px_4px_0_0_rgba(0,0,0,0.08)]">
+			<slot name="versions" />
+		</div>
+	{/if}
 
 	{#if editionApproved}
 		<!--

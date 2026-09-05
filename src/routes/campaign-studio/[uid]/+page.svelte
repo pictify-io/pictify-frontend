@@ -22,7 +22,12 @@
 	import BrandRail from '$lib/components/studio/v2/BrandRail.svelte';
 	import ConflictDialog from '$lib/components/studio/v2/ConflictDialog.svelte';
 	import AiLock from '$lib/components/studio/v2/AiLock.svelte';
-	import { editTemplateBySaying } from '../../../api/template';
+	import VersionsPanel from '$lib/components/studio/v2/VersionsPanel.svelte';
+	import {
+		editTemplateBySaying,
+		getTemplateRevisions,
+		restoreTemplateRevision
+	} from '../../../api/template';
 	import { createSaveQueue } from '$lib/components/studio/v2/save-queue.js';
 	import { getBrandAssets, uploadBrandAsset } from '../../../api/brand-assets';
 	import { SAMPLE_CASES, valuesFor } from '$lib/components/studio/v2/samples.js';
@@ -153,6 +158,70 @@
 		refreshLayers();
 		saveQueue?.nudge();
 	};
+
+	/* ------------------------------------------------------------ versions */
+
+	let versionsOpen = false;
+	let versions = null;
+	let versionsLoading = false;
+	let versionsError = null;
+	let restoring = null;
+
+	/**
+	 * Fetched on open and after every restore, never cached across them: the
+	 * list is a claim about what the server holds, and a stale one would offer
+	 * to restore a revision that is no longer the one shown.
+	 */
+	async function loadVersions() {
+		versionsLoading = true;
+		versionsError = null;
+		const res = await getTemplateRevisions(uid);
+		versionsLoading = false;
+		// The api wrappers return null on failure rather than throwing, so an
+		// unchecked assignment here would render an empty history as fact.
+		if (!res?.revisions && !res?.head) {
+			versionsError = 'The history could not be loaded.';
+			return;
+		}
+		versions = res;
+	}
+
+	function toggleVersions() {
+		versionsOpen = !versionsOpen;
+		if (versionsOpen && !versions) loadVersions();
+	}
+
+	/**
+	 * Restore. The server makes a NEW revision from the old content, so the
+	 * draft is re-read from it rather than being patched locally — and the
+	 * editor history is reset to that document, because undoing across a
+	 * restore would put the stage into a state no revision ever held.
+	 */
+	async function restore(revision) {
+		if (restoring !== null || $editor.operation) return;
+		restoring = revision;
+		const res = await restoreTemplateRevision(uid, revision);
+		if (!res?.revision) {
+			restoring = null;
+			versionsError = 'That revision could not be restored.';
+			return;
+		}
+
+		const fresh = await backend.get(`/templates/${uid}`);
+		const html = fresh?.template?.html;
+		restoring = null;
+		if (!html) {
+			versionsError = 'It was restored, but the design could not be reloaded. Reload the page.';
+			return;
+		}
+
+		design = { ...design, html, revision: res.revision };
+		editor.load({ html, revision: res.revision });
+		saveQueue?.discardLocal(res.revision);
+		refreshLayers();
+		await loadVersions();
+		showToast(`Restored rev ${revision} as rev ${res.revision}.`, 'default', 4000);
+	}
 
 	/** Cancel is a server operation; a closed socket cancels nothing. */
 	async function cancelAi() {
@@ -430,6 +499,8 @@
 		canRedo={$editor.canRedo && !$editor.operation}
 		onUndo={stepHistory('undo')}
 		onRedo={stepHistory('redo')}
+		onRevisionClick={design ? toggleVersions : null}
+		{versionsOpen}
 		useDisabled={useBlocked}
 		statusNote={design
 			? missingAssets.length
@@ -564,6 +635,16 @@
 					{/each}
 				</dl>
 			{/if}
+		</svelte:fragment>
+
+		<svelte:fragment slot="versions">
+			<VersionsPanel
+				data={versions}
+				loading={versionsLoading}
+				error={versionsError}
+				{restoring}
+				on:restore={(e) => restore(e.detail.revision)}
+			/>
 		</svelte:fragment>
 
 		<svelte:fragment slot="composer">

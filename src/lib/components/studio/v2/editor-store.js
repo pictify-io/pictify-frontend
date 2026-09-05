@@ -50,7 +50,15 @@ const emptyState = () => ({
 	 * in the state it subscribes to.
 	 */
 	canUndo: false,
-	canRedo: false
+	canRedo: false,
+	/*
+	 * `{ seq, label }` for every transaction not yet acknowledged by the server.
+	 *
+	 * The versions list is only as useful as its labels, and a save can cover
+	 * several gestures — so the queue needs to know what it is actually saving
+	 * rather than writing "edit" over every one of them.
+	 */
+	unsavedLabels: []
 });
 
 function createEditorStore() {
@@ -106,7 +114,8 @@ function createEditorStore() {
 			...s,
 			html: identified.html,
 			localSeq: s.localSeq + 1,
-			saveState: s.operation ? 'ai' : 'unsaved'
+			saveState: s.operation ? 'ai' : 'unsaved',
+			unsavedLabels: [...s.unsavedLabels, { seq: s.localSeq + 1, label }]
 		}));
 		syncHistoryFlags();
 		return { changed: true, assigned: identified.assigned, deduped: identified.deduped };
@@ -126,7 +135,8 @@ function createEditorStore() {
 			...s,
 			html: history[cursor].html,
 			localSeq: s.localSeq + 1,
-			saveState: 'unsaved'
+			saveState: 'unsaved',
+			unsavedLabels: [...s.unsavedLabels, { seq: s.localSeq + 1, label: 'undo' }]
 		}));
 		syncHistoryFlags();
 		return true;
@@ -139,7 +149,8 @@ function createEditorStore() {
 			...s,
 			html: history[cursor].html,
 			localSeq: s.localSeq + 1,
-			saveState: 'unsaved'
+			saveState: 'unsaved',
+			unsavedLabels: [...s.unsavedLabels, { seq: s.localSeq + 1, label: 'redo' }]
 		}));
 		syncHistoryFlags();
 		return true;
@@ -165,6 +176,9 @@ function createEditorStore() {
 			baseRevision: revision ?? s.baseRevision,
 			savedSeq: seq,
 			saveState: s.localSeq > seq ? 'unsaved' : 'saved',
+			// Only what this save covered. Anything committed while it was in
+			// flight is still unsaved and still needs a label of its own.
+			unsavedLabels: s.unsavedLabels.filter((entry) => entry.seq > seq),
 			conflict: null
 		}));
 	}
