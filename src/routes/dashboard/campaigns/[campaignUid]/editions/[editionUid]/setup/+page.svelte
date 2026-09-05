@@ -66,9 +66,19 @@
 	 * which reads as "no size chosen" — and saving from that state would have
 	 * silently changed the output dimensions of an approved design.
 	 */
+	/*
+	 * Derived from $campaign, NOT from draft.
+	 *
+	 * `draft` is assigned inside a reactive block that also READS draft, and a
+	 * $: statement that both reads and writes the same variable does not
+	 * reliably re-run its dependents — sizeOptions computed once while draft was
+	 * still undefined and never recomputed, so the stored size never appeared.
+	 * The server value has no such cycle.
+	 */
+	$: storedDetail = $campaign?.formatDetail || '';
 	$: sizeOptions =
-		draft?.formatDetail && !activeFormat.detail.includes(draft.formatDetail)
-			? [draft.formatDetail, ...activeFormat.detail]
+		storedDetail && !activeFormat.detail.includes(storedDetail)
+			? [storedDetail, ...activeFormat.detail]
 			: activeFormat.detail;
 	/** One to three. More than three stops being a summary and becomes a report. */
 	$: canAddMetric = (draft?.metrics?.length || 0) < 3;
@@ -165,12 +175,23 @@
 
 			<label class="mt-4 flex flex-wrap items-center gap-3">
 				<span class="font-sans text-[13.5px] text-brand-slate">Size</span>
+				<!--
+					value + on:change, NOT bind:value.
+
+					With bind:value, if the stored value is not among the options at
+					bind time the browser sets selectedIndex to -1 and the binding
+					writes '' STRAIGHT BACK into the model — silently clearing a size
+					that was already saved, and taking the "keep the stored value as
+					an option" logic down with it because that logic reads the very
+					field the binding just emptied. One-way value plus an explicit
+					change handler cannot do that.
+				-->
 				<select
-					bind:value={draft.formatDetail}
+					value={draft.formatDetail}
+					on:change={(e) => (draft.formatDetail = e.currentTarget.value)}
 					class="h-9 rounded-btn border border-brand-rule bg-white px-2.5 font-mono text-[12.5px] text-brand-ink"
 				>
-					{#each activeFormat.detail as option (option)}<option value={option}>{option}</option
-						>{/each}
+					{#each sizeOptions as option (option)}<option value={option}>{option}</option>{/each}
 				</select>
 			</label>
 		</section>
