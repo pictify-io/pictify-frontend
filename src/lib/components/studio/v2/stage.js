@@ -524,7 +524,7 @@ export async function attachStage(frame, { onTransaction, onSelection, onStatus,
 				if (v === null || v === undefined) return '';
 				return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 			});
-			results[sampleId] = findOverflow({ body: holder }, view);
+			results[sampleId] = findOverflow(doc, view, { root: holder });
 		}
 
 		holder.remove();

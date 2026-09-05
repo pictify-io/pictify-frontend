@@ -24,12 +24,22 @@ const CLIPS = /hidden|clip/;
  *   `spilling` — content is larger than its box but visible, so it overlaps
  *   whatever is beneath it.
  */
-export function findOverflow(doc, view) {
-	if (!doc?.body) return [];
+export function findOverflow(doc, view, { root = null } = {}) {
+	const scope = root || doc?.body;
+	if (!scope) return [];
 	const issues = [];
 
-	for (const el of doc.body.querySelectorAll('[data-pictify-id]')) {
-		if (el.closest('[data-editor-ui]')) continue;
+	for (const el of scope.querySelectorAll('[data-pictify-id]')) {
+		/*
+		 * Skip editor chrome, but not the measuring container itself.
+		 *
+		 * The off-screen clone used to check every sample is marked as editor UI
+		 * so it can never be serialized — which meant closest() matched it for
+		 * every element inside and the whole check silently returned nothing.
+		 * A diagnostic that always reports "fits" is worse than none.
+		 */
+		const chrome = el.closest('[data-editor-ui]');
+		if (chrome && chrome !== scope) continue;
 		const css = view.getComputedStyle(el);
 		if (css.display === 'none') continue;
 

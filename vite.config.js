@@ -75,6 +75,12 @@ export default defineConfig({
 			// same 504 wall described above, on the first ever open of a design.
 			'moveable',
 			'selecto',
+			// Reached only through the lazily-loaded studio route, so Vite meets
+			// them mid-navigation and each discovery triggers "optimized
+			// dependencies changed. reloading", which 504s everything in flight.
+			'dompurify',
+			'posthog-js',
+			'@paper-design/shaders',
 			'@codemirror/lint',
 			'@codemirror/lang-css',
 			'@codemirror/lang-javascript',
