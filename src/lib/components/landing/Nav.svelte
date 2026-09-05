@@ -10,6 +10,10 @@
 	// under /tools/html-to-* — there is no /formats page and there should not be.
 	const links = [
 		{ label: 'Tools', href: '/tools' },
+		// Campaigns is the one product surface in this nav rather than a
+		// category, because it is sold and explained on its own terms — the
+		// pilot's buyer arrives looking for it, not for a format.
+		{ label: 'Campaigns', href: '/campaigns/customer-value-updates' },
 		{ label: 'Docs', href: '/docs' },
 		{ label: 'Pricing', href: '/pricing' },
 		{ label: 'Blog', href: '/blogs' }

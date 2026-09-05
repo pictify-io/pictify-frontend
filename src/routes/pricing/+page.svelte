@@ -722,11 +722,67 @@
 			</div>
 		</section>
 
+		<!-- ── Campaign pilot ────────────────────────────────────────── -->
+		<!--
+			Deliberately NOT a fourth plan card and deliberately not on the toggle.
+			The pilot is quoted per engagement and has no checkout, so putting a
+			price on this page — or a Buy button — would be the one thing the
+			product cannot honour. It sits after the comparison table because a
+			reader who got that far has already decided this page is about renders
+			per month, and this is a different shape of thing entirely.
+		-->
+		<section class="mx-auto w-full max-w-page px-5 pt-16 lg:px-10">
+			<div class="border-t-2 border-brand-ink pt-8">
+				<div class="flex items-baseline gap-3">
+					<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">02</span>
+					<h2
+						class="font-display text-[26px] font-extrabold tracking-[-0.03em] text-brand-ink lg:text-h2"
+					>
+						Campaign pilot
+					</h2>
+				</div>
+
+				<div class="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-14">
+					<div>
+						<p class="max-w-[620px] font-sans text-[15.5px] leading-[25px] text-brand-slate">
+							Customer value updates — a card per customer, made from a spreadsheet your team
+							already keeps — are not sold by the render. A pilot is one campaign for one month,
+							quoted per engagement after a conversation about what you want to send.
+						</p>
+						<p class="mt-4 max-w-[620px] font-sans text-[15.5px] leading-[25px] text-brand-slate">
+							There is no checkout for it and no card on file. You ask for access, we reply, and the
+							pilot is set up with you.
+						</p>
+						<a
+							href="/campaigns/customer-value-updates"
+							class="mt-6 inline-flex h-11 items-center gap-2.5 bg-brand-ink px-5 font-sans text-[14.5px] font-semibold text-white"
+						>
+							How campaigns work
+							<span class="block h-2.5 w-2.5 bg-brand-field" aria-hidden="true" />
+						</a>
+					</div>
+
+					<dl class="border-t border-brand-rule">
+						{#each [['Scope', '1 campaign · 1 month'], ['Format', 'Email card or one-page PDF'], ['Customers', 'Up to 250 per send'], ['Sending', 'From your own email tool'], ['Price', 'Quoted per pilot']] as [label, value] (label)}
+							<div
+								class="flex items-baseline justify-between gap-5 border-b border-brand-rule py-2.5"
+							>
+								<dt class="flex-shrink-0 font-sans text-[13.5px] text-brand-slate">{label}</dt>
+								<dd class="text-right font-sans text-[13.5px] font-semibold text-brand-ink">
+									{value}
+								</dd>
+							</div>
+						{/each}
+					</dl>
+				</div>
+			</div>
+		</section>
+
 		<!-- ── FAQ ───────────────────────────────────────────────────── -->
 		<section class="mx-auto w-full max-w-page px-5 pt-16 lg:px-10">
 			<div class="max-w-[760px]">
 				<div class="flex items-baseline gap-3 border-t-2 border-brand-ink pt-8">
-					<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">02</span>
+					<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">03</span>
 					<h2
 						class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink lg:text-[32px] lg:leading-[42px]"
 					>

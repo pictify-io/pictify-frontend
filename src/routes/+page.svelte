@@ -6,6 +6,7 @@
 	import VideoSection from '$lib/components/landing/VideoSection.svelte';
 	import Moments from '$lib/components/landing/Moments.svelte';
 	import Integrations from '$lib/components/landing/Integrations.svelte';
+	import CampaignsBlock from '$lib/components/landing/CampaignsBlock.svelte';
 	import ClosingCta from '$lib/components/landing/ClosingCta.svelte';
 	import Footer from '$lib/components/landing/Footer.svelte';
 	import { onMount, onDestroy } from 'svelte';
@@ -95,7 +96,7 @@
 			'PNG, JPG, PDF, GIF and MP4 output from one template',
 			'Personalized video rendering (timeline editor, code, or AI-authored templates)',
 			'Batch rendering from CSV, and per-workflow webhooks',
-			'Optional per-recipient email delivery for rendered files',
+			'Per-row status and a CDN link for every rendered file',
 			'REST API, Node and Python SDKs, Zapier, Make, n8n, and an MCP server for AI agents'
 		],
 		offers: {
@@ -129,7 +130,15 @@
 		<!-- 6. Call it from wherever you already are -->
 		<Integrations />
 
-		<!-- 7. Closing -->
+		<!--
+			7. One truthful example of the campaigns pilot.
+			Placed after Integrations, not before: the homepage sells the API to
+			developers, and campaigns is a different buyer arriving for a different
+			reason. It earns a block, not the stage.
+		-->
+		<CampaignsBlock />
+
+		<!-- 8. Closing -->
 		<ClosingCta />
 	</main>
 	<Footer />
