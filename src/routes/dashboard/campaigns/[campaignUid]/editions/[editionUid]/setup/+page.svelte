@@ -304,12 +304,39 @@
 		</section>
 
 		<section class="mt-9">
+			{#if $edition?.approvalStale}
+				<!--
+					B05-2. Said here, where the buyer lands after "Use this design", and
+					not only on Generate. By the time Generate refuses, they have
+					already decided they are sending today.
+				-->
+				<p
+					class="mb-4 flex items-start gap-2.5 border-l-2 border-brand-alarm bg-brand-subtle p-3.5"
+				>
+					<span class="min-w-0">
+						<span class="block font-sans text-[14px] font-medium text-brand-ink"
+							>This version needs approving again</span
+						>
+						<span class="mt-0.5 block font-sans text-[13px] leading-[19px] text-brand-slate">
+							The campaign changed after this edition was approved — a new design revision, or a
+							change to the metrics. Review and approve it again before generating.
+						</span>
+					</span>
+				</p>
+			{/if}
+
 			<DesignSection
 				design={$campaign.templateRevisionUid
 					? {
 							uid: $campaign.templateRevisionUid,
 							name: $campaign.designName || 'Campaign design',
-							revision: $edition?.snapshotRevision || 1,
+							/*
+							 * The FROZEN revision once this edition has one, otherwise the
+							 * revision the campaign is currently pinned to. Defaulting to 1
+							 * printed a number that was true only by coincidence, and the
+							 * whole point of showing it is that a buyer can check it.
+							 */
+							revision: $edition?.snapshotRevision ?? $campaign.templateRevision ?? null,
 							width: $edition?.snapshotWidth || 1200,
 							height: $edition?.snapshotHeight || 800,
 							format: draft.format,

@@ -119,7 +119,16 @@ export function fixStyles(fixId, el, view) {
  */
 export function summarize(bySample) {
 	const failing = Object.entries(bySample).filter(([, issues]) => issues.length);
-	if (!failing.length) return { ok: true, label: 'All samples fit' };
+	// The counts are on BOTH branches. A caller reading `overflowCount` should
+	// not have to know that the passing shape omits it and treat undefined as
+	// zero — that is how a "0 of 10" quietly becomes a "NaN of 10".
+	if (!failing.length)
+		return {
+			ok: true,
+			label: 'All samples fit',
+			overflowCount: 0,
+			sampleCount: Object.keys(bySample).length
+		};
 	const elements = new Set(failing.flatMap(([, issues]) => issues.map((i) => i.id)));
 	const total = Object.keys(bySample).length;
 	return {
@@ -128,6 +137,8 @@ export function summarize(bySample) {
 			failing.length
 		} of ${total} samples`,
 		elements: [...elements],
-		samples: failing.map(([id]) => id)
+		samples: failing.map(([id]) => id),
+		overflowCount: failing.length,
+		sampleCount: total
 	};
 }

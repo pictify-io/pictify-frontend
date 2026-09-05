@@ -130,6 +130,22 @@ export const getCampaign = (campaignUid) => backend.get(`/campaigns/${enc(campai
  * stale_revision` means someone else changed it and the UI must reload before
  * offering to save again — do not retry this call automatically.
  */
+/**
+ * "Use this design" — records which revision the campaign renders. B05-2.
+ *
+ * No expectedVersion: the server takes the revision and the digest from the
+ * stored template, so there is no client value here that could be stale.
+ */
+export const setCampaignDesign = (campaignUid, templateRevisionUid) =>
+	backend.patch(`/campaigns/${enc(campaignUid)}/design`, { templateRevisionUid });
+
+/**
+ * Record that a proof was rendered for this edition's design, and of which
+ * revision. B05 — the image stays in the studio; Setup only needs the claim.
+ */
+export const recordDesignProof = (campaignUid, editionUid, proof) =>
+	backend.post(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/design-proof`, proof);
+
 export const updateCampaign = (campaignUid, patch, expectedVersion) =>
 	backend.patch(`/campaigns/${enc(campaignUid)}`, { ...patch, expectedVersion });
 

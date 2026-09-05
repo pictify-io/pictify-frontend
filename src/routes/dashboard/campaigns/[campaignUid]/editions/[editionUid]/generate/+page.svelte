@@ -73,6 +73,24 @@
 
 	async function begin() {
 		error = null;
+
+		/*
+		 * B05-2. Do not start a run against an approval the campaign has outgrown.
+		 *
+		 * The server refuses this too, and this check is not a substitute for
+		 * that one — it is here because this page starts a run the moment it
+		 * opens. Without it the buyer's first sight of the problem is a failed
+		 * run, which reads as something breaking rather than as a decision they
+		 * still have to make.
+		 */
+		if ($edition?.approvalStale) {
+			error = {
+				message:
+					'This campaign changed after it was approved — most likely a new design revision. Approve this version again before generating.'
+			};
+			return;
+		}
+
 		try {
 			const started = await startRun(campaignUid, editionUid, {
 				approvalId: $edition?.approvalId || $edition?.approval?.approvalUid,

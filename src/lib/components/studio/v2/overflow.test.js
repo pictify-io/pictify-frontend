@@ -93,3 +93,23 @@ describe('sample cases', () => {
 		assert.ok('anything_at_all' in values);
 	});
 });
+
+describe('summarize counts', () => {
+	test('a passing check still reports both counts', () => {
+		const s = summarize({ typical: [], longest: [] });
+		assert.equal(s.ok, true);
+		assert.equal(s.overflowCount, 0);
+		assert.equal(s.sampleCount, 2);
+	});
+
+	test('counts SAMPLES that fail, not issues', () => {
+		// Two issues on one sample is one failing sample, not two.
+		const s = summarize({
+			typical: [],
+			longest: [{ id: 'a' }, { id: 'b' }],
+			zero: []
+		});
+		assert.equal(s.overflowCount, 1);
+		assert.equal(s.sampleCount, 3);
+	});
+})

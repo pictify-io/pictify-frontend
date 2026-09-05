@@ -574,6 +574,16 @@ const editTemplateBySaying = async (
 /** Pop the newest snapshot back onto the template. */
 const undoTemplateEdit = async (uid) => backend.post(`/template-studio/${uid}/undo`, {});
 
+/**
+ * A server render of the SAVED revision. B05-1.
+ *
+ * The response says which revision it rendered, because a render takes seconds
+ * and the buyer can save while it runs — the caller compares rather than
+ * assuming the answer is about the design currently on screen.
+ */
+const renderTemplateProof = async (uid, { variables = {}, format } = {}) =>
+	backend.post(`/template-draft/${uid}/proof`, { variables, ...(format ? { format } : {}) });
+
 /** The durable history: `{ current, head, revisions }`. Never carries html. */
 const getTemplateRevisions = async (uid) => backend.get(`/template-draft/${uid}/revisions`);
 
@@ -594,6 +604,7 @@ export {
 	undoTemplateEdit,
 	getTemplateRevisions,
 	restoreTemplateRevision,
+	renderTemplateProof,
 	previewTemplateHtml,
 	getTemplate,
 	getTemplates,

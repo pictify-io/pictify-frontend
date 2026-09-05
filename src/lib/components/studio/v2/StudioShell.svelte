@@ -271,16 +271,25 @@
 					{/each}
 				</span>
 
+				<!--
+					The add-element tools belong to Design mode and nothing else. In
+					Preview and Proof the row carries that mode's own controls instead
+					of four disabled buttons, which read as broken rather than as
+					out of scope.
+				-->
 				<span class="flex flex-1 items-center gap-2">
-					{#each ['Text', 'Image', 'Shape', 'Field'] as tool (tool)}
-						<button
-							type="button"
-							disabled={mode !== 'design'}
-							on:click={() => dispatch('add', { kind: tool.toLowerCase() })}
-							class="h-8 rounded-btn border border-brand-rule px-2.5 font-sans text-[13px] text-brand-slate disabled:text-brand-rule"
-							>+ {tool}</button
-						>
-					{/each}
+					{#if mode === 'design'}
+						{#each ['Text', 'Image', 'Shape', 'Field'] as tool (tool)}
+							<button
+								type="button"
+								on:click={() => dispatch('add', { kind: tool.toLowerCase() })}
+								class="h-8 rounded-btn border border-brand-rule px-2.5 font-sans text-[13px] text-brand-slate"
+								>+ {tool}</button
+							>
+						{/each}
+					{:else}
+						<slot name="toolbar" {mode} />
+					{/if}
 				</span>
 
 				<span class="flex items-center rounded-btn border border-brand-rule p-0.5">
@@ -332,9 +341,14 @@
 			>
 				<span>
 					{#if proofStale}
+						<!--
+							Both numbers, because "re-proof after your next save" was wrong
+							whenever the design was already saved — which is the usual way
+							a proof goes stale.
+						-->
 						<StatusSquare
 							tone="blocked"
-							label={`Proof is from rev ${proof.revision} · re-proof after your next save`}
+							label={`Proof is rev ${proof.revision} · design is rev ${design.revision} · re-proof before you use this design`}
 						/>
 					{:else if statusNote}
 						<StatusSquare tone="current" label={statusNote} />

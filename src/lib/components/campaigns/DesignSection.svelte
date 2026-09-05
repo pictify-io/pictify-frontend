@@ -30,7 +30,17 @@
 	 * mapped. A proof of an older revision is stale, not ready — the buyer would
 	 * be approving a picture of something they have since changed.
 	 */
-	$: proofCurrent = Boolean(proof && design && proof.revision === design.revision);
+	/*
+	 * A design with no recorded revision cannot have a current proof. That is not
+	 * pedantry: `revision` is null until a design is pinned, and `undefined ===
+	 * undefined` would have called any proof at all a match for it.
+	 */
+	$: proofCurrent = Boolean(
+		proof && design && design.revision != null && proof.revision === design.revision
+	);
+
+	/** "rev 4", or "unpinned" when there is no revision to name. */
+	$: revLabel = design?.revision != null ? `rev ${design.revision}` : 'no revision pinned';
 	$: fieldsResolved = Boolean(fields && fields.used > 0 && fields.used === fields.mapped);
 	$: ready = Boolean(design) && proofCurrent && fieldsResolved;
 
@@ -88,16 +98,18 @@
 								? 'bg-brand-proof text-white'
 								: 'bg-brand-field text-brand-ink'}"
 						>
-							{ready ? 'Ready' : 'Not ready'} · Rev {design.revision}
+							{ready ? 'Ready' : 'Not ready'} · {revLabel}
 						</span>
 					</div>
 
 					<div class="mt-2.5 flex flex-col gap-1.5">
 						<StatusSquare
 							tone="ready"
-							label={`${design.format?.toUpperCase()} · ${design.width} × ${design.height} · rev ${
-								design.revision
-							} saved ${time(design.savedAt)}${design.savedBy ? ` by ${design.savedBy}` : ''}`}
+							label={`${design.format?.toUpperCase()} · ${design.width} × ${
+								design.height
+							} · ${revLabel} saved ${time(design.savedAt)}${
+								design.savedBy ? ` by ${design.savedBy}` : ''
+							}`}
 						/>
 						{#if proofCurrent}
 							<StatusSquare
@@ -111,7 +123,7 @@
 							     it actionable rather than alarming. -->
 							<StatusSquare
 								tone="blocked"
-								label={`Proof is from rev ${proof.revision}; the design is now rev ${design.revision}. Re-proof before approving.`}
+								label={`Proof is from rev ${proof.revision}; the design is now ${revLabel}. Re-proof before approving.`}
 							/>
 						{:else}
 							<StatusSquare tone="current" label="Not proofed yet · render one before approving" />

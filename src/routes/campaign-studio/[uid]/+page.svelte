@@ -23,10 +23,12 @@
 	import ConflictDialog from '$lib/components/studio/v2/ConflictDialog.svelte';
 	import AiLock from '$lib/components/studio/v2/AiLock.svelte';
 	import VersionsPanel from '$lib/components/studio/v2/VersionsPanel.svelte';
+	import ProofView from '$lib/components/studio/v2/ProofView.svelte';
 	import {
 		editTemplateBySaying,
 		getTemplateRevisions,
-		restoreTemplateRevision
+		restoreTemplateRevision,
+		renderTemplateProof
 	} from '../../../api/template';
 	import { createSaveQueue } from '$lib/components/studio/v2/save-queue.js';
 	import { getBrandAssets, uploadBrandAsset } from '../../../api/brand-assets';
@@ -36,6 +38,7 @@
 	import { SAMPLE_VALUES } from '$lib/campaigns/starters';
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
 	import { editionUrl } from '$lib/campaigns/nav';
+	import { setCampaignDesign, recordDesignProof } from '../../../api/campaign';
 	import backend from '../../../service/backend';
 	import { showToast } from '../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
@@ -159,6 +162,78 @@
 		saveQueue?.nudge();
 	};
 
+	/* --------------------------------------------------------------- proof */
+
+	/** `{ revision, url, at, bytes, totalMs, format, width, height }`. */
+	let proof = null;
+	let proofRendering = false;
+	let proofError = null;
+	let usingDesign = false;
+
+	/**
+	 * Render a proof of the saved revision. B05-1.
+	 *
+	 * Saves FIRST. A proof is a claim about what the server holds, so asking for
+	 * one while the draft is unsaved would render the previous revision and
+	 * label it with a number the buyer has already moved past — the failure this
+	 * whole mode exists to prevent.
+	 */
+	async function reproof() {
+		if (proofRendering || $editor.operation) return;
+		proofError = null;
+
+		await saveQueue?.flushNow();
+		if ($editor.saveState === 'conflict' || $editor.saveState === 'offline') {
+			proofError = 'Save your changes first — the design could not be saved.';
+			return;
+		}
+
+		proofRendering = true;
+		const sample = SAMPLE_CASES.find((c) => c.id === activeSample) || SAMPLE_CASES[0];
+		const res = await renderTemplateProof(uid, {
+			variables: { ...SAMPLE_VALUES, ...valuesFor(sample, metricKeys) }
+		});
+		proofRendering = false;
+
+		if (!res?.dataUrl) {
+			proofError = 'The server could not render this design.';
+			return;
+		}
+
+		/*
+		 * The revision comes from the RESPONSE, never from what we asked for. If
+		 * a save landed between the request and the reply, this render is already
+		 * a picture of the past and the badge has to say so.
+		 */
+		proof = {
+			revision: res.revision,
+			url: res.dataUrl,
+			at: res.at,
+			bytes: res.bytes,
+			totalMs: res.totalMs,
+			format: res.format,
+			width: res.width,
+			height: res.height
+		};
+
+		/*
+		 * Tell the edition. Setup shows whether the design has been proofed at
+		 * the revision it is about to freeze, and that card could only say "not
+		 * proofed yet" while the proof existed nowhere but this tab.
+		 *
+		 * The fit counts come from the last full check across every sample, not
+		 * from the one that happened to be rendered — a proof of the typical row
+		 * says nothing about the longest one.
+		 */
+		if (campaignUid && editionUid) {
+			await recordDesignProof(campaignUid, editionUid, {
+				revision: res.revision,
+				sampleCount: fitSummary?.sampleCount ?? SAMPLE_CASES.length,
+				overflowCount: fitSummary?.overflowCount ?? 0
+			});
+		}
+	}
+
 	/* ------------------------------------------------------------ versions */
 
 	let versionsOpen = false;
@@ -248,10 +323,53 @@
 	 * be, and nobody finds out until a customer says so. Blocking here is the
 	 * only cheap moment to catch it.
 	 */
-	$: useBlocked = !design || missingAssets.length > 0;
+	/**
+	 * The gate on "Use this design". B05-2.
+	 *
+	 * Four conditions, and each one is a different way the campaign could end up
+	 * pinned to something nobody has actually seen:
+	 *
+	 *   no design       nothing to pin.
+	 *   unsaved work    the campaign records a SERVER revision, so pinning while
+	 *                   the draft is ahead of the server would record a design
+	 *                   the buyer is not looking at.
+	 *   missing assets  a broken image does not fail loudly at render time. It
+	 *                   makes one card per account with a hole in it, and nobody
+	 *                   finds out until a customer says so.
+	 *   no current proof
+	 *                   the browser is not the renderer. Every other surface here
+	 *                   is a drawing of the design; the proof is the only
+	 *                   evidence of it, and pinning without one means the first
+	 *                   server render of this design is the one that goes to
+	 *                   customers.
+	 */
+	$: proofCurrent = Boolean(proof && proof.revision === ($editor.baseRevision || 0));
+	$: useBlockedReason = !design
+		? 'Nothing drawn yet · describe the card on the left or import HTML'
+		: $editor.saveState !== 'saved'
+		? 'Save your changes before using this design'
+		: missingAssets.length
+		? `${missingAssets.length} ${
+				missingAssets.length === 1 ? 'image cannot' : 'images cannot'
+		  } be resolved · fix in Brand before using this design`
+		: !proofCurrent
+		? 'Render a proof of this revision before using it'
+		: null;
+	$: useBlocked = Boolean(useBlockedReason);
 
 	/** Metric keys the campaign supplies, which is what a field may bind to. */
-	$: metricKeys = (campaign?.metrics || []).map((m) => m.key);
+	/**
+	 * Which fields get a sample NUMBER.
+	 *
+	 * The campaign's metric contract when there is one — those are the fields
+	 * real data will fill. Falling back to whatever the design binds means a
+	 * design opened outside a campaign still previews with numbers in it; without
+	 * the fallback every metric renders blank and the proof looks like a broken
+	 * design rather than an unbound one.
+	 */
+	$: metricKeys = campaign?.metrics?.length
+		? campaign.metrics.map((m) => m.key)
+		: usedFields.filter((f) => !(f in SAMPLE_VALUES));
 	$: fitSummary = Object.keys(bySample).length ? summarize(bySample) : null;
 
 	/**
@@ -435,15 +553,31 @@
 	 * know WHICH one the edition now points at. "Design updated" alone would
 	 * leave them to guess.
 	 */
+	/**
+	 * S7 / B05-2. Records the revision in the campaign, THEN navigates.
+	 *
+	 * The order matters. Navigating first and recording afterwards would leave
+	 * Setup showing the old revision until a reload, and a failure would be
+	 * invisible — the buyer would be on a page that says the design was taken
+	 * when nothing was written.
+	 */
 	async function useThisDesign() {
-		if (!design) return;
+		if (!design || useBlocked || usingDesign) return;
+		usingDesign = true;
+		const res = await setCampaignDesign(campaignUid, uid);
+		usingDesign = false;
+
+		if (!res?.campaign) {
+			showToast('That design could not be recorded on the campaign.', 'error', 5000);
+			return;
+		}
+
+		const recorded = res.campaign.templateRevision ?? $editor.baseRevision;
 		await goto(editionUrl(campaignUid, editionUid, 'setup'));
 		showToast(
 			editionApproved
-				? `Using rev ${
-						$editor.baseRevision || design.revision
-				  }. This edition needs approving again.`
-				: `Using rev ${$editor.baseRevision || design.revision} for this edition.`,
+				? `Using rev ${recorded}. This edition needs approving again.`
+				: `Using rev ${recorded} for this edition.`,
 			editionApproved ? 'error' : 'default',
 			4000
 		);
@@ -501,16 +635,9 @@
 		onRedo={stepHistory('redo')}
 		onRevisionClick={design ? toggleVersions : null}
 		{versionsOpen}
-		useDisabled={useBlocked}
-		statusNote={design
-			? missingAssets.length
-				? `${missingAssets.length} ${
-						missingAssets.length === 1 ? 'image cannot' : 'images cannot'
-				  } be resolved · fix in Brand before using this design`
-				: fitSummary && !fitSummary.ok
-				? fitSummary.label
-				: null
-			: 'Nothing drawn yet · describe the card on the left or import HTML'}
+		{proof}
+		useDisabled={useBlocked || usingDesign}
+		statusNote={useBlockedReason || (fitSummary && !fitSummary.ok ? fitSummary.label : null)}
 		{editionApproved}
 		on:back={back}
 		on:use={useThisDesign}
@@ -591,9 +718,12 @@
 					}}
 				/>
 			{:else if design}
-				<p class="font-sans text-[13.5px] text-brand-mute">
-					No proof yet. Render one to see exactly what the server produces.
-				</p>
+				<ProofView
+					{proof}
+					designRevision={$editor.baseRevision || design.revision}
+					rendering={proofRendering}
+					error={proofError}
+				/>
 			{:else}
 				<p class="font-sans text-[13.5px] text-brand-mute">No design chosen yet.</p>
 			{/if}
@@ -627,13 +757,26 @@
 			{:else}
 				<p class="font-mono text-[10px] uppercase tracking-[0.06em] text-brand-mute">Document</p>
 				<dl class="mt-2 border-t border-brand-rule">
-					{#each [['Size', `${design?.width ?? 1200} × ${design?.height ?? 800}`], ['Fields bound', String(usedFields.length)], ['Revision', `rev ${design?.revision ?? 1}`]] as [label, value] (label)}
+					{#each [['Size', `${design?.width ?? 1200} × ${design?.height ?? 800}`], ['Fields bound', String(usedFields.length)], ['Revision', `rev ${$editor.baseRevision || design?.revision || 1}`]] as [label, value] (label)}
 						<div class="flex items-baseline justify-between gap-3 border-b border-brand-rule py-2">
 							<dt class="font-sans text-[13px] text-brand-slate">{label}</dt>
 							<dd class="font-mono text-[11.5px] text-brand-ink">{value}</dd>
 						</div>
 					{/each}
 				</dl>
+			{/if}
+		</svelte:fragment>
+
+		<svelte:fragment slot="toolbar" let:mode>
+			{#if mode === 'proof'}
+				<button
+					type="button"
+					on:click={reproof}
+					disabled={proofRendering || !design || Boolean($editor.operation)}
+					class="h-8 flex-shrink-0 whitespace-nowrap rounded-btn bg-brand-ink px-3 font-sans text-[13px] font-semibold text-white disabled:bg-brand-rule disabled:text-brand-mute"
+				>
+					{proofRendering ? 'Rendering…' : `Re-proof rev ${$editor.baseRevision || 1}`}
+				</button>
 			{/if}
 		</svelte:fragment>
 
