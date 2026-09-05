@@ -136,6 +136,15 @@ export const getCampaign = (campaignUid) => backend.get(`/campaigns/${enc(campai
  * No expectedVersion: the server takes the revision and the digest from the
  * stored template, so there is no client value here that could be stale.
  */
+/**
+ * Draft a brief from one sentence. AI-1.
+ *
+ * Takes a description and nothing else — no edition, no dataset, no rows. The
+ * request's shape is what makes "no customer data reaches the AI" true.
+ */
+export const draftCampaignBrief = (description) =>
+	backend.post('/campaigns/brief', { description });
+
 export const setCampaignDesign = (campaignUid, templateRevisionUid) =>
 	backend.patch(`/campaigns/${enc(campaignUid)}/design`, { templateRevisionUid });
 

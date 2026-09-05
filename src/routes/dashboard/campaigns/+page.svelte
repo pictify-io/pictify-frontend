@@ -148,14 +148,18 @@
 					{seeding ? 'Opening…' : 'Try sample data'}
 				</button>
 				{#if enabled}
-					<!-- One plum primary per screen (handoff §2 decision 2). -->
-					<button
-						type="button"
+					<!--
+						One plum primary per screen (handoff §2 decision 2). It opens the
+						brief screen (AI-1) — until that existed this button had no
+						handler at all and did nothing when pressed.
+					-->
+					<a
+						href="/dashboard/campaigns/new"
 						class="flex h-11 flex-1 items-center justify-center gap-2.5 rounded-btn bg-brand-plum px-4 font-sans text-[13.5px] text-white sm:flex-none"
 					>
 						Create customer value update
 						<span class="block h-2 w-2 bg-brand-field" aria-hidden="true" />
-					</button>
+					</a>
 				{/if}
 				<!--
 					No header "Request pilot access" when the access card is on
