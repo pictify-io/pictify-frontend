@@ -228,8 +228,17 @@
 				Rendering {pending.length} of {samples.length}…
 			{:else if !allAcked}
 				Confirm all three statements to approve.
+			{:else if !verified.length}
+				<!--
+					`canApprove` also requires a verified preview, and no branch said so:
+					with the statements confirmed and nothing rendered, the line read
+					"Ready to approve 0 accounts" beside a disabled button. A sentence
+					that contradicts the control next to it is worse than none.
+				-->
+				No previews have been verified yet. Render previews before approving.
 			{:else}
-				Ready to approve {verified.length} accounts.
+				Ready to approve {verified.length}
+				{verified.length === 1 ? 'account' : 'accounts'}.
 			{/if}
 		</p>
 		<div class="flex items-center gap-3">

@@ -163,22 +163,37 @@
 			? d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 			: '—';
 
-	$: headline = !run
-		? 'Starting…'
-		: run.state === 'ready'
-		? `Ready · ${counts.ready} of ${counts.total} verified`
-		: run.state === 'partial'
-		? `Partial · ${counts.ready} ready, ${counts.failed} failed`
-		: run.state === 'failed'
-		? `Failed · ${counts.failed} of ${counts.total}`
-		: run.state === 'cancelled'
-		? 'Cancelled'
-		: cancelling
-		? 'Cancelling · leased work may still finish'
-		: `Working · ${counts.ready} of ${counts.total}`;
+	/*
+	 * A start that FAILED must not read as one in progress.
+	 *
+	 * This page starts a run the moment it opens, so `run` is null both while
+	 * the request is in flight and after it was refused. The headline said
+	 * "Starting…" for both — so a buyer whose approval had gone stale watched a
+	 * status square claim the run was starting, forever, directly above a line
+	 * telling them it could not. Two contradictory statements on one screen,
+	 * and the reassuring one is the more prominent.
+	 */
+	$: headline =
+		!run && error
+			? 'This run did not start'
+			: !run
+			? 'Starting…'
+			: run.state === 'ready'
+			? `Ready · ${counts.ready} of ${counts.total} verified`
+			: run.state === 'partial'
+			? `Partial · ${counts.ready} ready, ${counts.failed} failed`
+			: run.state === 'failed'
+			? `Failed · ${counts.failed} of ${counts.total}`
+			: run.state === 'cancelled'
+			? 'Cancelled'
+			: cancelling
+			? 'Cancelling · leased work may still finish'
+			: `Working · ${counts.ready} of ${counts.total}`;
 
 	$: tone =
-		run?.state === 'ready'
+		!run && error
+			? 'blocked'
+			: run?.state === 'ready'
 			? 'ready'
 			: ['partial', 'failed'].includes(run?.state)
 			? 'blocked'
@@ -191,7 +206,12 @@
 			<StatusSquare {tone} label={headline} />
 			<!-- What it knows and how often it looks. Never how long is left. -->
 			<span class="font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-mute">
-				Last checked {clock(lastChecked)} · Polling {pollSeconds} s
+				{#if !run && error}
+					<!-- Nothing is being polled, so it does not say it is. -->
+					Not started
+				{:else}
+					Last checked {clock(lastChecked)} · Polling {pollSeconds} s
+				{/if}
 			</span>
 		</div>
 		<p class="mt-1.5 font-sans text-[13px] text-brand-slate">
