@@ -23,6 +23,9 @@ All boards use the existing v2 tokens. Read exact values with `get_jsx` / `get_c
 | OUT-01 | OUT-01 — Value update email card (PNG 1200×800, preset v1) | `DS1-0` | Two-metric card at source size | Preset rules in the side note |
 | OUT-02 | OUT-02 — Value update PDF summary (A4 one page, preset v1) | `DSU-0` | Three-metric page with method box | Preset rules in the side note |
 | 11.3 M01 | Campaign landing — /campaigns/customer-value-updates | `DU4-0` | Full page: hero, sample in/out, workflow, fit + trust, offer + FAQ, closing, footer | Nav gains "Campaigns"; primary CTA = "Request pilot access" (product-not-ready state) |
+| D11 | Campaigns D11 — Brand assets (kit · rev 3 · used by) | `IVW-0` | Saved kit: Logo / Colours / Fonts / Voice rows, live specimen, USED BY, foot “Save as rev 4” | Notes `JIX-0` (decisions) + `JJI-0` (states) below the board |
+| D11a | Campaigns D11a — Brand assets · empty · Set up your brand dialog | `JBE-0` | Dimmed empty kit + dialog: website field + Detect brand, or Upload a logo / Start blank | Detecting, unreachable, partial in `JJI-0` |
+| D11b | Campaigns D11b — Brand assets · first run · detected from website, confirm | `J4W-0` | Detected kit, FOUND · n tags per row, accent contrast fails, foot “Save as rev 1” | Header actions: Try another website / Start blank |
 
 Rail for the Campaigns experience is the first child of `BPC-0` (`BPD-0`): Campaigns, Brand assets, Team & invites, Usage & billing; foot = campaign allowance card + "Switch to Platform tools".
 
@@ -60,6 +63,7 @@ Effort follows the spec's W-packages. "FE" = this repo, "BE" = html-to-gif. Desi
 - **W03 Setup / brand / presets**
   - [ ] FE-6 `src/lib/components/campaigns/Setup.svelte` (D02): format radio cards, period + timezone + locale, metric rows (1–3) with an edit drawer (key, label, unit, precision, source owner, observed/estimated + method note, direction, comparison on/off), brand block (logo/colour/font, contrast check, reset to preset). Explicit save on Continue; show "SAVED n MIN AGO".
   - [ ] FE-7 Summary panel component with the live synthetic card (`CardPreview.svelte`) rendered from the preset HTML with sample values; flags overflow / unreadable colour before data upload.
+  - [ ] FE-20 Brand assets page (D11 / D11a / D11b) replaces `src/routes/dashboard/brand-assets/+page.svelte` (v1 asset grid, FeatureGate). One kit with four rows (Logo, Colours, Fonts, Voice; 124 px label column, 562 px content), right column = live specimen (`CardPreview.svelte` with sample data) + USED BY. Saving makes brand rev n+1 (`POST /brand-kit/revisions`); editions pin the rev they were approved with; USED BY lists editions on the current rev. Colours are roles (brand/ink/wash/accent) with a contrast ratio tag against white (proof ≥ 4.5 : 1, alarm below, never blocks save) and a “Darken to pass” nudge. Fonts: two slots (headings/body), Google or uploaded file (embedded in renders). Voice: up to two tone chips + one free-text rule; static copy only. Empty state = D11a dialog (`POST /brand-kit/detect` with website URL → draft kit shown as D11b with FOUND · n tags; nothing saved until “Save as rev 1”). Delete of an asset used by an approved edition needs the typed confirmation pattern from D10. Locked plan: same page read-only + one plum “Unlock brand kit”. States in `JJI-0`.
   - [ ] FE-8 Presets `value-update-card-v1` (PNG, boards `DS1-0`) and `value-update-pdf-v1` (A4/Letter, `DSU-0`) as versioned HTML templates under `src/lib/campaigns/presets/`, with a shared typed-metric contract, "normal" and "neutral" narrative variants, and a deterministic text-equivalent generator (`textEquivalent(row, config)`).
 - **W04 Data**
   - [ ] FE-9 `Data.svelte` (D04): private multipart upload, file card, privacy note, mapping table (source header · sample · destination select · type · state) with suggestions requiring Confirm; ignored columns named and never sent. Re-upload creates a new draft data revision and warns that previews/approval go stale.
@@ -180,3 +184,18 @@ Competitor research (Movable Ink, Hyperise, Vitally; Mailchimp style on Refero):
 - Section order: Nav · Hero · Before/After · Proof wall · Spreadsheet→card · Four steps · What it needs / will not do · Offer + FAQ · Closing · Footer.
 
 Build FE-17 from this state. The inbox/phone mockups and the sheet table are HTML components with the sample fixture, not images.
+
+## 8. Brand assets page (2026-09-06, D11)
+
+The v1 `/dashboard/brand-assets` grid (asset tiles by type, categories, uppercase headings) is retired. Refero references: Frontify/Brandfolder-style kit pages (one kit, rows by role, live specimen) and Webflow/Framer site-settings forms (fixed label column). Boards: `IVW-0` (saved kit), `J4W-0` (first run after detect), `JBE-0` (empty + dialog); notes `JIX-0` (decisions) and `JJI-0` (states).
+
+Decisions (locked):
+- One kit, four rows: Logo · Colours · Fonts · Voice. No asset-type grid, no categories.
+- Revisions, not overwrites. Save = rev n+1; approved editions pin their rev; USED BY shows editions on the current rev.
+- Colour roles (Brand, Ink, Wash, Accent) with a contrast tag per swatch; alarm informs the AI, never blocks.
+- Fonts: headings + body slots, Google or uploaded (embedded). Voice: ≤ 2 chips + 1 line, static copy only.
+- Specimen is the standard card re-rendered live with sample data.
+- First run: detect from website (public homepage, read once), confirm, then save. Alternatives: upload a logo, start blank.
+
+Implementation task: FE-20 (W03). Backend: `GET /brand-kit`, `POST /brand-kit/revisions`, `POST /brand-kit/detect`, `POST /brand-kit/assets` (upload) — add to BE list when the peer resumes.
+
