@@ -31,6 +31,30 @@ The three PNGs are real output from the QA-25 rehearsal — the same renderer,
 the same pipeline. `card-00003-longname.png` is included as the overflow case
 (a 64-character name that wraps to two lines).
 
+## Pre-checked locally
+
+Before it reaches your UI, the template was rendered with each profile's real
+attributes and screenshotted, images on and off — so you are not debugging my
+Liquid in Customer.io:
+
+| | |
+|---|---|
+| `preview-a-images-on.png` | Dana · Contoso Freight 0 · 1,284 · 312.4 · account 00001 |
+| `preview-b-images-on.png` | Aiko · 株式会社ファブリカム · 2,041 · 501.2 · account 00002 |
+| `preview-a-images-off.png` / `preview-b-images-off.png` | the same, with every image blocked |
+
+Both joins are correct: the card shown is that account's card, and the `alt`
+names the same company and the same figures as the picture. With images off the
+company, both figures, the estimate disclosure and the CTA all stay readable,
+and the CTA is a text link rather than an image button. Non-Latin names survive
+the whole path — attribute, Liquid, `alt`, and the rendered PNG.
+
+Every Liquid tag in `email.html` resolved; none were left unsubstituted.
+
+The card art in these shots leaves a large blank area below the figures. That is
+the rehearsal's throwaway design (`scripts/campaign-rehearsal.js`), not the
+shipped preset — `value-update-card-v1` on board `DS1-0` fills the frame.
+
 ## The four steps left, in the Customer.io UI
 
 1. Upload `card-00001-contoso.png` and `card-00002-fabrikam.png` somewhere the
