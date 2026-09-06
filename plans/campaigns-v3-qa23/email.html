@@ -1,0 +1,44 @@
+<!-- QA-23 rehearsal email. Customer.io Liquid.
+     The join under test is {{customer.card_url}} — one image per person,
+     addressed by the attribute their row set, not by a shared asset. -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f4;padding:24px 0;font-family:Inter,Helvetica,Arial,sans-serif">
+  <tr><td align="center">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;max-width:600px">
+      <tr><td style="padding:28px 32px 8px">
+        <p style="margin:0;font-size:15px;color:#383A42">Hi {{customer.first_name | default: "there"}},</p>
+        <p style="margin:12px 0 0;font-size:15px;line-height:1.5;color:#383A42">
+          Here is what {{customer.account_name}} got done in {{customer.period}}.
+        </p>
+      </td></tr>
+
+      <!-- The card. `alt` is the whole test with images off: it must name the
+           same company and the same figures as the picture does. -->
+      <tr><td style="padding:20px 32px">
+        <img src="{{customer.card_url}}" width="536" style="display:block;width:100%;max-width:536px;height:auto;border:0"
+             alt="{{customer.account_name}} — {{customer.workflows}} workflows completed, {{customer.hours_saved}} hours saved (estimated), {{customer.period}}.">
+      </td></tr>
+
+      <!-- Text equivalent, always rendered. Not a fallback: a screen reader
+           gets this whether or not images load. -->
+      <tr><td style="padding:0 32px 8px">
+        <p style="margin:0;font-size:14px;line-height:1.6;color:#383A42">
+          <strong>{{customer.workflows}}</strong> workflows completed &nbsp;·&nbsp;
+          <strong>{{customer.hours_saved}}</strong> hours saved (estimated)
+        </p>
+        <p style="margin:8px 0 0;font-size:12px;color:#8A8A85">
+          Account {{customer.account_id}} · {{customer.period}} · hours saved is an estimate,
+          modelled from average handling time before and after automation.
+        </p>
+      </td></tr>
+
+      <!-- A text CTA, never an image button: with images blocked an image-only
+           CTA is an invisible link. -->
+      <tr><td style="padding:16px 32px 32px">
+        <a href="https://example.test/account/{{customer.account_id}}"
+           style="display:inline-block;background:#252527;color:#ffffff;font-size:14px;padding:12px 18px;text-decoration:none">
+          See the detail
+        </a>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
