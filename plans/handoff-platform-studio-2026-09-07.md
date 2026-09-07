@@ -72,6 +72,23 @@ Refero references: Resend broadcast editor (code left, live preview right, autos
 
 Order (revised 2026-09-07 after the user opened `/template-workspace/html/…` expecting selection): PS-1 → **PS-7 first** (mount the v2 shell in template context with Design / Preview data / Rendered proof as they work today, Code off, `?studio=v1` fallback) → **PS-9 Selection rail** (user 2026-09-07: "node selection is working but customization option is not appearing in panel") → PS-2 → PS-3 (report: does the id pass hold through code edits?) → PS-4 → PS-5 → PS-6 → PS-8. The route swap is what the user sees; Code mode follows it.
 
+**PS-3 gate, answered 2026-09-07 (verified in Chrome, not reasoned about):** the
+id pass holds through code edits ONLY BECAUSE IT DOES NOT RUN ON THAT PATH.
+`ensureNodeIds` returns `doc.body.innerHTML`, so it round-trips through
+DOMParser and rewrites the source — `<img />` loses its slash, `class='x'`
+gains double quotes, `<DIV>` lowercases, bare `disabled` becomes
+`disabled=""`. The ids themselves are stable and idempotent (a second pass
+assigns none, and `{{tokens}}` and indentation survive); the TEXT is not.
+Running it per keystroke would undo someone's formatting under their caret.
+
+So the code buffer is the source of truth while typing — `setHtmlFromCode`
+commits raw — and ids are assigned in `serialize()`, at a moment the document
+changed by other means and a rewrite is expected. The cost is that an element
+just typed has no id until then and is briefly not selectable. This is what
+"missing ids are assigned on serialize" means in §3 decision 3, and
+`code-map.js` is a scanner rather than a DOM parse for the same reason: the
+offsets must index the user's text.
+
 ## 6. Acceptance
 
 A developer opens an existing HTML template, sees it in the v2 studio, presses 2 to open Code, edits an `<h1>` text and adds `{{subtitle}}`, sees the canvas and Inputs follow, clicks the heading on the live canvas and lands on its line, presses Render and gets the real PNG URL, opens Use it and copies a cURL carrying the same values. Nothing about `/campaign-studio` changes except that it also has Code mode.
