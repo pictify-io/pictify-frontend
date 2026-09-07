@@ -1,5 +1,5 @@
 <script>
-	import BrandMark from '$lib/components/BrandMark.svelte';
+	import Wordmark from '$lib/components/landing/Wordmark.svelte';
 	import '../../app.css';
 	import RailV2 from '$lib/components/dashboard/v2/RailV2.svelte';
 	import CommandPalette from '$lib/components/dashboard/CommandPalette.svelte';
@@ -43,11 +43,8 @@
 		<header
 			class="flex h-14 flex-shrink-0 items-center justify-between border-b border-brand-rule px-4 lg:hidden"
 		>
-			<a href="/dashboard" class="flex items-center gap-2" aria-label="Pictify home">
-				<BrandMark size={24} />
-				<span class="font-display text-lg font-extrabold tracking-[-0.03em] text-brand-ink"
-					>Pictify</span
-				>
+			<a href="/dashboard" class="flex items-center" aria-label="Pictify home">
+				<Wordmark responsive={false} />
 			</a>
 			<button
 				type="button"

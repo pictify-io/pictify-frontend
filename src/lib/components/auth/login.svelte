@@ -1,7 +1,7 @@
 <script>
 	export let isLogin = false;
 
-	import BrandMark from '$lib/components/BrandMark.svelte';
+	import Wordmark from '$lib/components/landing/Wordmark.svelte';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { goto } from '$app/navigation';
 	import { safeIntent, campaignsHome } from '$lib/campaigns/nav';
@@ -237,11 +237,8 @@
 	<div
 		class="flex w-full flex-shrink-0 flex-col justify-between px-5 py-8 lg:w-[660px] lg:px-[88px] lg:py-11"
 	>
-		<a href="/" class="flex items-center gap-2.5" aria-label="Pictify home">
-			<BrandMark size={26} />
-			<span class="font-display text-[21px] font-extrabold tracking-[-0.03em] text-brand-ink">
-				Pictify
-			</span>
+		<a href="/" class="flex items-center" aria-label="Pictify home">
+			<Wordmark size={26} text="lg" />
 		</a>
 
 		<div class="flex w-full flex-col gap-[22px] py-10 lg:py-0">

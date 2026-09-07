@@ -11,7 +11,7 @@
 	import { page } from '$app/stores';
 	import { afterNavigate } from '$app/navigation';
 	import NavIcon from './NavIcon.svelte';
-	import BrandMark from '$lib/components/BrandMark.svelte';
+	import Wordmark from '$lib/components/landing/Wordmark.svelte';
 	import DitherMeter from './DitherMeter.svelte';
 	import VerifyEmailCard from './VerifyEmailCard.svelte';
 	import {
@@ -219,11 +219,8 @@
 	     above and the meters below stay pinned — the meters are the signature,
 	     they never leave the frame. -->
 	<div class="flex flex-1 flex-col gap-5 overflow-hidden">
-		<a href="/dashboard" class="flex items-center gap-2" aria-label="Pictify home">
-			<BrandMark size={24} />
-			<span class="font-display text-[19px] font-extrabold tracking-[-0.03em] text-brand-ink"
-				>Pictify</span
-			>
+		<a href="/dashboard" class="flex items-center" aria-label="Pictify home">
+			<Wordmark responsive={false} />
 		</a>
 
 		<!-- Team switcher: context, kept visually distinct from the active-nav card

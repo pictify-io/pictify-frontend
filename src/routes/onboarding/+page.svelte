@@ -8,7 +8,7 @@
 	 *
 	 * The API seams are marked TODO below. Everything else is real.
 	 */
-	import BrandMark from '$lib/components/BrandMark.svelte';
+	import Wordmark from '$lib/components/landing/Wordmark.svelte';
 	import { onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
@@ -291,11 +291,8 @@
 	<header
 		class="flex h-[72px] w-full flex-shrink-0 items-center justify-between border-b border-brand-rule px-10"
 	>
-		<a href="/" class="flex items-center gap-2.5" aria-label="Pictify home">
-			<BrandMark size={26} />
-			<span class="font-display text-[21px] font-extrabold tracking-[-0.03em] text-brand-ink">
-				Pictify
-			</span>
+		<a href="/" class="flex items-center" aria-label="Pictify home">
+			<Wordmark size={26} text="lg" />
 		</a>
 		<div class="flex items-center gap-6">
 			<span class="font-mono text-[11px] uppercase tracking-[0.1em] text-brand-mute"
