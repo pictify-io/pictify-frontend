@@ -58,7 +58,7 @@ Refero references: Resend broadcast editor (code left, live preview right, autos
 - [ ] **PS-7 Route swap.** `/template-workspace/html/[uid]/+page.svelte` mounts the v2 shell in template context; keep v1 `TemplateStudio` importable behind `?studio=v1` for one release, then delete. `/dashboard/template/create` lands on PS-04. Legacy fabric templates unchanged.
 - [ ] **PS-8 Verify.** Round trip: create → Say it → visual edit → Code edit → Say it → Render on a real account; `?mode=html` deep link; paste of a script-bearing HTML shows the report and strips on save; keyboard-only pass on Code mode; `npm run lint`, `svelte-check`, unit tests; gstack `/browse` screenshots of PS-01…PS-04 against the boards.
 
-Order: PS-1 → PS-2 → PS-3 (report before PS-4: does the id pass hold through code edits?) → PS-4 → PS-5 → PS-6 → PS-7 → PS-8.
+Order (revised 2026-09-07 after the user opened `/template-workspace/html/…` expecting selection): PS-1 → **PS-7 first** (mount the v2 shell in template context with Design / Preview data / Rendered proof as they work today, Code off, `?studio=v1` fallback) → PS-2 → PS-3 (report: does the id pass hold through code edits?) → PS-4 → PS-5 → PS-6 → PS-8. The route swap is what the user sees; Code mode follows it.
 
 ## 6. Acceptance
 
