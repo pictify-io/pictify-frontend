@@ -92,7 +92,19 @@ export function serialize(doc) {
  * a resize, a text commit — never per mousemove and never per keystroke. That
  * is what makes one undo step equal one thing the buyer did.
  */
-export async function attachStage(frame, { onTransaction, onSelection, onStatus, width, height }) {
+/**
+ * `selectOnly` is Code mode (PS-2, locked decision 4).
+ *
+ * The canvas there is a VIEW of the text on the left: clicking it should move
+ * the caret to that element's line, and nothing else. Dragging would edit the
+ * design by a gesture the code pane cannot show — the element would move and
+ * the source would not change under the user's eyes — so handles and inline
+ * editing are off while selection stays on.
+ */
+export async function attachStage(
+	frame,
+	{ onTransaction, onSelection, onStatus, width, height, selectOnly = false }
+) {
 	const [{ default: Moveable }, { default: Selecto }] = await Promise.all([
 		import('moveable'),
 		import('selecto')
@@ -113,8 +125,8 @@ export async function attachStage(frame, { onTransaction, onSelection, onStatus,
 		container: doc.body,
 		dragContainer: view,
 		target: [],
-		draggable: true,
-		resizable: true,
+		draggable: !selectOnly,
+		resizable: !selectOnly,
 		// Rotation is off for anything bound to a field: rotated text with a
 		// variable length is the fastest way to produce a card that fits the
 		// sample and clips a real customer's name.
@@ -583,7 +595,9 @@ export async function attachStage(frame, { onTransaction, onSelection, onStatus,
 	}
 
 	doc.addEventListener('click', onClick, true);
-	doc.addEventListener('dblclick', onDoubleClick, true);
+	// No inline editing in select-only: typing belongs in the code pane, and two
+	// carets for one document is how the two panes get out of step.
+	if (!selectOnly) doc.addEventListener('dblclick', onDoubleClick, true);
 
 	return {
 		select,

@@ -191,3 +191,99 @@ describe('history position and save labels', () => {
 		assert.equal(get(e).saveState, 'unsaved');
 	});
 });
+
+/* ------------------------------------------------------------------ PS-3 */
+
+describe('code mode two-way sync', () => {
+	/**
+	 * The property the gate asks about: does the id pass hold through code
+	 * edits? It does — but only because the id pass is NOT run on the code
+	 * path. `ensureNodeIds` round-trips through DOMParser and rewrites the
+	 * source, so running it per keystroke would undo the user's formatting
+	 * under the caret. These pin the split.
+	 */
+	test('a code edit does not rewrite the buffer', () => {
+		const store = createEditorStore();
+		store.load({ html: '<p data-pictify-id="p1">a</p>', revision: 1 });
+
+		// Formatting a DOM round-trip would destroy: self-closing, single
+		// quotes, uppercase tag, bare boolean attribute.
+		const typed = `<DIV class='card'><br/><input disabled></DIV>`;
+		const result = store.setHtmlFromCode(typed);
+
+		assert.equal(result.applied, true);
+		assert.equal(get(store).html, typed, 'the buffer must be preserved verbatim');
+		assert.equal(store.codeBuffer(), typed);
+	});
+
+	test('incomplete markup never replaces the last good document', () => {
+		const store = createEditorStore();
+		const good = '<p data-pictify-id="p1">good</p>';
+		store.load({ html: good, revision: 1 });
+
+		for (const mid of ['<p data-pictify-id="p1">good</p><div', '<img alt="a']) {
+			const result = store.setHtmlFromCode(mid);
+			assert.equal(result.applied, false, `${mid} should not apply`);
+			assert.equal(result.reason, 'incomplete');
+			assert.equal(get(store).html, good, 'canvas keeps the last good version');
+			// The buffer still holds what was typed — nothing is lost.
+			assert.equal(store.codeBuffer(), mid);
+		}
+	});
+
+	test('the selection survives a code edit by id', () => {
+		const store = createEditorStore();
+		store.load({ html: '<p data-pictify-id="p1">a</p>', revision: 1 });
+		store.select({ id: 'p1', tag: 'p' });
+
+		store.setHtmlFromCode('<p data-pictify-id="p1">a changed</p>');
+		assert.equal(get(store).selection?.id, 'p1');
+	});
+
+	test('a selection whose element was deleted is cleared, not left dangling', () => {
+		const store = createEditorStore();
+		store.load({ html: '<p data-pictify-id="p1">a</p>', revision: 1 });
+		store.select({ id: 'p1', tag: 'p' });
+
+		store.setHtmlFromCode('<span data-pictify-id="s9">gone</span>');
+		assert.equal(get(store).selection, null);
+	});
+
+	test('serialize is where ids are assigned', () => {
+		const store = createEditorStore();
+		store.load({ html: '<p data-pictify-id="p1">a</p>', revision: 1 });
+		store.setHtmlFromCode('<p data-pictify-id="p1">a</p><em>new</em>');
+
+		// Before serialize the typed element has no id — it is not addressable
+		// yet, and that is the trade for not rewriting the buffer.
+		assert.ok(!get(store).html.includes('<em data-pictify-id'));
+
+		const out = store.serialize();
+		// Without a DOM, ensureNodeIds is a documented no-op; assert the contract
+		// rather than the browser behaviour, which the id probe covers.
+		assert.equal(typeof out.html, 'string');
+		assert.equal(store.codeBuffer(), get(store).html);
+	});
+
+	test('a code edit is one undo step', () => {
+		const store = createEditorStore();
+		store.load({ html: '<p data-pictify-id="p1">a</p>', revision: 1 });
+		store.setHtmlFromCode('<p data-pictify-id="p1">b</p>');
+		store.setHtmlFromCode('<p data-pictify-id="p1">c</p>');
+
+		store.undo();
+		assert.equal(get(store).html, '<p data-pictify-id="p1">b</p>');
+		store.undo();
+		assert.equal(get(store).html, '<p data-pictify-id="p1">a</p>');
+	});
+
+	test('codeIsRenderable judges balance, not validity', () => {
+		const store = createEditorStore();
+		// Malformed but complete: the canvas can show it, so it applies.
+		assert.equal(store.codeIsRenderable('<p>unclosed paragraph'), true);
+		assert.equal(store.codeIsRenderable(''), true);
+		// Mid-tag and mid-attribute: not yet.
+		assert.equal(store.codeIsRenderable('<div class="a'), false);
+		assert.equal(store.codeIsRenderable('<div'), false);
+	});
+});

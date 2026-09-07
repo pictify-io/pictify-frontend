@@ -17,6 +17,7 @@
 	 */
 	import { createEventDispatcher } from 'svelte';
 	import StudioTopBarV2 from './StudioTopBarV2.svelte';
+	import CodePane from './CodePane.svelte';
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
 	import CardPreview from '$lib/components/campaigns/CardPreview.svelte';
 	import { saveState as saveStateOf } from './save-states.js';
@@ -25,8 +26,40 @@
 	export let format = 'PNG';
 	export let saveState = 'saved';
 	export let breadcrumb = null;
+	/**
+	 * 'campaign' | 'template' (PS-1, locked decision 1).
+	 *
+	 * Changes only the breadcrumb, the top-bar actions, the right-rail tab set
+	 * and the status copy. There is no second shell: a fork here would be two
+	 * places to fix the save state, the keyboard map and the announcer.
+	 */
+	export let context = 'campaign';
+	/** Deprecated alias kept so existing callers do not change behaviour. */
 	export let campaignContext = false;
 	export let useDisabled = true;
+	/**
+	 * Template context: disables Render. The shell DISPATCHES `render` rather
+	 * than taking a callback, matching how `use` already works — the route owns
+	 * the production render path, and a prop would be a second way in.
+	 */
+	export let renderDisabled = false;
+	/**
+	 * Whether this route renders the Code split stage. Off by default so a
+	 * caller that has not wired it keeps the modes — and the number keys — it
+	 * had before.
+	 */
+	export let codeEnabled = false;
+	/* --- Code mode. Supplied by the route, which owns the editor store. --- */
+	/** The RAW buffer, never the normalised document (PS-3). */
+	export let codeBuffer = '';
+	export let codeSelectedLine = null;
+	export let codeIssues = [];
+	export let codeVariableCount = 0;
+	export let codeValid = true;
+	/** Bound outward so "+ Variable" can insert at the caret. */
+	export let codeApi = null;
+
+	$: resolvedContext = campaignContext ? 'campaign' : context;
 	/** `{ revision, url, at, stale }` — null until B05 wires proofs. */
 	export let proof = null;
 
@@ -51,8 +84,18 @@
 	const dispatch = createEventDispatcher();
 
 	/** 1 / 2 / 3 select the modes (locked decision 1, keyboard map in B01-4). */
-	const MODES = [
+	$: MODES = [
 		{ key: 'design', label: 'Design' },
+		// Code is a MODE, not a page and not a rail tab (locked decision 2), and
+		// both contexts get it — but only once the route can actually RENDER it.
+		//
+		// OPT-IN, and this is a bug fix rather than caution. Listing Code
+		// unconditionally shifted key 2 from Preview data to Code, and a route
+		// with no split stage answered that by showing a canvas that was visible
+		// but not editable: it read as "selection and edit is broken", which is
+		// exactly how it was reported. A mode the route cannot draw must not be
+		// offered.
+		...(codeEnabled ? [{ key: 'code', label: 'Code' }] : []),
 		{ key: 'preview', label: 'Preview data' },
 		{ key: 'proof', label: 'Rendered proof' }
 	];
@@ -62,11 +105,26 @@
 		{ key: 'say', label: 'Say it' },
 		{ key: 'layers', label: 'Layers' }
 	];
-	const RIGHT_TABS = [
-		{ key: 'selection', label: 'Selection' },
-		{ key: 'inputs', label: 'Inputs' },
-		{ key: 'brand', label: 'Brand' }
-	];
+	/*
+	 * Brand is a TAB in campaigns and a BLOCK in the document panel for
+	 * templates (locked decision 7). A platform template has one brand kit and
+	 * it is edited in Brand assets, so a tab would be a permanent signpost to
+	 * another page; a campaign design is chosen against a brand, so there it
+	 * earns the tab.
+	 */
+	const RIGHT_TABS_BY_CONTEXT = {
+		campaign: [
+			{ key: 'selection', label: 'Selection' },
+			{ key: 'inputs', label: 'Inputs' },
+			{ key: 'brand', label: 'Brand' }
+		],
+		template: [
+			{ key: 'selection', label: 'Selection' },
+			{ key: 'inputs', label: 'Inputs' },
+			{ key: 'useit', label: 'Use it' }
+		]
+	};
+	$: RIGHT_TABS = RIGHT_TABS_BY_CONTEXT[resolvedContext] || RIGHT_TABS_BY_CONTEXT.campaign;
 	let leftTab = 'say';
 	let rightTab = 'selection';
 
@@ -100,8 +158,10 @@
 			return;
 		}
 
-		const index = ['1', '2', '3'].indexOf(event.key);
-		if (index >= 0) {
+		// Derived from MODES, not a literal list: the two drifting apart is how
+		// key 2 came to mean something the route could not draw.
+		const index = Number(event.key) - 1;
+		if (Number.isInteger(index) && index >= 0 && index < MODES.length) {
 			mode = MODES[index].key;
 			event.preventDefault();
 			return;
@@ -135,9 +195,16 @@
 
 	const MODE_LABEL = {
 		design: 'Design mode. The canvas is editable.',
+		code: 'Code mode. HTML on the left, live canvas on the right.',
 		preview: 'Preview data mode. Sample values shown, editing is off.',
 		proof: 'Rendered proof mode. Showing a server render.'
 	};
+	/*
+	 * If the current mode leaves the list — `codeEnabled` flipping off, say —
+	 * fall back to Design rather than holding a key nothing renders.
+	 */
+	$: if (MODES.length && !MODES.some((m) => m.key === mode)) mode = 'design';
+
 	let lastMode = mode;
 	$: if (mode !== lastMode) {
 		lastMode = mode;
@@ -229,8 +296,12 @@
 			  }
 			: null}
 		{versionsOpen}
-		onUseThisDesign={campaignContext ? () => dispatch('use') : null}
+		context={resolvedContext}
+		onUseThisDesign={resolvedContext === 'campaign' ? () => dispatch('use') : null}
 		{useDisabled}
+		onRender={resolvedContext === 'template' ? () => dispatch('render') : null}
+		{renderDisabled}
+		onUseIt={resolvedContext === 'template' ? () => (rightTab = 'useit') : null}
 		onBack={() => dispatch('back')}
 		onPreview={() => (mode = 'preview')}
 	/>
@@ -363,34 +434,57 @@
 				</span>
 			</div>
 
-			<!-- `relative` so the AI lock can cover the stage and nothing else. -->
-			<div
-				class="relative flex min-h-0 flex-1 items-center justify-center overflow-auto bg-brand-canvas p-8"
-			>
-				<slot name="stage" {mode} {zoom}>
-					{#if mode === 'proof'}
-						{#if proof?.url}
-							<img
-								src={proof.url}
-								alt="Rendered proof of revision {proof.revision}"
-								class="max-w-full"
-							/>
+			<!--
+				Code mode is a SPLIT, and the split lives here rather than in each
+				route so both contexts get one implementation (locked decision 1).
+				The code pane is fixed at 432px; the canvas takes the rest and is
+				the same `stage` slot every other mode uses — it is one canvas in a
+				different frame, not a second one.
+			-->
+			<div class="flex min-h-0 flex-1">
+				{#if mode === 'code'}
+					<CodePane
+						bind:this={codeApi}
+						html={codeBuffer}
+						selectedLine={codeSelectedLine}
+						issues={codeIssues}
+						variableCount={codeVariableCount}
+						valid={codeValid}
+						on:change
+						on:caret
+						on:format
+					/>
+				{/if}
+
+				<!-- `relative` so the AI lock can cover the stage and nothing else. -->
+				<div
+					class="relative flex min-h-0 flex-1 items-center justify-center overflow-auto bg-brand-canvas p-8"
+				>
+					<slot name="stage" {mode} {zoom}>
+						{#if mode === 'proof'}
+							{#if proof?.url}
+								<img
+									src={proof.url}
+									alt="Rendered proof of revision {proof.revision}"
+									class="max-w-full"
+								/>
+							{:else}
+								<p class="font-sans text-[13.5px] text-brand-mute">
+									No proof yet. Render one to see exactly what the server produces.
+								</p>
+							{/if}
 						{:else}
-							<p class="font-sans text-[13.5px] text-brand-mute">
-								No proof yet. Render one to see exactly what the server produces.
-							</p>
+							<!-- Design and Preview share the stage; only substitution differs. -->
+							<CardPreview
+								html={design.html}
+								width={design.width}
+								height={design.height}
+								displayWidth={Math.min(600, design.width)}
+								values={mode === 'design' ? {} : undefined}
+							/>
 						{/if}
-					{:else}
-						<!-- Design and Preview share the stage; only substitution differs. -->
-						<CardPreview
-							html={design.html}
-							width={design.width}
-							height={design.height}
-							displayWidth={Math.min(600, design.width)}
-							values={mode === 'design' ? {} : undefined}
-						/>
-					{/if}
-				</slot>
+					</slot>
+				</div>
 			</div>
 
 			<div

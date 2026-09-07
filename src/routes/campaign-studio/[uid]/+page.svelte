@@ -16,6 +16,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import StudioShell from '$lib/components/studio/v2/StudioShell.svelte';
+	import { nodeForOffset, rangeForNode } from '$lib/components/studio/v2/code-map.js';
 	import StudioStart from '$lib/components/studio/v2/StudioStart.svelte';
 	import StudioStage from '$lib/components/studio/v2/StudioStage.svelte';
 	import LayersTree from '$lib/components/studio/v2/LayersTree.svelte';
@@ -70,6 +71,56 @@
 	let busy = false;
 	/** The live stage, so the rails can drive the canvas. */
 	let stageApi = null;
+
+	/* ------------------------------------------------------------ PS-2 code */
+
+	let codePane = null;
+	let codeCaretLine = null;
+
+	/**
+	 * The buffer the code pane edits — RAW, so typing is never rewritten under
+	 * the caret (PS-3). It only tracks the document when the document changed by
+	 * some other means.
+	 */
+	/*
+	 * READ FROM `$editor`, NOT `editor.codeBuffer()`.
+	 *
+	 * Svelte only re-runs a reactive statement when an identifier IT CAN SEE in
+	 * the statement changes. `editor.codeBuffer()` names the store object, not
+	 * its value, so this ran once at init and never again — the pane mounted
+	 * with an empty buffer and stayed empty no matter what the document did.
+	 * Caught in the browser, not by the type checker; it is a silent staleness,
+	 * not an error.
+	 */
+	$: codeBuffer = $editor.codeBuffer ?? $editor.html ?? '';
+	$: codeValid = editor.codeIsRenderable(codeBuffer);
+	/** Derived from the tokens, which are the contract (locked decision 5). */
+	$: codeVariableCount = new Set(
+		[...String(codeBuffer || '').matchAll(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g)].map((m) => m[1])
+	).size;
+
+	/*
+	 * The selected element's line, so the pane can band it. Read from the
+	 * BUFFER rather than the document: the offsets have to index the text the
+	 * user is looking at.
+	 */
+	$: codeSelectedLine = selectedId
+		? (rangeForNode(codeBuffer, selectedId)?.line ?? null)
+		: codeCaretLine;
+
+	function onCodeChange(event) {
+		editor.setHtmlFromCode(event.detail.html);
+	}
+
+	/** Caret → element: the code half of one shared selection. */
+	function onCodeCaret(event) {
+		codeCaretLine = event.detail.line;
+		const id = nodeForOffset(codeBuffer, event.detail.offset);
+		if (id && id !== selectedId) {
+			selectedId = id;
+			stageApi?.selectById(id);
+		}
+	}
 	let layers = [];
 	let selectedId = null;
 	let usedFields = [];
@@ -814,6 +865,14 @@
 		format={campaign?.format?.toUpperCase() || 'PNG'}
 		breadcrumb={campaign ? `${campaign.name} · Setup` : null}
 		campaignContext={inCampaign}
+		codeEnabled={true}
+		{codeBuffer}
+		{codeSelectedLine}
+		{codeVariableCount}
+		{codeValid}
+		bind:codeApi={codePane}
+		on:change={onCodeChange}
+		on:caret={onCodeCaret}
 		saveState={design ? $editor.saveState : 'unsaved'}
 		canUndo={$editor.canUndo && !$editor.operation}
 		canRedo={$editor.canRedo && !$editor.operation}
@@ -936,6 +995,7 @@
 					height={design.height}
 					{zoom}
 					editable={mode === 'design' && !$editor.operation}
+					selectOnly={mode === 'code' && !$editor.operation}
 					sampleValues={{
 						...SAMPLE_VALUES,
 						...valuesFor(

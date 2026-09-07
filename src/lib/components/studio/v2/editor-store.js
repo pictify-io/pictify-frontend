@@ -76,11 +76,14 @@ function createEditorStore() {
 	 */
 	function load({ html, revision }) {
 		const identified = ensureNodeIds(html || '');
+		// The code buffer starts as the loaded document; from then on it is the
+		// user's raw text until a serialize regenerates it.
 		history = [{ label: 'opened', html: identified.html, at: Date.now() }];
 		cursor = 0;
 		state.set({
 			...emptyState(),
 			html: identified.html,
+			codeBuffer: identified.html,
 			baseRevision: revision ?? 0,
 			saveState: 'saved'
 		});
@@ -245,6 +248,106 @@ function createEditorStore() {
 
 	const select = (selection) => state.update((s) => ({ ...s, selection }));
 
+	/* ------------------------------------------------------- PS-3: code mode */
+
+	/**
+	 * Is this a document the canvas can safely be shown?
+	 *
+	 * DOMParser does not throw on malformed HTML — it repairs it — so "does it
+	 * parse" is not a usable question. What matters is narrower and answerable:
+	 * are the tags balanced enough that showing it would not rearrange the
+	 * design under the person typing. An unclosed `<div` mid-keystroke must
+	 * leave the last good canvas alone.
+	 */
+	function codeIsRenderable(html) {
+		const src = String(html || '');
+		if (!src.trim()) return true;
+		// An unterminated tag: a `<` with no `>` after it.
+		const lastLt = src.lastIndexOf('<');
+		if (lastLt > src.lastIndexOf('>')) return false;
+		// An unterminated attribute quote inside the final tag.
+		if (lastLt !== -1) {
+			const tail = src.slice(lastLt);
+			if ((tail.match(/"/g) || []).length % 2) return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Code → document. The half of the sync that must NOT touch the buffer.
+	 *
+	 * `commit` runs `ensureNodeIds`, which round-trips through DOMParser and
+	 * therefore REWRITES the source: `<br/>` becomes `<br>`, `class='x'`
+	 * becomes `class="x"`, uppercase tags are lowercased, `disabled` becomes
+	 * `disabled=""`. Every one of those is correct HTML and completely wrong to
+	 * do while somebody is typing — the caret jumps and their formatting is
+	 * undone under their hands.
+	 *
+	 * So the code buffer is the source of truth in Code mode and is kept raw.
+	 * The document is updated from it for the canvas and the selection, and the
+	 * normalising id pass is deferred to `serialize()` — one predictable
+	 * rewrite at a moment the user is not mid-keystroke, which is exactly what
+	 * "missing ids are assigned on serialize" means.
+	 *
+	 * Returns `{ applied, reason }`. `applied: false` is a normal outcome: the
+	 * canvas simply keeps showing the last good version, and the pane says so.
+	 */
+	function setHtmlFromCode(nextHtml, { label = 'Code edit' } = {}) {
+		const raw = String(nextHtml ?? '');
+		state.update((s) => ({ ...s, codeBuffer: raw }));
+
+		if (!codeIsRenderable(raw)) return { applied: false, reason: 'incomplete' };
+
+		const current = snapshot();
+		if (raw === current.html) return { applied: false, reason: 'unchanged' };
+
+		/*
+		 * Committed RAW, not through ensureNodeIds. The selection is kept by id
+		 * across the change, and elements the user has just typed simply have no
+		 * id until the next serialize — they are not selectable for that moment,
+		 * which is honest and invisible in practice.
+		 */
+		history = history.slice(0, cursor + 1);
+		history.push({ label, html: raw, at: Date.now(), source: 'code' });
+		if (history.length > MAX_HISTORY) history = history.slice(history.length - MAX_HISTORY);
+		cursor = history.length - 1;
+
+		state.update((s) => ({
+			...s,
+			html: raw,
+			localSeq: s.localSeq + 1,
+			saveState: s.operation ? 'ai' : 'unsaved',
+			unsavedLabels: [...s.unsavedLabels, { seq: s.localSeq + 1, label }],
+			// The selection survives by ID, so an element that is still in the
+			// document stays selected even though its offsets moved.
+			selection: s.selection && raw.includes(`"${s.selection.id}"`) ? s.selection : null
+		}));
+		syncHistoryFlags();
+		return { applied: true };
+	}
+
+	/**
+	 * Document → code. Run after a visual or AI edit, and when leaving Code.
+	 *
+	 * THIS is where ids are assigned and the markup is normalised, because this
+	 * is the moment a rewrite is expected: the document changed by some means
+	 * other than typing, so the buffer has to be regenerated anyway.
+	 */
+	function serialize() {
+		const current = snapshot();
+		const identified = ensureNodeIds(current.html || '');
+		state.update((s) => ({ ...s, html: identified.html, codeBuffer: identified.html }));
+		return {
+			html: identified.html,
+			assigned: identified.assigned,
+			deduped: identified.deduped
+		};
+	}
+
+	/** The buffer the code pane shows: raw while typing, normalised after a serialize. */
+	const codeBuffer = () => snapshot().codeBuffer ?? snapshot().html;
+
+
 	return {
 		subscribe: state.subscribe,
 		load,
@@ -263,6 +366,10 @@ function createEditorStore() {
 		completeOperation,
 		endOperation,
 		select,
+		setHtmlFromCode,
+		serialize,
+		codeBuffer,
+		codeIsRenderable,
 		/** Test seam only. */
 		_reset: () => {
 			history = [];

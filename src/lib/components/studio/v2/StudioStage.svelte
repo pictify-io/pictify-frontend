@@ -23,6 +23,13 @@
 	export let zoom = 'fit';
 	/** Read-only in Preview data and Rendered proof. */
 	export let editable = true;
+	/**
+	 * Code mode: the canvas is a live view of the text, so it SELECTS but does
+	 * not drag, resize or edit in place (PS-2). Distinct from `editable`, which
+	 * being false used to mean "do not attach at all" — that is what made Code
+	 * mode a canvas nothing responded to.
+	 */
+	export let selectOnly = false;
 	export let sampleValues = {};
 	/**
 	 * The live stage API, bound outward so the rails can drive the canvas.
@@ -62,7 +69,7 @@
 	 * selectable under a mode that is meant to be read-only. Changing the
 	 * sample also did nothing until the html changed.
 	 */
-	$: mountKey = JSON.stringify([html, editable, editable ? null : sampleValues]);
+	$: mountKey = JSON.stringify([html, editable, selectOnly, editable ? null : sampleValues]);
 	$: if (frame && mountKey !== lastKey) {
 		lastKey = mountKey;
 		mount(html);
@@ -79,16 +86,20 @@
 		if (selection) dispatch('selection', null);
 		selection = null;
 		status = null;
-		const substituted = editable ? source : substitute(source, sampleValues);
+		// Select-only shows the AUTHORED markup, tokens and all — it is a view of
+		// the code, and substituting values would show something the text does
+		// not say.
+		const substituted = editable || selectOnly ? source : substitute(source, sampleValues);
 		const doc = writePreviewDocument(frame, cleanHtml(substituted));
 		if (!doc) {
 			status = 'The stage could not start. Reload to try again.';
 			return;
 		}
 
-		if (!editable) return;
+		if (!editable && !selectOnly) return;
 		try {
 			stage = await attachStage(frame, {
+				selectOnly: selectOnly && !editable,
 				width,
 				height,
 				onTransaction: (label, next) => dispatch('transaction', { label, html: next }),
