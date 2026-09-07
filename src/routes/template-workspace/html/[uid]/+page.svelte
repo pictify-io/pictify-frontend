@@ -33,6 +33,7 @@
 	import VersionsPanel from '$lib/components/studio/v2/VersionsPanel.svelte';
 	import ConflictDialog from '$lib/components/studio/v2/ConflictDialog.svelte';
 	import AiLock from '$lib/components/studio/v2/AiLock.svelte';
+	import SelectionRail from '$lib/components/studio/v2/SelectionRail.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 
 	import { editor } from '$lib/components/studio/v2/editor-store.js';
@@ -55,6 +56,8 @@
 	let conflict = null;
 	let versionsOpen = false;
 	let sampleValues = {};
+	/** The full `describe()` payload — the inspector renders from this. */
+	let selection = null;
 
 	/**
 	 * The contract, derived from the html on every change — never stored
@@ -133,6 +136,20 @@
 
 	function setSample(name, value) {
 		sampleValues = { ...sampleValues, [name]: value };
+	}
+
+	/*
+	 * PS-9. Every inspector field is one stage call, one transaction, one save.
+	 * They funnel through here rather than each handler scheduling its own, so
+	 * "one gesture, one entry" cannot be forgotten in a new field.
+	 */
+	function fromRail(run) {
+		return (event) => {
+			if ($editor.operation || !stageApi) return;
+			if (run(event.detail) === false) return;
+			refreshLayers();
+			saveQueue?.schedule();
+		};
 	}
 </script>
 
@@ -229,7 +246,10 @@
 					editable={mode === 'design' && !$editor.operation}
 					{sampleValues}
 					on:ready={refreshLayers}
-					on:selection={(e) => (selectedId = e.detail?.count === 1 ? e.detail.id : null)}
+					on:selection={(e) => {
+						selection = e.detail || null;
+						selectedId = e.detail?.count === 1 ? e.detail.id : null;
+					}}
 					on:transaction={onTransaction}
 				/>
 			{:else}
@@ -279,11 +299,25 @@
 					The API, agent and automation snippets land with the next build.
 				</p>
 			{:else}
-				<p class="p-4 font-sans text-[13px] leading-[19px] text-brand-mute">
-					{selectedId
-						? 'Selected. Drag to move, double-click text to edit.'
-						: 'Nothing selected. Click an element on the canvas.'}
-				</p>
+				<SelectionRail
+					{selection}
+					variables={variables.map((v) => v.name)}
+					disabled={Boolean($editor.operation)}
+					on:style={fromRail((d) => stageApi.setStyle(d.id, d.patch, d.label))}
+					on:text={fromRail((d) => stageApi.setText(d.id, d.text))}
+					on:rotate={fromRail((d) => stageApi.setRotation(d.id, d.deg))}
+					on:reorder={fromRail((d) => stageApi.moveBy(d.id, d.direction))}
+					on:lock={fromRail((d) => stageApi.toggleLock(d.id))}
+					on:duplicate={fromRail(() => stageApi.duplicateSelected())}
+					on:remove={fromRail(() => stageApi.removeSelected())}
+					on:offset={fromRail((d) =>
+						stageApi.setStyle(
+							d.id,
+							{ transform: `translate(${d.axis === 'x' ? d.value : selection?.offset?.x || 0}px, ${d.axis === 'y' ? d.value : selection?.offset?.y || 0}px)` },
+							`Offset ${d.axis} ${d.value}`
+						)
+					)}
+				/>
 			{/if}
 		</svelte:fragment>
 	</StudioShell>

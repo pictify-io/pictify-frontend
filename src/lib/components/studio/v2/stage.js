@@ -177,6 +177,30 @@ export async function attachStage(
 		// the inside of {{account_name}} is how a field silently stops binding.
 		const bindings = [...text.matchAll(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g)].map((m) => m[1]);
 
+		/*
+		 * PS-9. The inspector renders from this and nothing else, so anything it
+		 * shows has to be here — reading computed style in the rail would mean
+		 * reaching across the frame boundary from the dashboard, which is the
+		 * boundary the stage exists to keep.
+		 *
+		 * `widthPinned` distinguishes a width the author SET from one the layout
+		 * produced: the rail shows `auto` in mute for the latter, and writing a
+		 * measured number back into the style would silently freeze a box that
+		 * was meant to grow.
+		 */
+		const inline = el.style;
+		const parent = el.parentElement;
+		const siblings = parent ? [...parent.children].filter((c) => !c.closest(`[${UI}]`)) : [];
+		const rotation = (() => {
+			const m = /rotate\(([-0-9.]+)deg\)/.exec(inline.transform || '');
+			return m ? parseFloat(m[1]) : 0;
+		})();
+		const translate = (() => {
+			const m = /translate\(\s*([-0-9.]+)px\s*,\s*([-0-9.]+)px\s*\)/.exec(inline.transform || '');
+			return m ? { x: parseFloat(m[1]), y: parseFloat(m[2]) } : { x: 0, y: 0 };
+		})();
+		const isContainer = el.childElementCount > 0;
+
 		onSelection({
 			count: 1,
 			id: el.getAttribute(ATTR),
@@ -186,13 +210,39 @@ export async function attachStage(
 			bindings,
 			text: bindings.length ? '' : text,
 			leaf: !el.childElementCount,
+			locked: el.hasAttribute('data-locked'),
 			width: Math.round(rect.width),
 			height: Math.round(rect.height),
+			widthPinned: Boolean(inline.width),
+			heightPinned: Boolean(inline.height),
 			fontSize: parseFloat(css.fontSize),
+			fontFamily: css.fontFamily,
 			fontWeight: css.fontWeight,
+			lineHeight: css.lineHeight,
 			textAlign: css.textAlign,
 			color: css.color,
-			background: css.backgroundColor
+			background: css.backgroundColor,
+			rotation,
+			offset: translate,
+			// Free elements are positioned; flow elements are nudged by transform.
+			position: { x: parseFloat(inline.left) || 0, y: parseFloat(inline.top) || 0 },
+			src: el.tagName === 'IMG' ? el.getAttribute('src') : null,
+			layout: {
+				index: siblings.indexOf(el) + 1,
+				count: siblings.length,
+				parentLabel: parent && parent !== doc.body ? labelFor(parent) : null
+			},
+			group: isContainer
+				? {
+						direction: css.display === 'flex' ? (css.flexDirection.startsWith('column') ? 'column' : 'row') : 'free',
+						gap: parseFloat(css.gap) || 0,
+						justify: css.justifyContent,
+						align: css.alignItems,
+						padding: parseFloat(css.paddingTop) || 0,
+						radius: parseFloat(css.borderRadius) || 0,
+						children: el.childElementCount
+				  }
+				: null
 		});
 	}
 
@@ -498,6 +548,35 @@ export async function attachStage(
 		return true;
 	}
 
+	/**
+	 * Move one place earlier or later among siblings (PS-9's ↑ ↓).
+	 *
+	 * A sibling-relative move rather than `reorder(id, beforeId)` with a
+	 * computed neighbour, because working out that neighbour means reading the
+	 * DOM — and the rail lives outside the frame. Asking the stage "move it one
+	 * place" keeps that knowledge on this side of the boundary.
+	 */
+	function moveBy(id, delta) {
+		const el = byId(id);
+		const parent = el?.parentElement;
+		if (!parent) return false;
+		const siblings = [...parent.children].filter((c) => !c.closest(`[${UI}]`));
+		const from = siblings.indexOf(el);
+		const to = from + (Number(delta) || 0);
+		if (from < 0 || to < 0 || to >= siblings.length) return false;
+
+		// Moving later has to skip PAST the element now occupying the slot, so
+		// the anchor is the one after it — inserting before it would put the
+		// element back where it started.
+		const anchor = delta > 0 ? siblings[to].nextElementSibling : siblings[to];
+		if (anchor) parent.insertBefore(el, anchor);
+		else parent.appendChild(el);
+
+		commit(delta > 0 ? 'move later' : 'move earlier');
+		describe();
+		return true;
+	}
+
 	/* -------------------------------------------- B03 fields and fitting */
 
 	/** Field keys this design binds, read from the live document. */
@@ -586,12 +665,82 @@ export async function attachStage(
 	}
 
 	/** Apply a style patch as one transaction, so undo restores exactly. */
-	function applyStyles(id, patch) {
+	/**
+	 * One style change, one transaction, one printable label (PS-9).
+	 *
+	 * The label is a PARAMETER now. It used to be the literal 'fix overflow',
+	 * which was true for its only caller and became a lie the moment the
+	 * inspector started writing font sizes through the same door — the receipt
+	 * would have said "fix overflow" for a colour change.
+	 */
+	function setStyle(id, patch, label) {
 		const el = byId(id);
 		if (!el || !patch) return false;
-		for (const [prop, value] of Object.entries(patch)) el.style.setProperty(prop, value);
-		commit('fix overflow');
+		for (const [prop, value] of Object.entries(patch)) {
+			if (value === null || value === '') el.style.removeProperty(prop);
+			else el.style.setProperty(prop, value);
+		}
+		commit(label || 'style change');
+		describe();
 		return true;
+	}
+
+	/** Kept so the overflow fix's call site and its label stay together. */
+	const applyStyles = (id, patch) => setStyle(id, patch, 'fix overflow');
+
+	/**
+	 * Replace a text element's content.
+	 *
+	 * REFUSED on an element that carries a binding: the text there is
+	 * `{{account_name}}`, and letting the rail overwrite it is how a field
+	 * silently stops binding — the same reason the inline editor shows a chip
+	 * rather than caret-editable text.
+	 */
+	function setText(id, text) {
+		const el = byId(id);
+		if (!el || el.childElementCount) return false;
+		if (/\{\{/.test(el.textContent || '')) return false;
+		el.textContent = String(text ?? '');
+		commit('edit text');
+		describe();
+		return true;
+	}
+
+	/** Bind a text element to a variable, replacing its content with the token. */
+	function setBinding(id, name) {
+		const el = byId(id);
+		if (!el || el.childElementCount) return false;
+		el.textContent = name ? `{{${name}}}` : '';
+		commit(name ? `bind to ${name}` : 'remove binding');
+		describe();
+		return true;
+	}
+
+	/**
+	 * Rotate, preserving any translate already on the element.
+	 *
+	 * Rewriting `transform` wholesale would drop the nudge a flow element uses
+	 * for its offset, so the two are composed rather than one overwriting the
+	 * other.
+	 */
+	function setRotation(id, deg) {
+		const el = byId(id);
+		if (!el) return false;
+		const angle = Math.round(Number(deg) || 0);
+		const current = el.style.transform || '';
+		const translate = /translate\([^)]*\)/.exec(current)?.[0] || '';
+		el.style.transform = [translate, angle ? `rotate(${angle}deg)` : ''].filter(Boolean).join(' ');
+		commit(`rotate to ${angle}°`);
+		describe();
+		return true;
+	}
+
+	/** Where this element sits among its siblings, for the Layout order control. */
+	function layoutIndex(id) {
+		const el = byId(id);
+		if (!el?.parentElement) return { index: 0, count: 0 };
+		const siblings = [...el.parentElement.children].filter((c) => !c.closest(`[${UI}]`));
+		return { index: siblings.indexOf(el) + 1, count: siblings.length };
 	}
 
 	doc.addEventListener('click', onClick, true);
@@ -613,6 +762,12 @@ export async function attachStage(
 		setAssetSrc,
 		checkAllSamples,
 		applyStyles,
+		setStyle,
+		setText,
+		setBinding,
+		setRotation,
+		layoutIndex,
+		moveBy,
 		toggleLock,
 		toggleHide,
 		rename,

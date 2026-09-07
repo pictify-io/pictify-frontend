@@ -24,6 +24,7 @@
 	import BrandRail from '$lib/components/studio/v2/BrandRail.svelte';
 	import ConflictDialog from '$lib/components/studio/v2/ConflictDialog.svelte';
 	import AiLock from '$lib/components/studio/v2/AiLock.svelte';
+	import SelectionRail from '$lib/components/studio/v2/SelectionRail.svelte';
 	import VersionsPanel from '$lib/components/studio/v2/VersionsPanel.svelte';
 	import UsingLine from '$lib/components/campaigns/UsingLine.svelte';
 	import EditReceipt from '$lib/components/studio/v2/EditReceipt.svelte';
@@ -71,6 +72,21 @@
 	let busy = false;
 	/** The live stage, so the rails can drive the canvas. */
 	let stageApi = null;
+	/** The full `describe()` payload — PS-9's inspector renders from this. */
+	let selection = null;
+
+	/*
+	 * PS-9. Every inspector field is one stage call, one transaction, one save.
+	 * Funnelled through here so "one gesture, one entry" cannot be forgotten in
+	 * a field added later.
+	 */
+	function fromRail(run) {
+		return (event) => {
+			if ($editor.operation || !stageApi) return;
+			if (run(event.detail) === false) return;
+			refreshLayers();
+		};
+	}
 
 	/* ------------------------------------------------------------ PS-2 code */
 
@@ -1004,7 +1020,10 @@
 						)
 					}}
 					on:ready={refreshLayers}
-					on:selection={(e) => (selectedId = e.detail?.count === 1 ? e.detail.id : null)}
+					on:selection={(e) => {
+						selection = e.detail || null;
+						selectedId = e.detail?.count === 1 ? e.detail.id : null;
+					}}
 					on:transaction={(e) => {
 						editor.commit(e.detail.label, e.detail.html);
 						refreshLayers();
@@ -1049,6 +1068,30 @@
 						stageApi?.setAssetSrc(e.detail.id, e.detail.asset.url, e.detail.asset.name);
 						refreshLayers();
 					}}
+				/>
+			{:else if selection}
+				<!--
+					PS-9. Selecting an element used to lead nowhere here — this
+					branch showed the document summary whatever was selected.
+				-->
+				<SelectionRail
+					{selection}
+					variables={usedFields}
+					disabled={Boolean($editor.operation)}
+					on:style={fromRail((d) => stageApi.setStyle(d.id, d.patch, d.label))}
+					on:text={fromRail((d) => stageApi.setText(d.id, d.text))}
+					on:rotate={fromRail((d) => stageApi.setRotation(d.id, d.deg))}
+					on:reorder={fromRail((d) => stageApi.moveBy(d.id, d.direction))}
+					on:lock={fromRail((d) => stageApi.toggleLock(d.id))}
+					on:duplicate={fromRail(() => stageApi.duplicateSelected())}
+					on:remove={fromRail(() => stageApi.removeSelected())}
+					on:offset={fromRail((d) =>
+						stageApi.setStyle(
+							d.id,
+							{ transform: `translate(${d.axis === 'x' ? d.value : selection?.offset?.x || 0}px, ${d.axis === 'y' ? d.value : selection?.offset?.y || 0}px)` },
+							`Offset ${d.axis} ${d.value}`
+						)
+					)}
 				/>
 			{:else}
 				<p class="font-mono text-[10px] uppercase tracking-[0.06em] text-brand-mute">Document</p>
