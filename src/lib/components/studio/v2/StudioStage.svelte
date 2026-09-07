@@ -38,7 +38,7 @@
 	let selection = null;
 	let status = null;
 	let containerWidth = 0;
-	let lastHtml = null;
+	let lastKey = null;
 
 	$: scale =
 		zoom === '50%'
@@ -50,12 +50,21 @@
 			: 0.5;
 
 	/**
-	 * Rebuild the frame only when the html actually changes, and never while the
-	 * buyer is mid-gesture — reloading the document under a drag loses both the
-	 * selection and the gesture.
+	 * Rebuild the frame only when what it shows actually changes, and never
+	 * while the buyer is mid-gesture — reloading the document under a drag
+	 * loses both the selection and the gesture.
+	 *
+	 * "What it shows" is the html AND whether it is editable AND, when it is
+	 * not, the sample values substituted into it. Keying on html alone was a
+	 * bug measured on the dev harness (/dev/stage): switching to Preview data
+	 * with unchanged html never rebuilt the frame, so the preview showed raw
+	 * {{tokens}} instead of the sample, and the editor stayed attached and
+	 * selectable under a mode that is meant to be read-only. Changing the
+	 * sample also did nothing until the html changed.
 	 */
-	$: if (frame && html !== lastHtml) {
-		lastHtml = html;
+	$: mountKey = JSON.stringify([html, editable, editable ? null : sampleValues]);
+	$: if (frame && mountKey !== lastKey) {
+		lastKey = mountKey;
 		mount(html);
 	}
 
@@ -64,6 +73,12 @@
 			stage.destroy();
 			stage = null;
 		}
+		// A read-only mount has no editor: the rails must not keep driving a
+		// stage that is gone, and a stale selection must not outlive it.
+		api = null;
+		if (selection) dispatch('selection', null);
+		selection = null;
+		status = null;
 		const substituted = editable ? source : substitute(source, sampleValues);
 		const doc = writePreviewDocument(frame, cleanHtml(substituted));
 		if (!doc) {
