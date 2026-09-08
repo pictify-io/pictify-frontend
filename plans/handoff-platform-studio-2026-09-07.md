@@ -343,3 +343,32 @@ Tasks (replace TS-1/TS-5/TS-6; TS-2, TS-3, TS-4 and TS-B1…B3 stand):
 - [ ] **TS-5a** OG image generator page: replace the current tool block with EmbeddedStudio; default template drawn on load; URL field → website-info → instruction written into the Say it composer → guest AI run; templates panel from the templates endpoint with names/categories/thumbnails and swap-keeping-values; result card, analytics (`tool_editor_*` with tool_name og_image_generator, plus `tool_editor_url_prompt` and `tool_editor_template_pick`) and SEO copy unchanged except the hero facts line.
 - [ ] **TS-6a** Verify logged-out in a fresh profile on /tools/og-image-generator: page opens drawn; URL → instruction appears in Say it and the card re-renders with the page's title/logo/colours in ≈20 s; edit the instruction and re-run; pick two templates and values persist; select/edit/say it; Code; Preview; Download twice; AI counter; reload restores the draft; Expand and Esc; Save → signup → template at rev 1. Then the same page logged in. Mobile at 390.
 - Next tools follow one at a time on the same embed: certificate, invoice, html-to-*. Do not touch them in this pass.
+
+## 9b. Roll-out to the other tools (2026-09-08) — user: "Implement these as well. Design the sections that need redesign"
+
+Boards: **TS-05 `LBP-0`** (the "From a …" block at the top of Say it, nine variants: LinkedIn banner, social proof, certificate, invoice, email header, badge, membership/portfolio/leaderboard, markdown/table, html/code) and **TS-06 `LGX-0`** (four embed variants: A Code-first with THEMES panel, B STYLES panel with auto-height canvas, C certificate with landscape A4 + INPUTS-first + bulk lead-in, D invoice with portrait A4 + line-item table). Everything else is TS-03 unchanged.
+
+**Matrix.** One `EmbeddedStudio` with four props: `leftPanel` (templates | styles | themes), `source` (the Say it input variant), `opensIn` (design | code), `canvas` (fixed WxH | auto-height | A4 landscape | A4 portrait), plus `defaultTab` and `bulkLeadIn`.
+
+| Tool (slug) | Left panel | Source block (TS-05) | Opens in | Canvas | Default tab | Notes |
+|---|---|---|---|---|---|---|
+| og-image-generator | templates (19) | page URL | design | 1200×630 | Say it | TS-03, first |
+| linkedin-banner-generator | templates | profile URL or name + headline | design | 1584×396 | Say it | photo-safe zone left 20 % drawn as a dashed guide |
+| social-proof-card | templates by platform look | review URL or quote + author | design | 1200×630 | Say it | platform mark from the URL host |
+| certificate-generator | templates | course + recipient + issuer | design | A4 landscape | **Inputs** | recipient = `{{name}}`; bulk lead-in card "One certificate is also a thousand → Bulk from CSV" (goes to /dashboard/template/[uid]/bulk-render after save) |
+| online-invoice-generator | templates | company URL + invoice meta | design | A4 portrait, PDF primary | Inputs | line items as a small table in Inputs (`items[]` each variable); totals via helpers |
+| email-header | templates | site URL + campaign line | design | 600×200 | Say it | |
+| badge | templates | name + role + event | design | 1000×1400 | Say it | role picks the colour band |
+| membership-card / portfolio-card | templates | 2–3 fields | design | card sizes | Inputs | |
+| leaderboard | templates | pasted table | design | 1200×auto | Inputs | table → `rows[]` |
+| markdown / table | **styles** (6) | pasted text | design | 1200×auto | Say it | height follows content; tables keep column alignment |
+| html-to-[format] / code-to-image | **themes** (8) | "your code is in the Code tab" | **code** | fixed, from the format chip | Say it | Code pane 330 px between themes and canvas (TS-06 A); Say it acts on the pasted markup |
+| csv-to-pdf, tweet-screenshot, url-to-image-generator | — | — | — | — | — | not on this layout; leave as they are |
+
+Rules that hold for every tool: the page opens already drawn (default template/theme + sample), the source block writes the instruction into the composer tagged `YOU · WRITTEN FROM THE INPUT · EDIT IT` and runs it (one of the 3 daily guest AI edits), templates/styles/themes swap the layout and keep values, Download is the tool's public render on the guest ladder, Save to Pictify carries the draft, Expand opens the full studio overlay. Copy per tool follows the frozen SEO shape and the `/writing-aeo-content` skill; only the hero facts line changes.
+
+Tasks:
+- [ ] **TS-7** EmbeddedStudio props (`leftPanel`, `source`, `opensIn`, `canvas`, `defaultTab`, `bulkLeadIn`) + the three left-panel kinds + the nine source blocks as one `SourceBlock.svelte` with a `kind` prop (fields per TS-05) and a `writeInstruction(kind, values)` helper with unit tests per kind.
+- [ ] **TS-8** Roll-out, one PR per tool, in this order: linkedin-banner → social-proof → certificate → invoice → email-header → badge → membership/portfolio/leaderboard → markdown/table → html-to-[format]/code-to-image. Each PR: template/style/theme set with names, categories and build-time thumbnails; source block; hero facts line; TS-6a-style verification logged out and logged in; screenshots against TS-03/TS-06.
+- [ ] **TS-9** Backend per tool where needed: LinkedIn/G2 fetchers reuse website-info's shape (title, description, image, colours) with per-host extractors; `items[]`/`rows[]` variables accepted by the guest AI route and the public render; A4 PDF through the public PDF route on the same guest counter (TS-B3).
+
