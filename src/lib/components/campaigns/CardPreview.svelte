@@ -16,6 +16,7 @@
 	import { SAMPLE_VALUES } from '$lib/campaigns/starters';
 	import { previewDocument } from '$lib/components/studio/v2/preview-document.js';
 	import { cleanHtml } from '$lib/components/studio/v2/stage.js';
+	import { splitDocument } from '$lib/components/studio/v2/document-shell.js';
 
 	export let html = '';
 	export let width = 1200;
@@ -34,7 +35,13 @@
 	 * markup, and a mismatch with the server's renderer is better than running
 	 * an expression engine on the client.
 	 */
-	$: substituted = String(html || '').replace(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g, (match, key) => {
+	/*
+	 * A whole-document design keeps its shell: the `<body>` style is where the
+	 * background and the canvas size live, so a card that mounted only the body
+	 * showed the right elements on the wrong page.
+	 */
+	$: shell = splitDocument(html);
+	$: substituted = String(shell.body || '').replace(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g, (match, key) => {
 		const value = merged[key];
 		if (value === null || value === undefined) return '';
 		// Escaped: a sample value is data, and a design that concatenates it into
@@ -48,7 +55,10 @@
 	 * markup here can come from an AI result or an imported file, so those
 	 * requests would go to a host the buyer never chose. See preview-document.js.
 	 */
-	$: doc = previewDocument(cleanHtml(substituted), 'html,body{margin:0;padding:0;overflow:hidden}');
+	$: doc = previewDocument(cleanHtml(substituted), {
+		css: 'html,body{margin:0;padding:0;overflow:hidden}',
+		shell
+	});
 </script>
 
 <div

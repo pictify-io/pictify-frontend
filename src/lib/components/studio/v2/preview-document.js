@@ -1,3 +1,5 @@
+import { fontLinks, shellAttributes } from './document-shell.js';
+
 /**
  * The document wrapper every in-browser preview of a design is written into.
  * B06-1.
@@ -30,6 +32,23 @@
 const ASSET_ORIGINS = ['https://htgf.s3.amazonaws.com', 'https://media.pictify.io'];
 
 /**
+ * Google Fonts, and only Google Fonts.
+ *
+ * Platform templates are set in webfonts loaded from here, and a preview that
+ * drops them shows the design in Times — which is not the design. Two hosts,
+ * because the CSS and the font files it points at are served separately:
+ * `fonts.googleapis.com` is a style-src fetch, `fonts.gstatic.com` a font-src
+ * one, and allowing the first without the second loads a stylesheet whose
+ * every `@font-face` is then blocked.
+ *
+ * This is a deliberate hole in `default-src 'none'`, kept as narrow as the
+ * mechanism allows: two named hosts, no wildcard, and `document-shell.js`
+ * admits a `<link>` only after parsing its href and matching the host exactly.
+ */
+const FONT_CSS = 'https://fonts.googleapis.com';
+const FONT_FILES = 'https://fonts.gstatic.com';
+
+/**
  * `script-src 'none'` even though the sanitizer strips scripts, and
  * `connect-src 'none'` even though there is nothing to connect with. Each rule
  * is here to hold when the layer above it has been got past — that is what
@@ -43,8 +62,8 @@ const ASSET_ORIGINS = ['https://htgf.s3.amazonaws.com', 'https://media.pictify.i
 export const PREVIEW_CSP = [
 	"default-src 'none'",
 	`img-src 'self' data: blob: ${ASSET_ORIGINS.join(' ')}`,
-	"style-src 'unsafe-inline'",
-	`font-src data: ${ASSET_ORIGINS.join(' ')}`,
+	`style-src 'unsafe-inline' ${FONT_CSS}`,
+	`font-src data: ${FONT_FILES} ${ASSET_ORIGINS.join(' ')}`,
 	"script-src 'none'",
 	"connect-src 'none'",
 	"frame-src 'none'",
@@ -61,14 +80,40 @@ export const PREVIEW_CSP = [
  * CSP is honoured for everything the parser reaches after it, which is why it
  * is the FIRST thing in the head — content before it would load unpoliced.
  */
-export const previewHead = (extraCss = 'html,body{margin:0;padding:0}') =>
+export const previewHead = (extraCss = 'html,body{margin:0;padding:0}', links = []) =>
 	`<meta http-equiv="Content-Security-Policy" content="${PREVIEW_CSP}">` +
 	`<meta charset="utf-8">` +
-	`<style>${extraCss}</style>`;
+	`<style>${extraCss}</style>` +
+	links.join('');
+
+/**
+ * Options are `{ css, shell }`. `shell` is a `splitDocument` result, and
+ * carrying it is what makes a preview look like the saved design rather than
+ * like its body: the source `<html>` and `<body>` style/class are applied to
+ * the frame's own tags, and the source's font links go in the head.
+ *
+ * A bare string is still accepted as `css` — several callers only ever had
+ * that to say.
+ */
+const options = (arg) => (typeof arg === 'string' ? { css: arg } : arg || {});
 
 /** A whole preview document, head policy included. */
-export const previewDocument = (body, extraCss) =>
-	`<!doctype html><html><head>${previewHead(extraCss)}</head><body>${body}</body></html>`;
+export function previewDocument(body, arg) {
+	const { css, shell } = options(arg);
+	const html = shell ? shellAttributes(shell.htmlAttrs) : {};
+	const bodyAttrs = shell ? shellAttributes(shell.bodyAttrs) : {};
+	const links = shell ? fontLinks(shell.head) : [];
+	return (
+		`<!doctype html><html${attrText(html)}>` +
+		`<head>${previewHead(css, links)}</head>` +
+		`<body${attrText(bodyAttrs)}>${body}</body></html>`
+	);
+}
+
+const attrText = (attrs) =>
+	Object.entries(attrs)
+		.map(([name, value]) => ` ${name}="${String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`)
+		.join('');
 
 /**
  * Put a preview document into a same-origin frame.
@@ -87,9 +132,31 @@ export const previewDocument = (body, extraCss) =>
  * Synchronous on purpose: the editor attaches to `contentDocument` on the next
  * line, and `srcdoc` would make that a load-event dance for no gain.
  */
-export function writePreviewDocument(frame, body, extraCss) {
+export function writePreviewDocument(frame, body, arg) {
 	const doc = frame.contentDocument;
 	if (!doc?.documentElement) return null;
-	doc.documentElement.innerHTML = `<head>${previewHead(extraCss)}</head><body>${body}</body>`;
+	const { css, shell } = options(arg);
+	const links = shell ? fontLinks(shell.head) : [];
+	doc.documentElement.innerHTML = `<head>${previewHead(css, links)}</head><body>${body}</body>`;
+
+	/*
+	 * Set on the live elements rather than written into the markup, because
+	 * `documentElement.innerHTML` replaces the CONTENT of `<html>` and cannot
+	 * touch the tag itself — an `<html style>` in that string would be parsed
+	 * as stray markup inside the head and dropped. Cleared first so that
+	 * remounting a design that no longer has a shell does not keep the last
+	 * one's background.
+	 */
+	applyShellAttributes(doc.documentElement, shell?.htmlAttrs);
+	applyShellAttributes(doc.body, shell?.bodyAttrs);
 	return doc;
+}
+
+function applyShellAttributes(el, attrText) {
+	if (!el) return;
+	const attrs = shellAttributes(attrText);
+	for (const name of ['style', 'class']) {
+		if (attrs[name] === undefined) el.removeAttribute(name);
+		else el.setAttribute(name, attrs[name]);
+	}
 }

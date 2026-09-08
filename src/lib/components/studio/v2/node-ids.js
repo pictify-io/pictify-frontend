@@ -12,6 +12,8 @@
  * duplicate keeps the id.
  */
 
+import { splitDocument, joinDocument } from './document-shell.js';
+
 export const ATTR = 'data-pictify-id';
 
 /** Not addressable in the visual editor, so never tagged. */
@@ -46,7 +48,20 @@ export function ensureNodeIds(html) {
 		return { html, assigned: 0, deduped: 0, total: 0, skipped: true };
 	}
 
-	const doc = new DOMParser().parseFromString(`<body>${html}</body>`, 'text/html');
+	/*
+	 * THE SHELL IS SPLIT OFF FIRST, and rejoined at the end.
+	 *
+	 * This function parses into a body and returns `body.innerHTML`, so handing
+	 * it a whole document DESTROYED that document: the parser ignores a nested
+	 * `<html>`/`<body>` tag, drops the attributes on them, and hoists whatever
+	 * was in the head. A 1080x1080 design on a plum gradient in Bricolage
+	 * Grotesque came back as unsized content with a stray `<link>` on the front,
+	 * and because `load()` and `commit()` both run this, the studio never once
+	 * saw the real document — the stage's own shell handling had nothing left to
+	 * find. Measured on a real template, not assumed.
+	 */
+	const shell = splitDocument(html);
+	const doc = new DOMParser().parseFromString(`<body>${shell.body}</body>`, 'text/html');
 	const elements = [...doc.body.querySelectorAll('*')].filter((el) => !SKIP.has(el.tagName));
 
 	// Collect first, so a minted id cannot collide with one further down the
@@ -79,5 +94,10 @@ export function ensureNodeIds(html) {
 		used.add(existing);
 	}
 
-	return { html: doc.body.innerHTML, assigned, deduped, total: elements.length };
+	return {
+		html: joinDocument(shell, doc.body.innerHTML),
+		assigned,
+		deduped,
+		total: elements.length
+	};
 }
