@@ -50,14 +50,14 @@ Refero references: Resend broadcast editor (code left, live preview right, autos
 
 ## 5. Tasks (PS)
 
-- [ ] **PS-1 Context prop.** Add `context` to `StudioShell`/`StudioTopBarV2` (breadcrumb, buttons, tab set, status copy). Campaign route passes `campaign`; new platform route passes `template`. No behaviour change for `/campaign-studio`.
-- [ ] **PS-2 Code mode.** New `CodePane.svelte` in `studio/v2/` built from v1 `HtmlPane` (press palette, gutter, overlay, native textarea) with: selected-line highlight (field bar), error gutter marks, header (file label, LINE n · SELECTED, Format, Copy), footer (validity square + sentence, `n VARIABLES · m LINES`). `StudioStage` gains the split layout when `mode === 'code'`; the live canvas is selectable, not draggable. Keyboard 1–4.
-- [ ] **PS-3 Two-way sync + selection map.** `editor-store.js`: `setHtmlFromCode(html)` (debounced parse, id pass, keep selection by id) and `serialize()` after visual/AI edits; a `rangeForNode(id)` / `nodeForOffset(offset)` map computed on serialize. Tests: round-trip keeps ids and `{{tokens}}`; invalid HTML never replaces the last good document; cursor→node and node→range agree on the fixtures.
-- [ ] **PS-4 Inputs from tokens + "+ Variable".** Derive Inputs from HTML in both modes (reuse v1 `extractInputs`/`typeFor`); server AST override; `+ Variable ⌄` popover (existing list + New variable… name/type/sample); insert into selected text element or at cursor. Rename propagates; last-use removal after 2 s grace.
-- [ ] **PS-5 Render + Use it.** Top bar `Render` (primary, disabled on Start and while AI works) → production render → proof mode with URL/Download/Copy URL/caption; failure and quota states per `KD6-0`. `Use it` button focuses the USE IT tab; port `UseItCard` tabs (API · Agent · Zapier · Sheet) into the rail with the current sample values and the active key.
-- [ ] **PS-6 Start (template).** `StudioStart` in template context: Image/PDF format cards with size presets, Paste HTML → S3 report → Code mode, starters (OG image, Certificate, Invoice) from `src/lib/campaigns/starters/` + two new HTML files.
-- [ ] **PS-7 Route swap.** `/template-workspace/html/[uid]/+page.svelte` mounts the v2 shell in template context; keep v1 `TemplateStudio` importable behind `?studio=v1` for one release, then delete. `/dashboard/template/create` lands on PS-04. Legacy fabric templates unchanged.
-- [ ] **PS-9 Selection rail (properties inspector) — both contexts, do right after PS-7.** The Selection tab today renders only the Document summary; the inspector drawn on ST-01 (`FM8-0` right rail, platform copy on PS-01 `JL4-0`), ST-02 image rail (`GEN-0`) and ST-03 group rail (`GJE-0`) was never built. New `SelectionRail.svelte` in `studio/v2/`, fed by the stage's `describe()` payload and driving the stage API; every field commits ONE transaction on change/blur with a label the receipt can print ("Heading · 52 → 60 px"). Sections, from the board:
+- [x] **PS-1 Context prop.** Add `context` to `StudioShell`/`StudioTopBarV2` (breadcrumb, buttons, tab set, status copy). Campaign route passes `campaign`; new platform route passes `template`. No behaviour change for `/campaign-studio`.
+- [x] **PS-2 Code mode.** New `CodePane.svelte` in `studio/v2/` built from v1 `HtmlPane` (press palette, gutter, overlay, native textarea) with: selected-line highlight (field bar), error gutter marks, header (file label, LINE n · SELECTED, Format, Copy), footer (validity square + sentence, `n VARIABLES · m LINES`). `StudioStage` gains the split layout when `mode === 'code'`; the live canvas is selectable, not draggable. Keyboard 1–4.
+- [x] **PS-3 Two-way sync + selection map.** `editor-store.js`: `setHtmlFromCode(html)` (debounced parse, id pass, keep selection by id) and `serialize()` after visual/AI edits; a `rangeForNode(id)` / `nodeForOffset(offset)` map computed on serialize. Tests: round-trip keeps ids and `{{tokens}}`; invalid HTML never replaces the last good document; cursor→node and node→range agree on the fixtures.
+- [x] **PS-4 Inputs from tokens + "+ Variable".** Derive Inputs from HTML in both modes (reuse v1 `extractInputs`/`typeFor`); server AST override; `+ Variable ⌄` popover (existing list + New variable… name/type/sample); insert into selected text element or at cursor. Rename propagates; last-use removal after 2 s grace.
+- [x] **PS-5 Render + Use it.** Top bar `Render` (primary, disabled on Start and while AI works) → production render → proof mode with URL/Download/Copy URL/caption; failure and quota states per `KD6-0`. `Use it` button focuses the USE IT tab; port `UseItCard` tabs (API · Agent · Zapier · Sheet) into the rail with the current sample values and the active key.
+- [x] **PS-6 Start (template).** `StudioStart` in template context: Image/PDF format cards with size presets, Paste HTML → S3 report → Code mode, starters (OG image, Certificate, Invoice) from `src/lib/campaigns/starters/` + two new HTML files.
+- [x] **PS-7 Route swap.** `/template-workspace/html/[uid]/+page.svelte` mounts the v2 shell in template context; keep v1 `TemplateStudio` importable behind `?studio=v1` for one release, then delete. `/dashboard/template/create` lands on PS-04. Legacy fabric templates unchanged.
+- [x] **PS-9 Selection rail (properties inspector) — both contexts, do right after PS-7.** The Selection tab today renders only the Document summary; the inspector drawn on ST-01 (`FM8-0` right rail, platform copy on PS-01 `JL4-0`), ST-02 image rail (`GEN-0`) and ST-03 group rail (`GJE-0`) was never built. New `SelectionRail.svelte` in `studio/v2/`, fed by the stage's `describe()` payload and driving the stage API; every field commits ONE transaction on change/blur with a label the receipt can print ("Heading · 52 → 60 px"). Sections, from the board:
   - **Header**: element label ("Heading") + one line "Text · shows a variable · inside “Header group”" (or "Image · 2 of 3 in Header group", "Group · row · 3 children").
   - **CONTENT** (text with a binding): powder chip `title` + its label + **Change** (opens the variable picker); "Sample: … · edit samples in Inputs". Text without a binding: the text itself in a field, editable (same commit as inline edit).
   - **TEXT**: font family ⌄ (brand fonts + Inter/system list), weight ⌄, size px, line-height, align L/C/R segmented, colour swatch + hex + brand name when it matches a brand colour.
@@ -69,7 +69,7 @@ Refero references: Resend broadcast editor (code left, live preview right, autos
   - **Multi-select**: count, Align (6) and Distribute, Group; nothing else.
   - Stage API additions: `setStyle(id, patch, label)` (generalise `applyStyles`, whose "fix overflow" label is hard-coded), `setText(id, text)`, `setBinding(id, name)`, `setRotation(id, deg)`, `layoutIndex(id)` → `{ index, count }`. `describe()` gains `fontFamily`, `lineHeight`, `offset {x,y}`, `rotation`, `widthPinned/heightPinned`, `src` for images, and group props for containers.
   - Inputs are plain `<input>` / `<select>` in the v2 field style (34 px, rule border, radius 6, mono for numbers). No sliders. Keyboard: ↑↓ steps 1, shift 10 in numeric fields.
-- [ ] **PS-10 Handlebars logic, document styles and fonts in the studio — BLOCKING, do before PS-2.** User 2026-09-07 on `/template-workspace/html/ELOMRRNOGP`: "This template is messed up now. Specially due to handlebar conditions and code being displayed weirdly." That template (`{{#if firstName}}, …{{else}}{{#if userName}}…{{/if}}{{/if}}`, `{{default planName "PRO TRIAL"}}`, `<html style>`, `<body style>` with the background gradient, a Google Fonts `<link>`) is the shape of most real platform templates. Board PS-05 `KDV-0`, notes `KL2-0`.
+- [x] **PS-10 Handlebars logic, document styles and fonts in the studio — BLOCKING, do before PS-2.** User 2026-09-07 on `/template-workspace/html/ELOMRRNOGP`: "This template is messed up now. Specially due to handlebar conditions and code being displayed weirdly." That template (`{{#if firstName}}, …{{else}}{{#if userName}}…{{/if}}{{/if}}`, `{{default planName "PRO TRIAL"}}`, `<html style>`, `<body style>` with the background gradient, a Google Fonts `<link>`) is the shape of most real platform templates. Board PS-05 `KDV-0`, notes `KL2-0`.
   - **Parse, don't regex.** `src/lib/components/studio/v2/logic.js`: use `handlebars` (already a dependency) `Handlebars.parse(html)` to walk `ContentStatement` / `MustacheStatement` / `BlockStatement` (+ `else` programs, `{{else if}}` chains). Build the stage HTML from the AST: content → as is; mustache with no params/hash → `{{name}}` text (existing chip behaviour); mustache with helper/params/hash → `{{…}}` text carrying the raw expression (`describe()` reports `expression` and `helper`; the rail shows the expression in a mono field with Change); block → wrapper `<pictify-logic data-hb-kind="if" data-hb-expr="firstName" data-hb-open="{{#if firstName}}" data-hb-close="{{/if}}">` containing `<pictify-branch data-hb-branch="then">…</pictify-branch><pictify-branch data-hb-branch="else" data-hb-open="{{else}}" hidden>…</pictify-branch>`. Inline vs block: `display:inline` when the block's content parses to phrasing content only, else `display:contents`. Custom elements so DOMPurify (add them to ALLOWED_TAGS) and the serializer can find them and nothing in a template can collide.
   - **Well-formedness gate.** Wrapping requires each block to open and close in the same parent element. Detect by parsing the block's inner content with the fragment parser and checking that the wrapper's parent's child list is unchanged; on failure, Design mounts read-only with the field strip `This template’s logic spans elements · edit it in Code` (state in `KL2-0`), Code/Preview/proof unaffected.
   - **Serializer** (`stage.js` `serialize`): unwrap `pictify-logic` back to `open + then + (else-open + else) + close`, strip editor attributes, keep ids. Test: parse → stage HTML → serialize equals the source byte for byte for ELOMRRNOGP's html and for the five OUT/starter fixtures; and after one text edit inside a branch only that text differs.
@@ -81,7 +81,7 @@ Refero references: Resend broadcast editor (code left, live preview right, autos
   - **Document styles**: `writePreviewDocument` copies `style`/`class`/`lang` from the source `<html>` and `<body>` onto the frame's own `html`/`body` and `serialize` writes them back into the saved document (keep `WHOLE_DOCUMENT` shape when the source had one; bare fragments stay fragments). ELOMRRNOGP's body background and 1080×1080 sizing must show on the canvas.
   - **Fonts**: `cleanHtml` keeps `<link rel="stylesheet">` only when `href` is on `fonts.googleapis.com`; `PREVIEW_CSP` adds `style-src https://fonts.googleapis.com` and `font-src https://fonts.gstatic.com`. Everything else stays blocked (B06-1 stands). The renderer already loads these fonts, so the canvas and the file agree.
   - **Verify** on ELOMRRNOGP in the user's own session (tenancy: your dev cookie cannot open it, so use a copy of its html on a template your team owns): canvas shows the dark gradient, the fonts, the welcome line with the IF chip; Preview data shows "Welcome aboard, Priya"; a text edit inside the then branch saves and the saved html still contains the exact `{{#if firstName}} … {{else}}{{#if userName}} … {{/if}}{{/if}}`; Rendered proof matches Preview data.
-- [ ] **PS-8 Verify.** Round trip: create → Say it → visual edit → Code edit → Say it → Render on a real account; `?mode=html` deep link; paste of a script-bearing HTML shows the report and strips on save; keyboard-only pass on Code mode; `npm run lint`, `svelte-check`, unit tests; gstack `/browse` screenshots of PS-01…PS-04 against the boards.
+- [x] **PS-8 Verify.** Round trip: create → Say it → visual edit → Code edit → Say it → Render on a real account; `?mode=html` deep link; paste of a script-bearing HTML shows the report and strips on save; keyboard-only pass on Code mode; `npm run lint`, `svelte-check`, unit tests; gstack `/browse` screenshots of PS-01…PS-04 against the boards.
 
 Order (revised 2026-09-07 after the user opened `/template-workspace/html/…` expecting selection): PS-1 → **PS-7 first** (mount the v2 shell in template context with Design / Preview data / Rendered proof as they work today, Code off, `?studio=v1` fallback) → **PS-9 Selection rail** (done 5be4e6c) → **PS-10 Handlebars logic + document styles + fonts** (user 2026-09-07: "This template is messed up now… handlebar conditions and code being displayed weirdly") → PS-2 → PS-3 (report: does the id pass hold through code edits?) → PS-4 → PS-5 → PS-6 → PS-8. The route swap is what the user sees; Code mode follows it.
 
@@ -102,6 +102,212 @@ just typed has no id until then and is briefly not selectable. This is what
 `code-map.js` is a scanner rather than a DOM parse for the same reason: the
 offsets must index the user's text.
 
+### 5a. What was built (2026-09-07)
+
+All PS tasks are implemented on `worktree-redesign-v2` (frontend) and
+`feat/campaigns-r1` (backend). Nothing is committed.
+
+**New files** — `studio/v2/`: `logic.js` + test (Handlebars → stage → source,
+byte-for-byte), `document-shell.js` + test (split/rejoin `<html>`/`<head>`/
+`<body>`), `code-map.js` + test, `paste-report.js` + test, `CodePane.svelte`,
+`SelectionRail.svelte`, `VariablePopover.svelte`, `TemplateStart.svelte`,
+`fixtures/logic-template.html` (a real platform template, used as the
+round-trip fixture); `src/lib/campaigns/starters/templates.js`.
+**Rewritten**: `template-workspace/html/create/+page.svelte`,
+`template-workspace/html/[uid]/+page.svelte`.
+**Touched**: `stage.js`, `node-ids.js`, `preview-document.js`, `StudioShell`,
+`StudioStage`, `LayersTree`, `ProofView`, `UseItCard`, `CardPreview`,
+`campaign-studio/[uid]/+page.svelte`.
+
+### 5b. Deviations from the spec
+
+1. **Starters are one JS module**, `src/lib/campaigns/starters/templates.js`,
+   not "two new HTML files". The existing starters keep HTML in template
+   literals in a JS module and the build has no raw-html import configured; one
+   starter loading differently from the others is a difference someone has to
+   discover. Approved by the handoff author.
+2. **Start is the whole page**, not the shell's left rail. A new template has no
+   row, no revision and nothing to save, so the shell's top bar would be
+   controls for a document that does not exist. All of the board's copy is
+   present. Approved.
+3. **No sample switcher on the proof.** Template context has a single
+   `sampleValues` object rather than named samples, so the proof is keyed by
+   revision alone. Approved.
+4. **`RETURNS` and `ALSO` are opt-in props** on `UseItCard`. It is shared with
+   the v1 studio and the video studio, neither of which has a Rendered proof to
+   point at — "exactly what Rendered proof shows for rev n" is a claim they
+   cannot back.
+5. **Render passes the buyer's API key.** `POST /templates/:uid/render` is
+   registered behind `verifyApiToken` and there is no cookie-authenticated
+   render route (`renderTemplateProof`'s `/template-draft/:uid/proof` does not
+   exist in the backend at all). Without a key the button is disabled and says
+   `Render needs an API key · create one in Settings`. The v1 studio's
+   `onRender` never passed a key, so v1 Render was 401ing too.
+6. **Helper mustaches are chips, bare tokens are not.** `{{firstName}}` stays
+   literal text so the existing binding path is untouched; anything with a
+   helper, params or a hash becomes `<pictify-expr>` carrying its raw source.
+7. **The paste report also flags relative paths.** `/logo.png` works on the site
+   it was copied from and resolves against nothing in a render.
+
+### 5c. Bugs found while building, and fixed
+
+Every one of these was pre-existing and is unrelated to the feature that
+surfaced it.
+
+- **Backend, `service/template-node-ids.js`: `cheerio.load(html, null, false)`
+  is FRAGMENT mode.** A whole document lost `<html>`, `<head>`, `<body>` and
+  their attributes, and the head's contents were hoisted to the front — 105
+  chars in, 45 out. It runs on every draft save (`routes/template-draft.js:73`)
+  and every AI result (`routes/template-studio.js:405`), so the loss was written
+  to the database. The load mode now follows the input; 6 regression tests.
+  **20+ dev templates already carry the damage and a code fix does not undo it.**
+  `ELOMRRNOGP` is intact. The file does not exist on `origin/master`, so
+  production was never affected.
+- **Frontend, `node-ids.js`: the same bug on the client**, for the same reason
+  (`DOMParser` into a body, return `body.innerHTML`). `load()` and `commit()`
+  both run it, so the studio never saw the real document.
+- **The create route was completely broken.** It POSTed `html: ''` on mount,
+  which the renderer's validation now rejects (422, "template source is
+  required"), so every New Template click died on a red error page — and it
+  spent a template slot on anyone who merely clicked New. Also
+  `outputFormat: 'png'` is a 500; the model enum is `['image','pdf']`.
+- **Saves in the template studio were throwing.** The route called
+  `saveQueue?.schedule()`; the API is `{ nudge, flushNow, recover, discardLocal,
+  stop }`. `?.` guards the queue, not the missing method, so no edit ever
+  persisted. Five call sites.
+- **The code buffer went stale after every visual or AI edit.** `commit()`
+  updates `html` but deliberately not `codeBuffer`, and nothing called
+  `serialize()` — so opening Code showed the document as it was at page load,
+  and one keystroke committed that stale document over the real one. Measured on
+  a fresh template: canvas 3,125 chars, code pane 182. Entering Code now
+  serializes first, in **both** contexts.
+- **Selection was dropped after every rail edit.** The edit round-tripped
+  through the store and remounted the stage. `serialize()` now emits ids-complete
+  html and the stage skips the remount when the incoming html is its own output;
+  a genuine rebuild re-selects by id.
+- **`StudioStage` dispatched an un-normalised selection.** A deselect is
+  `{count: 0}` — truthy — so consumers doing `e.detail || null` kept a selection
+  with nothing in it and `SelectionRail` read `one.blocked` off null.
+- **`AiLock`'s Cancel was a dead button** on the template route: the component
+  dispatches `cancel` and nothing listened, on the one control available while a
+  run holds the document.
+- **DOMPurify drops leading comments**, so a template opening with a section
+  marker lost it on every save (619 bytes on the fixture).
+- **The proof image raced the CDN.** An `<img>` requested milliseconds after the
+  render returned got 403, the browser cached it, and a render that had in fact
+  succeeded showed as broken for the life of the page. Retried with backoff;
+  observed `403, 200` on the next render, image then displays.
+
 ## 6. Acceptance
 
 A developer opens an existing HTML template, sees it in the v2 studio, presses 2 to open Code, edits an `<h1>` text and adds `{{subtitle}}`, sees the canvas and Inputs follow, clicks the heading on the live canvas and lands on its line, presses Render and gets the real PNG URL, opens Use it and copies a cURL carrying the same values. Nothing about `/campaign-studio` changes except that it also has Code mode.
+
+### 6a. PS-8 verification pass (2026-09-07)
+
+One continuous scripted run on the dev account against the live dev server,
+Chrome at 1440 × 900. 21 checks, all passing; screenshots for PS-01…PS-04 in
+the session scratchpad.
+
+| # | Step | Result |
+|---|------|--------|
+| 1 | Start renders (PS-04) | pass |
+| 2 | starter fills the description, nothing drawn | pass (133 chars) |
+| 3 | Create → row made, navigated to the new uid | pass |
+| 3.1–3.2 | `?draft=` runs the AI once, lock up then down | pass |
+| 3.3 | canvas holds a document | pass (3,125 chars server-side, 13 elements) |
+| 4 | click selects, inspector appears | pass |
+| 4.1 | font-size 13px → 43px | pass |
+| 4.2 | **selection survives the edit** | pass |
+| 4.3 | saved | pass |
+| 5–5.1 | Code pane populated, keeps the document shell | pass |
+| 5.2 | **code pane reachable by Tab alone** (23 tabs) | pass |
+| 5.3–5.4 | typing changes the buffer, no mouse used | pass |
+| 6–6.1 | second AI run starts and finishes | pass |
+| 7–7.1 | Render → real PNG URL + caption | pass |
+| 8–8.1 | Use it: cURL with live key, RETURNS + ALSO | pass |
+
+Render from the pass:
+`https://media.pictify.io/template-renders/wxqhy2xe-1788753994232.png`
+(200, image/png, 1200 × 630, 55,766 bytes). Both templates created by the pass
+were deleted afterwards.
+
+**Two defects the pass itself found**, both since fixed and re-verified: the
+stale code buffer (§5c) — caught only because the run printed the buffer length
+and 182 chars was the seed document, not the draft — and the proof image race
+(§5c), caught because the run logged a 403 on the render URL that `curl`
+returned 200 for.
+
+**Not covered.** The `/browse` screenshots are Chrome screenshots from the
+verification script, not a gstack `/browse` session, and they have not been
+diffed against the boards pixel by pixel — they were read by eye. A paste of
+script-bearing HTML was verified to produce the report (`paste-report` has 17
+unit tests including scripts, handlers and `javascript:` urls) but the
+strips-on-save half was verified through `cleanHtml`'s DOMPurify config rather
+than by saving a script-bearing document end to end. (`/campaign-studio` is now covered — see §6b.)
+
+### 6b. Campaign studio regression pass (2026-09-07)
+
+`/campaign-studio/[uid]` takes a TEMPLATE uid with `?campaign=&edition=`. Run
+against `UJY0FFD1DT?campaign=5VD1PBY8UR&edition=EI9FZW8226`. Nine items, all
+passing, no failing requests and no page errors:
+
+| # | Item | Result |
+|---|------|--------|
+| 1 | loads with a document (4 modes) | pass |
+| 2 | click selects, inspector appears | pass |
+| 3 | rail edit applies (→ 44px) | pass |
+| 3.1 | **selection survives the edit** | pass |
+| 4 | Layers lists rows (11) | pass |
+| 5 | Brand tab opens | pass |
+| 6 | Preview data renders | pass |
+| 7 | Code pane populated (1,160 chars) | pass |
+| 7.1 | **buffer carries the rail edit** (serialize-on-enter) | pass |
+| 8 | Say it runs and finishes (receipt "changed · verified") | pass |
+| 9 | Use this design present, correctly disabled | pass |
+
+Item 9 is disabled by design, not broken: `useBlockedReason` is "Render a proof
+of this revision before using it" because the edit moved the design past the
+last proof.
+
+**A third defect found here**, and the most subtle of the three: the
+serialize-on-enter fix was ORDER-DEPENDENT. `codeBuffer` is derived from the
+store in its own `$:` statement, and Svelte orders reactive statements by
+dependency — that statement could run before the mode-change statement in the
+same flush, so the pane rendered the pre-serialize value. It presented as
+identical code passing with a `console.log` in the block and failing without
+it, because the extra `$editor` read reordered the two. The fresh html is now
+assigned to `codeBuffer` directly as well as into the store, so the outcome does
+not depend on statement order. Verified in BOTH contexts afterwards (campaign
+1,160 chars carrying the edit; template 13,908 chars carrying it).
+
+This also invalidated an earlier claim of mine: the template-route check that
+"the buffer is 3,125 chars" only proved `load()` populates it, not that entering
+Code refreshes it. Both are now tested by making an edit first.
+
+## 9. TS — the template editor as a free tool (2026-09-08, user: "expose it in tools so that TOFU get a good experience")
+
+Boards in the same Paper file: **TS-01 `KM0-0`** (guest editor: top bar `Tools / Untitled OG image · DRAFT · KEPT IN THIS BROWSER`, undo/redo, format chip, guest quota squares `4 FREE TODAY · NO WATERMARK`, secondary **Save to Pictify**, primary **Download PNG**; Say it composer with `2 AI EDITS LEFT TODAY · Sign up for more` and the privacy line; right rail USE IT with `YOUR_API_KEY` / `saved after sign-up` placeholders and the "Keep this template and call it from anywhere" card; footer `Guest · downloads free · saving needs an account`) and **TS-02 `KUK-0`** (hub card, result-card "Open in editor", zero-quota top bar, save handoff steps).
+
+Model (Excalidraw / CodePen / Carbon): fully usable with no account, the draft lives in the browser, downloads are free on the existing guest ladder, and an account gates only saving, more AI edits and the API.
+
+Decisions (locked):
+1. **Route `/tools/template-editor`**, public, SSR head + longform via `ToolPageShell` conventions (ToolSeoHead, breadcrumb Tools / Template editor, facts, related), but the editor itself is full-bleed below the hero: the v2 shell in a third context `context="tool"`. `?draft=<id>` restores a local draft; `?html=<key>` opens HTML handed over from a tool result (sessionStorage key, never a URL payload).
+2. **No server row for guests.** The document lives in `localStorage` (`pictify.tool-draft.<id>`: html, width, height, format, sampleValues, updatedAt). The editor store's save queue is replaced by a local writer in tool context; the top bar shows `DRAFT · KEPT IN THIS BROWSER` (field square) instead of SAVED · REV n. Undo/redo, Layers, Selection rail, Inputs, Code mode, Preview data all work unchanged.
+3. **Download is the primary** and uses the guest render path the tools already use (`createImagePublic` in src/api/image.js; PDF via the public PDF equivalent) with the current sample values substituted server-side (same `/templates/preview`-style engine, no Handlebars sent to the public image route unsubstituted — if the public route cannot take variables, substitute through the preview endpoint first and render the result). Quota = the existing `QuotaMeter` / `GUEST_DAILY_LIMIT` (5/day) ladder; at zero the primary swaps for the signup button exactly as `GenerateButton` does; editing keeps working. Rendered proof mode shows the downloaded file as the proof.
+4. **AI edits for guests: 3 per day**, counted client-side AND enforced server-side on `POST /template-studio/edit` for anonymous callers (new guest variant of the route keyed the same way the guest image quota is keyed; no template uid, the html travels in the body and comes back in the response). Counter under the composer (`2 AI EDITS LEFT TODAY · Sign up for more`); at zero the composer is replaced by `RailSignupCard` (location `say_it_zero`). Receipts, scope chips and the AI lock are unchanged.
+5. **Use it tab teases, never lies.** Snippets render with `YOUR_API_KEY` and `saved after sign-up` placeholders; the card "Keep this template and call it from anywhere" lists the free plan facts from plan-features (no hard-coded numbers in the final build) and its button is the same signup handoff as Save.
+6. **Save to Pictify = signup with the draft.** `/signup?intent=template-editor&draft=<id>` (login too). After auth: create the template from the local draft (name from the document title or "Untitled <format>"), redirect to `/template-workspace/html/<uid>`, toast "Saved as rev 1", clear the local draft. A draft older than 30 days is offered on return, not restored silently. This uses the FE-1 safe-intent allowlist from the campaigns handoff: add `template-editor`.
+7. **Entry points.** (a) `/tools` hub: a new first card "Template editor" with the `NEW · NO SIGN-UP` tag and `5 FREE DOWNLOADS A DAY`; (b) every v2 `ResultCard` gets a third action **Open in editor** that stores the tool's HTML under a sessionStorage key and opens `/tools/template-editor?html=<key>`; (c) the Start page copy in tool context says "No account needed" under the heading.
+8. **Analytics:** `tool_editor_opened` (source: hub | result_card | direct), `tool_editor_download`, `tool_editor_ai_edit` (remaining), `tool_editor_save_click`, `tool_editor_signup_completed` (draft restored yes/no). All masked, never the html.
+9. **SEO copy** for the page follows the tool-page rules (frozen shape: H1 "Free online template editor: describe it, edit it, download it", facts line, longform, FAQ) and the `/writing-aeo-content` skill; write it in the handoff report, do not invent product claims beyond what ships.
+
+Tasks:
+- [ ] **TS-1** `context="tool"` in StudioShell/TopBar: draft status, Download primary, Save to Pictify secondary, QuotaMeter in the bar, no revision/versions, Say it counter, USE IT placeholders + signup card, footer line. Start page in tool context.
+- [ ] **TS-2** Local draft store (`src/lib/tools/editor-draft.js`): write-through on every commit, restore on load, 30-day offer, `?html=` handoff key. Tests.
+- [ ] **TS-3** Guest download through the public render path with server-side substitution; quota ladder; zero state; proof mode shows the file. Guest AI edit route + client counter + zero state.
+- [ ] **TS-4** Signup/login handoff (`intent=template-editor&draft=`), template creation from the draft, redirect, toast, cleanup; allowlist entry.
+- [ ] **TS-5** Hub card, ResultCard "Open in editor", analytics events, SEO head + longform for `/tools/template-editor`, sitemap-tools entry.
+- [ ] **TS-6** Verify as a logged-out visitor in a fresh profile: land from the hub, draft with AI, edit visually, Code, Preview, download twice, hit the AI counter, reload and get the draft back, Save → signup → template exists at rev 1 with the same html. Then as a logged-in user: `/tools/template-editor` still works and Save goes straight to a template.
+
+Backend (html-to-gif, campaigns-r1): guest variant of `POST /template-studio/edit` with the daily cap and the same safelisted helpers; confirm the public image route can take substituted html of 1200×630 / A4 without an account (it can today for the tools); nothing else new.
+
