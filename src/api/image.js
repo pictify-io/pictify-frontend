@@ -13,6 +13,23 @@ const createImagePublic = async ({ html, width, height, selector, url, fileExten
 	return response;
 };
 
+/**
+ * What the guest has left today, from the server. TS-B1/TS-B3.
+ *
+ * The meter must not be the browser's own tally — counting downloads in
+ * localStorage is exactly what made the old "5 free today" a decoration. A
+ * peek, so reading the number does not spend one.
+ */
+const getGuestRenderQuota = async () => {
+	try {
+		return await backend.get('/image/public/quota');
+	} catch {
+		// A meter that cannot reach the server shows nothing rather than zero:
+		// telling someone they are out when we do not know is worse than silence.
+		return null;
+	}
+};
+
 const createGifPublic = async ({ html, width, height, duration }) => {
 	const response = await backend.post('/gif/public', {
 		html,
@@ -247,6 +264,7 @@ const createAgentScreenshotStream = async (prompt, onMessage, apiKey) => {
 export {
 	createGifPublic,
 	createImagePublic,
+	getGuestRenderQuota,
 	createOgImage,
 	getOgImageTemplates,
 	checkApiHealth,

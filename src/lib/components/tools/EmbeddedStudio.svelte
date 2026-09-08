@@ -37,6 +37,9 @@
 	export let downloadsLimit = 5;
 	export let format = 'png';
 	export let saving = false;
+	/** The gallery's native size, so a scaled thumbnail keeps its aspect. */
+	export let thumbSourceWidth = 1200;
+	export let thumbSourceHeight = 630;
 
 	const dispatch = createEventDispatcher();
 
@@ -164,9 +167,32 @@
 							? 'border-[1.5px] border-brand-ink shadow-[2px_2px_0_0_var(--brand-field,#D8F34A)]'
 							: 'border border-brand-rule'}"
 					>
-						<span class="relative block overflow-hidden rounded-[3px] bg-brand-subtle">
+						<!-- `w-full` is load-bearing: the thumbnail is absolutely positioned, so
+						     without it this box has no in-flow content to size it, computes to
+						     zero width, and clips the whole gallery away. -->
+						<span class="relative block h-[108px] w-full overflow-hidden rounded-[3px] bg-brand-subtle">
 							{#if t.thumbnail}
 								<img src={t.thumbnail} alt="" class="block h-[108px] w-full object-cover" loading="lazy" />
+							{:else if t.html}
+								<!--
+									The template itself, scaled down. A build-time thumbnail
+									would be cheaper and is what the board asks for; until that
+									exists this is at least TRUE — a picture of the layout the
+									visitor will actually get, rather than a grey box that
+									makes the gallery unusable.
+
+									`sandbox` with nothing granted: these are static layouts
+									and nothing in them needs to run.
+								-->
+								<iframe
+									title={t.name}
+									sandbox=""
+									scrolling="no"
+									srcdoc={t.html}
+									class="pointer-events-none absolute left-0 top-0 origin-top-left border-0"
+									style="width:{thumbSourceWidth}px;height:{thumbSourceHeight}px;transform:scale({108 /
+										thumbSourceHeight})"
+								/>
 							{:else}
 								<span class="block h-[108px] w-full" aria-hidden="true" />
 							{/if}

@@ -138,6 +138,27 @@ const escapeAttr = (value) =>
 	String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
 /**
+ * `<style>` blocks from the source `<head>`.
+ *
+ * A design's CSS lives in one of two places and BOTH have to survive. Inline
+ * `style=` attributes ride along on the elements; a `<style>` block in the head
+ * does not, and dropping it strips the design to unstyled markup — measured on
+ * the OG-image templates, which put all of their CSS there and came back as
+ * black text on white with the layout gone.
+ *
+ * Returned as raw text and written into the preview head, where the CSP's
+ * `style-src 'unsafe-inline'` already permits it. It is the same CSS the
+ * renderer will apply, so the canvas and the file agree.
+ */
+export function styleBlocks(head) {
+	const out = [];
+	const re = /<style\b[^>]*>([\s\S]*?)<\/style>/gi;
+	let m;
+	while ((m = re.exec(String(head ?? '')))) out.push(m[1]);
+	return out;
+}
+
+/**
  * Attributes to copy onto the preview frame's own `<html>` and `<body>`.
  *
  * `style` and `class` only. Everything else on those tags is either the

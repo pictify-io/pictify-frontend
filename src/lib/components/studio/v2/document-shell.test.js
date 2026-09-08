@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { splitDocument, joinDocument, fontLinks, shellAttributes } from './document-shell.js';
+import { splitDocument, joinDocument, fontLinks, shellAttributes, styleBlocks } from './document-shell.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const REAL = fs.readFileSync(path.join(here, 'fixtures/logic-template.html'), 'utf8');
@@ -171,5 +171,40 @@ describe('which shell attributes are applied', () => {
 
 	test('nothing at all is an empty set, not a throw', () => {
 		for (const junk of ['', null, undefined]) assert.deepEqual(shellAttributes(junk), {});
+	});
+});
+
+describe('css in the head', () => {
+	test('a style block is found and returned', () => {
+		/*
+		 * A design's CSS lives inline OR in a head <style>, and both have to
+		 * survive. Dropping the block strips the design to unstyled markup —
+		 * measured on the OG-image templates, which keep all of their CSS there.
+		 */
+		const src = '<html><head><style>body{background:#000}</style></head><body>x</body></html>';
+		assert.deepEqual(styleBlocks(splitDocument(src).head), ['body{background:#000}']);
+	});
+
+	test('several blocks keep their order', () => {
+		const src =
+			'<html><head><style>a{}</style><style>b{}</style></head><body>x</body></html>';
+		assert.deepEqual(styleBlocks(splitDocument(src).head), ['a{}', 'b{}']);
+	});
+
+	test('a document with no styles yields none', () => {
+		assert.deepEqual(styleBlocks(splitDocument('<html><head></head><body>x</body></html>').head), []);
+	});
+
+	test('a style block in the BODY is not the head’s business', () => {
+		// It rides along with the body markup and must not be duplicated.
+		const src = '<html><head></head><body><style>p{}</style>x</body></html>';
+		assert.deepEqual(styleBlocks(splitDocument(src).head), []);
+	});
+
+	test('extracting styles does not disturb the round trip', () => {
+		const src = '<html><head><style>a{color:red}</style></head><body>x</body></html>';
+		const shell = splitDocument(src);
+		styleBlocks(shell.head);
+		assert.equal(joinDocument(shell, shell.body), src);
 	});
 });

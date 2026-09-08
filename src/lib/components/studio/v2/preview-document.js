@@ -1,4 +1,4 @@
-import { fontLinks, shellAttributes } from './document-shell.js';
+import { fontLinks, shellAttributes, styleBlocks } from './document-shell.js';
 
 /**
  * The document wrapper every in-browser preview of a design is written into.
@@ -80,11 +80,13 @@ export const PREVIEW_CSP = [
  * CSP is honoured for everything the parser reaches after it, which is why it
  * is the FIRST thing in the head — content before it would load unpoliced.
  */
-export const previewHead = (extraCss = 'html,body{margin:0;padding:0}', links = []) =>
+export const previewHead = (extraCss = 'html,body{margin:0;padding:0}', links = [], styles = []) =>
 	`<meta http-equiv="Content-Security-Policy" content="${PREVIEW_CSP}">` +
 	`<meta charset="utf-8">` +
 	`<style>${extraCss}</style>` +
-	links.join('');
+	links.join('') +
+	// The design's OWN css, after the reset so it wins, before nothing else.
+	styles.map((css) => `<style>${css}</style>`).join('');
 
 /**
  * Options are `{ css, shell }`. `shell` is a `splitDocument` result, and
@@ -103,9 +105,10 @@ export function previewDocument(body, arg) {
 	const html = shell ? shellAttributes(shell.htmlAttrs) : {};
 	const bodyAttrs = shell ? shellAttributes(shell.bodyAttrs) : {};
 	const links = shell ? fontLinks(shell.head) : [];
+	const styles = shell ? styleBlocks(shell.head) : [];
 	return (
 		`<!doctype html><html${attrText(html)}>` +
-		`<head>${previewHead(css, links)}</head>` +
+		`<head>${previewHead(css, links, styles)}</head>` +
 		`<body${attrText(bodyAttrs)}>${body}</body></html>`
 	);
 }
@@ -137,7 +140,9 @@ export function writePreviewDocument(frame, body, arg) {
 	if (!doc?.documentElement) return null;
 	const { css, shell } = options(arg);
 	const links = shell ? fontLinks(shell.head) : [];
-	doc.documentElement.innerHTML = `<head>${previewHead(css, links)}</head><body>${body}</body>`;
+	const styles = shell ? styleBlocks(shell.head) : [];
+	doc.documentElement.innerHTML =
+		`<head>${previewHead(css, links, styles)}</head><body>${body}</body>`;
 
 	/*
 	 * Set on the live elements rather than written into the markup, because

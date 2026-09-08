@@ -619,6 +619,17 @@ const restoreTemplateRevision = async (uid, revision) =>
  * persisted, and it returns the render time the proof bar shows.
  * @returns {Promise<{dataUrl, width, height, totalMs}>}
  */
+/**
+ * An AI edit with no account. TS-B2.
+ *
+ * The document travels in the body and comes back in the response — there is
+ * no template row to edit against, because a guest does not have one. Throws
+ * an HttpError on 429 carrying `resetsAt`, which is how the composer knows to
+ * swap itself for the signup card rather than guessing from a local counter.
+ */
+const editGuestTemplate = async ({ html, instruction, width, height }) =>
+	backend.post('/template-studio/guest/edit', { html, instruction, width, height });
+
 const previewTemplateHtml = async (body, options = {}) =>
 	backend.post('/templates/preview', body, options);
 
@@ -629,6 +640,7 @@ export {
 	restoreTemplateRevision,
 	renderTemplateProof,
 	previewTemplateHtml,
+	editGuestTemplate,
 	getTemplate,
 	getTemplates,
 	getTemplateById,

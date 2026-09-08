@@ -14,6 +14,7 @@
 	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
 	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
 	import OgImageTemplate from '$lib/components/tools/OgImageTemplate.svelte';
+	import OgImageEditor from '$lib/components/tools/OgImageEditor.svelte';
 	import { getTemplate, getWebsiteInfo } from '../../../api/tools/og-image';
 	import { createImagePublic } from '../../../api/image.js';
 	import { onMount } from 'svelte';
@@ -108,6 +109,28 @@
 	}));
 
 	let templates = [];
+
+	/*
+	 * The gallery the embedded editor shows.
+	 *
+	 * `name` and `category` are DERIVED, because nothing supplies them: the
+	 * templates endpoint returns filenames and there is no metadata beside the
+	 * files. The panel renders whatever it is given, so a real name/category
+	 * source can be added later without touching this — but until one exists
+	 * the gallery says "Template 15" rather than inventing a name on the
+	 * template's behalf.
+	 */
+	$: editorTemplates = templates
+		.map((html, i) => ({
+			key: templateNames[i] || `t${i}`,
+			name: `Template ${String(templateNames[i] || '').replace(/^template-/, '') || i + 1}`,
+			category: null,
+			html
+		}))
+		.filter((t) => t.html);
+
+	/** One release of escape hatch, the same lever the studio route uses. */
+	$: useLegacyTool = $page?.url?.searchParams?.get?.('studio') === 'v1';
 	let url = '';
 	let selectedTemplate = '';
 	let isFetchingWebsiteInfo = false;
@@ -871,431 +894,33 @@
 	</HeroSub>
 
 	<div slot="tool">
-		<ToolCard>
-			<div class="flex flex-col gap-6 p-5 lg:p-7">
-				<div class="p-6 md:p-8 bg-brand-subtle">
-					<!-- Mode Toggle -->
-					<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-						<button
-							class="group relative w-full"
-							on:click={() => {
-								creationMode = 'website';
-								websiteInfo = null;
-							}}
-						>
-							<div
-								class={`px-6 py-5 border border-brand-ink transition-all duration-200 flex flex-col items-center gap-2
-				                ${
-													creationMode === 'website'
-														? 'bg-brand-ink text-white'
-														: 'bg-brand-paper hover:bg-brand-subtle hover:'
-												}`}
-							>
-								<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-									/></svg
-								>
-								<span class="font-semibold text-lg tracking-tight">From Website</span>
-								<span class="text-xs font-bold text-brand-mute">Extract info automatically</span>
-							</div>
-						</button>
-						<button
-							class="group relative w-full"
-							on:click={() => {
-								creationMode = 'direct';
-								createDirectOgImage();
-							}}
-						>
-							<div
-								class={`px-6 py-5 border border-brand-ink transition-all duration-200 flex flex-col items-center gap-2
-				                ${
-													creationMode === 'direct'
-														? 'bg-brand-ink text-white'
-														: 'bg-brand-paper hover:bg-brand-subtle hover:'
-												}`}
-							>
-								<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-									/></svg
-								>
-								<span class="font-semibold text-lg tracking-tight">Create Directly</span>
-								<span class="text-xs font-bold text-brand-mute">Design from scratch</span>
-							</div>
-						</button>
-					</div>
+		<!--
+			TS-5a. The tool IS the editor now: the visitor edits the card in place
+			instead of filling three fields and pressing Generate.
 
-					{#if creationMode === 'website'}
-						<!-- Website URL Input -->
-						<div class="border-t-[3px] border-dashed border-gray-300 pt-8">
-							<h4 class="font-semibold text-lg mb-4 tracking-tight flex items-center gap-3">
-								<span
-									class="w-8 h-8 bg-brand-ink text-white flex items-center justify-center text-sm font-bold border border-brand-ink"
-									>01</span
-								>
-								Enter Website URL
-							</h4>
-							<div class="flex flex-col md:flex-row gap-4">
-								<input
-									bind:value={url}
-									on:input={handleFirstInput}
-									type="text"
-									class="flex-1 border border-brand-ink placeholder-gray-400 text-lg font-bold focus:outline-none py-4 px-5 transition-all bg-brand-paper"
-									placeholder="https://yourwebsite.com"
-									on:keydown={(e) => e.key === 'Enter' && submitUrl(url)}
-								/>
-								<button
-									on:click={() => submitUrl(url)}
-									disabled={isFetchingWebsiteInfo}
-									class="py-4 px-8 bg-brand-field border border-brand-ink font-semibold tracking-wide text-brand-ink transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-								>
-									{#if isFetchingWebsiteInfo}
-										<svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"
-											><circle
-												class="opacity-25"
-												cx="12"
-												cy="12"
-												r="10"
-												stroke="currentColor"
-												stroke-width="4"
-											/><path
-												class="opacity-75"
-												fill="currentColor"
-												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-											/></svg
-										>
-										Fetching...
-									{:else}
-										Fetch Info
-										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="3"
-												d="M13 7l5 5m0 0l-5 5m5-5H6"
-											/></svg
-										>
-									{/if}
-								</button>
-							</div>
-							{#if error}
-								<div
-									class="mt-4 p-4 bg-brand-pink/10 border border-brand-danger text-brand-pink font-bold flex items-center gap-2"
-								>
-									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-										/></svg
-									>
-									{error}
-								</div>
-							{/if}
-						</div>
-					{:else}
-						<div class="border-t-[3px] border-dashed border-gray-300 pt-8">
-							<div class="bg-brand-proof/10 border border-brand-proof p-6 text-center">
-								<p class="text-brand-ink font-bold text-lg">
-									✓ Select a template below to start designing
-								</p>
-							</div>
-						</div>
-					{/if}
-				</div>
-				{#if websiteInfo && selectedTemplate}
-					<div
-						class="w-full max-w-5xl mx-auto mb-20 relative px-2 md:px-0"
-						bind:this={ogImageTemplateWrapper}
-					>
-						<div class="border border-brand-ink bg-brand-paper">
-							<!-- Editor Header -->
-							<div
-								class="bg-brand-ink text-white px-4 py-3 flex justify-between items-center border-b border-brand-ink"
-							>
-								<h3 class="font-bold font-mono tracking-widest text-xs md:text-sm">
-									/// CUSTOMIZE_IMAGE
-								</h3>
-								<div class="flex gap-2">
-									<div class="w-3 h-3 bg-brand-pink border border-white/20" />
-									<div class="w-3 h-3 bg-brand-field border border-white/20" />
-									<div class="w-3 h-3 bg-brand-proof border border-white/20" />
-								</div>
-							</div>
-
-							<!-- Preview Section -->
-							<div class="p-6 md:p-8 bg-brand-subtle border-b border-brand-ink">
-								<div class="flex justify-center items-center">
-									<div class="border border-brand-ink overflow-hidden bg-brand-paper">
-										<OgImageTemplate
-											html={typeof selectedTemplate === 'string'
-												? selectedTemplate
-												: selectedTemplate.html}
-											width={1200}
-											height={630}
-											scale={0.5}
-										/>
-									</div>
-								</div>
-							</div>
-
-							<!-- Editor Controls -->
-							<div class="p-6 md:p-8">
-								<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-									<!-- Logo Section -->
-									<div class="space-y-4">
-										<h4 class="font-semibold text-lg tracking-tight flex items-center gap-3">
-											<span
-												class="w-8 h-8 bg-brand-field flex items-center justify-center border border-brand-ink"
-											>
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-													/></svg
-												>
-											</span>
-											Logo
-										</h4>
-										<div class="p-4 bg-brand-subtle border border-brand-rule space-y-4">
-											{#if websiteInfo.logo}
-												<div
-													class="bg-brand-paper p-4 border-[2px] border-gray-200 flex justify-center"
-												>
-													{#if websiteInfo.logo.startsWith('<svg')}
-														<div style="width: 120px;">{@html websiteInfo.logo}</div>
-													{:else}
-														<img
-															loading="lazy"
-															src={websiteInfo.logo}
-															style="width: 120px;"
-															alt="Logo"
-															class="object-contain"
-														/>
-													{/if}
-												</div>
-											{/if}
-											<input
-												type="file"
-												class="hidden"
-												id="logoInput"
-												accept="image/*"
-												on:change={updateLogo}
-											/>
-											<label
-												for="logoInput"
-												class="block w-full px-4 py-3 bg-brand-paper border border-brand-ink text-brand-ink font-bold cursor-pointer hover:bg-brand-subtle transition-all text-center tracking-wide"
-											>
-												Upload Logo
-											</label>
-											<div class="space-y-2">
-												<span class="text-xs font-bold text-brand-mute"
-													>Logo Width: {logoWidth}px</span
-												>
-												<input
-													type="range"
-													min="50"
-													max="400"
-													class="w-full h-2 bg-brand-rule appearance-none cursor-pointer accent-brand-danger"
-													value={logoWidth}
-													on:input={updateLogoWidth}
-												/>
-											</div>
-										</div>
-									</div>
-
-									<!-- Content Section -->
-									<div class="space-y-4">
-										<h4 class="font-semibold text-lg tracking-tight flex items-center gap-3">
-											<span
-												class="w-8 h-8 bg-brand-pink text-white flex items-center justify-center border border-brand-ink"
-											>
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-													/></svg
-												>
-											</span>
-											Content
-										</h4>
-										<div class="space-y-4">
-											<div>
-												<label for="og-heading" class="text-xs font-bold text-brand-mute block mb-2"
-													>Heading</label
-												>
-												<input
-													id="og-heading"
-													type="text"
-													class="w-full border border-brand-rule text-lg font-bold focus:outline-none focus:border-black py-3 px-4 transition-all"
-													placeholder="Enter heading"
-													value={websiteInfo.heading}
-													on:input={updateHeading}
-												/>
-											</div>
-											<div>
-												<label
-													for="og-description"
-													class="text-xs font-bold text-brand-mute block mb-2">Description</label
-												>
-												<textarea
-													id="og-description"
-													class="w-full border border-brand-rule text-base font-medium focus:outline-none focus:border-black py-3 px-4 transition-all resize-none"
-													rows="3"
-													value={websiteInfo.subHeading}
-													on:input={updateSubHeading}
-												/>
-											</div>
-										</div>
-									</div>
-
-									<!-- Style Section -->
-									<div class="space-y-4 lg:col-span-2">
-										<h4 class="font-semibold text-lg tracking-tight flex items-center gap-3">
-											<span
-												class="w-8 h-8 bg-brand-proof flex items-center justify-center border border-brand-ink"
-											>
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-													/></svg
-												>
-											</span>
-											Style
-										</h4>
-										<div class="p-4 bg-brand-subtle border border-brand-rule">
-											<div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-												<div>
-													<label for="og-font" class="text-xs font-bold text-brand-mute block mb-2"
-														>Font</label
-													>
-													<select
-														id="og-font"
-														class="w-full border border-brand-rule text-base font-bold focus:outline-none focus:border-black py-3 px-4 bg-brand-paper appearance-none cursor-pointer"
-														on:change={(e) => updateFont(combinedFonts[e.target.selectedIndex])}
-													>
-														{#each combinedFonts as font}
-															<option value={font.id}>{font.name}</option>
-														{/each}
-													</select>
-												</div>
-												<div>
-													<div class="text-xs font-bold text-brand-mute block mb-2">Background</div>
-													<div class="color-picker-wrapper">
-														<ColorPicker
-															bind:rgb={backgroundColorRgb}
-															isDialog={true}
-															on:input={updateBackgroundColor}
-														/>
-													</div>
-												</div>
-												<div>
-													<div class="text-xs font-bold text-brand-mute block mb-2">Text Color</div>
-													<div class="color-picker-wrapper">
-														<ColorPicker
-															bind:rgb={headingColorRgb}
-															isDialog={true}
-															on:input={updateHeadingColor}
-														/>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Generated Image Result -->
-							{#if imageUrl}
-								<div class="border-t border-brand-ink">
-									<!-- Image preview -->
-									<div class="p-4 md:p-6 bg-brand-paper">
-										<div class="border border-brand-ink bg-brand-paper p-2">
-											<img loading="lazy" src={imageUrl} alt="Generated OG" class="w-full" />
-										</div>
-									</div>
-									<!-- Action bar -->
-									<div
-										class="bg-brand-proof border-t border-brand-ink px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3"
-									>
-										<span
-											class="font-semibold text-xs sm:text-sm tracking-widest text-brand-ink flex items-center gap-2"
-										>
-											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-												><path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="3"
-													d="M5 13l4 4L19 7"
-												/></svg
-											>
-											Image generated
-										</span>
-										<div class="flex items-center gap-2">
-											<button
-												on:click={() => copyToClipboard(imageUrl)}
-												class="px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-ink text-white font-bold text-xs border border-brand-ink transition-all"
-											>
-												Copy URL
-											</button>
-											<button
-												on:click={() =>
-													downloadFile(imageUrl, 'og-image.png', {
-														tool_name: 'og_image_generator'
-													})}
-												class="px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-paper text-brand-ink font-bold text-xs border border-brand-ink transition-all"
-											>
-												Download
-											</button>
-										</div>
-									</div>
-								</div>
-							{/if}
-						</div>
-					</div>
-				{/if}
+			The old block — template picker, form fields, static preview, generate
+			button — is replaced wholesale. `?studio=v1` keeps a way back for one
+			release while this is watched.
+		-->
+		{#if useLegacyTool}
+			<ToolCard>
+				<p class="p-6 font-sans text-[13.5px] leading-[19px] text-brand-slate">
+					The classic generator has been replaced by the editor.
+					<a href="?" class="text-brand-royal underline">Open it</a>.
+				</p>
+			</ToolCard>
+		{:else if editorTemplates.length}
+			<OgImageEditor templates={editorTemplates} width={previewWidth} height={previewHeight} />
+		{:else}
+			<!-- Never an empty state: this is the moment before the templates land. -->
+			<div
+				class="flex h-[560px] items-center justify-center rounded-[12px] border-[1.5px] border-brand-ink bg-brand-paper"
+			>
+				<p class="font-mono text-[11px] uppercase tracking-[0.08em] text-brand-mute">
+					Loading the editor…
+				</p>
 			</div>
-
-			<svelte:fragment slot="toolbar-left">
-				<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">
-					TITLE · LOGO → 1200×630
-				</span>
-			</svelte:fragment>
-
-			<svelte:fragment slot="toolbar-right">
-				<QuotaMeter
-					remaining={guestRemaining}
-					loggedIn={isUserLoggedIn}
-					toolName={TOOL_NAME}
-					toolPath={TOOL_PATH}
-				/>
-				<GenerateButton
-					label="Generate Image"
-					loading={isImageGenerating}
-					ready={!!(websiteInfo && selectedTemplate)}
-					remaining={guestRemaining}
-					loggedIn={isUserLoggedIn}
-					toolName={TOOL_NAME}
-					toolPath={TOOL_PATH}
-					on:generate={generateImage}
-				/>
-			</svelte:fragment>
-		</ToolCard>
+		{/if}
 	</div>
 
 	<div slot="result">
