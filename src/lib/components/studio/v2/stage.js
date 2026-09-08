@@ -1,6 +1,8 @@
 import DOMPurify from 'dompurify';
-import { ATTR } from './node-ids.js';
+import { ATTR, ensureNodeIds } from './node-ids.js';
 import { findOverflow } from './overflow.js';
+import { joinDocument } from './document-shell.js';
+import { fromStageHtml, EXPR } from './logic.js';
 
 /**
  * The visual stage. B02.
@@ -23,16 +25,68 @@ import { findOverflow } from './overflow.js';
 /** Editor chrome is marked so it can never be serialized into the design. */
 const UI = 'data-editor-ui';
 
+/**
+ * Sanitize markup for a preview frame.
+ *
+ * Takes a BODY FRAGMENT, not a document: the shell — doctype, `<html>`,
+ * `<head>` — is split off by `document-shell.js` before this runs and applied
+ * to the frame's own tags, so `WHOLE_DOCUMENT` here would wrap the fragment in
+ * a second `<html>` that then lands inside the real one.
+ *
+ * `link` stays forbidden. Fonts are not an exception to that: the one allowed
+ * `<link>` comes from the head, is host-checked by `fontLinks`, and is written
+ * into the preview head directly — it never passes through the body sanitizer,
+ * which is why the sanitizer never has to be taught to trust one.
+ */
+/**
+ * DOMPurify drops every comment at the START of a fragment — its defence
+ * against a leading-comment mXSS trick, and not configurable. Leading
+ * whitespace does not shield them; measured, not assumed:
+ *
+ *   '<!-- a --><p>x</p>'        -> '<p>x</p>'
+ *   '\n  <!-- a -->\n  <p>x</p>' -> '\n  <p>x</p>'
+ *   '<p>x</p><!-- a --><p>y</p>' -> unchanged
+ *
+ * Templates open with a section marker often enough that this deleted the
+ * first comment of a real one on every save. A sentinel element gives the
+ * comments something to not-be-first of, and is removed afterwards.
+ */
+const SENTINEL = '<span></span>';
+
 export function cleanHtml(html) {
+	const source = String(html ?? '');
+	// Only when it would actually matter, so the common path is untouched.
+	if (/^\s*<!--/.test(source)) {
+		const out = sanitize(SENTINEL + source);
+		// If the sentinel is not where it was put, sanitising did something
+		// unexpected — return the result whole rather than cutting into it.
+		return out.startsWith(SENTINEL) ? out.slice(SENTINEL.length) : out;
+	}
+	return sanitize(source);
+}
+
+function sanitize(html) {
 	return DOMPurify.sanitize(html, {
-		WHOLE_DOCUMENT: true,
 		FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'base', 'meta', 'link', 'form'],
-		FORBID_ATTR: ['srcdoc', 'autofocus']
+		FORBID_ATTR: ['srcdoc', 'autofocus'],
+		// The logic wrappers `logic.js` mounts. They carry no behaviour — they
+		// are markers the canvas draws IF chips against — but DOMPurify drops
+		// unknown elements, and dropping these would take the branch contents
+		// with them.
+		// `#comment` keeps HTML comments, which DOMPurify drops by default.
+		// A template's comments are the author's section markers, and the studio
+		// saves whatever it mounted — so dropping them here deleted 619 bytes of
+		// a real template's structure on every save. Measured, not assumed.
+		ADD_TAGS: ['pictify-logic', 'pictify-branch', 'pictify-expr', '#comment'],
+		ADD_ATTR: [
+			'data-hb-kind', 'data-hb-expr', 'data-hb-open', 'data-hb-close', 'data-hb-branch',
+			'data-hb-raw', 'data-hb-helper', 'data-hb-paths'
+		]
 	});
 }
 
 /** Elements whose text is not editable in place. */
-const ATOMIC = new Set(['IMG', 'SVG', 'PATH', 'HR', 'BR', 'INPUT', 'VIDEO']);
+const ATOMIC = new Set(['IMG', 'SVG', 'PATH', 'HR', 'BR', 'INPUT', 'VIDEO', 'PICTIFY-EXPR']);
 
 /**
  * How an element participates in layout, which decides what a drag may do.
@@ -75,14 +129,37 @@ export function blockedReason(el, view) {
  * saved HTML must be exactly what the renderer will receive, with nothing the
  * editor added to make itself work.
  */
-export function serialize(doc) {
+export function serialize(doc, shell) {
 	const clone = doc.body.cloneNode(true);
 	clone.querySelectorAll(`[${UI}]`).forEach((el) => el.remove());
 	clone
 		.querySelectorAll('[contenteditable]')
 		.forEach((el) => el.removeAttribute('contenteditable'));
 	clone.querySelectorAll('[data-selected]').forEach((el) => el.removeAttribute('data-selected'));
-	return clone.innerHTML;
+	/*
+	 * The shell goes back VERBATIM, from the text that was loaded — not rebuilt
+	 * from the live frame. Nothing in the studio edits `<html>`, `<head>` or the
+	 * `<body>` tag today, so re-serializing them could only lose something: a
+	 * `<meta>`, an attribute the preview deliberately does not apply, the exact
+	 * spacing of the head. If the body tag ever becomes selectable this has to
+	 * become a patch of those two open tags instead.
+	 */
+	/*
+	 * `fromStageHtml` first: the canvas mounts Handlebars blocks as
+	 * `<pictify-logic>` wrappers, and those are scaffolding. Saving them would
+	 * write a document the renderer has never seen and cannot render.
+	 */
+	/*
+	 * IDS ARE COMPLETED HERE, not left to the store.
+	 *
+	 * `editor.commit` runs `ensureNodeIds` on whatever it is given, so if this
+	 * emitted html without ids the store's copy came back DIFFERENT from the
+	 * one the stage just produced — and the stage, seeing html it did not
+	 * recognise, tore the frame down and rebuilt it on every single edit,
+	 * taking the selection with it. Emitting ids-complete html makes the
+	 * store's transform a no-op and lets the stage recognise its own output.
+	 */
+	return joinDocument(shell, ensureNodeIds(fromStageHtml(clone.innerHTML)).html);
 }
 
 /**
@@ -103,7 +180,7 @@ export function serialize(doc) {
  */
 export async function attachStage(
 	frame,
-	{ onTransaction, onSelection, onStatus, width, height, selectOnly = false }
+	{ onTransaction, onSelection, onStatus, width, height, selectOnly = false, shell = null }
 ) {
 	const [{ default: Moveable }, { default: Selecto }] = await Promise.all([
 		import('moveable'),
@@ -160,7 +237,7 @@ export async function attachStage(
 	});
 
 	const commit = (label) => {
-		onTransaction(label, serialize(doc));
+		onTransaction(label, serialize(doc, shell));
 		moveable.updateRect();
 	};
 
@@ -176,6 +253,21 @@ export async function attachStage(
 		// A binding is shown as a chip, never as caret-editable text: editing
 		// the inside of {{account_name}} is how a field silently stops binding.
 		const bindings = [...text.matchAll(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g)].map((m) => m[1]);
+
+		/*
+		 * Helper calls the element shows. A bare `{{name}}` is matched above; an
+		 * expression is a chip, and its paths are bindings too — otherwise Inputs
+		 * and Change would go blank on an element that plainly shows planName
+		 * just because it shows it through `default`.
+		 */
+		const expressions = [...el.querySelectorAll(EXPR)].map((node) => ({
+			raw: node.getAttribute('data-hb-raw') || '',
+			helper: node.getAttribute('data-hb-helper') || '',
+			paths: (node.getAttribute('data-hb-paths') || '').split(',').filter(Boolean)
+		}));
+		for (const expression of expressions) {
+			for (const path of expression.paths) if (!bindings.includes(path)) bindings.push(path);
+		}
 
 		/*
 		 * PS-9. The inspector renders from this and nothing else, so anything it
@@ -205,6 +297,8 @@ export async function attachStage(
 			count: 1,
 			id: el.getAttribute(ATTR),
 			tag: el.tagName.toLowerCase(),
+			logic: logicContext(el),
+			expressions,
 			role: layoutRole(el, view),
 			blocked: blockedReason(el, view),
 			bindings,
@@ -444,24 +538,114 @@ export async function attachStage(
 
 	/* ------------------------------------------------- B02-4 layers tree */
 
-	/** Depth-first tree of addressable elements, for the Layers rail. */
+	/**
+	 * Depth-first tree of addressable elements, for the Layers rail.
+	 *
+	 * Logic wrappers are part of the walk, not skipped. They carry no node id,
+	 * so filtering on the id attribute alone stopped the descent at a
+	 * `<pictify-logic>` and every element inside a condition disappeared from
+	 * the rail — the design still drew it, and Layers said it was not there.
+	 * They get a row of their own instead, because "this is inside IF
+	 * firstName" is the single most useful thing the tree can say about it.
+	 */
 	function tree() {
+		let logicSeq = 0;
 		const walk = (el, depth) =>
-			[...el.children]
-				.filter((child) => child.hasAttribute(ATTR))
-				.flatMap((child) => [
+			[...el.children].flatMap((child) => {
+				const tag = child.tagName.toLowerCase();
+
+				if (tag === 'pictify-logic') {
+					const kind = (child.getAttribute('data-hb-kind') || 'if').toUpperCase();
+					const expr = child.getAttribute('data-hb-expr') || '';
+					return [
+						{
+							// Synthetic: there is no element id to select, and
+							// `selectById` no-ops on an id it cannot find.
+							id: `logic:${++logicSeq}`,
+							tag,
+							depth,
+							label: `${kind} ${expr}`.trim(),
+							kind: 'logic',
+							selectable: false,
+							locked: true,
+							hidden: false,
+							hasChildren: child.childElementCount > 0
+						},
+						...walk(child, depth + 1)
+					];
+				}
+
+				// A branch is structure, not a thing to name — descend through it,
+				// except the else, which is worth saying out loud because it is
+				// hidden on the canvas by default.
+				if (tag === 'pictify-branch') {
+					const isElse = child.getAttribute('data-hb-branch') === 'else';
+					return isElse
+						? [
+								{
+									id: `logic:${++logicSeq}`,
+									tag,
+									depth,
+									label: 'ELSE',
+									kind: 'logic',
+									selectable: false,
+									locked: true,
+									hidden: true,
+									hasChildren: child.childElementCount > 0
+								},
+								...walk(child, depth + 1)
+							]
+						: walk(child, depth);
+				}
+
+				if (!child.hasAttribute(ATTR)) return [];
+
+				return [
 					{
 						id: child.getAttribute(ATTR),
-						tag: child.tagName.toLowerCase(),
+						tag,
 						depth,
 						label: child.getAttribute('data-label') || labelFor(child),
+						selectable: true,
 						locked: child.hasAttribute('data-locked'),
 						hidden: child.style.display === 'none',
 						hasChildren: [...child.children].some((c) => c.hasAttribute(ATTR))
 					},
 					...walk(child, depth + 1)
-				]);
+				];
+			});
 		return walk(doc.body, 0);
+	}
+
+	/**
+	 * Which conditions an element sits inside, outermost first.
+	 *
+	 * `[{ kind, expression, branch }]`. An element inside `{{#if firstName}}`
+	 * does not always render, and the rail has to say so — otherwise someone
+	 * styles a greeting, renders with no first name, and finds their work
+	 * missing from the output with nothing on screen having warned them.
+	 *
+	 * The else-branch matters most: it is hidden on the canvas by default, so
+	 * anything selected there is doubly invisible.
+	 */
+	function logicContext(el) {
+		const chain = [];
+		let node = el.parentElement;
+		let branch = null;
+		while (node && node !== doc.body) {
+			const tag = node.tagName.toLowerCase();
+			if (tag === 'pictify-branch') branch = node.getAttribute('data-hb-branch') || 'then';
+			if (tag === 'pictify-logic') {
+				chain.unshift({
+					kind: (node.getAttribute('data-hb-kind') || 'if').toUpperCase(),
+					expression: node.getAttribute('data-hb-expr') || '',
+					branch: branch || 'then'
+				});
+				branch = null;
+			}
+			node = node.parentElement;
+		}
+		return chain;
 	}
 
 	/**
@@ -608,7 +792,7 @@ export async function attachStage(
 		holder.style.cssText = 'position:absolute;left:-99999px;top:0;width:' + width + 'px';
 		doc.body.appendChild(holder);
 
-		const source = serialize(doc);
+		const source = serialize(doc, shell);
 		for (const [sampleId, values] of Object.entries(valuesBySample)) {
 			holder.innerHTML = source.replace(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g, (m, key) => {
 				const v = values[key];
@@ -699,6 +883,16 @@ export async function attachStage(
 	function setText(id, text) {
 		const el = byId(id);
 		if (!el || el.childElementCount) return false;
+		/*
+		 * Refuses ANY mustache, helper or not.
+		 *
+		 * The `{{` test alone stopped being enough once helper calls became
+		 * chips: a chip's text is its LABEL (`planName · default "PRO TRIAL"`),
+		 * which has no braces, so this would have accepted the element and
+		 * overwritten the helper call with whatever was typed — the very hazard
+		 * the brace test exists to prevent.
+		 */
+		if (el.querySelector(EXPR)) return false;
 		if (/\{\{/.test(el.textContent || '')) return false;
 		el.textContent = String(text ?? '');
 		commit('edit text');
@@ -772,7 +966,7 @@ export async function attachStage(
 		toggleHide,
 		rename,
 		reorder,
-		serialize: () => serialize(doc),
+		serialize: () => serialize(doc, shell),
 		destroy() {
 			doc.removeEventListener('click', onClick, true);
 			doc.removeEventListener('dblclick', onDoubleClick, true);

@@ -99,7 +99,12 @@
 		{ key: 'preview', label: 'Preview data' },
 		{ key: 'proof', label: 'Rendered proof' }
 	];
-	let mode = 'design';
+	/*
+	 * Bindable: a finished render has to be able to SHOW itself. Rendering and
+	 * then leaving the buyer on the Design canvas, with the result behind a tab
+	 * they have to know to click, is a result that reads as nothing happening.
+	 */
+	export let mode = 'design';
 
 	const LEFT_TABS = [
 		{ key: 'say', label: 'Say it' },
@@ -531,7 +536,9 @@
 				{/each}
 			</div>
 			<div class="min-h-0 flex-1 overflow-y-auto p-3.5">
-				<slot name="right" {rightTab}>
+				<!-- `mode` too: inserting a variable goes to the canvas in Design and
+				     to the caret in Code, so the rail has to know which is showing. -->
+				<slot name="right" {rightTab} {mode}>
 					<!-- Nothing selected → the document, then Brand (locked decision 3). -->
 					<p class="font-mono text-[10px] uppercase tracking-[0.06em] text-brand-mute">Document</p>
 					<dl class="mt-2 border-t border-brand-rule">

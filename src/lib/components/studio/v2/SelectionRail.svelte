@@ -106,7 +106,8 @@
 </script>
 
 <div class="flex flex-col gap-4 p-4">
-	{#if !selection}
+	<!-- A deselect arrives as { count: 0 }: truthy, but nothing to inspect. -->
+	{#if !selection || !(multi || one)}
 		<p class="font-sans text-[13px] leading-[19px] text-brand-mute">
 			Nothing selected. Click an element on the canvas.
 		</p>
@@ -144,6 +145,36 @@
 			<!-- The renderer cannot reproduce a move for this element; say why
 			     rather than leaving a control that quietly does nothing. -->
 			<p><StatusSquare tone="blocked" label={one.blocked} /></p>
+		{/if}
+
+		{#if one.logic?.length}
+			<!--
+				CONDITIONAL. This element does not always render, and that is the
+				most important thing to know before styling it — otherwise someone
+				perfects a greeting, renders with no first name, and finds it
+				missing from the output with nothing having warned them.
+
+				Outermost condition first, so the chain reads the way the renderer
+				evaluates it. The else-branch is called out separately because it is
+				hidden on the canvas by default: anything selected there is doubly
+				invisible.
+			-->
+			<section class="flex flex-col gap-1.5 border border-brand-royal/40 bg-brand-royal/5 p-2">
+				<p class="font-mono text-[10.5px] uppercase tracking-[0.08em] text-brand-royal">
+					Only renders when
+				</p>
+				{#each one.logic as step}
+					<p class="font-mono text-[10.5px] leading-4 text-brand-slate">
+						{step.kind}
+						{step.expression}{step.branch === 'else' ? ' · else branch' : ''}
+					</p>
+				{/each}
+				{#if one.logic.some((s) => s.branch === 'else')}
+					<p class="font-sans text-[12px] leading-4 text-brand-mute">
+						Hidden on the canvas — turn on Show else to see it in place.
+					</p>
+				{/if}
+			</section>
 		{/if}
 
 		<!-- CONTENT -->

@@ -49,7 +49,7 @@
 	<ul class="flex flex-col gap-px">
 		{#each rows as row (row.id)}
 			<li
-				draggable={!row.locked}
+				draggable={!row.locked && row.kind !== 'logic'}
 				on:dragstart={() => (dragId = row.id)}
 				on:dragover|preventDefault
 				on:drop|preventDefault={() => onDrop(row)}
@@ -60,12 +60,22 @@
 			>
 				<button
 					type="button"
+					disabled={row.kind === 'logic'}
 					on:click={() => dispatch('select', { id: row.id })}
-					on:dblclick={() => startRename(row)}
-					class="flex min-w-0 flex-1 items-center gap-2 py-1.5 text-left"
+					on:dblclick={() => row.kind !== 'logic' && startRename(row)}
+					class="flex min-w-0 flex-1 items-center gap-2 py-1.5 text-left {row.kind === 'logic'
+						? 'cursor-default'
+						: ''}"
 				>
+					<!--
+						A condition is not an element: it has no box to select, drag or
+						rename. It is drawn as a rule marker so the tree still shows
+						what its contents are inside of.
+					-->
 					<span
-						class="block h-2 w-2 flex-shrink-0 {row.hidden
+						class="block h-2 w-2 flex-shrink-0 {row.kind === 'logic'
+							? 'rotate-45 border border-brand-royal'
+							: row.hidden
 							? 'border border-brand-mute'
 							: selectedId === row.id
 							? 'bg-brand-ink'
@@ -86,7 +96,11 @@
 						/>
 					{:else}
 						<span
-							class="truncate font-sans text-[12.5px] {row.hidden
+							class="truncate {row.kind === 'logic'
+								? 'font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-royal'
+								: 'font-sans text-[12.5px]'} {row.kind === 'logic'
+								? ''
+								: row.hidden
 								? 'text-brand-mute line-through'
 								: selectedId === row.id
 								? 'font-semibold text-brand-ink'
