@@ -10,24 +10,19 @@
 	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
 	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
-	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
-	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
 	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
 	import OgImageTemplate from '$lib/components/tools/OgImageTemplate.svelte';
 	import OgImageEditor from '$lib/components/tools/OgImageEditor.svelte';
-	import { getTemplate, getWebsiteInfo } from '../../../api/tools/og-image';
-	import { createImagePublic } from '../../../api/image.js';
+	import { getTemplate } from '../../../api/tools/og-image';
 	import { onMount } from 'svelte';
-	import { toast } from '../../../store/toast.store';
 	import { page } from '$app/stores';
-	import ColorPicker from 'svelte-awesome-color-picker';
+	import { goto } from '$app/navigation';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 	import { user } from '../../../store/user.store';
 	import {
 		ogPlatforms,
 		popularSizes as configPopularSizes,
-		platformGuides,
 		platformRecommendedSizes,
 		parseSize
 	} from '$lib/pseo/config.js';
@@ -36,7 +31,6 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/telemetry.js';
-	import { downloadFile } from '$lib/utils/download.js';
 	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
 	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
 	import ProseGroup from '$lib/components/tools/v2/longform/ProseGroup.svelte';
@@ -55,7 +49,6 @@
 	$: platformSizes = isPlatform
 		? platformRecommendedSizes[platformObj.id] || recommendedSizes
 		: recommendedSizes;
-	$: platformSteps = isPlatform ? platformGuides[platformObj.id] || [] : [];
 
 	// If a platform is provided, adapt default preview dimensions to its recommended size
 	$: if (isPlatform && platformSizes && platformSizes.length) {
@@ -67,7 +60,6 @@
 	}
 
 	// Growth metrics
-	let totalImagesGenerated = 45897; // Social proof counter
 
 	// Add user store subscription
 	let isUserLoggedIn = false;
@@ -75,38 +67,8 @@
 		isUserLoggedIn = !!userData.email;
 	});
 
-	const popularFontsLinks = [
-		'https://fonts.googleapis.com/css2?family=Arial:wght@100;200;300;400;500;600;700;800;900&display=swap',
-		'https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap',
-		'https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap',
-		'https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap',
-		'https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap',
-		'https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap',
-		'https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;300;400;600;700;900&display=swap',
-		'https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap',
-		'https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap',
-		'https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap',
-		'https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap'
-	];
 
-	const popularFonts = [
-		{ id: 'Arial', name: 'Arial', className: 'arial' },
-		{ id: 'Roboto', name: 'Roboto', className: 'roboto' },
-		{ id: 'Roboto Condensed', name: 'Roboto Condensed', className: 'roboto-condensed' },
-		{ id: 'Open Sans', name: 'Open Sans', className: 'open-sans' },
-		{ id: 'Montserrat', name: 'Montserrat', className: 'montserrat' },
-		{ id: 'Poppins', name: 'Poppins', className: 'poppins' },
-		{ id: 'Source Sans Pro', name: 'Source Sans Pro', className: 'source-sans-pro' },
-		{ id: 'Oswald', name: 'Oswald', className: 'oswald' },
-		{ id: 'Inter', name: 'Inter', className: 'inter' },
-		{ id: 'Manrope', name: 'Manrope', className: 'manrope' },
-		{ id: 'DynaPuff', name: 'DynaPuff', className: 'dynapuff' }
-	];
 
-	const combinedFonts = popularFonts.map((font, index) => ({
-		...font,
-		link: popularFontsLinks[index]
-	}));
 
 	let templates = [];
 
@@ -129,99 +91,28 @@
 		}))
 		.filter((t) => t.html);
 
-	/** One release of escape hatch, the same lever the studio route uses. */
-	$: useLegacyTool = $page?.url?.searchParams?.get?.('studio') === 'v1';
-	let url = '';
-	let selectedTemplate = '';
-	let isFetchingWebsiteInfo = false;
-	let selectedFont = combinedFonts[0];
-	let logoWidth = 150;
-	let imageUrl = '';
-	let isImageGenerating = false;
-	let websiteInfo;
-	let error = null;
-	let creationMode = 'website'; // 'website' or 'direct'
-
-	// /api/tools/website-info can return fewer than three palette entries (or
-	// none at all); indexing a missing entry used to throw and silently kill
-	// the generate flow. Always read the palette through this fallback.
-	const paletteColor = (colors, index, fallback) => {
-		const entry = colors?.[index];
-		return Array.isArray(entry) && entry.length >= 3
-			? { r: entry[0], g: entry[1], b: entry[2] }
-			: fallback;
+	/**
+	 * The longform gallery scrolls the visitor up into the editor with that
+	 * template chosen, rather than driving a picker that no longer exists.
+	 */
+	const openTemplateInEditor = (index) => {
+		const key = templateNames[index];
+		if (key) goto(`?template=${encodeURIComponent(key)}`, { noScroll: true, keepFocus: true });
+		document.querySelector('[slot="tool"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	};
 
-	let backgroundColorRgb = paletteColor(websiteInfo?.colors, 0, { r: 255, g: 255, b: 255 });
-	let headingColorRgb = paletteColor(websiteInfo?.colors, 1, { r: 0, g: 0, b: 0 });
-	let subHeadingColorRgb = paletteColor(websiteInfo?.colors, 2, { r: 0, g: 0, b: 0 });
+	/** One release of escape hatch, the same lever the studio route uses. */
+	$: useLegacyTool = $page?.url?.searchParams?.get?.('studio') === 'v1';
+	let isFetchingWebsiteInfo = false;
+	let imageUrl = '';
 
-	let ogImageTemplateWrapper;
+
+
 	// Remove the dynamic width/height calculations
 	let previewWidth = 1200;
 	let previewHeight = 630;
 
-	const isValidUrl = (url) => {
-		const urlRegex = new RegExp(
-			'^(https?:\\/\\/)?' + // protocol
-				'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-				'((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-				'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-				'(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-				'(\\#[-a-z\\d_]*)?$',
-			'i'
-		);
-		try {
-			new URL(url);
-			return urlRegex.test(url);
-		} catch (e) {
-			return false;
-		}
-	};
 
-	const submitUrl = async (url) => {
-		if (!isValidUrl(url)) {
-			return;
-		}
-		error = null;
-		isFetchingWebsiteInfo = true;
-		try {
-			websiteInfo = await getWebsiteInfo(url);
-		} catch (e) {
-			error = 'Failed to fetch website info';
-			isFetchingWebsiteInfo = false;
-			return;
-		}
-		isFetchingWebsiteInfo = false;
-		try {
-			backgroundColorRgb = paletteColor(websiteInfo?.colors, 0, { r: 255, g: 255, b: 255 });
-			headingColorRgb = paletteColor(websiteInfo?.colors, 1, { r: 0, g: 0, b: 0 });
-			subHeadingColorRgb = paletteColor(websiteInfo?.colors, 2, { r: 0, g: 0, b: 0 });
-
-			while (!ogImageTemplateWrapper) {
-				await new Promise((resolve) => {
-					setTimeout(resolve, 100);
-				});
-			}
-
-			const iframe = ogImageTemplateWrapper.querySelector('iframe');
-			// A freshly created iframe has document.body === null until its srcdoc
-			// parses; probing body.innerHTML directly threw for cold organic landings.
-			if (!iframe?.contentWindow?.document?.body?.innerHTML) {
-				await new Promise((resolve) => {
-					if (iframe) iframe.onload = resolve;
-					// Fallback so a never-firing onload can't hang the promise.
-					setTimeout(resolve, 1500);
-				});
-			}
-
-			await updateHTML(selectedTemplate);
-		} catch (e) {
-			// Post-fetch failures used to escape as unhandled rejections, leaving
-			// the spinner cleared but no preview and no message.
-			error = 'Could not build a preview from that site. Try another URL.';
-		}
-	};
 
 	const templateNames = [
 		'template-15',
@@ -245,132 +136,6 @@
 		'template-19'
 	];
 
-	// Modify websiteInfo to handle direct creation
-	const createDirectOgImage = () => {
-		websiteInfo = {
-			heading: '',
-			subHeading: '',
-			logo: null,
-			colors: [
-				[255, 255, 255],
-				[0, 0, 0],
-				[0, 0, 0]
-			] // Default colors
-		};
-		backgroundColorRgb = { r: 255, g: 255, b: 255 };
-		headingColorRgb = { r: 0, g: 0, b: 0 };
-		subHeadingColorRgb = { r: 0, g: 0, b: 0 };
-	};
-
-	const selectTemplate = (template) => {
-		// Store current content and colors if they exist
-		const currentHeading = websiteInfo?.heading;
-		const currentSubHeading = websiteInfo?.subHeading;
-		const currentLogo = websiteInfo?.logo || null;
-
-		selectedTemplate = template;
-
-		// Parse template to get default text content
-		const parser = new DOMParser();
-		const doc = parser.parseFromString(
-			typeof template === 'string' ? template : template.html,
-			'text/html'
-		);
-		const defaultHeading = doc.querySelector('#template-heading')?.innerHTML || '';
-		const defaultSubHeading = doc.querySelector('#template-subheading')?.innerHTML || '';
-
-		// Only create new websiteInfo if it doesn't exist
-		if (!websiteInfo) {
-			createDirectOgImage();
-		}
-
-		// Extract colors from the new template
-		const styleTag = doc.querySelector('style');
-		if (styleTag) {
-			const cssText = styleTag.textContent;
-			const rootMatch = cssText.match(/:root\s*{([^}]+)}/);
-			if (rootMatch) {
-				const cssVars = {};
-				const varRegex = /--([^:]+):\s*([^;]+);/g;
-				let match;
-
-				while ((match = varRegex.exec(rootMatch[1])) !== null) {
-					cssVars[match[1].trim()] = match[2].trim();
-				}
-
-				// Extract colors from CSS variables
-				const extractRGB = (colorString) => {
-					if (!colorString) return null;
-
-					if (colorString.startsWith('#')) {
-						const hex = colorString.replace('#', '');
-						return {
-							r: parseInt(hex.substring(0, 2), 16),
-							g: parseInt(hex.substring(2, 4), 16),
-							b: parseInt(hex.substring(4, 6), 16)
-						};
-					}
-
-					const rgbMatch = colorString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-					if (rgbMatch) {
-						return {
-							r: parseInt(rgbMatch[1]),
-							g: parseInt(rgbMatch[2]),
-							b: parseInt(rgbMatch[3])
-						};
-					}
-					return null;
-				};
-
-				// Always update colors from template
-				if (cssVars['primary-color']) {
-					const rgb = extractRGB(cssVars['primary-color']);
-					if (rgb) backgroundColorRgb = rgb;
-				} else {
-					backgroundColorRgb = { r: 255, g: 255, b: 255 }; // Default white
-				}
-				if (cssVars['secondary-color']) {
-					const rgb = extractRGB(cssVars['secondary-color']);
-					if (rgb) headingColorRgb = rgb;
-				} else {
-					headingColorRgb = { r: 0, g: 0, b: 0 }; // Default black
-				}
-				if (cssVars['tertiary-color']) {
-					const rgb = extractRGB(cssVars['tertiary-color']);
-					if (rgb) subHeadingColorRgb = rgb;
-				} else {
-					subHeadingColorRgb = { r: 0, g: 0, b: 0 }; // Default black
-				}
-			}
-		}
-
-		// Update websiteInfo while preserving existing content
-		websiteInfo = {
-			heading: currentHeading || defaultHeading,
-			subHeading: currentSubHeading || defaultSubHeading,
-			logo: currentLogo,
-			colors: [
-				[backgroundColorRgb.r, backgroundColorRgb.g, backgroundColorRgb.b],
-				[headingColorRgb.r, headingColorRgb.g, headingColorRgb.b],
-				[subHeadingColorRgb.r, subHeadingColorRgb.g, subHeadingColorRgb.b]
-			]
-		};
-
-		setTimeout(() => {
-			updateHTML(template);
-			ogImageTemplateWrapper?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-		}, 100);
-	};
-
-	let hasTrackedFirstInput = false;
-
-	function handleFirstInput() {
-		if (!hasTrackedFirstInput) {
-			hasTrackedFirstInput = true;
-			analytics.trackToolFirstInput({ tool_name: 'og_image_generator' });
-		}
-	}
-
 	// Initialize editor with default template
 	onMount(async () => {
 		// Track tool opened
@@ -383,253 +148,27 @@
 			})
 		);
 
-		const requestedTemplate = $page?.url?.searchParams?.get?.('template');
-		if (requestedTemplate) {
-			const idx = templateNames.indexOf(requestedTemplate);
-			selectedTemplate = idx >= 0 ? templates[idx] : templates[0];
-			// Deep-linking from template gallery should be frictionless.
-			creationMode = 'direct';
-		} else {
-			selectedTemplate = templates[0];
-		}
+		// Deep links still work: `?template=` decides which template the editor
+		// opens on, and the editor draws it — there is no separate picker now.
 
-		if (creationMode === 'direct') {
-			createDirectOgImage();
-		}
 	});
 
-	// Watch for creationMode changes
-	$: if (creationMode === 'direct' && !websiteInfo) {
-		createDirectOgImage();
-	}
 
-	const updateHTML = async (html) => {
-		if (!ogImageTemplateWrapper) return;
 
-		const iframe = ogImageTemplateWrapper.querySelector('iframe');
-		if (!iframe) return;
 
-		// Wait for iframe to be ready. document.body is null until the srcdoc
-		// parses, so the readiness probe itself must be null-safe.
-		if (!iframe.contentWindow?.document?.body?.innerHTML) {
-			await new Promise((resolve) => {
-				iframe.onload = resolve;
-				// Fallback so a never-firing onload can't hang the promise.
-				setTimeout(resolve, 1500);
-			});
-		}
 
-		const document = iframe.contentWindow?.document;
-		if (!document?.body) return;
-		const heading = document.querySelector('#template-heading');
-		const subHeading = document.querySelector('#template-subheading');
-		const logo = document.querySelector('#template-logo');
 
-		if (heading) heading.innerHTML = websiteInfo?.heading || '';
-		if (subHeading) subHeading.innerHTML = websiteInfo?.subHeading || '';
 
-		if (logo) {
-			if (websiteInfo?.logo && websiteInfo.logo.startsWith('<svg')) {
-				const svgContainer = document.createElement('div');
-				svgContainer.id = 'template-logo';
-				svgContainer.innerHTML = websiteInfo.logo;
-				logo.replaceWith(svgContainer);
 
-				const svgElement = svgContainer.querySelector('svg');
-				if (svgElement) {
-					svgElement.setAttribute('width', logoWidth);
-					svgElement.setAttribute('height', 'auto');
-				}
-			} else if (websiteInfo?.logo) {
-				const img = document.createElement('img');
-				img.src = websiteInfo.logo;
-				img.width = logoWidth;
-				img.id = 'template-logo';
-				logo.replaceWith(img);
-			}
-		}
 
-		document.documentElement.style.setProperty(
-			'--primary-color',
-			`rgb(${backgroundColorRgb.r}, ${backgroundColorRgb.g}, ${backgroundColorRgb.b})`
-		);
-		document.documentElement.style.setProperty(
-			'--secondary-color',
-			`rgb(${headingColorRgb.r}, ${headingColorRgb.g}, ${headingColorRgb.b})`
-		);
-		document.documentElement.style.setProperty(
-			'--tertiary-color',
-			`rgb(${subHeadingColorRgb.r}, ${subHeadingColorRgb.g}, ${subHeadingColorRgb.b})`
-		);
 
-		// Update Font
-		const fontLink = document.createElement('link');
-		fontLink.rel = 'stylesheet';
-		fontLink.href = selectedFont.link;
-		document.head.appendChild(fontLink);
-		document.documentElement.style.fontFamily = selectedFont.id;
-	};
 
-	const updateHeading = (event) => {
-		websiteInfo.heading = event.target.value;
-		updateHTML(selectedTemplate);
-	};
 
-	const updateSubHeading = (event) => {
-		websiteInfo.subHeading = event.target.value;
-		updateHTML(selectedTemplate);
-	};
-
-	const updateLogo = async (event) => {
-		const file = event.target.files[0];
-		if (file) {
-			const reader = new FileReader();
-			reader.onload = (e) => {
-				websiteInfo.logo = e.target.result;
-				updateHTML(selectedTemplate);
-			};
-			reader.readAsDataURL(file);
-		}
-	};
-
-	const updateBackgroundColor = (event) => {
-		const rgb = event.detail.rgb;
-		backgroundColorRgb = rgb;
-		updateHTML(selectedTemplate);
-	};
-
-	const updateHeadingColor = (event) => {
-		const rgb = event.detail.rgb;
-		headingColorRgb = rgb;
-		updateHTML(selectedTemplate);
-	};
-
-	function copyToClipboard(text, contentType = 'image_url') {
-		navigator.clipboard.writeText(text).then(() => {
-			analytics.trackCopy({
-				content_type: contentType,
-				context: 'tool_result',
-				tool_name: 'og_image_generator'
-			});
-			toast.set({ message: 'URL copied to clipboard! 🔗', type: 'success', duration: 1500 });
-		});
-	}
-
-	function buildCurlSnippetFromHtml(html, width, height) {
-		const payload = {
-			html: String(html || ''),
-			width: Number(width) || 1200,
-			height: Number(height) || 630
-		};
-		return `curl -X POST https://api.pictify.io/image \\\\\n  -H "Content-Type: application/json" \\\\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\\\n  -d '${JSON.stringify(
-			payload,
-			null,
-			2
-		)}'`;
-	}
-
-	function getCurrentOgHtml() {
-		try {
-			const iframe = ogImageTemplateWrapper?.querySelector?.('iframe');
-			return iframe?.contentWindow?.document?.documentElement?.outerHTML || '';
-		} catch (e) {
-			return '';
-		}
-	}
-
-	const updateFont = (font) => {
-		selectedFont = font;
-		updateHTML(selectedTemplate);
-	};
-
-	const updateLogoWidth = (event) => {
-		logoWidth = event.target.value;
-		updateHTML(selectedTemplate);
-	};
 
 	// Add these variables to the existing script section
-	const apiExampleCode = `curl -X POST https://api.pictify.io/image/og-image \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
-  -d '{
-    "template": "template-1",
-    "heading": "Launch Day",
-    "description": "Ship product updates in style",
-    "logo": "https://cdn.pictify.io/logo.png"
-  }'`;
 
-	let generationCount = 0;
-	let showUpgradePrompt = false;
-	const defaultApiFeatureBullets = [
-		'Personalize OG images at publish-time with dynamic data',
-		'Serve optimized assets from our global CDN in milliseconds',
-		'Rotate tokens, monitor usage, and manage limits from the dashboard'
-	];
-	const apiCtaDetails = {
-		title: 'Ship OG images straight from your product',
-		description:
-			'Use our REST API to generate branded OG art on publish, across marketing workflows, or inside your SaaS with a single call.',
-		featurePoints: defaultApiFeatureBullets,
-		codeSnippet: apiExampleCode,
-		docsUrl: 'https://docs.pictify.io/',
-		docsLabel: 'View OG Image API docs',
-		secondaryCtaLabel: 'See code examples'
-	};
 
 	// Modify the generateImage function
-	const generateImage = async () => {
-		// Track generation in the limits store
-		generationLimits.increment();
-		generationCount++;
-
-		isImageGenerating = true;
-		const iframe = ogImageTemplateWrapper?.querySelector('iframe');
-		const document = iframe?.contentWindow?.document;
-		if (!document?.documentElement) {
-			isImageGenerating = false;
-			toast.set({
-				message: 'Preview is still loading. Please try again.',
-				type: 'error',
-				duration: 3000
-			});
-			return;
-		}
-		let html = document.documentElement.outerHTML;
-
-		// No guest watermark: the toolbar promises NO WATERMARK.
-
-		try {
-			const { image } = await createImagePublic({
-				html,
-				width: previewWidth,
-				height: previewHeight
-			});
-			imageUrl = image.url;
-
-			// Track image generation
-			analytics.trackImageGenerated({
-				tool_name: 'og_image_generator',
-				format: 'png',
-				with_watermark: !isUserLoggedIn
-			});
-
-			// Increment total images counter
-			totalImagesGenerated++;
-
-			// Show upgrade prompt after 2 generations
-			if (!isUserLoggedIn && generationCount >= 2) {
-				showUpgradePrompt = true;
-			}
-		} catch (error) {
-			toast.set({
-				message: 'Failed to generate image. Please try again.',
-				type: 'error',
-				duration: 3000
-			});
-		} finally {
-			isImageGenerating = false;
-		}
-	};
 
 	let progress = tweened(0, {
 		duration: 3000,
@@ -643,30 +182,11 @@
 	}
 
 	// Add state for growth features
-	let savedTemplates = [];
-	let showSignupPrompt = false;
 
 	// Function to handle template saving
-	const saveTemplate = () => {
-		if (!isUserLoggedIn) {
-			showSignupPrompt = true;
-			return;
-		}
-		toast.set({ message: 'Template saved successfully!', type: 'success', duration: 1500 });
-	};
 
 	// Increment stats
-	const incrementStats = () => {
-		totalImagesGenerated++;
-		// Update backend stats
-	};
 
-	let visible = false;
-
-	onMount(() => {
-		visible = true;
-		// ... rest of existing onMount code ...
-	});
 
 	$: canonicalUrl =
 		isPlatform && platformObj?.id
@@ -870,6 +390,10 @@
 	/>
 {/if}
 
+<!-- The editor raises toasts for render and quota failures; without this
+     they set the store and nothing appears. -->
+<Toast />
+
 <ToolPageShell
 	toolName={TOOL_NAME}
 	toolPath={TOOL_PATH}
@@ -976,8 +500,8 @@
 					{#each templates.slice(0, 6) as template, i}
 						<div
 							class="group bg-brand-paper border border-brand-ink overflow-hidden hover:-translate-y-1 transition-all duration-200 cursor-pointer"
-							on:click={() => selectTemplate(template)}
-							on:keydown={(e) => e.key === 'Enter' && selectTemplate(template)}
+							on:click={() => openTemplateInEditor(i)}
+							on:keydown={(e) => e.key === 'Enter' && openTemplateInEditor(i)}
 							role="button"
 							tabindex="0"
 						>
