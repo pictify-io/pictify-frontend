@@ -17,6 +17,79 @@
 	export let designRevision = 1;
 	export let rendering = false;
 	export let error = null;
+	/**
+	 * `template` renders the REAL file the API returns and offers it for
+	 * download; `campaign` proofs a revision on its way into an edition. Same
+	 * evidence, different next step, so only the wording and the actions differ.
+	 */
+	export let context = 'campaign';
+
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
+	let copied = false;
+
+	/** The host, so the caption says WHERE the file is, not just how big. */
+	const hostOf = (url) => {
+		try {
+			const { hostname, pathname } = new URL(url);
+			return `${hostname}${pathname.length > 12 ? `${pathname.slice(0, 12)}…` : pathname}`;
+		} catch {
+			return '';
+		}
+	};
+
+	/*
+	 * THE RENDER URL IS NOT READABLE THE INSTANT IT IS RETURNED.
+	 *
+	 * Measured: a proof requested milliseconds after the render came back got
+	 * 403 from the CDN, the browser cached that failure, and the pane showed a
+	 * broken image for the life of the page — a render that had in fact
+	 * succeeded, with a 55 KB file sitting at exactly that URL. Fetching the
+	 * same URL a moment later returns 200 every time.
+	 *
+	 * So a failed load is retried rather than believed. The cache-buster is only
+	 * ever on the `<img>`; `proof.url` is what Copy URL and Download hand over,
+	 * and appending our retry counter to the URL someone pastes elsewhere would
+	 * be worse than the bug.
+	 */
+	const MAX_RETRIES = 4;
+	let attempt = 0;
+	let imageFailed = false;
+	let imageSrc = '';
+	// Named dependency, so a new proof resets the retry state rather than
+	// inheriting the last one's.
+	$: if (proof?.url !== undefined) {
+		imageSrc = proof?.url || '';
+		attempt = 0;
+		imageFailed = false;
+	}
+
+	function onImageError() {
+		if (!proof?.url) return;
+		if (attempt >= MAX_RETRIES) {
+			imageFailed = true;
+			return;
+		}
+		attempt += 1;
+		const wait = 600 * attempt;
+		setTimeout(() => {
+			imageSrc = `${proof.url}${proof.url.includes('?') ? '&' : '?'}r=${attempt}`;
+		}, wait);
+	}
+
+	async function copyUrl() {
+		if (!proof?.url) return;
+		try {
+			await navigator.clipboard.writeText(proof.url);
+			copied = true;
+			setTimeout(() => (copied = false), 2000);
+		} catch {
+			// Clipboard can be refused (permissions, insecure context). Say so
+			// rather than showing a "Copied" that did not happen.
+			dispatch('copyfailed');
+		}
+	}
 
 	$: stale = Boolean(proof && proof.revision !== designRevision);
 
@@ -40,9 +113,12 @@
 		? [
 				`RENDERED REV ${proof.revision}`,
 				`${String(proof.format || 'png').toUpperCase()} ${proof.width} × ${proof.height}`,
-				KB(proof.bytes),
+				// Omitted when the size is unknown: `1 KB` for an unmeasured file is
+				// a wrong number, and a caption that invents one cannot be trusted
+				// about the numbers it does know.
+				proof.bytes ? KB(proof.bytes) : null,
 				duration(proof.totalMs),
-				clockTime(proof.at)
+				context === 'template' ? hostOf(proof.url) : clockTime(proof.at)
 		  ]
 				.filter(Boolean)
 				.join(' · ')
@@ -78,10 +154,12 @@
 				</span>
 				<span class="mt-0.5 block font-sans text-[13px] text-brand-slate">
 					{stale
-						? `Proof shows rev ${proof.revision} · design is rev ${designRevision} · re-proof before you use this design`
-						: `Both are rev ${proof.revision} · rendered ${clockTime(
-								proof.at
-						  )} · “Use this design” records rev ${proof.revision} in the campaign`}
+						? `Proof shows rev ${proof.revision} · design is rev ${designRevision} · render again before you rely on it`
+						: context === 'template'
+							? `Both are rev ${proof.revision} · rendered ${clockTime(proof.at)}`
+							: `Both are rev ${proof.revision} · rendered ${clockTime(
+									proof.at
+							  )} · “Use this design” records rev ${proof.revision} in the campaign`}
 				</span>
 			</span>
 			<!-- Never colour alone: the badge says the word as well as the tone. -->
@@ -95,20 +173,60 @@
 		</div>
 
 		<figure class="m-0 bg-brand-paper">
-			<img
-				src={proof.url}
-				alt="Rendered proof of revision {proof.revision}"
-				class="block max-w-full {rendering ? 'opacity-40' : ''}"
-			/>
+			{#if imageFailed}
+				<!-- Said plainly, with the file still reachable: the render worked,
+				     it is the display that did not. -->
+				<p class="px-3.5 py-6 font-sans text-[13px] leading-[18px] text-brand-slate">
+					The file rendered but would not load here.
+					<a href={proof.url} target="_blank" rel="noopener" class="text-brand-royal underline"
+						>Open it directly</a
+					>.
+				</p>
+			{:else}
+				<img
+					src={imageSrc}
+					on:error={onImageError}
+					alt="Rendered proof of revision {proof.revision}"
+					class="block max-w-full {rendering ? 'opacity-40' : ''}"
+				/>
+			{/if}
 			<figcaption
 				class="flex flex-wrap items-baseline justify-between gap-3 border-t border-brand-rule px-3.5 py-2.5"
 			>
 				<span class="font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-mute"
 					>{caption}</span
 				>
-				<span class="font-sans text-[13px] text-brand-slate">Exactly what customers receive.</span>
+				<span class="font-sans text-[13px] text-brand-slate">
+					{context === 'template'
+						? 'This is the real file the API returns for these sample values.'
+						: 'Exactly what customers receive.'}
+				</span>
 			</figcaption>
 		</figure>
+
+		{#if context === 'template' && proof.url}
+			<!--
+				The file itself, not a picture of it. `download` is advisory across
+				origins, so this opens the real URL rather than promising a save the
+				browser may not perform.
+			-->
+			<div class="flex flex-wrap items-center gap-2">
+				<a
+					href={proof.url}
+					target="_blank"
+					rel="noopener"
+					class="flex h-8 items-center rounded-btn bg-brand-ink px-3 font-sans text-[12.5px] text-white"
+					>Download {String(proof.format || 'png').toUpperCase()}</a
+				>
+				<button
+					type="button"
+					on:click={copyUrl}
+					class="flex h-8 items-center rounded-btn border border-brand-rule px-3 font-sans text-[12.5px] text-brand-ink"
+					>{copied ? 'Copied' : 'Copy URL'}</button
+				>
+				<span class="truncate font-mono text-[10.5px] text-brand-mute">{proof.url}</span>
+			</div>
+		{/if}
 	{:else if rendering}
 		<p class="font-sans text-[13.5px] text-brand-slate">
 			Rendering on the server — about four seconds.

@@ -25,6 +25,7 @@
 	import ConflictDialog from '$lib/components/studio/v2/ConflictDialog.svelte';
 	import AiLock from '$lib/components/studio/v2/AiLock.svelte';
 	import SelectionRail from '$lib/components/studio/v2/SelectionRail.svelte';
+	import VariablePopover from '$lib/components/studio/v2/VariablePopover.svelte';
 	import VersionsPanel from '$lib/components/studio/v2/VersionsPanel.svelte';
 	import UsingLine from '$lib/components/campaigns/UsingLine.svelte';
 	import EditReceipt from '$lib/components/studio/v2/EditReceipt.svelte';
@@ -92,6 +93,29 @@
 
 	let codePane = null;
 	let codeCaretLine = null;
+	/** Bound from the shell so entering Code can regenerate the buffer. */
+	let mode = 'design';
+
+	/** Open state of the "+ Variable" popover (PS-4). */
+	let pickingVariable = false;
+
+	/**
+	 * Put `{{name}}` where the buyer is working — the selected text element in
+	 * Design, the caret in Code. Nothing is stored: a variable is real because
+	 * the design references it (locked decision 5).
+	 */
+	function insertVariable(name, mode) {
+		pickingVariable = false;
+		if (!name) return;
+		if (mode === 'code') {
+			codePane?.insertAtCursor(`{{${name}}}`);
+			return;
+		}
+		if (!selectedId) return;
+		if (stageApi?.setBinding(selectedId, name) === false) {
+			showToast('Pick a text element first — a group cannot show a variable.', 'error');
+		}
+	}
 
 	/**
 	 * The buffer the code pane edits — RAW, so typing is never rewritten under
@@ -123,6 +147,40 @@
 	$: codeSelectedLine = selectedId
 		? (rangeForNode(codeBuffer, selectedId)?.line ?? null)
 		: codeCaretLine;
+
+
+	/*
+	 * ENTERING CODE REGENERATES THE BUFFER FROM THE DOCUMENT.
+	 *
+	 * `commit()` updates `html` but deliberately NOT `codeBuffer` — the buffer is
+	 * the user's raw text while they are typing, and rewriting it under the caret
+	 * is the thing PS-3 exists to prevent. But nothing was calling `serialize()`
+	 * either, so after a visual or AI edit the buffer still held the document as
+	 * it was when the page loaded. Opening Code then showed stale text, and
+	 * typing one character into it committed that stale document over the real
+	 * one. Measured on a fresh template: the canvas held a 3,125-character
+	 * drafted design and the code pane showed the 182-character seed.
+	 *
+	 * `serialize()` is the documented moment for this — "run after a visual or
+	 * AI edit, and when leaving Code" — and entering Code is the last instant
+	 * that is true before anyone can type.
+	 */
+	let lastMode = null;
+	$: if (mode !== lastMode) {
+		const entering = mode;
+		lastMode = mode;
+		/*
+		 * The fresh html is assigned to `codeBuffer` DIRECTLY as well as into the
+		 * store. `$: codeBuffer = $editor…` is a separate reactive statement, and
+		 * Svelte orders statements by dependency — that one can run before this
+		 * one in the same flush, in which case the pane renders the value from
+		 * before the serialize. Measured: identical code passed with a
+		 * `console.log` in this block and failed without it, because the extra
+		 * `$editor` read reordered the two. Not something to leave to chance.
+		 */
+		// Never mid-run: the AI owns the document until it finishes.
+		if (entering === 'code' && !$editor.operation) codeBuffer = editor.serialize().html;
+	}
 
 	function onCodeChange(event) {
 		editor.setHtmlFromCode(event.detail.html);
@@ -882,6 +940,7 @@
 		breadcrumb={campaign ? `${campaign.name} · Setup` : null}
 		campaignContext={inCampaign}
 		codeEnabled={true}
+		bind:mode
 		{codeBuffer}
 		{codeSelectedLine}
 		{codeVariableCount}
@@ -1042,7 +1101,7 @@
 			{/if}
 		</svelte:fragment>
 
-		<svelte:fragment slot="right" let:rightTab>
+		<svelte:fragment slot="right" let:rightTab let:mode>
 			{#if rightTab === 'inputs'}
 				<InputsRail
 					used={usedFields}
@@ -1074,10 +1133,22 @@
 					PS-9. Selecting an element used to lead nowhere here — this
 					branch showed the document summary whatever was selected.
 				-->
+				{#if pickingVariable}
+					<div class="relative">
+						<div class="absolute right-3 top-0 z-20">
+							<VariablePopover
+								variables={usedFields}
+								target={mode === 'code' ? 'code' : 'design'}
+								on:pick={(e) => insertVariable(e.detail.name, mode)}
+							/>
+						</div>
+					</div>
+				{/if}
 				<SelectionRail
 					{selection}
 					variables={usedFields}
 					disabled={Boolean($editor.operation)}
+					on:rebind={() => (pickingVariable = true)}
 					on:style={fromRail((d) => stageApi.setStyle(d.id, d.patch, d.label))}
 					on:text={fromRail((d) => stageApi.setText(d.id, d.text))}
 					on:rotate={fromRail((d) => stageApi.setRotation(d.id, d.deg))}

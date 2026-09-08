@@ -102,16 +102,27 @@
 				type="button"
 				on:click={onUndo}
 				disabled={!canUndo}
-				class="h-7 w-[30px] font-sans text-[14px] text-brand-ink disabled:text-brand-mute"
-				aria-label="Undo">↶</button
+				class="flex h-7 w-[30px] items-center justify-center text-brand-ink disabled:text-brand-mute"
+				aria-label="Undo"
 			>
+				<!-- Curved arrows, stroked: the ↶/↷ glyphs vary by font and sit off-baseline. -->
+				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+					<path d="M6 4.5 3 7.5l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+					<path d="M3.5 7.5H10a3 3 0 0 1 0 6H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+				</svg>
+			</button>
 			<button
 				type="button"
 				on:click={onRedo}
 				disabled={!canRedo}
-				class="h-7 w-[30px] font-sans text-[14px] text-brand-ink disabled:text-brand-mute"
-				aria-label="Redo">↷</button
+				class="flex h-7 w-[30px] items-center justify-center text-brand-ink disabled:text-brand-mute"
+				aria-label="Redo"
 			>
+				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+					<path d="m10 4.5 3 3-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+					<path d="M12.5 7.5H6a3 3 0 0 0 0 6h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+				</svg>
+			</button>
 		</span>
 
 		<span

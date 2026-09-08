@@ -21,6 +21,17 @@
 	/** 'image' | 'video' — picks the endpoint and the wording. */
 	export let kind = 'image';
 	export let heading = 'Use it — the call, with these inputs';
+	/**
+	 * What the call gives back, in a sentence. Board PS-03.
+	 *
+	 * Opt-in, because only a context that knows the revision can say "exactly
+	 * what Rendered proof shows for rev n" truthfully — the v1 studio and the
+	 * video studio have no proof to point at, and a claim they cannot back is
+	 * worse than no claim.
+	 */
+	export let returnsNote = null;
+	/** `[{ label, href }]` — the next things to do with the call. */
+	export let alsoLinks = [];
 
 	const TABS = ['API', 'AGENT', 'ZAPIER', 'SHEET'];
 	let tab = 'API';
@@ -110,4 +121,27 @@ ${
 		copyLabel="Copy full snippet"
 		maxHeight="max-h-[200px]"
 	/>
+
+	{#if returnsNote}
+		<!-- Under the snippet, because it answers the question the snippet
+		     raises: "and then what do I get back?" -->
+		<div class="flex flex-col gap-1">
+			<span class="font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute">Returns</span>
+			<p class="font-sans text-[12.5px] leading-[17px] text-brand-slate">{returnsNote}</p>
+		</div>
+	{/if}
+
+	{#if alsoLinks.length}
+		<div class="flex flex-col gap-1">
+			<span class="font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute">Also</span>
+			{#each alsoLinks as link (link.href)}
+				<a
+					href={link.href}
+					target={link.href.startsWith('http') ? '_blank' : null}
+					rel={link.href.startsWith('http') ? 'noopener' : null}
+					class="font-sans text-[12.5px] leading-[18px] text-brand-royal hover:underline">{link.label}</a
+				>
+			{/each}
+		</div>
+	{/if}
 </div>
