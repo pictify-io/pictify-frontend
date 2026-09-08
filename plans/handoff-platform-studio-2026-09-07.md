@@ -316,6 +316,11 @@ Backend (html-to-gif, campaigns-r1) — **enforcement is server-side, and today 
 - Confirm the public image route accepts substituted html at 1200×630 / A4 sizes without an account (it does for the tools today); substitution itself runs through the preview engine server-side so raw Handlebars never reaches the public renderer.
 Frontend TS-3 and TS-5 depend on TS-B1/B2; build them against the server headers, never against localStorage alone.
 
+Built 2026-09-08 (backend fac5336, verified against a running server: 403 without an allowed origin, 400 without an instruction, 413 over 256 KB, five renders then 429 + `resetsAt`, `X-Guest-Remaining/Limit/Resets-At` on every public render response, 18 unit tests). Two findings from the build, for the owner:
+- The counter keys on `getClientIP`, not `req.ip`: behind the proxy `req.ip` is the proxy, so a counter on it puts the whole internet in one bucket. The existing `keyGenerator: (req) => req.ip` rate limits in `routes/auth.js`, `routes/oauth.js` and `routes/public-render.js` have exactly that shape and may be doing much less than intended in production. **Separate fix, not done.**
+- `POST /gif/public` has no origin allowlist where `/image/public` does. Left as is rather than narrowing access silently. **Separate decision.**
+- Behaviour change on deploy: the 5/day guest limit is now enforced for every tool, matching what the tool components already promise; anyone quietly exceeding it will hit a ceiling.
+
 ## 9a. REVISION 2026-09-08 — embedded in the tool page, OG image generator first (supersedes §9's full page)
 
 User: *"Can we bring this experience in tools page itself rather than a full page. Check how canva and other tools do it."*, then *"We will design tools one at a time. This is good for the OG image generator. We need list of pre-made template and input box for user to add the url and ai will create OG image"*, then *"TS-03 is good. We need 2 things there. 1. A panel of pre-made templates 2. An input for url that will automatically prompt the AI in say it panel"*.
