@@ -63,6 +63,12 @@
 	 * the profile is the whole failure mode of the tool.
 	 */
 	export let safeZone = null;
+	/**
+	 * Samples a page can supply for tokens its templates carry but cannot
+	 * describe — the certificates, whose `render(values)` names its inputs but
+	 * whose markup has no ids for the tokeniser to read.
+	 */
+	export let initialSamples = {};
 
 	const AI_LIMIT = 3;
 
@@ -86,7 +92,7 @@
 	let aiError = null;
 	let aiLeft = AI_LIMIT;
 
-	let sampleValues = {};
+	let sampleValues = { ...initialSamples };
 	let downloadsLeft = null;
 	let downloadsLimit = 5;
 	let rendering = false;
@@ -204,7 +210,7 @@
 		 * keep their text (board TS-03: "Your text and colours stay"). Only
 		 * tokens they have not touched take the new template's sample.
 		 */
-		const merged = { ...samples };
+		const merged = { ...initialSamples, ...samples };
 		for (const [key, value] of Object.entries(sampleValues)) {
 			if (touched.has(key) && value !== undefined) merged[key] = value;
 		}

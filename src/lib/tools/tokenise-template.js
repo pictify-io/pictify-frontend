@@ -57,6 +57,15 @@ export function tokeniseTemplate(source) {
 
 	const samples = {};
 	const variables = [];
+	/*
+	 * Whether the template STATED any fields, which is different from whether
+	 * any could be tokenised. A template that names `template-heading` on a
+	 * container has declared its contract; if that element holds layout and
+	 * cannot take a token, the answer is "no fields here" — not "go and infer
+	 * some from the design", which would tokenise whatever text happened to sit
+	 * nearby instead.
+	 */
+	let declaresFields = false;
 	let out = '';
 	let i = 0;
 
@@ -85,6 +94,7 @@ export function tokeniseTemplate(source) {
 			i = gt + 1;
 			continue;
 		}
+		declaresFields = true;
 
 		if (IMAGE_TAGS.has(name)) {
 			/*
@@ -141,7 +151,102 @@ export function tokeniseTemplate(source) {
 		i = close;
 	}
 
+	/*
+	 * Only for sets that carry no contract of any kind.
+	 *
+	 * A document that ALREADY holds `{{tokens}}` has one — the certificate
+	 * templates arrive that way, their fields named by the render function.
+	 * Inferring on top of that added `label`, `label_2`, `label_3` for the fixed
+	 * chrome ("CERTIFICATE", "ORGANIZATION", "DATE"), which is not content and
+	 * just buries the four fields that are.
+	 */
+	if (!variables.length && !declaresFields && !/\{\{\s*[A-Za-z0-9_.]+\s*\}\}/.test(src)) {
+		return inferFields(src);
+	}
+
 	return { html: out, samples, variables };
+}
+
+/**
+ * Work out the fields of a template that declares none.
+ *
+ * The OG, LinkedIn and invoice sets carry `id="template-…"`, so their contract
+ * is stated. The pSEO sets are eighteen templates of inline-styled `<div>`s
+ * with no ids, no data attributes and no tokens — swapping to one gave the
+ * visitor an empty Inputs tab and a design they could only edit by clicking.
+ *
+ * SIZE IS THE SIGNAL, because it is the one the designer already used: the
+ * biggest text in a card is its heading, the next is its subheading, and small
+ * letter-spaced capitals are an eyebrow. That is a reading of the design, not a
+ * guess about its meaning, and it produces the same answer every time.
+ *
+ * It is deliberately a FALLBACK. A template that states its own fields is
+ * always believed over this.
+ */
+const ROLE_NAMES = ['heading', 'subheading', 'body', 'detail', 'footnote'];
+const MAX_INFERRED = 6;
+
+export function inferFields(source) {
+	const src = String(source ?? '');
+	const found = [];
+
+	// Text-bearing leaves, with whatever font-size their own style declares.
+	const re = /<([a-zA-Z][^\s/>]*)([^>]*)>([^<]*)<\/\1>/g;
+	let m;
+	while ((m = re.exec(src))) {
+		const text = m[3].trim();
+		// Anything already a token is someone else's field.
+		if (!text || /\{\{/.test(text)) continue;
+		/*
+		 * WORDS ONLY. Without this the biggest "text" in a badge is the ★ glyph
+		 * and the avatar's "JA" initials outrank the author's name — someone
+		 * editing `{{heading}}` expecting the title would get a star. A field has
+		 * to be something a person would type: at least four letters, or two
+		 * words.
+		 */
+		const letters = (text.match(/[A-Za-z]/g) || []).length;
+		const words = text.split(/\s+/).filter((w) => /[A-Za-z0-9]/.test(w)).length;
+		if (letters < 4 && words < 2) continue;
+		const attrs = m[2] || '';
+		const size = Number(/font-size:\s*(\d+(?:\.\d+)?)px/i.exec(attrs)?.[1] || 0);
+		const upper = /text-transform:\s*uppercase/i.test(attrs) || text === text.toUpperCase();
+		const spaced = /letter-spacing/i.test(attrs);
+		found.push({ start: m.index + m[0].indexOf(m[3]), end: m.index + m[0].indexOf(m[3]) + m[3].length, text, size, eyebrow: upper && spaced });
+	}
+	if (!found.length) return { html: src, samples: {}, variables: [] };
+
+	/*
+	 * Ranked by size, but an eyebrow is named for what it is rather than by its
+	 * rank — a 22px label above a 64px headline is not the second-most
+	 * important line, it is a label.
+	 */
+	const ranked = [...found].sort((a, b) => b.size - a.size);
+	const names = new Map();
+	let role = 0;
+	let eyebrows = 0;
+	let extras = 0;
+	for (const node of ranked.slice(0, MAX_INFERRED)) {
+		let name;
+		if (node.eyebrow) name = eyebrows++ ? `label_${eyebrows}` : 'label';
+		else if (role < ROLE_NAMES.length) name = ROLE_NAMES[role++];
+		else name = `text_${++extras}`;
+		names.set(node, name);
+	}
+
+	// Rewritten back to front so earlier offsets stay valid.
+	const chosen = [...names.keys()].sort((a, b) => b.start - a.start);
+	let html = src;
+	const samples = {};
+	for (const node of chosen) {
+		const name = names.get(node);
+		samples[name] = node.text;
+		html = html.slice(0, node.start) + `{{${name}}}` + html.slice(node.end);
+	}
+	// Document order, so Inputs reads down the design rather than by size.
+	const variables = [...names.keys()]
+		.sort((a, b) => a.start - b.start)
+		.map((n) => names.get(n));
+	return { html, samples, variables };
 }
 
 /**

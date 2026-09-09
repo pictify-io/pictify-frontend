@@ -43,12 +43,36 @@
 	 *
 	 * Sizes come from the templates themselves — see the note by CERT_WIDTH.
 	 */
-	const CERT_SAMPLE = {
-		recipientName: '{{name}}',
-		organizationName: 'Your Organization',
-		date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-		achievementText: 'for successfully completing the Advanced Training Program'
-	};
+	/*
+	 * EVERY field the render function takes becomes a variable, not just the
+	 * recipient. These templates carry no ids for the tokeniser to find, but
+	 * `render(values)` names its inputs exactly — so the contract is known
+	 * rather than guessed, and a certificate saved from here can be called with
+	 * all four.
+	 *
+	 * The sample each one starts with is what the tool shipped, so the canvas
+	 * reads as a real certificate rather than four tokens.
+	 */
+	const CERT_FIELDS = [
+		{ key: 'recipientName', token: 'name', sample: 'Ada Lovelace' },
+		{ key: 'organizationName', token: 'organization', sample: 'Your Organization' },
+		{
+			key: 'date',
+			token: 'issued_on',
+			sample: new Date().toLocaleDateString('en-US', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric'
+			})
+		},
+		{
+			key: 'achievementText',
+			token: 'achievement',
+			sample: 'for successfully completing the Advanced Training Program'
+		}
+	];
+	const CERT_SAMPLE = Object.fromEntries(CERT_FIELDS.map((f) => [f.key, `{{${f.token}}}`]));
+	const CERT_SAMPLE_VALUES = Object.fromEntries(CERT_FIELDS.map((f) => [f.token, f.sample]));
 	$: editorTemplates = certificateHtmlTemplates.map((t) => ({
 		key: t.id,
 		name: t.name,
@@ -388,6 +412,7 @@
 		{:else}
 			<ToolEditor
 				templates={editorTemplates}
+				initialSamples={CERT_SAMPLE_VALUES}
 				width={CERT_WIDTH}
 				height={CERT_HEIGHT}
 				sourceKind="certificate"

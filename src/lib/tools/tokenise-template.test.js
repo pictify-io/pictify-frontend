@@ -36,6 +36,11 @@ describe('tokenising', () => {
 		 */
 		const src = '<div id="template-heading"><span class="a">Big</span> <em>small</em></div>';
 		assert.equal(tokeniseTemplate(src).html, src);
+		/*
+		 * And it does NOT fall through to inference: the template stated its
+		 * fields, so "none here" is the answer — inferring some would tokenise
+		 * whatever text sat nearby instead of what was declared.
+		 */
 		assert.deepEqual(tokeniseTemplate(src).variables, []);
 	});
 
@@ -56,9 +61,14 @@ describe('tokenising', () => {
 		assert.equal(tokeniseTemplate(src).samples.subheading, 'Full Stack Developer');
 	});
 
-	test('elements without an id are untouched', () => {
-		const src = '<p>Just prose.</p><div class="x">More.</div>';
-		assert.equal(tokeniseTemplate(src).html, src);
+	test('markup that declares no ids falls through to inference', () => {
+		/*
+		 * Intended: an id-less template's text IS its content — that is the whole
+		 * point of the fallback. Templates that DO declare ids are handled above
+		 * and never reach it.
+		 */
+		const src = '<p>Just prose.</p><div class="x">More words here.</div>';
+		assert.ok(tokeniseTemplate(src).variables.length > 0);
 	});
 
 	test('an id that is not a template field still becomes a token only once', () => {
@@ -91,14 +101,94 @@ describe('tokenising', () => {
 		assert.equal(tokeniseTemplate(src).html, src);
 	});
 
-	test('an id inside a comment or a string does not create a variable', () => {
-		// `id=` appearing in prose must not be mistaken for an attribute.
-		const src = '<p>Set id= on the element</p>';
-		assert.deepEqual(tokeniseTemplate(src).variables, []);
+	test('an id= in prose is not read as an attribute', () => {
+		// It must not become a field NAMED from that text; inference may still
+		// treat the prose as content, which is a different thing.
+		const out = tokeniseTemplate('<p>Set id= on the element</p>');
+		assert.ok(!out.variables.some((v) => v.startsWith('on_')));
 	});
 
 	test('a self-closing image is handled', () => {
 		const out = tokeniseTemplate('<img id="template-logo" src="a.png" />');
 		assert.match(out.html, /\{\{logo_url\}\}/);
+	});
+});
+
+/**
+ * The fallback for templates that declare no fields. Eighteen pSEO templates
+ * are inline-styled divs with no ids at all, so swapping to one used to give
+ * the visitor an empty Inputs tab.
+ */
+describe('inferring fields from the design', () => {
+	const CARD =
+		'<div><div style="font-size:22px;letter-spacing:.12em;text-transform:uppercase">MARCH NEWSLETTER</div>' +
+		'<div style="font-size:64px">What shipped this month</div>' +
+		'<div style="font-size:24px">Roadmap notes and one big announcement.</div></div>';
+
+	test('size is the signal: biggest is the heading, next the subheading', () => {
+		const out = tokeniseTemplate(CARD);
+		assert.equal(out.samples.heading, 'What shipped this month');
+		assert.equal(out.samples.subheading, 'Roadmap notes and one big announcement.');
+	});
+
+	test('small letter-spaced capitals are a label, not the second heading', () => {
+		// A 22px eyebrow above a 64px headline is a label, not the runner-up.
+		assert.equal(tokeniseTemplate(CARD).samples.label, 'MARCH NEWSLETTER');
+	});
+
+	test('variables come back in DOCUMENT order, not size order', () => {
+		// Inputs should read down the design.
+		assert.deepEqual(tokeniseTemplate(CARD).variables, ['label', 'heading', 'subheading']);
+	});
+
+	test('glyphs and initials are not fields', () => {
+		/*
+		 * Without this the biggest "text" in a badge is the ★ and an avatar's
+		 * "JA" outranks the author's name — someone editing {{heading}} expecting
+		 * the title would get a star.
+		 */
+		const src =
+			'<div><div style="font-size:90px">★</div><div style="font-size:30px">JA</div>' +
+			'<div style="font-size:20px">Top Contributor</div></div>';
+		const out = tokeniseTemplate(src);
+		assert.ok(!Object.values(out.samples).includes('★'));
+		assert.ok(!Object.values(out.samples).includes('JA'));
+		assert.equal(out.samples.heading, 'Top Contributor');
+	});
+
+	test('a template that DECLARES its fields is believed over the fallback', () => {
+		// The fallback is a fallback; a stated contract always wins.
+		const src = '<div><h1 id="template-heading">Real</h1><div style="font-size:99px">Bigger</div></div>';
+		const out = tokeniseTemplate(src);
+		assert.deepEqual(out.variables, ['heading']);
+		assert.equal(out.samples.heading, 'Real');
+	});
+
+	test('markup with no words yields nothing rather than junk fields', () => {
+		const out = tokeniseTemplate('<div><div style="font-size:40px">★</div></div>');
+		assert.deepEqual(out.variables, []);
+	});
+
+	test('it never produces more fields than it can name well', () => {
+		let src = '<div>';
+		for (let i = 0; i < 20; i++) src += `<div style="font-size:${40 - i}px">Line number ${i}</div>`;
+		src += '</div>';
+		assert.ok(tokeniseTemplate(src).variables.length <= 6);
+	});
+});
+
+describe('a document that already has tokens', () => {
+	test('is not inferred over', () => {
+		/*
+		 * The certificates arrive with their fields already named by the render
+		 * function. Inferring on top added label/label_2/label_3 for the fixed
+		 * chrome — "CERTIFICATE", "ORGANIZATION", "DATE" — which is not content
+		 * and buried the four fields that are.
+		 */
+		const src =
+			'<div><div style="font-size:20px">CERTIFICATE</div>' +
+			'<div style="font-size:60px">{{name}}</div></div>';
+		assert.deepEqual(tokeniseTemplate(src).variables, []);
+		assert.equal(tokeniseTemplate(src).html, src);
 	});
 });
