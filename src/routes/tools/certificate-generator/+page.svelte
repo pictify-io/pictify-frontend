@@ -5,7 +5,6 @@
 	 * Bulk upsell, gallery, form and preview become the tool card; the quota
 	 * ladder and Generate move to its toolbar. SEO copy is frozen.
 	 */
-	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
 	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
 	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
 	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
@@ -23,113 +22,59 @@
 	import JumpLink from '$lib/components/tools/v2/longform/JumpLink.svelte';
 	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
-	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
-	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
+	import ToolEditor from '$lib/components/tools/ToolEditor.svelte';
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { user } from '../../../store/user.store';
-	import { toast } from '../../../store/toast.store';
-	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
-	import { createImagePublic } from '../../../api/image.js';
 	import { analytics } from '$lib/telemetry.js';
-	import { downloadFile } from '$lib/utils/download.js';
 	import { certificateHtmlTemplates } from '$lib/components/tools/CertificateHtmlTemplates.js';
 
 	// User login state (reactive — no manual subscribe needed)
 	$: isUserLoggedIn = !!$user?.email;
 
-	let selectedTemplate = certificateHtmlTemplates[0];
-	let formValues = {
-		recipientName: 'John Doe',
+	/*
+	 * The gallery for the embed.
+	 *
+	 * THE RECIPIENT IS RENDERED AS A VARIABLE, not as a name. That is the whole
+	 * point of a certificate template: one is also a thousand, and the visitor
+	 * should see `{{name}}` in the design and in Inputs from the first second
+	 * rather than discover the idea later. Everything else renders as sample
+	 * text they can edit directly.
+	 *
+	 * Sizes come from the templates themselves — see the note by CERT_WIDTH.
+	 */
+	const CERT_SAMPLE = {
+		recipientName: '{{name}}',
 		organizationName: 'Your Organization',
-		date: new Date().toLocaleDateString('en-US', {
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric'
-		}),
+		date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
 		achievementText: 'for successfully completing the Advanced Training Program'
 	};
+	$: editorTemplates = certificateHtmlTemplates.map((t) => ({
+		key: t.id,
+		name: t.name,
+		category: null,
+		html: t.render(CERT_SAMPLE)
+	}));
 
-	let isGenerating = false;
-	let generatedImageUrl = '';
-	let generationError = '';
-	let previewContainerWidth = 0;
+	/*
+	 * The shipped templates are 1920×1080. The handoff matrix asks for landscape
+	 * A4, which is a different aspect ratio (1.414 vs 1.778) — rendering these
+	 * at A4 would letterbox or crop every one of them. Reflowing five designs
+	 * for print is design work, not a prop change, so the canvas uses the
+	 * templates' own size and the A4 question stays open.
+	 */
+	const CERT_WIDTH = certificateHtmlTemplates[0]?.width || 1920;
+	const CERT_HEIGHT = certificateHtmlTemplates[0]?.height || 1080;
+
+	/** One release of escape hatch, the same lever the other tools use. */
+	$: useLegacyTool = $page?.url?.searchParams?.get?.('studio') === 'v1';
+
+
 
 	// The preview HTML is rebuilt from the form on every keystroke — the same
-	// string that gets POSTed to /image/public, so preview === output.
-	$: previewHtml = selectedTemplate.render(formValues);
-	$: previewScale = previewContainerWidth
-		? Math.min(1, previewContainerWidth / selectedTemplate.width)
-		: 1;
 
-	function selectTemplate(template) {
-		selectedTemplate = template;
-		formValues = {
-			recipientName: 'John Doe',
-			organizationName: 'Your Organization',
-			date: new Date().toLocaleDateString('en-US', {
-				year: 'numeric',
-				month: 'long',
-				day: 'numeric'
-			}),
-			achievementText: 'for successfully completing the Advanced Training Program'
-		};
-		generatedImageUrl = '';
-		generationError = '';
-	}
-
-	// Generation flow (matches [usecase] page pattern) — renders the HTML
-	// template through the public endpoint, same engine as the paid API.
-	async function handleGenerate() {
-		generationLimits.increment();
-		isGenerating = true;
-		generationError = '';
-		generatedImageUrl = '';
-
-		try {
-			const { image } = await createImagePublic({
-				html: previewHtml,
-				width: selectedTemplate.width,
-				height: selectedTemplate.height,
-				fileExtension: 'png'
-			});
-
-			if (image?.url) {
-				generatedImageUrl = image.url;
-				toast.set({
-					message: 'Certificate generated successfully!',
-					type: 'success',
-					duration: 2000
-				});
-				analytics.trackImageGenerated({
-					tool_name: 'certificate_generator',
-					format: 'png',
-					with_watermark: false
-				});
-			} else {
-				throw new Error('No image URL in response');
-			}
-		} catch (e) {
-			if (e.message?.includes('rate') || e.status === 429) {
-				generationError = 'Too many requests. Please wait a moment and try again.';
-			} else {
-				generationError = e.message || 'Failed to generate certificate';
-			}
-			toast.set({ message: generationError, type: 'error', duration: 3000 });
-		} finally {
-			isGenerating = false;
-		}
-	}
 
 	// API snippet for NextSteps — the same HTML with variables swapped in
-	const apiSnippet = `curl -X POST https://api.pictify.io/image \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
-  -d '{
-    "html": "<your certificate HTML: swap the sample values for {{recipientName}}, {{date}}...>",
-    "width": 1920,
-    "height": 1080,
-    "fileExtension": "png"
-  }'`;
 
 	// FAQ data
 	const faqs = [
@@ -320,8 +265,6 @@
 	const TOOL_NAME = 'certificate_generator';
 	const TOOL_PATH = '/tools/certificate-generator';
 
-	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
-	$: lastFreeRender = !isUserLoggedIn && guestRemaining <= 1;
 
 	const certificateExamples = [
 		{
@@ -418,7 +361,6 @@
 	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · 5 TEMPLATES"
 	related={RELATED}
 	loggedIn={isUserLoggedIn}
-	hasResult={!!generatedImageUrl}
 	toc={TOC}
 	longform="rail"
 >
@@ -435,332 +377,31 @@
 	</HeroSub>
 
 	<div slot="tool">
-		<ToolCard>
-			<div class="flex flex-col gap-6 p-5 lg:p-7">
-				<div class="max-w-5xl mx-auto mb-10 sm:mb-14">
-					<div
-						class="bg-brand-field border border-brand-ink rounded-xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-6"
-					>
-						<div class="flex-1">
-							<div
-								class="inline-flex items-center gap-2 px-3 py-1 bg-brand-ink text-white text-[10px] sm:text-xs font-semibold tracking-wider mb-3"
-							>
-								<svg
-									class="w-3 h-3 sm:w-4 sm:h-4"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M13 10V3L4 14h7v7l9-11h-7z"
-									/></svg
-								>
-								Bulk
-							</div>
-							<p class="mb-1 text-lg font-semibold tracking-tight text-brand-ink sm:text-xl">
-								Need certificates for a whole list?
-							</p>
-							<p class="text-sm sm:text-base font-bold text-brand-slate">
-								Upload a CSV and render every row against this template. Or trigger it by webhook:
-								issue a certificate the moment your LMS reports a completion.
-							</p>
-						</div>
-						<a
-							href="/signup?redirect=%2Fdashboard%2Fworkflows%2Fnew%3Fpack%3Dcertificates"
-							class="flex-shrink-0 px-6 py-3 bg-brand-ink text-white border border-brand-ink font-semibold text-sm tracking-wide transition-all rounded-xl text-center"
-						>
-							Start a Bulk Run →
-						</a>
-					</div>
-				</div>
-				<div class="max-w-5xl mx-auto mb-10 sm:mb-14">
-					<p class="mb-6 flex items-center gap-3 text-xl font-semibold sm:text-2xl">
-						<span
-							class="w-8 h-8 bg-brand-field border border-brand-ink flex items-center justify-center"
-						>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
-								/></svg
-							>
-						</span>
-						CHOOSE A TEMPLATE
-					</p>
-
-					<div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
-						{#each certificateHtmlTemplates as template}
-							<button
-								class="flex-shrink-0 w-44 bg-brand-paper border-[1.5px] {selectedTemplate.id ===
-								template.id
-									? 'border-brand-danger'
-									: 'border-black'} p-3 overflow-hidden transition-all cursor-pointer rounded-xl relative"
-								on:click={() => selectTemplate(template)}
-								aria-label="{template.name} certificate template: {template.description}"
-								title="{template.name} certificate template"
-							>
-								{#if selectedTemplate.id === template.id}
-									<div
-										class="absolute top-2 right-2 z-10 w-6 h-6 bg-brand-pink border border-brand-ink flex items-center justify-center rounded-full"
-									>
-										<span class="text-white font-semibold text-sm">&#10003;</span>
-									</div>
-								{/if}
-								<div
-									class="w-full h-20 rounded-lg mb-2 border-[2px] border-gray-200"
-									role="img"
-									aria-label="{template.name} certificate template preview"
-									style="background-color: {template.thumbnailColor};"
-								/>
-								<span class="text-xs font-semibold text-brand-ink tracking-wide block text-center"
-									>{template.name}</span
-								>
-								<span
-									class="text-[10px] text-brand-mute font-medium block text-center mt-0.5 line-clamp-1"
-									>{template.description}</span
-								>
-							</button>
-						{/each}
-					</div>
-				</div>
-
-				<div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-8">
-					<div class="bg-brand-paper border border-brand-ink overflow-hidden rounded-xl">
-						<!-- Terminal Header -->
-						<div
-							class="bg-brand-ink text-white px-4 py-3 flex justify-between items-center border-b border-brand-ink"
-						>
-							<p class="flex items-center gap-2 font-mono text-xs font-bold tracking-widest">
-								<span class="animate-pulse">_</span> CERTIFICATE DETAILS
-							</p>
-							<div class="flex gap-2">
-								<div class="w-3 h-3 bg-brand-pink border border-black" />
-								<div class="w-3 h-3 bg-brand-field border border-black" />
-								<div class="w-3 h-3 bg-brand-proof border border-black" />
-							</div>
-						</div>
-
-						<div class="p-4 sm:p-6 space-y-5">
-							<!-- Recipient Name -->
-							<div class="space-y-2">
-								<p
-									class="flex items-center gap-2 text-xs font-semibold tracking-wider text-brand-ink"
-								>
-									<span
-										class="w-6 h-6 bg-brand-field border border-brand-ink flex items-center justify-center text-xs"
-										>1</span
-									>
-									Recipient Name
-								</p>
-								<input
-									bind:value={formValues.recipientName}
-									type="text"
-									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none rounded-lg"
-									placeholder="John Doe"
-								/>
-							</div>
-
-							<!-- Organization Name -->
-							<div class="space-y-2">
-								<p
-									class="flex items-center gap-2 text-xs font-semibold tracking-wider text-brand-ink"
-								>
-									<span
-										class="w-6 h-6 bg-data-sky border border-brand-ink flex items-center justify-center text-xs text-white"
-										>2</span
-									>
-									Organization Name
-								</p>
-								<input
-									bind:value={formValues.organizationName}
-									type="text"
-									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none rounded-lg"
-									placeholder="Your Organization"
-								/>
-							</div>
-
-							<!-- Date -->
-							<div class="space-y-2">
-								<p
-									class="flex items-center gap-2 text-xs font-semibold tracking-wider text-brand-ink"
-								>
-									<span
-										class="w-6 h-6 bg-data-violet border border-brand-ink flex items-center justify-center text-xs text-white"
-										>3</span
-									>
-									Date
-								</p>
-								<input
-									bind:value={formValues.date}
-									type="text"
-									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none rounded-lg"
-									placeholder="April 13, 2026"
-								/>
-							</div>
-
-							<!-- Achievement Text -->
-							<div class="space-y-2">
-								<p
-									class="flex items-center gap-2 text-xs font-semibold tracking-wider text-brand-ink"
-								>
-									<span
-										class="w-6 h-6 bg-brand-pink border border-brand-ink flex items-center justify-center text-xs text-white"
-										>4</span
-									>
-									Achievement
-								</p>
-								<textarea
-									bind:value={formValues.achievementText}
-									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none resize-none rounded-lg"
-									placeholder="for successfully completing the Advanced Training Program"
-									rows="3"
-								/>
-							</div>
-
-							<!-- Workflow CTA: bulk generation + delivery -->
-							<a
-								href="/dashboard/workflows/new"
-								class="w-full py-3 bg-brand-proof text-brand-ink border border-brand-ink font-semibold text-sm tracking-wide transition-all flex items-center justify-center gap-2 rounded-xl"
-							>
-								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M13 10V3L4 14h7v7l9-11h-7z"
-									/></svg
-								>
-								Start a Certificate Run
-							</a>
-						</div>
-					</div>
-					<div class="flex flex-col gap-4">
-						<div class="bg-brand-paper border border-brand-ink overflow-hidden rounded-xl">
-							<!-- Preview Header -->
-							<div
-								class="bg-brand-subtle border-b border-brand-ink p-4 flex items-center justify-between"
-							>
-								<div class="flex items-center gap-2">
-									<div class="w-3.5 h-3.5 rounded-full bg-brand-pink border border-brand-ink" />
-									<div class="w-3.5 h-3.5 rounded-full bg-brand-field border border-brand-ink" />
-									<div class="w-3.5 h-3.5 rounded-full bg-brand-proof border border-brand-ink" />
-								</div>
-								<div class="font-mono text-xs font-bold text-brand-mute flex items-center gap-2">
-									<span
-										class="px-2 py-0.5 bg-brand-proof/20 border border-brand-proof rounded text-brand-slate"
-										>Live Preview</span
-									>
-									{selectedTemplate.width} x {selectedTemplate.height}px
-								</div>
-							</div>
-
-							<!-- Live HTML Preview (scaled iframe of the exact render HTML) -->
-							<div
-								class="p-4 sm:p-6 bg-brand-subtle flex flex-col items-center justify-center relative min-h-[300px]"
-							>
-								<div
-									class="absolute inset-0 opacity-10"
-									style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
-								/>
-
-								<div class="relative z-10 w-full" bind:clientWidth={previewContainerWidth}>
-									<div
-										class="overflow-hidden bg-brand-paper border border-brand-ink rounded-lg"
-										style="height: {Math.round(selectedTemplate.height * previewScale)}px;"
-									>
-										<iframe
-											title="Certificate preview"
-											srcdoc={previewHtml}
-											sandbox="allow-scripts"
-											scrolling="no"
-											style="width: {selectedTemplate.width}px; height: {selectedTemplate.height}px; border: 0; transform: scale({previewScale}); transform-origin: top left; pointer-events: none;"
-										/>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<svelte:fragment slot="toolbar-left">
-				<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">
-					NAMES → CERTIFICATES
-				</span>
-			</svelte:fragment>
-
-			<svelte:fragment slot="toolbar-right">
-				<QuotaMeter
-					remaining={guestRemaining}
-					loggedIn={isUserLoggedIn}
-					toolName={TOOL_NAME}
-					toolPath={TOOL_PATH}
-				/>
-				<GenerateButton
-					label="Generate Certificate"
-					loading={isGenerating}
-					remaining={guestRemaining}
-					loggedIn={isUserLoggedIn}
-					toolName={TOOL_NAME}
-					toolPath={TOOL_PATH}
-					on:generate={handleGenerate}
-				/>
-			</svelte:fragment>
-		</ToolCard>
-	</div>
-
-	<div slot="result">
-		{#if generatedImageUrl}
-			<ResultCard
-				imageUrl={generatedImageUrl}
-				formatLabel="PNG"
-				fileExtension="png"
-				width={selectedTemplate.width}
-				height={selectedTemplate.height}
-				loggedIn={isUserLoggedIn}
-				lastFree={lastFreeRender}
-				toolName={TOOL_NAME}
-				toolPath={TOOL_PATH}
+		<!-- TS-8. Edited in place on the shared embed. `?studio=v1` for one release. -->
+		{#if useLegacyTool}
+			<ToolCard>
+				<p class="p-6 font-sans text-[13.5px] leading-[19px] text-brand-slate">
+					The classic generator has been replaced by the editor.
+					<a href="?" class="text-brand-royal underline">Open it</a>.
+				</p>
+			</ToolCard>
+		{:else}
+			<ToolEditor
+				templates={editorTemplates}
+				width={CERT_WIDTH}
+				height={CERT_HEIGHT}
+				sourceKind="certificate"
+				toolName="certificate_generator"
+				downloadName="certificate"
+				defaultTab="inputs"
+				bulkLeadIn={{
+					label: 'One certificate is also a thousand · Bulk from CSV',
+					href: '/signup?intent=template-editor&next=bulk-render'
+				}}
 			/>
-			<div class="mt-4 flex justify-center">
-				<a
-					href="/dashboard/workflows/new"
-					class="inline-flex items-center gap-2 rounded-lg border-[1.5px] border-brand-ink bg-brand-field px-5 py-2.5 font-sans text-sm font-semibold text-brand-ink shadow-[2px_2px_0_0_#000] transition-transform hover:-translate-y-0.5"
-				>
-					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M13 10V3L4 14h7v7l9-11h-7z"
-						/></svg
-					>
-					Need a whole class? Send these in bulk from a CSV
-				</a>
-			</div>
-		{:else if generationError}
-			<div class="max-w-3xl mx-auto px-4 mb-12">
-				<div class="flex items-center gap-4 rounded-tile border border-brand-danger bg-red-50 p-6">
-					<div
-						class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center border-2 border-red-500 text-red-500 font-semibold"
-					>
-						!
-					</div>
-					<div>
-						<h4 class="font-semibold text-red-900">Generation Failed</h4>
-						<p class="text-red-700 font-medium">{generationError}</p>
-					</div>
-					<button on:click={handleGenerate} class="ml-auto underline font-bold text-red-900"
-						>Retry</button
-					>
-				</div>
-			</div>
 		{/if}
 	</div>
+
 
 	<AutomateSection
 		slot="automate"

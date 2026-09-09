@@ -62,8 +62,11 @@
 	const AI_LIMIT = 3;
 
 	let activeTemplate = null;
-	let mode = 'design';
-	let panel = 'say';
+	// Seeded from the props, not hardcoded: these are BOUND to the embed, so a
+	// literal here silently overrides `opensIn` / `defaultTab` and the
+	// certificate tool opens on Say it instead of Inputs.
+	let mode = opensIn === 'code' ? 'code' : 'design';
+	let panel = defaultTab;
 	let stageApi = null;
 	let selection = null;
 	let draftId = null;
