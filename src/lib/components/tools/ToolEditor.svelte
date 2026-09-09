@@ -28,7 +28,7 @@
 	import StudioStage from '$lib/components/studio/v2/StudioStage.svelte';
 	import SelectionRail from '$lib/components/studio/v2/SelectionRail.svelte';
 	import { editor } from '$lib/components/studio/v2/editor-store.js';
-	import { extractInputs } from '$lib/utils/template-tokens.js';
+	import { extractInputs, typeFor, defaultSampleFor } from '$lib/utils/template-tokens.js';
 	import { createImagePublic, getGuestRenderQuota } from '../../../api/image.js';
 	import { editGuestTemplate } from '../../../api/template.js';
 	import { getWebsiteInfo } from '../../../api/tools/og-image.js';
@@ -81,13 +81,38 @@
 	let aiError = null;
 	let aiLeft = AI_LIMIT;
 
+	let sampleValues = {};
 	let downloadsLeft = null;
 	let downloadsLimit = 5;
 	let rendering = false;
 	let format = formats[0] || 'png';
 
 	$: html = $editor.html || '';
-	$: variables = extractInputs(html);
+	$: variables = extractInputs(html).map((name) => ({ name, type: typeFor(name) }));
+
+	/**
+	 * Sample values, pre-filled the first time each token appears.
+	 *
+	 * An empty Inputs column asks the visitor to invent test data before they
+	 * can see what the design does with it, and an empty variable renders as a
+	 * hole — the card looks broken and they blame the template. So a token gets
+	 * a plausible placeholder the moment it exists, and anything they type
+	 * afterwards is theirs: `??=` here rather than an overwrite, or the field
+	 * would fight the person typing in it.
+	 */
+	$: if (variables.length) {
+		let added = false;
+		for (const v of variables) {
+			if (sampleValues[v.name] === undefined) {
+				sampleValues[v.name] = defaultSampleFor(v.name, v.type);
+				added = true;
+			}
+		}
+		// One assignment, so Svelte sees it once rather than per key.
+		if (added) sampleValues = { ...sampleValues };
+	}
+
+	const setSample = (name, value) => (sampleValues = { ...sampleValues, [name]: value });
 
 	/* ── draft ─────────────────────────────────────────────────────────── */
 	/*
@@ -236,7 +261,12 @@
 		if (rendering) return;
 		rendering = true;
 		try {
-			const source = stageApi?.serialize?.() || $editor.html;
+			/*
+			 * Substituted before rendering. The visitor is looking at their sample
+			 * values, and a download that came back with `{{name}}` printed on it
+			 * would be a different thing from the one on screen.
+			 */
+			const source = substitute(stageApi?.serialize?.() || $editor.html, sampleValues);
 			/*
 			 * `fileExtension` is what makes this a PDF rather than a picture of
 			 * one. The public image route takes it and runs the same engine — it
@@ -271,6 +301,14 @@
 			refreshQuota();
 		}
 	}
+
+	/** `{{token}}` only, escaped — the same rule the stage preview uses. */
+	const substitute = (source, values) =>
+		String(source || '').replace(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g, (m, key) => {
+			const value = values[key];
+			if (value === null || value === undefined || value === '') return m;
+			return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		});
 
 	function save() {
 		analytics?.track?.('tool_editor_save_click', { tool_name: toolName });
@@ -317,7 +355,7 @@
 				imagePolicy="any"
 				{safeZone}
 
-				sampleValues={{}}
+				{sampleValues}
 				on:selection={(e) => (selection = e.detail || null)}
 				on:transaction={(e) => editor.commit(e.detail.label, e.detail.html)}
 			/>
@@ -404,22 +442,38 @@
 	</svelte:fragment>
 
 	<svelte:fragment slot="inputs">
-		<div class="flex flex-col gap-2 p-3">
-			<span class="font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-mute"
-				>Variables · {variables.length}</span
-			>
-			{#if variables.length}
-				{#each variables as v (typeof v === 'string' ? v : v.name)}
-					<span class="font-mono text-[12px] text-brand-ink"
-						>{'{{'}{typeof v === 'string' ? v : v.name}{'}}'}</span
-					>
-				{/each}
-				<p class="font-sans text-[12px] leading-[16px] text-brand-mute">
-					These become the API contract when you save this as a template.
-				</p>
+		<div class="flex flex-col gap-3 p-3">
+			<p class="font-mono text-[10.5px] uppercase tracking-[0.08em] text-brand-mute">
+				{variables.length}
+				{variables.length === 1 ? 'variable' : 'variables'}
+			</p>
+			{#each variables as v (v.name)}
+				<label class="flex flex-col gap-1">
+					<span class="flex items-center gap-2">
+						<span class="font-mono text-[12px] text-brand-ink">{v.name}</span>
+						<span
+							class="rounded-btn border border-brand-rule px-1.5 font-mono text-[9.5px] uppercase tracking-[0.06em] text-brand-mute"
+							>{v.type}</span
+						>
+					</span>
+					<input
+						type={v.type === 'color' ? 'color' : 'text'}
+						value={sampleValues[v.name] ?? ''}
+						on:input={(e) => setSample(v.name, e.currentTarget.value)}
+						placeholder={v.type === 'image' ? 'https://…/logo.png' : 'Sample value'}
+						class="h-8 rounded-btn border border-brand-rule px-2 font-sans text-[13px] text-brand-ink outline-none focus:border-brand-ink"
+					/>
+				</label>
 			{:else}
-				<p class="font-sans text-[12.5px] leading-[17px] text-brand-mute">
-					No variables yet. Add one and this card becomes callable from the API.
+				<p class="font-sans text-[13px] leading-[19px] text-brand-mute">
+					No variables yet. Add <span class="font-mono">&#123;&#123;name&#125;&#125;</span> to the
+					design and it appears here.
+				</p>
+			{/each}
+			{#if variables.length}
+				<p class="font-sans text-[12px] leading-[16px] text-brand-mute">
+					Preview shows these values. They become the API contract when you save this as a
+					template.
 				</p>
 			{/if}
 		</div>

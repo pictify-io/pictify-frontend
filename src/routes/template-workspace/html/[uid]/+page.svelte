@@ -39,7 +39,7 @@
 
 	import { editor } from '$lib/components/studio/v2/editor-store.js';
 	import { createSaveQueue } from '$lib/components/studio/v2/save-queue.js';
-	import { extractInputs } from '$lib/utils/template-tokens.js';
+	import { extractInputs, typeFor } from '$lib/utils/template-tokens.js';
 	import { rangeForNode, nodeForOffset } from '$lib/components/studio/v2/code-map.js';
 	import { previewTemplateHtml, renderTemplate } from '../../../../api/template';
 	import ProofView from '$lib/components/studio/v2/ProofView.svelte';
@@ -454,15 +454,6 @@
 	 * separately, so the rail cannot claim an input the template does not have.
 	 * Ported from the v1 studio so both agree on what counts as a variable.
 	 */
-	function typeFor(tokenName) {
-		const n = String(tokenName).toLowerCase();
-		if (/(^|_)(date|issued_on|expires|day)($|_)/.test(n)) return 'date';
-		if (/(image|img|logo|photo|avatar|signature)_?url$|^(image|img|logo|photo|avatar)$/.test(n))
-			return 'image';
-		if (/url$|^link$/.test(n)) return 'url';
-		if (/colou?r$/.test(n)) return 'color';
-		return 'text';
-	}
 
 	$: html = $editor.html || template?.html || '';
 	$: variables = extractInputs(html).map((name) => ({ name, type: typeFor(name) }));
