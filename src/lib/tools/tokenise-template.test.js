@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { tokeniseTemplate, tokenFor } from './tokenise-template.js';
+import { tokeniseTemplate, tokenFor, inferFields } from './tokenise-template.js';
 
 describe('tokenFor', () => {
 	test('strips the template- prefix and normalises', () => {
@@ -190,5 +190,34 @@ describe('a document that already has tokens', () => {
 			'<div style="font-size:60px">{{name}}</div></div>';
 		assert.deepEqual(tokeniseTemplate(src).variables, []);
 		assert.equal(tokeniseTemplate(src).html, src);
+	});
+});
+
+describe('inferFields · opaque elements', () => {
+	test('never proposes a stylesheet as a field', () => {
+		const doc = `<html><head><style>
+      body { margin: 0; font-family: system-ui; }
+      h1 { font-size: 76px; color: #14110f; }
+    </style></head><body>
+      <h1 style="font-size:76px">Edit this HTML</h1>
+      <p style="font-size:26px">Change anything on the left and it follows.</p>
+    </body></html>`;
+		const { html, samples, variables } = inferFields(doc);
+		// The CSS survives untouched — it is the design, not a value.
+		assert.match(html, /font-family: system-ui/);
+		for (const v of variables) assert.doesNotMatch(samples[v], /font-family/);
+		assert.deepEqual(variables, ['heading', 'subheading']);
+	});
+
+	test('leaves script, title and pre alone too', () => {
+		const doc = `<html><head><title>Some page title here</title></head><body>
+      <script>const answer = "forty two and then some";</script>
+      <pre>a preformatted block of sample text</pre>
+      <h1 style="font-size:60px">The real heading</h1>
+      <p style="font-size:20px">And the real body copy underneath.</p>
+    </body></html>`;
+		const { samples, variables } = inferFields(doc);
+		const texts = variables.map((v) => samples[v]);
+		assert.deepEqual(texts, ['The real heading', 'And the real body copy underneath.']);
 	});
 });

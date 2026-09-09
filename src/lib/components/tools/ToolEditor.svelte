@@ -37,6 +37,7 @@
 	import { newDraftId, saveDraft, latestDraft } from '$lib/tools/editor-draft.js';
 	import { writeInstruction } from '$lib/tools/write-instruction.js';
 	import { tokeniseTemplate } from '$lib/tools/tokenise-template.js';
+	import { proposeFields } from '$lib/tools/propose-fields.js';
 	import { inspectPastedHtml, reportLines } from '$lib/components/studio/v2/paste-report.js';
 	import CodePane from '$lib/components/studio/v2/CodePane.svelte';
 	import { nodeForOffset, rangeForNode } from '$lib/components/studio/v2/code-map.js';
@@ -201,6 +202,37 @@
 		}
 		// One assignment, so Svelte sees it once rather than per key.
 		if (added) sampleValues = { ...sampleValues };
+	}
+
+	/* ── "this could be a template" (TS-11) ─────────────────────────────── */
+	/*
+	 * Only ever offered on a document with no contract of its own, and only in
+	 * the panel — never applied on arrival. Someone who pasted their own page
+	 * asked for a render; turning their headline into `{{heading}}` behind them
+	 * is indistinguishable from a bug.
+	 */
+	let proposalDismissed = false;
+	$: proposal = variables.length || proposalDismissed ? null : proposeFields(html);
+
+	function acceptProposal() {
+		if (!proposal) return;
+		const { html: tokenised, samples } = proposal;
+		// The samples first: `variables` recomputes off the new html, and an
+		// input that renders before its value has a visible empty moment.
+		sampleValues = { ...samples, ...sampleValues };
+		editor.commit('made it a template', tokenised);
+		/*
+		 * Straight to Preview. Design shows the AUTHORED markup — that is what
+		 * makes it editable — so accepting the offer and staying here leaves the
+		 * visitor looking at `{{heading}}` where their headline was, which reads
+		 * as damage rather than as a template. Preview is the same document with
+		 * the values put back.
+		 */
+		mode = 'preview';
+		analytics?.track?.('tool_editor_fields_proposed_accepted', {
+			tool_name: toolName,
+			field_count: Object.keys(samples).length
+		});
 	}
 
 	/** Keys the visitor has actually typed in, so a template swap keeps them. */
@@ -658,10 +690,49 @@
 					/>
 				</label>
 			{:else}
-				<p class="font-sans text-[13px] leading-[19px] text-brand-mute">
-					No variables yet. Add <span class="font-mono">&#123;&#123;name&#125;&#125;</span> to the
-					design and it appears here.
-				</p>
+				{#if proposal}
+					<!--
+						The offer names the words it would replace. "5 fields found" is a
+						number to take on trust; "heading ← Acme cut render time by half"
+						is a claim the visitor can read and reject.
+					-->
+					<div class="flex flex-col gap-2 border border-brand-ink bg-brand-subtle p-3">
+						<p class="font-sans text-[13px] font-semibold leading-[18px] text-brand-ink">
+							This could be a template
+						</p>
+						<p class="font-sans text-[12px] leading-[16px] text-brand-slate">
+							{proposal.count} things here look like values you would change per render.
+						</p>
+						<ul class="flex flex-col gap-1">
+							{#each proposal.fields as f (f.name)}
+								<li class="flex min-w-0 items-baseline gap-1.5">
+									<span class="flex-shrink-0 font-mono text-[11.5px] text-brand-ink">{f.name}</span>
+									<span class="flex-shrink-0 font-mono text-[10px] text-brand-mute">←</span>
+									<span class="truncate font-sans text-[12px] text-brand-slate">{f.sample}</span>
+								</li>
+							{/each}
+						</ul>
+						<div class="flex items-center gap-2 pt-1">
+							<button
+								type="button"
+								on:click={acceptProposal}
+								class="h-8 rounded-btn bg-brand-ink px-3 font-sans text-[12.5px] font-semibold text-white"
+								>Make it a template</button
+							>
+							<button
+								type="button"
+								on:click={() => (proposalDismissed = true)}
+								class="h-8 px-2 font-sans text-[12.5px] text-brand-slate hover:text-brand-ink"
+								>No thanks</button
+							>
+						</div>
+					</div>
+				{:else}
+					<p class="font-sans text-[13px] leading-[19px] text-brand-mute">
+						No variables yet. Add <span class="font-mono">&#123;&#123;name&#125;&#125;</span> to the
+						design and it appears here.
+					</p>
+				{/if}
 			{/each}
 			{#if variables.length}
 				<p class="font-sans text-[12px] leading-[16px] text-brand-mute">

@@ -69,6 +69,7 @@
 		{ key: 'code', label: 'Code' },
 		{ key: 'preview', label: 'Preview' }
 	];
+	$: visibleModes = leftPanel === 'code' ? MODES.filter((m) => m.key !== 'code') : MODES;
 	const PANELS = [
 		{ key: 'say', label: 'Say it' },
 		{ key: 'selection', label: 'Selection' },
@@ -114,15 +115,12 @@
 	>
 		<!--
 			Code-first tools have the pane open permanently in the left panel, so
-			the toggle would offer a mode the visitor is already in. It only
-			survives where Code is somewhere else to go.
+			CODE is dropped from the toggle — it would offer a mode the visitor is
+			already in. Design and Preview stay: they are still two different
+			things to look at, the markup you are editing and the picture it makes.
 		-->
-		<div
-			class="flex items-center gap-1 rounded-[6px] p-[3px] {leftPanel === 'code'
-				? ''
-				: 'bg-brand-subtle'}"
-		>
-			{#each leftPanel === 'code' ? [] : MODES as m (m.key)}
+		<div class="flex items-center gap-1 rounded-[6px] bg-brand-subtle p-[3px]">
+			{#each visibleModes as m (m.key)}
 				<button
 					type="button"
 					on:click={() => (mode = m.key)}

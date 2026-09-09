@@ -190,10 +190,20 @@ export function inferFields(source) {
 	const src = String(source ?? '');
 	const found = [];
 
+	/*
+	 * ELEMENTS WHOSE CONTENT IS NOT TEXT, whatever it looks like to a regex.
+	 * A `<style>` block is the longest run of "words" in most documents, so
+	 * without this the top-ranked field is the entire stylesheet: accepting the
+	 * proposal replaced every rule in the starter with `{{heading}}` and the
+	 * design lost its CSS. Measured on /tools/html-to-png.
+	 */
+	const OPAQUE = /^(style|script|title|noscript|template|textarea|svg|code|pre)$/i;
+
 	// Text-bearing leaves, with whatever font-size their own style declares.
 	const re = /<([a-zA-Z][^\s/>]*)([^>]*)>([^<]*)<\/\1>/g;
 	let m;
 	while ((m = re.exec(src))) {
+		if (OPAQUE.test(m[1])) continue;
 		const text = m[3].trim();
 		// Anything already a token is someone else's field.
 		if (!text || /\{\{/.test(text)) continue;
