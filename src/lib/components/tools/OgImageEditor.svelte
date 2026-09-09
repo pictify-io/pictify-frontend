@@ -18,6 +18,7 @@
 	 */
 	import { onMount, tick } from 'svelte';
 	import EmbeddedStudio from './EmbeddedStudio.svelte';
+	import SourceBlock from './SourceBlock.svelte';
 	import StudioStage from '$lib/components/studio/v2/StudioStage.svelte';
 	import SelectionRail from '$lib/components/studio/v2/SelectionRail.svelte';
 	import { editor } from '$lib/components/studio/v2/editor-store.js';
@@ -45,7 +46,6 @@
 	let selection = null;
 	let draftId = null;
 
-	let url = '';
 	let fetchingUrl = false;
 	let urlError = null;
 	let instruction = '';
@@ -129,8 +129,8 @@
 	 * we asked for, change it and run it again. A URL box that silently produced
 	 * a card would give them no way to steer the second attempt.
 	 */
-	async function makeFromUrl() {
-		const target = url.trim();
+	async function makeFromUrl(value) {
+		const target = String(value || '').trim();
 		if (!target || fetchingUrl || aiBusy) return;
 		fetchingUrl = true;
 		urlError = null;
@@ -262,36 +262,13 @@
 	</svelte:fragment>
 
 	<svelte:fragment slot="url-band">
-		<div class="flex flex-col gap-2 border-b border-brand-rule p-3">
-			<span class="font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-mute"
-				>From a page URL</span
-			>
-			<div class="flex gap-1.5">
-				<input
-					bind:value={url}
-					on:keydown={(e) => e.key === 'Enter' && makeFromUrl()}
-					placeholder="yoursite.com/post"
-					class="h-9 min-w-0 flex-1 rounded-[5px] border border-brand-rule px-2.5 font-sans text-[13px] text-brand-ink placeholder:text-brand-mute"
-				/>
-				<button
-					type="button"
-					on:click={makeFromUrl}
-					disabled={!url.trim() || fetchingUrl || aiBusy || aiLeft <= 0}
-					class="h-9 flex-shrink-0 rounded-[5px] bg-brand-ink px-3 font-sans text-[13px] text-white disabled:opacity-40"
-					>{fetchingUrl ? 'Reading…' : 'Make it'}</button
-				>
-			</div>
-			<p class="font-sans text-[11.5px] leading-[15px] text-brand-mute">
-				Writes the instruction below from the page's title, description, logo and colours, then runs
-				it.
-			</p>
-			{#if urlError}
-				<p class="flex items-start gap-1.5">
-					<span class="mt-1 block h-2 w-2 flex-shrink-0 bg-brand-alarm" aria-hidden="true" />
-					<span class="font-sans text-[11.5px] leading-[15px] text-brand-slate">{urlError}</span>
-				</p>
-			{/if}
-		</div>
+		<SourceBlock
+			kind="og"
+			busy={fetchingUrl || aiBusy}
+			error={urlError}
+			enabled={aiLeft > 0}
+			on:make={(e) => makeFromUrl(e.detail.values.url)}
+		/>
 	</svelte:fragment>
 
 	<svelte:fragment slot="say">

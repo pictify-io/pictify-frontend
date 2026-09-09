@@ -23,12 +23,31 @@
 
 	/** `[{ key, name, category, thumbnail }]` — the tool's gallery. */
 	export let templates = [];
+	/**
+	 * What the left panel offers. TS-7 (matrix in handoff §9b).
+	 *
+	 * `templates` for most tools, `styles` for markdown/table, `themes` for the
+	 * code tools. They differ only in what the items MEAN, so they share the
+	 * panel and differ in its heading and its footnote — three near-identical
+	 * panels would drift apart within two tools.
+	 */
+	export let leftPanel = 'templates';
+	/** design | code — the code tools open on the markup, not the canvas. */
+	export let opensIn = 'design';
+	/** say | selection | inputs — certificate and invoice open on Inputs. */
+	export let defaultTab = 'say';
+	/**
+	 * `{ label, href }`. Certificate's "One certificate is also a thousand",
+	 * shown under the canvas because it is the thing a visitor realises AFTER
+	 * they have made one.
+	 */
+	export let bulkLeadIn = null;
 	/** Which one is drawn now, so the panel can say IN USE. */
 	export let activeTemplate = null;
 	/** design | code | preview */
-	export let mode = 'design';
+	export let mode = opensIn === 'code' ? 'code' : 'design';
 	/** say | selection | inputs */
-	export let panel = 'say';
+	export let panel = defaultTab;
 	export let canUndo = false;
 	export let canRedo = false;
 	export let busy = false;
@@ -54,6 +73,18 @@
 		{ key: 'inputs', label: 'Inputs' }
 	];
 	const FORMATS = ['png', 'jpg', 'webp'];
+
+	/*
+	 * The three panel kinds say what swapping actually does, because it is
+	 * different each time: a template changes the layout, a style changes how
+	 * the same text is set, a theme changes only the colours of the code.
+	 */
+	const PANEL_LABEL = { templates: 'Templates', styles: 'Styles', themes: 'Themes' };
+	const PANEL_FOOT = {
+		templates: 'Click one to swap the layout. Your text and colours stay.',
+		styles: 'Click one to restyle. Your words stay exactly as they are.',
+		themes: 'Click one to recolour. Your code is untouched.'
+	};
 
 	/** Categories come from the data, so a new template file needs no code. */
 	$: categories = ['all', ...new Set(templates.map((t) => t.category).filter(Boolean))];
@@ -140,7 +171,7 @@
 		>
 			<div class="flex items-baseline justify-between px-3 pb-2 pt-3">
 				<span class="font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-mute"
-					>Templates · {templates.length}</span
+					>{PANEL_LABEL[leftPanel] || PANEL_LABEL.templates} · {templates.length}</span
 				>
 			</div>
 			<div class="flex flex-wrap gap-1 px-3 pb-2">
@@ -214,13 +245,26 @@
 				{/each}
 			</div>
 			<p class="border-t border-brand-rule px-3 py-2 font-sans text-[11.5px] leading-[15px] text-brand-mute">
-				Click one to swap the layout. Your text and colours stay.
+				{PANEL_FOOT[leftPanel] || PANEL_FOOT.templates}
 			</p>
 		</div>
 
 		<!-- Canvas -->
-		<div class="relative flex min-h-0 min-w-0 flex-1 items-center justify-center bg-brand-canvas p-4">
+		<div class="relative flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center gap-3 bg-brand-canvas p-4">
 			<slot name="canvas" {mode} />
+			{#if bulkLeadIn}
+				<!--
+					Shown after the canvas, not before it: this is the thought a
+					visitor has once they have made ONE of the thing.
+				-->
+				<a
+					href={bulkLeadIn.href}
+					class="flex items-center gap-2 border border-brand-rule bg-brand-paper px-3 py-2 font-sans text-[12.5px] text-brand-ink hover:border-brand-ink"
+				>
+					<span class="block h-2 w-2 flex-shrink-0 bg-brand-field" aria-hidden="true" />
+					{bulkLeadIn.label}
+				</a>
+			{/if}
 		</div>
 
 		<!-- Side panel · 340px, a bottom sheet below 1024 -->
