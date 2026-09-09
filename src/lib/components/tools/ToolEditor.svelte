@@ -444,9 +444,10 @@
 			const source = substitute(stageApi?.serialize?.() || $editor.html, sampleValues);
 			/*
 			 * `fileExtension` is what makes this a PDF rather than a picture of
-			 * one. The public image route takes it and runs the same engine — it
-			 * is how the invoice tool has always produced PDFs, and it means the
-			 * guest render counter covers them too.
+			 * one — and until TS-12 it did not: the route flattened 'pdf' to
+			 * 'png' on the way in, so the invoice tool's PDF download handed
+			 * people a PNG named `.pdf`. The route now prints the page for that
+			 * one format, on the same guest counter as every other render.
 			 */
 			const { image } = await createImagePublic({
 				html: source,
