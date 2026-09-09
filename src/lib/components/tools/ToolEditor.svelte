@@ -1,9 +1,15 @@
 <script>
 	/**
-	 * The OG image generator, as an editor. TS-5a (board TS-03 `KW3-0`).
+	 * A tool page, as an editor. TS-5a / TS-7 (boards TS-03 `KW3-0`, TS-05, TS-06).
 	 *
-	 * Replaces the tool's old "pick a template, fill three fields, generate"
-	 * block with the studio itself: the visitor edits the card directly, with no
+	 * ONE component for every tool on this layout. What differs between them is
+	 * data — the gallery, the source block, the canvas size, which tab opens —
+	 * so it is props, not a copy per tool. The alternative is nine editors that
+	 * start identical and drift, and the first thing to drift is always the
+	 * quota handling, which is the part that must not.
+	 *
+	 * Replaces a tool's old "pick a template, fill some fields, generate" block
+	 * with the studio itself: the visitor edits the thing directly, with no
 	 * account and nothing to install.
 	 *
 	 * THE PAGE OPENS ALREADY DRAWN. A default template with sample text, one
@@ -27,7 +33,7 @@
 	import { editGuestTemplate } from '../../../api/template.js';
 	import { getWebsiteInfo } from '../../../api/tools/og-image.js';
 	import { newDraftId, saveDraft, latestDraft } from '$lib/tools/editor-draft.js';
-	import { writeOgInstruction } from '$lib/tools/write-instruction.js';
+	import { writeInstruction } from '$lib/tools/write-instruction.js';
 	import { downloadFile } from '$lib/utils/download.js';
 	import { analytics } from '$lib/telemetry.js';
 	import { toast } from '../../../store/toast.store';
@@ -36,6 +42,22 @@
 	export let templates = [];
 	export let width = 1200;
 	export let height = 630;
+	/** Which SOURCES kind sits at the top of Say it. */
+	export let sourceKind = 'og';
+	/** For analytics and nothing else. */
+	export let toolName = 'og_image_generator';
+	export let leftPanel = 'templates';
+	export let opensIn = 'design';
+	export let defaultTab = 'say';
+	export let bulkLeadIn = null;
+	export let downloadName = 'image';
+	/**
+	 * `{ side, percent, label }` — a dashed guide drawn OVER the canvas, never
+	 * into the design. LinkedIn covers the left of a banner with the profile
+	 * photo, and a banner that looks right in the editor and is half-hidden on
+	 * the profile is the whole failure mode of the tool.
+	 */
+	export let safeZone = null;
 
 	const AI_LIMIT = 3;
 
@@ -89,7 +111,7 @@
 		}
 		await tick();
 		refreshQuota();
-		analytics?.trackToolOpened?.({ tool_name: 'og_image_generator', mode: 'editor' });
+		analytics?.trackToolOpened?.({ tool_name: toolName, mode: 'editor' });
 	});
 
 	async function refreshQuota() {
@@ -115,7 +137,7 @@
 		editor.load({ html: template.html, revision: 1 });
 		if (!silent) {
 			analytics?.track?.('tool_editor_template_pick', {
-				tool_name: 'og_image_generator',
+				tool_name: toolName,
 				template: template.key
 			});
 		}
@@ -129,7 +151,24 @@
 	 * we asked for, change it and run it again. A URL box that silently produced
 	 * a card would give them no way to steer the second attempt.
 	 */
-	async function makeFromUrl(value) {
+	/**
+	 * Run whatever the source block collected.
+	 *
+	 * When it carries a URL we read the page first and let the writer fold the
+	 * branding in; otherwise the instruction the block already composed is what
+	 * runs. Either way the sentence is in the composer where it can be edited.
+	 */
+	async function runSource({ kind, values, instruction: written }) {
+		const target = String(values?.url || '').trim();
+		if (!target) {
+			instruction = written;
+			await runAi();
+			return;
+		}
+		await makeFromUrl(target, kind, values);
+	}
+
+	async function makeFromUrl(value, kind = sourceKind, values = {}) {
 		const target = String(value || '').trim();
 		if (!target || fetchingUrl || aiBusy) return;
 		fetchingUrl = true;
@@ -147,9 +186,9 @@
 			// read is not a reason to leave the visitor with an empty composer.
 			urlError = 'We could not read that page. Edit the instruction below and run it anyway.';
 		}
-		instruction = writeOgInstruction(target, info);
+		instruction = writeInstruction(kind, { ...values, url: target }, info);
 		analytics?.track?.('tool_editor_url_prompt', {
-			tool_name: 'og_image_generator',
+			tool_name: toolName,
 			resolved: Boolean(info)
 		});
 		await runAi();
@@ -172,7 +211,7 @@
 			// The SERVER's number, not a decrement of ours.
 			if (typeof res.remaining === 'number') aiLeft = res.remaining;
 			analytics?.track?.('tool_editor_ai_edit', {
-				tool_name: 'og_image_generator',
+				tool_name: toolName,
 				remaining: aiLeft
 			});
 		} catch (err) {
@@ -198,8 +237,8 @@
 				toast.set({ message: 'That render came back empty. Try again.', type: 'error', duration: 4000 });
 				return;
 			}
-			await downloadFile(image.url, `og-image.${format}`);
-			analytics?.track?.('tool_editor_download', { tool_name: 'og_image_generator', format });
+			await downloadFile(image.url, `${downloadName}.${format}`);
+			analytics?.track?.('tool_editor_download', { tool_name: toolName, format });
 		} catch (err) {
 			if (err?.status === 429) {
 				downloadsLeft = 0;
@@ -218,7 +257,7 @@
 	}
 
 	function save() {
-		analytics?.track?.('tool_editor_save_click', { tool_name: 'og_image_generator' });
+		analytics?.track?.('tool_editor_save_click', { tool_name: toolName });
 		// The draft id travels so the account it lands in gets THIS document.
 		window.location.href = `/signup?intent=template-editor&draft=${encodeURIComponent(draftId || '')}`;
 	}
@@ -227,6 +266,12 @@
 <EmbeddedStudio
 	{templates}
 	{activeTemplate}
+	{leftPanel}
+	{opensIn}
+	{defaultTab}
+	{bulkLeadIn}
+	thumbSourceWidth={width}
+	thumbSourceHeight={height}
 	bind:mode
 	bind:panel
 	{format}
@@ -253,6 +298,7 @@
 				editable={mode === 'design'}
 				selectOnly={mode === 'code'}
 				imagePolicy="any"
+				{safeZone}
 
 				sampleValues={{}}
 				on:selection={(e) => (selection = e.detail || null)}
@@ -263,11 +309,11 @@
 
 	<svelte:fragment slot="url-band">
 		<SourceBlock
-			kind="og"
+			kind={sourceKind}
 			busy={fetchingUrl || aiBusy}
 			error={urlError}
 			enabled={aiLeft > 0}
-			on:make={(e) => makeFromUrl(e.detail.values.url)}
+			on:make={(e) => runSource(e.detail)}
 		/>
 	</svelte:fragment>
 

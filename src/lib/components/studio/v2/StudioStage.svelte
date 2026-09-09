@@ -69,6 +69,15 @@
 	 * preview-document.js.
 	 */
 	export let imagePolicy = 'assets';
+	/**
+	 * `{ side, percent, label }` — a dashed guide over the ARTBOARD.
+	 *
+	 * Drawn here rather than by the caller because only the stage knows the
+	 * scale: 20% of the canvas area is not 20% of the design, and a guide that
+	 * marks the wrong fifth of a LinkedIn banner is worse than none — someone
+	 * would trust it and still have their headline covered by their own face.
+	 */
+	export let safeZone = null;
 
 	/** `{ status, dataUrl, error }` for the server-rendered Preview. */
 	let serverProof = { status: 'idle', dataUrl: null, error: null };
@@ -357,6 +366,19 @@
 			class="absolute left-0 top-0 origin-top-left border-0"
 			style="width:{width}px;height:{height}px;transform:scale({scale})"
 		/>
+
+		{#if safeZone}
+			<div
+				class="pointer-events-none absolute inset-y-0 z-10 border-x border-dashed border-brand-alarm/70"
+				style="{safeZone.side === 'right' ? 'right' : 'left'}:0;width:{safeZone.percent}%"
+				aria-hidden="true"
+			>
+				<span
+					class="absolute bottom-1 left-1 bg-brand-alarm px-1 py-0.5 font-mono text-[9px] uppercase tracking-[0.06em] text-white"
+					>{safeZone.label}</span
+				>
+			</div>
+		{/if}
 
 		{#if serverProof.status !== 'idle'}
 			<!--

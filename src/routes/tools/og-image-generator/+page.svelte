@@ -12,7 +12,7 @@
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
 	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
 	import OgImageTemplate from '$lib/components/tools/OgImageTemplate.svelte';
-	import OgImageEditor from '$lib/components/tools/OgImageEditor.svelte';
+	import ToolEditor from '$lib/components/tools/ToolEditor.svelte';
 	import { getTemplate } from '../../../api/tools/og-image';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
@@ -434,7 +434,14 @@
 				</p>
 			</ToolCard>
 		{:else if editorTemplates.length}
-			<OgImageEditor templates={editorTemplates} width={previewWidth} height={previewHeight} />
+			<ToolEditor
+				templates={editorTemplates}
+				width={previewWidth}
+				height={previewHeight}
+				sourceKind="og"
+				toolName="og_image_generator"
+				downloadName="og-image"
+			/>
 		{:else}
 			<!-- Never an empty state: this is the moment before the templates land. -->
 			<div
