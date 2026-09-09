@@ -182,3 +182,30 @@ describe('the tool-result handoff', () => {
 		assert.equal(globalThis.window.localStorage._map.size, 0);
 	});
 });
+
+describe('drafts are per tool', () => {
+	test('one tool never restores another tool’s draft', () => {
+		/*
+		 * The failure this prevents: a visitor uses the OG generator, opens the
+		 * LinkedIn one, and finds their OG card there — same variables, same
+		 * text, wrong tool entirely.
+		 */
+		install(fakeStorage());
+		saveDraft('a', { html: '<p>og</p>', tool: 'og_image_generator' });
+		saveDraft('b', { html: '<p>li</p>', tool: 'linkedin_banner_generator' });
+		assert.equal(latestDraft('og_image_generator').draft.html, '<p>og</p>');
+		assert.equal(latestDraft('linkedin_banner_generator').draft.html, '<p>li</p>');
+	});
+
+	test('a tool with no draft of its own gets nothing, not someone else’s', () => {
+		install(fakeStorage());
+		saveDraft('a', { html: '<p>og</p>', tool: 'og_image_generator' });
+		assert.equal(latestDraft('certificate_generator'), null);
+	});
+
+	test('without a tool the newest of any is returned, for the signup handoff', () => {
+		install(fakeStorage());
+		saveDraft('a', { html: '<p>og</p>', tool: 'og_image_generator' });
+		assert.ok(latestDraft());
+	});
+});

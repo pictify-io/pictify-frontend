@@ -34,6 +34,7 @@
 	import { getWebsiteInfo } from '../../../api/tools/og-image.js';
 	import { newDraftId, saveDraft, latestDraft } from '$lib/tools/editor-draft.js';
 	import { writeInstruction } from '$lib/tools/write-instruction.js';
+	import { tokeniseTemplate } from '$lib/tools/tokenise-template.js';
 	import { downloadFile } from '$lib/utils/download.js';
 	import { analytics } from '$lib/telemetry.js';
 	import { toast } from '../../../store/toast.store';
@@ -104,6 +105,8 @@
 		let added = false;
 		for (const v of variables) {
 			if (sampleValues[v.name] === undefined) {
+				// Only for tokens a template did not bring a sample for — a variable
+				// someone added by hand, or one the AI introduced.
 				sampleValues[v.name] = defaultSampleFor(v.name, v.type);
 				added = true;
 			}
@@ -112,7 +115,12 @@
 		if (added) sampleValues = { ...sampleValues };
 	}
 
-	const setSample = (name, value) => (sampleValues = { ...sampleValues, [name]: value });
+	/** Keys the visitor has actually typed in, so a template swap keeps them. */
+	const touched = new Set();
+	const setSample = (name, value) => {
+		touched.add(name);
+		sampleValues = { ...sampleValues, [name]: value };
+	};
 
 	/* ── draft ─────────────────────────────────────────────────────────── */
 	/*
@@ -123,14 +131,21 @@
 	let lastSaved = -1;
 	$: if (draftId && $editor.localSeq !== lastSaved && $editor.html) {
 		lastSaved = $editor.localSeq;
-		saveDraft(draftId, { html: $editor.html, width, height, format, templateKey: activeTemplate });
+		saveDraft(draftId, {
+			html: $editor.html,
+			width,
+			height,
+			format,
+			templateKey: activeTemplate,
+			tool: toolName
+		});
 	}
 
 	onMount(async () => {
 		// A draft the visitor left behind beats the default template — but only
 		// if it is recent; `loadDraft` flags anything older than 30 days and we
 		// leave that alone rather than resurrecting it under them.
-		const existing = latestDraft();
+		const existing = latestDraft(toolName);
 		if (existing && !existing.stale && existing.draft.html) {
 			draftId = existing.id;
 			activeTemplate = existing.draft.templateKey ?? templates[0]?.key ?? null;
@@ -164,7 +179,32 @@
 	function useTemplate(template, { silent = false } = {}) {
 		if (!template?.html) return;
 		activeTemplate = template.key;
-		editor.load({ html: template.html, revision: 1 });
+
+		/*
+		 * TOKENISED ON THE WAY IN. These templates were built to be driven by DOM
+		 * surgery — `#template-heading` and friends — so they ship prose where a
+		 * template wants variables. Converting here means Inputs has something to
+		 * show, Save produces a template with a real API contract, and the files
+		 * themselves stay readable standalone HTML for everything else that reads
+		 * them.
+		 */
+		const { html: tokenised, samples } = tokeniseTemplate(template.html);
+		editor.load({ html: tokenised, revision: 1 });
+
+		/*
+		 * The design's own words become the samples — a better default than
+		 * anything a generic table could invent, and the canvas looks exactly as
+		 * its designer intended on first paint.
+		 *
+		 * VALUES THE VISITOR HAS ALREADY SET WIN, because swapping a layout must
+		 * keep their text (board TS-03: "Your text and colours stay"). Only
+		 * tokens they have not touched take the new template's sample.
+		 */
+		const merged = { ...samples };
+		for (const [key, value] of Object.entries(sampleValues)) {
+			if (touched.has(key) && value !== undefined) merged[key] = value;
+		}
+		sampleValues = merged;
 		if (!silent) {
 			analytics?.track?.('tool_editor_template_pick', {
 				tool_name: toolName,

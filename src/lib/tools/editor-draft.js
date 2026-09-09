@@ -64,6 +64,14 @@ export function saveDraft(id, draft) {
 		format: draft?.format === 'pdf' ? 'pdf' : 'png',
 		sampleValues: draft?.sampleValues && typeof draft.sampleValues === 'object' ? draft.sampleValues : {},
 		templateKey: draft?.templateKey ?? null,
+		/*
+		 * WHICH TOOL THIS BELONGS TO.
+		 *
+		 * Without it `latestDraft()` handed the newest draft from ANY tool to
+		 * whichever page asked, so opening the LinkedIn generator restored the OG
+		 * card — same variables, same text, wrong tool. Drafts are per tool.
+		 */
+		tool: draft?.tool ?? null,
 		updatedAt: now()
 	};
 	try {
@@ -117,14 +125,23 @@ export function loadDraft(id) {
 	return { id, draft: parsed, stale: ageDays > STALE_AFTER_DAYS, ageDays: Math.floor(ageDays) };
 }
 
-/** The most recently touched draft, for a visitor arriving with no `?draft=`. */
-export function latestDraft() {
+/**
+ * The most recently touched draft FOR THIS TOOL.
+ *
+ * `tool` is required in practice: without it a visitor who used the OG
+ * generator and then opened the certificate tool would be handed their OG card.
+ * Passing nothing returns the newest of any tool, which is only useful for the
+ * signup handoff, where the draft id is known anyway.
+ */
+export function latestDraft(tool = null) {
 	const s = store();
 	if (!s) return null;
 	let best = null;
 	for (const key of listKeys(s)) {
 		const found = loadDraft(key.slice(PREFIX.length));
-		if (found && (!best || found.draft.updatedAt > best.draft.updatedAt)) best = found;
+		if (!found) continue;
+		if (tool && found.draft.tool !== tool) continue;
+		if (!best || found.draft.updatedAt > best.draft.updatedAt) best = found;
 	}
 	return best;
 }
