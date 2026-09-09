@@ -42,6 +42,7 @@
 	import { SAMPLE_CASES, valuesFor } from '$lib/components/studio/v2/samples.js';
 	import { summarize } from '$lib/components/studio/v2/overflow.js';
 	import { editor, dirty } from '$lib/components/studio/v2/editor-store.js';
+	import { stageFromAgentEvent } from '$lib/tools/agent-stage.js';
 	import { SAMPLE_VALUES } from '$lib/campaigns/starters';
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
 	import { editionUrl } from '$lib/campaigns/nav';
@@ -320,7 +321,12 @@
 			operationId,
 			baseRevision: $editor.baseRevision,
 			...(scopedTo ? { selectedNodeIds: [scopedTo], allowedScope: 'selection' } : {}),
-			onStage: (s) => editor.operationStage(s?.stage || 'plan'),
+			/*
+			 * The agent reports `{ id, status, label }`, never a `stage` key, so
+			 * `s?.stage || 'plan'` pinned the lock to "Planning the change" for
+			 * the whole run — through reading, thinking, proofing and finishing.
+			 */
+			onStage: (s) => editor.operationStage(stageFromAgentEvent(s) || 'plan'),
 			onDone: async (result) => {
 				/*
 				 * The run finished and nothing changed. The server did not commit it,

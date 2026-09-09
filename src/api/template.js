@@ -627,8 +627,110 @@ const restoreTemplateRevision = async (uid, revision) =>
  * an HttpError on 429 carrying `resetsAt`, which is how the composer knows to
  * swap itself for the signup card rather than guessing from a local counter.
  */
-const editGuestTemplate = async ({ html, instruction, width, height }) =>
-	backend.post('/template-studio/guest/edit', { html, instruction, width, height });
+/**
+ * Read an SSE run and call the handlers. Shared by the signed-in and guest
+ * edits, so the two cannot drift about what a frame means.
+ *
+ * A chunk can split a frame anywhere, so only whole frames are parsed; a frame
+ * without both an event and a data line is skipped rather than guessed at.
+ */
+async function readEditStream(response, { onStage, onDone, onProposal, onError }) {
+	const reader = response.body.getReader();
+	const decoder = new TextDecoder();
+	let buffer = '';
+	let settled = false;
+
+	try {
+		for (;;) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			buffer += decoder.decode(value, { stream: true });
+			const frames = buffer.split('\n\n');
+			buffer = frames.pop() ?? '';
+			for (const frame of frames) {
+				const lines = frame.split('\n');
+				const eventLine = lines.find((l) => l.startsWith('event:'));
+				const dataLine = lines.find((l) => l.startsWith('data:'));
+				if (!eventLine || !dataLine) continue;
+				const event = eventLine.slice(6).trim();
+				let payload;
+				try {
+					payload = JSON.parse(dataLine.slice(5).trim());
+				} catch {
+					continue;
+				}
+				if (event === 'stage') onStage?.(payload);
+				else if (event === 'done') {
+					settled = true;
+					onDone?.(payload);
+				} else if (event === 'proposal') {
+					settled = true;
+					onProposal?.(payload);
+				} else if (event === 'error') {
+					settled = true;
+					onError?.(payload);
+				}
+			}
+		}
+	} catch (e) {
+		if (e?.name !== 'AbortError') {
+			onError?.({ message: 'The connection dropped mid-edit.', code: 'stream_failed' });
+		}
+		return;
+	}
+
+	// Closed without ever saying how it ended.
+	if (!settled) onError?.({ message: 'That edit stopped early.', code: 'stream_incomplete' });
+}
+
+/**
+ * An AI edit with no account. TS-B2.
+ *
+ * STREAMED, like the signed-in one: the agent takes twenty seconds and more,
+ * and a spinner with no progress on a public tool page is where people leave.
+ * The document travels in the body and comes back in the `done` frame — there
+ * is no template row to edit against, because a guest does not have one.
+ *
+ * Quota refusals arrive BEFORE the stream starts and are ordinary JSON, which
+ * is how the composer knows to swap itself for the signup card.
+ */
+const editGuestTemplate = async (
+	{ html, instruction, width, height },
+	{ onStage, onDone, onError, signal } = {}
+) => {
+	let response;
+	try {
+		response = await fetch(`${PUBLIC_BACKEND_URL}/template-studio/guest/edit`, {
+			method: 'POST',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ html, instruction, width, height }),
+			signal
+		});
+	} catch (e) {
+		if (e?.name !== 'AbortError')
+			onError?.({ message: "Couldn't reach the server.", code: 'network' });
+		return;
+	}
+
+	if (!response.ok || !response.body) {
+		let payload = null;
+		try {
+			payload = await response.json();
+		} catch {
+			/* non-JSON; fall through to the generic message */
+		}
+		onError?.({
+			message: payload?.message || "That change didn't go through.",
+			code: payload?.code || 'bad_response',
+			status: response.status,
+			resetsAt: payload?.resetsAt
+		});
+		return;
+	}
+
+	await readEditStream(response, { onStage, onDone, onError });
+};
 
 const previewTemplateHtml = async (body, options = {}) =>
 	backend.post('/templates/preview', body, options);

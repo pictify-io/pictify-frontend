@@ -25,6 +25,8 @@
 	import { onMount, tick } from 'svelte';
 	import EmbeddedStudio from './EmbeddedStudio.svelte';
 	import SourceBlock from './SourceBlock.svelte';
+	import AiLock from '$lib/components/studio/v2/AiLock.svelte';
+	import { stageFromAgentEvent } from '$lib/tools/agent-stage.js';
 	import StudioStage from '$lib/components/studio/v2/StudioStage.svelte';
 	import SelectionRail from '$lib/components/studio/v2/SelectionRail.svelte';
 	import { editor } from '$lib/components/studio/v2/editor-store.js';
@@ -79,6 +81,8 @@
 	let instruction = '';
 	let receipt = null;
 	let aiBusy = false;
+	/** Where the agent has got to, so a 20-second wait is not a blank spinner. */
+	let aiStage = 'read';
 	let aiError = null;
 	let aiLeft = AI_LIMIT;
 
@@ -270,30 +274,44 @@
 		if (aiLeft <= 0) return;
 		aiBusy = true;
 		aiError = null;
-		try {
-			const res = await editGuestTemplate({ html: $editor.html, instruction: text, width, height });
-			if (!res?.html) {
-				aiError = 'That change did not go through. Try describing it differently.';
-				return;
+		aiStage = 'read';
+
+		/*
+		 * Streamed, so the visitor watches the agent work instead of a spinner.
+		 * Twenty-plus seconds of nothing on a public page is where people leave,
+		 * and it is the same progress the signed-in studio shows.
+		 */
+		await editGuestTemplate(
+			{ html: $editor.html, instruction: text, width, height },
+			{
+				// Keep the last stage when a frame maps to nothing, rather than
+				// snapping back to the start.
+				onStage: (s) => (aiStage = stageFromAgentEvent(s) || aiStage),
+				onDone: (res) => {
+					if (!res?.html) {
+						aiError = 'That change did not go through. Try describing it differently.';
+						return;
+					}
+					editor.commit('ai edit', res.html, { source: 'ai' });
+					receipt = res.receipt || null;
+					// The SERVER's number, not a decrement of ours.
+					if (typeof res.remaining === 'number') aiLeft = res.remaining;
+					analytics?.track?.('tool_editor_ai_edit', { tool_name: toolName, remaining: aiLeft });
+				},
+				onError: (err) => {
+					// A quota refusal arrives before the stream and carries its own
+					// status; it swaps the composer for the signup card rather than
+					// reading as a failure.
+					if (err?.status === 429) {
+						aiLeft = 0;
+						aiError = err?.message || "You've used today's free AI edits.";
+					} else {
+						aiError = err?.message || 'That change did not go through.';
+					}
+				}
 			}
-			editor.commit('ai edit', res.html, { source: 'ai' });
-			receipt = res.receipt || null;
-			// The SERVER's number, not a decrement of ours.
-			if (typeof res.remaining === 'number') aiLeft = res.remaining;
-			analytics?.track?.('tool_editor_ai_edit', {
-				tool_name: toolName,
-				remaining: aiLeft
-			});
-		} catch (err) {
-			if (err?.status === 429) {
-				aiLeft = 0;
-				aiError = err?.data?.message || "You've used today's free AI edits.";
-			} else {
-				aiError = err?.data?.message || err?.message || 'That change did not go through.';
-			}
-		} finally {
-			aiBusy = false;
-		}
+		);
+		aiBusy = false;
 	}
 
 	/* ── download ──────────────────────────────────────────────────────── */
@@ -384,6 +402,16 @@
 	on:expand={() => (window.location.hash = 'editor')}
 >
 	<svelte:fragment slot="canvas">
+		{#if aiBusy}
+			<!--
+				The same lock the studio uses: the design stays on screen underneath
+				so the visitor can compare, and the stages say what is happening
+				rather than that something is.
+			-->
+			<div class="absolute inset-0 z-20 flex items-center justify-center bg-brand-canvas/85">
+				<AiLock stage={aiStage} fromRevision={1} />
+			</div>
+		{/if}
 		{#if html}
 			<StudioStage
 				bind:api={stageApi}

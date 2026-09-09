@@ -38,6 +38,7 @@
 	import Toast from '$lib/components/Toast.svelte';
 
 	import { editor } from '$lib/components/studio/v2/editor-store.js';
+	import { stageFromAgentEvent } from '$lib/tools/agent-stage.js';
 	import { createSaveQueue } from '$lib/components/studio/v2/save-queue.js';
 	import { extractInputs, typeFor } from '$lib/utils/template-tokens.js';
 	import { rangeForNode, nodeForOffset } from '$lib/components/studio/v2/code-map.js';
@@ -136,7 +137,12 @@
 			operationId,
 			baseRevision: $editor.baseRevision,
 			...(scopedTo ? { selectedNodeIds: [scopedTo], allowedScope: 'selection' } : {}),
-			onStage: (stage) => editor.operationStage(stage?.stage || 'plan'),
+			/*
+			 * The agent reports `{ id, status, label }`, never a `stage` key, so
+			 * `s?.stage || 'plan'` pinned the lock to "Planning the change" for
+			 * the whole run — through reading, thinking, proofing and finishing.
+			 */
+			onStage: (s) => editor.operationStage(stageFromAgentEvent(s) || 'plan'),
 			onDone: async (result) => {
 				if (result?.noChange) {
 					aiEditNoChange({
