@@ -37,6 +37,9 @@
 	import { newDraftId, saveDraft, latestDraft } from '$lib/tools/editor-draft.js';
 	import { writeInstruction } from '$lib/tools/write-instruction.js';
 	import { tokeniseTemplate } from '$lib/tools/tokenise-template.js';
+	import { inspectPastedHtml, reportLines } from '$lib/components/studio/v2/paste-report.js';
+	import CodePane from '$lib/components/studio/v2/CodePane.svelte';
+	import { nodeForOffset, rangeForNode } from '$lib/components/studio/v2/code-map.js';
 	import { downloadFile } from '$lib/utils/download.js';
 	import { analytics } from '$lib/telemetry.js';
 	import { toast } from '../../../store/toast.store';
@@ -69,6 +72,14 @@
 	 * whose markup has no ids for the tokeniser to read.
 	 */
 	export let initialSamples = {};
+	/**
+	 * The document a code-first tool opens on, when it has no gallery.
+	 *
+	 * Not a blank canvas: an empty stage gives a visitor nothing to change and
+	 * nothing to render, so the first thing they do is leave. A short, entirely
+	 * self-contained document is something they can edit a word of and see move.
+	 */
+	export let starterHtml = '';
 
 	const AI_LIMIT = 3;
 
@@ -93,6 +104,73 @@
 	let aiLeft = AI_LIMIT;
 
 	let sampleValues = { ...initialSamples };
+
+	/* ── code-first tools (TS-10) ───────────────────────────────────────── */
+	/*
+	 * The same pane the studio uses, on the same store, for the same reason it
+	 * exists there: the buffer is the visitor's RAW TEXT while they are typing,
+	 * and rewriting it under the caret is the one thing a code pane must never
+	 * do. So `codeBuffer` is a plain local, written in exactly two places —
+	 * here when the document changed by some means other than typing, and in
+	 * `onCodeChange` from the keystroke itself.
+	 */
+	let codeBuffer = '';
+	let codeCaretLine = null;
+	/*
+	 * The document as it stood the last time the buffer was written FROM it.
+	 * Everything that changes the document some other way — a drag on the
+	 * canvas, an AI edit, the starter loading — has to regenerate the buffer,
+	 * or the next keystroke commits stale text over the real document. In the
+	 * full studio that moment is "entering Code"; here the pane never closes,
+	 * so the trigger is the document moving without us.
+	 *
+	 * NOT `localSeq`. `load()` resets the counter, so a starter arriving after
+	 * the first flush lands on the same seq the empty state had and the pane
+	 * stays blank — measured, a 0-character buffer over a rendered canvas.
+	 * The html itself is the thing that actually changed.
+	 */
+	let lastBufferedHtml = null;
+	$: if (leftPanel === 'code' && $editor.html !== lastBufferedHtml && !$editor.operation) {
+		// Never mid-run: the AI owns the document until it finishes.
+		codeBuffer = editor.serialize().html;
+		lastBufferedHtml = codeBuffer;
+	}
+
+	$: codeValid = editor.codeIsRenderable(codeBuffer);
+	$: codeVariableCount = new Set(
+		[...String(codeBuffer || '').matchAll(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g)].map((m) => m[1])
+	).size;
+	$: codeSelectedLine = selection?.id
+		? (rangeForNode(codeBuffer, selection.id)?.line ?? null)
+		: codeCaretLine;
+
+	/*
+	 * WHAT WE CHANGED, before it is saved rather than after it renders wrong.
+	 * Someone pasting a working page from their own site cannot see what will
+	 * not survive the trip — the logo on their CDN is cached and same-origin in
+	 * the tab they copied it from, and simply absent here.
+	 */
+	$: pasteReport = codeBuffer.trim() ? inspectPastedHtml(codeBuffer) : null;
+	$: pasteLines = pasteReport && !pasteReport.ok ? reportLines(pasteReport) : [];
+
+	function onCodeChange(event) {
+		codeBuffer = event.detail.html;
+		editor.setHtmlFromCode(codeBuffer);
+		/*
+		 * Read back from the store rather than assuming `codeBuffer` landed:
+		 * a half-typed document is not renderable, so `html` deliberately holds
+		 * the last good one. Recording what the document ACTUALLY is keeps the
+		 * regenerate guard quiet until something other than typing moves it.
+		 */
+		lastBufferedHtml = $editor.html;
+	}
+
+	/** Caret → element: the code half of one shared selection. */
+	function onCodeCaret(event) {
+		codeCaretLine = event.detail.line;
+		const id = nodeForOffset(codeBuffer, event.detail.offset);
+		if (id && id !== selection?.id) stageApi?.selectById(id);
+	}
 	let downloadsLeft = null;
 	let downloadsLimit = 5;
 	let rendering = false;
@@ -162,7 +240,8 @@
 			editor.load({ html: existing.draft.html, revision: 1 });
 		} else {
 			draftId = newDraftId();
-			useTemplate(templates[0], { silent: true });
+			if (templates.length) useTemplate(templates[0], { silent: true });
+			else if (starterHtml) editor.load({ html: starterHtml, revision: 1 });
 		}
 		await tick();
 		refreshQuota();
@@ -407,6 +486,46 @@
 	on:format={(e) => (format = e.detail.format)}
 	on:expand={() => (window.location.hash = 'editor')}
 >
+	<svelte:fragment slot="code">
+		<CodePane
+			html={codeBuffer}
+			busy={aiBusy}
+			selectedLine={codeSelectedLine}
+			variableCount={codeVariableCount}
+			valid={codeValid}
+			fileLabel="{downloadName}.html"
+			on:change={onCodeChange}
+			on:caret={onCodeCaret}
+		/>
+		{#if pasteLines.length}
+			<div
+				class="flex max-h-[184px] flex-col gap-2 overflow-auto border-t border-brand-rule bg-brand-paper p-3"
+			>
+				<p class="font-mono text-[10px] uppercase tracking-[0.06em] text-brand-mute">
+					What we changed · {pasteLines.length}
+				</p>
+				{#each pasteLines as line (line.label)}
+					<p class="flex items-start gap-2">
+						<span
+							class="mt-1 block h-2 w-2 flex-shrink-0 {line.tone === 'alarm'
+								? 'bg-brand-alarm'
+								: 'bg-brand-field'}"
+							aria-hidden="true"
+						/>
+						<span class="min-w-0">
+							<span class="block font-sans text-[12px] font-medium leading-4 text-brand-ink"
+								>{line.label}</span
+							>
+							<span class="block font-sans text-[11.5px] leading-4 text-brand-slate"
+								>{line.detail}</span
+							>
+						</span>
+					</p>
+				{/each}
+			</div>
+		{/if}
+	</svelte:fragment>
+
 	<svelte:fragment slot="canvas">
 		{#if aiBusy}
 			<!--

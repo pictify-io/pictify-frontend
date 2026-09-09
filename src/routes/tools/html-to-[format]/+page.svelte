@@ -15,12 +15,8 @@
 		ogPlatforms,
 		dimensionContexts
 	} from '$lib/pseo/config.js';
-	import CodeEditor from '$lib/components/tools/CodeEditor.svelte';
+	import ToolEditor from '$lib/components/tools/ToolEditor.svelte';
 	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
-	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
-	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
-	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
-	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
 	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
 	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
 	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
@@ -40,12 +36,7 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { user } from '../../../store/user.store';
-	import { toast } from '../../../store/toast.store';
-	import { createImagePublic } from '../../../api/image.js';
-	import { generationLimits } from '../../../store/generationLimits.store';
 	import { analytics } from '$lib/telemetry.js';
-	import { saveLastRender } from '$lib/lastRender.js';
-	import posthog from 'posthog-js';
 	$: format = $page.params.format;
 	$: toolKey = `html_to_${format}`;
 	$: toolPath = `/tools/html-to-${format}`;
@@ -174,22 +165,6 @@
 		}
 	];
 
-	// Add copyToClipboard function
-	function copyToClipboard(text, contentType = 'image_url') {
-		navigator.clipboard
-			.writeText(text)
-			.then(() => {
-				analytics.trackCopy({
-					content_type: contentType,
-					context: 'tool_result',
-					tool_name: `html_to_${format}`
-				});
-				toast.set({ message: 'URL copied to clipboard! 🔗', type: 'success', duration: 2000 });
-			})
-			.catch(() => {
-				toast.set({ message: 'Failed to copy URL', type: 'error', duration: 2000 });
-			});
-	}
 
 	const formatExtensionMap = {
 		jpg: 'jpeg',
@@ -212,96 +187,35 @@
 	const popularSizes = configPopularSizes;
 	const featuredPlatforms = ogPlatforms.slice(0, 3);
 
-	function handleFormatChange(event) {
-		const newFormat = event.target.value;
-		if (browser) {
-			goto(`/tools/html-to-${newFormat}`);
-		}
-	}
 
-	function trackSignupClick(ctaLocation) {
-		analytics.track('tool_signup_click', {
-			tool_name: `html_to_${format}`,
-			cta_location: ctaLocation
-		});
-	}
 
-	// Add local storage management
-	let usageKey = 'pictify_free_usage';
-	let maxFreeGenerations = 5;
-	let freeGenerationsUsed = 0;
-	let shareBonusGenerations = 0; // +1/day via share (guest only)
-	let bonusKey = usageKey + '_bonus';
+	/*
+	 * TS-10. The free allowance is COUNTED ON THE SERVER now (`/image/public/quota`),
+	 * and the editor's toolbar reads it. The old localStorage counter is gone
+	 * rather than kept as a second opinion: two counters that can disagree is
+	 * how a visitor gets told they are out while the render still succeeds.
+	 * The number survives only as the promise in the facts line.
+	 */
+	const FREE_RENDERS_A_DAY = 5;
 
 	onMount(() => {
-		if (browser) {
-			// Track tool opened
-			analytics.trackToolOpened({ tool_name: `html_to_${format}` });
+		if (!browser) return;
+		analytics.trackToolOpened({ tool_name: `html_to_${format}` });
 
-			// Load usage from local storage
-			const usage = localStorage.getItem(usageKey);
-			if (usage) {
-				freeGenerationsUsed = parseInt(usage);
+		// Dimensions handed over from a size-variant page, applied once.
+		const storedWidth = localStorage.getItem('pictify_html_to_image_width');
+		const storedHeight = localStorage.getItem('pictify_html_to_image_height');
+		if (storedWidth && storedHeight) {
+			const widthVal = parseInt(storedWidth, 10);
+			const heightVal = parseInt(storedHeight, 10);
+			if (!Number.isNaN(widthVal) && !Number.isNaN(heightVal) && widthVal > 0 && heightVal > 0) {
+				editorWidth = widthVal;
+				editorHeight = heightVal;
 			}
-
-			// Load share bonus
-			const bonus = localStorage.getItem(bonusKey);
-			if (bonus) {
-				shareBonusGenerations = parseInt(bonus);
-			}
-
-			// Reset usage if it's a new day
-			const lastUsageDate = localStorage.getItem(usageKey + '_date');
-			const lastBonusDate = localStorage.getItem(bonusKey + '_date');
-			const today = new Date().toDateString();
-			if (lastUsageDate !== today) {
-				freeGenerationsUsed = 0;
-				localStorage.setItem(usageKey, '0');
-				localStorage.setItem(usageKey + '_date', today);
-			}
-			if (lastBonusDate !== today) {
-				shareBonusGenerations = 0;
-				localStorage.setItem(bonusKey, '0');
-				localStorage.setItem(bonusKey + '_date', today);
-			}
-		}
-
-		// Apply preselected dimensions from size variant pages, if present
-		if (browser) {
-			const storedWidth = localStorage.getItem('pictify_html_to_image_width');
-			const storedHeight = localStorage.getItem('pictify_html_to_image_height');
-			if (storedWidth && storedHeight) {
-				const widthVal = parseInt(storedWidth, 10);
-				const heightVal = parseInt(storedHeight, 10);
-				if (!Number.isNaN(widthVal) && !Number.isNaN(heightVal) && widthVal > 0 && heightVal > 0) {
-					previewWidth = widthVal;
-					previewHeight = heightVal;
-				}
-				localStorage.removeItem('pictify_html_to_image_width');
-				localStorage.removeItem('pictify_html_to_image_height');
-			}
-		}
-
-		// Ensure the correct format is selected on page load
-		const select = document.getElementById('format-select');
-		if (select) {
-			select.value = format;
+			localStorage.removeItem('pictify_html_to_image_width');
+			localStorage.removeItem('pictify_html_to_image_height');
 		}
 	});
-
-	// Function to update usage in local storage
-	function updateUsage() {
-		if (browser) {
-			freeGenerationsUsed++;
-			localStorage.setItem(usageKey, freeGenerationsUsed.toString());
-			localStorage.setItem(usageKey + '_date', new Date().toDateString());
-		}
-	}
-
-	// Add remaining generations computed property
-	$: effectiveMaxFreeGenerations =
-		maxFreeGenerations + (isUserLoggedIn ? 0 : shareBonusGenerations);
-	$: remainingGenerations = effectiveMaxFreeGenerations - freeGenerationsUsed;
 
 	// Add user store subscription
 	let isUserLoggedIn = false;
@@ -309,102 +223,9 @@
 		isUserLoggedIn = !!userData.email;
 	});
 
-	/**
-	 * True once a guest's render has used up the last free one today. Drives the
-	 * result card's limit state — the render itself is never withheld.
-	 */
-	let lastFreeRender = false;
 
-	let imageUrl = '';
-	let isImageGenerating = false;
-	let previewWidth = 1200;
-	let previewHeight = 630;
-	let previewHtml = '';
 
-	// Apply dimensions if present in URL params
-	$: if (hasSize) {
-		previewWidth = dimWidth;
-		previewHeight = dimHeight;
-	}
 
-	function handlePreviewUpdate(event) {
-		const { html, width, height } = event.detail;
-		previewHtml = html;
-		// Only allow the editor to control dimensions when no size is locked from the URL
-		if (!hasSize) {
-			previewWidth = width;
-			previewHeight = height;
-		}
-	}
-
-	async function generateImage() {
-		if (isImageGenerating) return;
-
-		// The button is already a signup link at zero; this only guards a
-		// programmatic call.
-		if (!isUserLoggedIn && freeGenerationsUsed >= effectiveMaxFreeGenerations) return;
-
-		// Track generation in global limits store
-		generationLimits.increment();
-		isImageGenerating = true;
-
-		try {
-			// No watermark for guests: the toolbar promises "NO WATERMARK" and the
-			// signup pitch is "keep this link", not "remove the badge".
-			const html = previewHtml;
-
-			const widthToUse = hasSize ? dimWidth : previewWidth;
-			const heightToUse = hasSize ? dimHeight : previewHeight;
-			const { image } = await createImagePublic({
-				html,
-				width: widthToUse,
-				height: heightToUse,
-				fileExtension: fileExtension
-			});
-
-			imageUrl = image.url;
-			totalImagesGenerated++;
-
-			saveLastRender({
-				tool: `html_to_${format}`,
-				html: previewHtml,
-				width: widthToUse,
-				height: heightToUse,
-				format: fileExtension || format,
-				imageUrl: image.url
-			});
-
-			// Track image generation
-			analytics.trackImageGenerated({
-				tool_name: `html_to_${format}`,
-				format: fileExtension || format,
-				with_watermark: !isUserLoggedIn
-			});
-
-			// Update usage tracking for non-logged in users
-			if (!isUserLoggedIn) {
-				updateUsage();
-				// The limit variant of the result card only makes sense on the render
-				// that spent the allowance, and only for the experiment's treatment
-				// arm; the control arm keeps the plain card so the two stay comparable.
-				lastFreeRender =
-					freeGenerationsUsed >= effectiveMaxFreeGenerations && stickyVariant !== 'control';
-			}
-		} catch (error) {
-			toast.set({
-				message: 'Failed to generate image. Please try again.',
-				type: 'error',
-				duration: 3000
-			});
-			// Track render error
-			analytics.trackRenderError({
-				tool_name: `html_to_${format}`,
-				error_message: error?.message || 'Unknown error'
-			});
-		} finally {
-			isImageGenerating = false;
-		}
-	}
 
 	// Add format-specific information
 	const formatInfo = {
@@ -493,20 +314,45 @@
 		format === 'image' ? imageHubInfo : formatInfo[format] || defaultFormatInfo.jpg;
 	$: otherFormats = Object.keys(formatInfo).filter((f) => f !== format);
 
-	/**
-	 * `tool-sticky-signup-bar` used to decide whether a sticky bottom bar
-	 * appeared after a render. The bar is gone; its treatment arm now renders
-	 * the limit variant of the result card instead, so the running experiment
-	 * keeps reading against the same flag.
-	 */
-	let stickyVariant = 'control';
-	onMount(() => {
-		if (browser) stickyVariant = posthog.getFeatureFlag?.('tool-sticky-signup-bar') || 'control';
-	});
-
 	// Bound to the editor so the toolbar can drive the render size.
 	let editorWidth = 1200;
 	let editorHeight = 630;
+
+	/*
+	 * TS-10. The document the code pane opens on.
+	 *
+	 * NO REMOTE ASSETS, deliberately. The paste report flags anything loaded
+	 * from another host, and a starter that trips its own warning teaches the
+	 * visitor to ignore it — which is the one thing that report cannot afford.
+	 * Everything here is inline, so it renders identically in the preview and
+	 * on the server.
+	 */
+	const STARTER_HTML = `<html>
+  <head>
+    <style>
+      body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; }
+      .card {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 5rem;
+        background: #fff4da;
+        box-sizing: border-box;
+      }
+      h1 { margin: 0 0 1rem; font-size: 76px; line-height: 1.05; color: #14110f; }
+      p { margin: 0; font-size: 26px; line-height: 1.4; color: #57534e; max-width: 42ch; }
+      .rule { width: 96px; height: 10px; background: #ff6b6b; margin-bottom: 2.5rem; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="rule"></div>
+      <h1>Edit this HTML</h1>
+      <p>Change anything on the left and the preview follows. Press Download for the file.</p>
+    </div>
+  </body>
+</html>`;
 
 	const TOC = [
 		{ id: 'key-features', label: 'Key Features' },
@@ -758,13 +604,12 @@
 	toolName={toolKey}
 	{toolPath}
 	breadcrumb={`HTML TO ${currentFormat.fullName.toUpperCase()}`}
-	facts={`FREE · ${effectiveMaxFreeGenerations} RENDERS A DAY · NO SIGNUP · ALSO ${otherFormats
+	facts={`FREE · ${FREE_RENDERS_A_DAY} RENDERS A DAY · NO SIGNUP · ALSO ${otherFormats
 		.map((f) => f.toUpperCase())
 		.join(' & ')}`}
 	toc={TOC}
 	related={RELATED}
 	loggedIn={isUserLoggedIn}
-	hasResult={!!imageUrl}
 	longform="rail"
 >
 	<HeroTitle slot="h1">
@@ -787,79 +632,43 @@
 
 	<!-- ── Tool ──────────────────────────────────────────────────────── -->
 	<div slot="tool">
-		<ToolCard>
-			<CodeEditor
-				variant="v2"
-				isPreviewEnabled={true}
-				{fileExtension}
-				toolName={toolKey}
-				bind:previewWidth={editorWidth}
-				bind:previewHeight={editorHeight}
-				on:previewUpdated={handlePreviewUpdate}
-			/>
+		<!--
+			TS-10. The code-first embed: the pane IS the primary input, and the
+			canvas beside it is live rather than a preview you press a button to
+			refresh. Replaces the CodeEditor + Generate block wholesale.
+		-->
+		<ToolEditor
+			templates={[]}
+			starterHtml={STARTER_HTML}
+			width={hasSize ? dimWidth : editorWidth}
+			height={hasSize ? dimHeight : editorHeight}
+			leftPanel="code"
+			defaultTab="inputs"
+			sourceKind="code"
+			toolName={toolKey}
+			downloadName={`html-to-${format}`}
+			formats={format === 'image' ? ['png', 'jpg', 'webp'] : [fileExtension || format]}
+		/>
 
-			<svelte:fragment slot="toolbar-left">
-				{#each formats as f}
-					<a
-						href={`/tools/html-to-${f}`}
-						class="rounded-full px-3 py-1 font-mono text-[11px] tracking-[0.04em] transition-colors {f ===
-						format
-							? 'bg-brand-ink text-white'
-							: 'border border-brand-rule text-brand-ink hover:border-brand-ink'}"
-					>
-						{f.toUpperCase()}
-					</a>
-				{/each}
+		<!--
+			The sibling formats stay LINKS, not a control. Each is a separate page
+			that ranks on its own query, and turning them into a dropdown here
+			would quietly delete three entry points.
+		-->
+		<div class="mt-4 flex flex-wrap items-center gap-2">
+			{#each formats as f}
+				<a
+					href={`/tools/html-to-${f}`}
+					class="rounded-full px-3 py-1 font-mono text-[11px] tracking-[0.04em] transition-colors {f ===
+					format
+						? 'bg-brand-ink text-white'
+						: 'border border-brand-rule text-brand-ink hover:border-brand-ink'}"
+				>
+					{f.toUpperCase()}
+				</a>
+			{/each}
+		</div>
 
-				<span class="ml-1 flex items-center gap-2 border-l border-brand-rule pl-3.5">
-					<label
-						class="flex items-center gap-1.5 border border-brand-ink bg-brand-paper px-2.5 py-[5px]"
-					>
-						<span class="sr-only">Width</span>
-						<input
-							type="number"
-							min="100"
-							max="4000"
-							disabled={hasSize}
-							bind:value={editorWidth}
-							class="w-[52px] bg-transparent text-center font-mono text-xs tracking-[0.06em] text-brand-ink outline-none disabled:text-brand-mute"
-						/>
-						<span class="font-mono text-xs text-brand-mute" aria-hidden="true">×</span>
-						<span class="sr-only">Height</span>
-						<input
-							type="number"
-							min="100"
-							max="4000"
-							disabled={hasSize}
-							bind:value={editorHeight}
-							class="w-[52px] bg-transparent text-center font-mono text-xs tracking-[0.06em] text-brand-ink outline-none disabled:text-brand-mute"
-						/>
-					</label>
-					<span class="hidden font-mono text-xs tracking-[0.06em] text-brand-mute sm:inline">
-						2× RETINA
-					</span>
-				</span>
-			</svelte:fragment>
-
-			<svelte:fragment slot="toolbar-right">
-				<QuotaMeter
-					remaining={remainingGenerations}
-					limit={effectiveMaxFreeGenerations}
-					loggedIn={isUserLoggedIn}
-					toolName={toolKey}
-					{toolPath}
-				/>
-				<GenerateButton
-					label={`Generate ${currentFormat.fullName}`}
-					loading={isImageGenerating}
-					remaining={remainingGenerations}
-					loggedIn={isUserLoggedIn}
-					toolName={toolKey}
-					{toolPath}
-					on:generate={generateImage}
-				/>
-			</svelte:fragment>
-		</ToolCard>
 
 		{#if format === 'image'}
 			<p class="mt-5 text-sm font-bold text-brand-slate">
@@ -951,24 +760,6 @@
 					{/if}
 				</div>
 			{/if}
-		{/if}
-	</div>
-
-	<!-- ── Result ────────────────────────────────────────────────────── -->
-	<div slot="result">
-		{#if imageUrl}
-			<ResultCard
-				{imageUrl}
-				formatLabel={currentFormat.fullName}
-				fileExtension={fileExtension || format}
-				width={hasSize ? dimWidth : editorWidth}
-				height={hasSize ? dimHeight : editorHeight}
-				loggedIn={isUserLoggedIn}
-				lastFree={lastFreeRender}
-				toolName={toolKey}
-				{toolPath}
-				html={previewHtml}
-			/>
 		{/if}
 	</div>
 

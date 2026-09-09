@@ -32,6 +32,8 @@
 	 * panels would drift apart within two tools.
 	 */
 	export let leftPanel = 'templates';
+	/** Width of the code zone. The board asks for 460 px. */
+	export let codeWidth = 460;
 	/** design | code — the code tools open on the markup, not the canvas. */
 	export let opensIn = 'design';
 	/** say | selection | inputs — certificate and invoice open on Inputs. */
@@ -110,8 +112,17 @@
 	<div
 		class="flex h-11 flex-shrink-0 items-center justify-between gap-3 border-b border-brand-rule px-3"
 	>
-		<div class="flex items-center gap-1 rounded-[6px] bg-brand-subtle p-[3px]">
-			{#each MODES as m (m.key)}
+		<!--
+			Code-first tools have the pane open permanently in the left panel, so
+			the toggle would offer a mode the visitor is already in. It only
+			survives where Code is somewhere else to go.
+		-->
+		<div
+			class="flex items-center gap-1 rounded-[6px] p-[3px] {leftPanel === 'code'
+				? ''
+				: 'bg-brand-subtle'}"
+		>
+			{#each leftPanel === 'code' ? [] : MODES as m (m.key)}
 				<button
 					type="button"
 					on:click={() => (mode = m.key)}
@@ -169,6 +180,22 @@
 
 	<!-- Body · 560px, three zones -->
 	<div class="flex h-[560px] min-h-0 flex-col lg:flex-row">
+		{#if leftPanel === 'code'}
+			<!--
+				CODE-FIRST (board TS-07 `LMJ-0`). For the html and code tools the
+				markup IS the input, so it takes the left zone at full width and
+				there is no gallery: the visitor arrives with something to paste,
+				not something to pick.
+			-->
+			<!-- Inline width, not a Tailwind class: the value is a prop, and
+			     Tailwind cannot generate a class for a number it never sees. -->
+			<div
+				class="flex min-h-0 w-full flex-shrink-0 flex-col border-b border-brand-rule lg:w-[var(--code-w)] lg:border-b-0 lg:border-r"
+				style="--code-w:{codeWidth}px"
+			>
+				<slot name="code" />
+			</div>
+		{:else}
 		<!-- TEMPLATES · 232px, a horizontal strip below 1024 -->
 		<div
 			class="flex flex-shrink-0 flex-col border-brand-rule lg:w-[232px] lg:border-r border-b lg:border-b-0"
@@ -252,6 +279,7 @@
 				{PANEL_FOOT[leftPanel] || PANEL_FOOT.templates}
 			</p>
 		</div>
+		{/if}
 
 		<!-- Canvas -->
 		<div class="relative flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center gap-3 bg-brand-canvas p-4">
