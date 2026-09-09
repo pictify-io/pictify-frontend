@@ -252,6 +252,8 @@
 				{height}
 				editable={mode === 'design'}
 				selectOnly={mode === 'code'}
+				imagePolicy="any"
+
 				sampleValues={{}}
 				on:selection={(e) => (selection = e.detail || null)}
 				on:transaction={(e) => editor.commit(e.detail.label, e.detail.html)}

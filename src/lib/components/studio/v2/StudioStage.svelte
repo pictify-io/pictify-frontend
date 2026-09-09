@@ -62,6 +62,13 @@
 	 * without one.
 	 */
 	export let renderPreview = null;
+	/**
+	 * `assets` (default) or `any`. Widens ONLY `img-src`, and only where the
+	 * author and the viewer are the same person — the public tool editor, whose
+	 * whole point is using a logo from a host we cannot enumerate. See
+	 * preview-document.js.
+	 */
+	export let imagePolicy = 'assets';
 
 	/** `{ status, dataUrl, error }` for the server-rendered Preview. */
 	let serverProof = { status: 'idle', dataUrl: null, error: null };
@@ -98,7 +105,7 @@
 	 * Split in two so an html change can be told apart from a mode change.
 	 * Everything except the document goes in `viewKey`.
 	 */
-	$: viewKey = JSON.stringify([editable, selectOnly, showElse, editable ? null : sampleValues]);
+	$: viewKey = JSON.stringify([editable, selectOnly, showElse, imagePolicy, editable ? null : sampleValues]);
 	$: mountKey = JSON.stringify([html, viewKey]);
 	$: if (frame && mountKey !== lastKey) {
 		/*
@@ -184,7 +191,8 @@
 			editable || selectOnly ? staged.html : substitute(staged.html, sampleValues);
 		const doc = writePreviewDocument(frame, cleanHtml(substituted), {
 			css: `html,body{margin:0;padding:0}${LOGIC_CHROME_CSS}`,
-			shell
+			shell,
+			images: imagePolicy
 		});
 		if (!doc) {
 			status = 'The stage could not start. Reload to try again.';

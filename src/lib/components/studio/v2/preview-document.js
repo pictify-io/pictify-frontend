@@ -59,18 +59,47 @@ const FONT_FILES = 'https://fonts.gstatic.com';
  * fetching, because those are style-src fetches against hosts this list does
  * not name.
  */
-export const PREVIEW_CSP = [
-	"default-src 'none'",
-	`img-src 'self' data: blob: ${ASSET_ORIGINS.join(' ')}`,
-	`style-src 'unsafe-inline' ${FONT_CSS}`,
-	`font-src data: ${FONT_FILES} ${ASSET_ORIGINS.join(' ')}`,
-	"script-src 'none'",
-	"connect-src 'none'",
-	"frame-src 'none'",
-	"object-src 'none'",
-	"form-action 'none'",
-	"base-uri 'none'"
-].join('; ');
+/**
+ * WHO IS LOOKING DECIDES WHAT IMAGES MAY LOAD.
+ *
+ * `assets` (the default) is the campaign and template studio. There, the
+ * markup can come from an AI result or an imported file and the person looking
+ * at it is the BUYER — someone else chose what it fetches. A remote image is
+ * then a request to a host the buyer never picked, which is a tracking channel
+ * and, with a query string, an exfiltration one. Two named hosts only.
+ *
+ * `any` is the public tool editor. There the author and the viewer are the
+ * same person: the templates are ours, and the whole feature is "read my site
+ * and use my logo" — a logo that lives, by definition, on a host we cannot
+ * enumerate. Refusing it does not protect that person from anything; it just
+ * means the tool does not work. Measured: every OG template loads its mark
+ * from res.cloudinary.com and every one of them came back blank.
+ *
+ * ONLY `img-src` WIDENS. Scripts, connections, frames, objects, forms and the
+ * base uri stay at `none` in both modes, so a design still cannot execute,
+ * phone home, or navigate the page it sits in.
+ */
+const IMG_SRC = {
+	assets: `'self' data: blob: ${ASSET_ORIGINS.join(' ')}`,
+	any: `'self' data: blob: https:`
+};
+
+export const previewCsp = (images = 'assets') =>
+	[
+		"default-src 'none'",
+		`img-src ${IMG_SRC[images] || IMG_SRC.assets}`,
+		`style-src 'unsafe-inline' ${FONT_CSS}`,
+		`font-src data: ${FONT_FILES} ${ASSET_ORIGINS.join(' ')}`,
+		"script-src 'none'",
+		"connect-src 'none'",
+		"frame-src 'none'",
+		"object-src 'none'",
+		"form-action 'none'",
+		"base-uri 'none'"
+	].join('; ');
+
+/** The strict policy, which is still the default everywhere. */
+export const PREVIEW_CSP = previewCsp('assets');
 
 /**
  * The `<head>` for a preview document.
@@ -80,8 +109,13 @@ export const PREVIEW_CSP = [
  * CSP is honoured for everything the parser reaches after it, which is why it
  * is the FIRST thing in the head — content before it would load unpoliced.
  */
-export const previewHead = (extraCss = 'html,body{margin:0;padding:0}', links = [], styles = []) =>
-	`<meta http-equiv="Content-Security-Policy" content="${PREVIEW_CSP}">` +
+export const previewHead = (
+	extraCss = 'html,body{margin:0;padding:0}',
+	links = [],
+	styles = [],
+	images = 'assets'
+) =>
+	`<meta http-equiv="Content-Security-Policy" content="${previewCsp(images)}">` +
 	`<meta charset="utf-8">` +
 	`<style>${extraCss}</style>` +
 	links.join('') +
@@ -101,14 +135,14 @@ const options = (arg) => (typeof arg === 'string' ? { css: arg } : arg || {});
 
 /** A whole preview document, head policy included. */
 export function previewDocument(body, arg) {
-	const { css, shell } = options(arg);
+	const { css, shell, images } = options(arg);
 	const html = shell ? shellAttributes(shell.htmlAttrs) : {};
 	const bodyAttrs = shell ? shellAttributes(shell.bodyAttrs) : {};
 	const links = shell ? fontLinks(shell.head) : [];
 	const styles = shell ? styleBlocks(shell.head) : [];
 	return (
 		`<!doctype html><html${attrText(html)}>` +
-		`<head>${previewHead(css, links, styles)}</head>` +
+		`<head>${previewHead(css, links, styles, images)}</head>` +
 		`<body${attrText(bodyAttrs)}>${body}</body></html>`
 	);
 }
@@ -138,11 +172,11 @@ const attrText = (attrs) =>
 export function writePreviewDocument(frame, body, arg) {
 	const doc = frame.contentDocument;
 	if (!doc?.documentElement) return null;
-	const { css, shell } = options(arg);
+	const { css, shell, images } = options(arg);
 	const links = shell ? fontLinks(shell.head) : [];
 	const styles = shell ? styleBlocks(shell.head) : [];
 	doc.documentElement.innerHTML =
-		`<head>${previewHead(css, links, styles)}</head><body>${body}</body>`;
+		`<head>${previewHead(css, links, styles, images)}</head><body>${body}</body>`;
 
 	/*
 	 * Set on the live elements rather than written into the markup, because
