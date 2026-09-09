@@ -72,7 +72,11 @@
 		{ key: 'selection', label: 'Selection' },
 		{ key: 'inputs', label: 'Inputs' }
 	];
-	const FORMATS = ['png', 'jpg', 'webp'];
+	/**
+	 * What this tool can produce. An invoice's primary is a PDF, an OG image's
+	 * is a PNG — the chip row is the tool's own, not a fixed three.
+	 */
+	export let formats = ['png', 'jpg', 'webp'];
 
 	/*
 	 * The three panel kinds say what swapping actually does, because it is
@@ -305,7 +309,7 @@
 	>
 		<div class="flex flex-wrap items-center gap-2">
 			<span class="flex items-center gap-0.5 rounded-[5px] border border-brand-rule p-[3px]">
-				{#each FORMATS as f (f)}
+				{#each formats as f (f)}
 					<button
 						type="button"
 						on:click={() => dispatch('format', { format: f })}

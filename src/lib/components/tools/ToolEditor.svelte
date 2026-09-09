@@ -51,6 +51,8 @@
 	export let defaultTab = 'say';
 	export let bulkLeadIn = null;
 	export let downloadName = 'image';
+	/** The formats this tool offers; the first is the primary. */
+	export let formats = ['png', 'jpg', 'webp'];
 	/**
 	 * `{ side, percent, label }` — a dashed guide drawn OVER the canvas, never
 	 * into the design. LinkedIn covers the left of a banner with the profile
@@ -82,7 +84,7 @@
 	let downloadsLeft = null;
 	let downloadsLimit = 5;
 	let rendering = false;
-	let format = 'png';
+	let format = formats[0] || 'png';
 
 	$: html = $editor.html || '';
 	$: variables = extractInputs(html);
@@ -235,7 +237,18 @@
 		rendering = true;
 		try {
 			const source = stageApi?.serialize?.() || $editor.html;
-			const { image } = await createImagePublic({ html: source, width, height });
+			/*
+			 * `fileExtension` is what makes this a PDF rather than a picture of
+			 * one. The public image route takes it and runs the same engine — it
+			 * is how the invoice tool has always produced PDFs, and it means the
+			 * guest render counter covers them too.
+			 */
+			const { image } = await createImagePublic({
+				html: source,
+				width,
+				height,
+				fileExtension: format
+			});
 			if (!image?.url) {
 				toast.set({ message: 'That render came back empty. Try again.', type: 'error', duration: 4000 });
 				return;
@@ -269,6 +282,7 @@
 <EmbeddedStudio
 	{templates}
 	{activeTemplate}
+	{formats}
 	{leftPanel}
 	{opensIn}
 	{defaultTab}

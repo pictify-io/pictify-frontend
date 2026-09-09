@@ -10,17 +10,15 @@
 	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
 	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
-	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
-	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
 	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { getTemplates, getTemplate } from '../../../api/tools/invoice.js';
 	import { onMount } from 'svelte';
-	import { toast } from '../../../store/toast.store';
 	import { user } from '../../../store/user.store';
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
-	import { createImagePublic } from '../../../api/image.js';
+	import ToolEditor from '$lib/components/tools/ToolEditor.svelte';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import { analytics } from '$lib/telemetry.js';
 	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
 	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
@@ -37,52 +35,45 @@
 		isUserLoggedIn = !!userData?.email;
 	});
 
+	/*
+	 * An invoice is a document, so the canvas is portrait A4 at 96 dpi and PDF
+	 * is the first format chip — the thing people actually send.
+	 */
+	const A4_PORTRAIT_WIDTH = 794;
+	const A4_PORTRAIT_HEIGHT = 1123;
+
+	/*
+	 * The gallery. Names are derived from the filenames, as with the OG set —
+	 * the templates endpoint returns names only and there is no metadata beside
+	 * the files, so the panel says "Template 2" rather than inventing one.
+	 */
+	$: editorTemplates = templates
+		.map((html, i) => ({
+			key: templateNames[i] || `t${i}`,
+			name: `Template ${String(templateNames[i] || '').replace(/[^0-9]/g, '') || i + 1}`,
+			category: null,
+			html
+		}))
+		.filter((t) => t.html);
+
+	/** The longform gallery deep-links into the editor rather than a dead picker. */
+	const openTemplateInEditor = (index) => {
+		const key = templateNames[index];
+		if (key) goto(`?template=${encodeURIComponent(key)}`, { noScroll: true, keepFocus: true });
+		document.querySelector('[slot="tool"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	};
+
+	/** One release of escape hatch, the same lever the other tools use. */
+	$: useLegacyTool = $page?.url?.searchParams?.get?.('studio') === 'v1';
+
 	let templates = [];
 	let templateNames = [];
 	let selectedTemplate = '';
-	let total = 0;
 	let imageUrl = '';
-	let isImageGenerating = false;
-	let logo;
-	let invoiceData = {
-		companyName: '',
-		companyAddress: '',
-		clientName: '',
-		clientAddress: '',
-		invoiceNumber: '',
-		invoiceDate: '',
-		dueDate: '',
-		items: [{ description: '', quantity: 1, price: 0 }],
-		notes: '',
-		logo: '',
-		taxRate: 0
-	};
 
-	let invoiceTemplateWrapper;
-	let windowWidth;
 	let previewContainerWidth = 500;
 
-	function buildCurlSnippetFromHtml(html, width, height) {
-		const payload = {
-			html: String(html || ''),
-			width: Number(width) || 800,
-			height: Number(height) || 1200
-		};
-		return `curl -X POST https://api.pictify.io/image \\\\\n  -H "Content-Type: application/json" \\\\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\\\n  -d '${JSON.stringify(
-			payload,
-			null,
-			2
-		)}'`;
-	}
 
-	function getCurrentInvoiceHtml() {
-		try {
-			const iframe = invoiceTemplateWrapper?.querySelector?.('iframe');
-			return iframe?.contentWindow?.document?.documentElement?.outerHTML || '';
-		} catch (e) {
-			return '';
-		}
-	}
 
 	const structuredData = {
 		'@context': 'https://schema.org',
@@ -129,31 +120,7 @@
 		return Math.max(scale, 0.25); // Min scale of 0.25
 	}
 
-	function sharePage(platform) {
-		const url = encodeURIComponent(window.location.href);
-		const text = encodeURIComponent('Check out this awesome Invoice Generator!');
-		if (platform === 'twitter') {
-			window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
-		} else if (platform === 'linkedin') {
-			window.open(
-				`https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${encodeURIComponent(
-					'Invoice Generator'
-				)}&summary=${text}`,
-				'_blank'
-			);
-		}
-	}
 
-	function copyToClipboard(text, contentType = 'image_url') {
-		navigator.clipboard.writeText(text).then(() => {
-			analytics.trackCopy({
-				content_type: contentType,
-				context: 'tool_result',
-				tool_name: 'online_invoice_generator'
-			});
-			toast.set({ message: 'Copied to clipboard !!', type: 'success', duration: 1500 });
-		});
-	}
 
 	$: iframeScale = calculateScale(previewContainerWidth);
 
@@ -162,10 +129,14 @@
 		analytics.trackToolOpened({ tool_name: 'online_invoice_generator' });
 
 		templateNames = await getTemplates();
-		for (const template of templateNames) {
-			const html = await getTemplate(template);
-			templates.push(html);
-		}
+		/*
+		 * Assigned, not pushed. `templates.push(...)` mutates the array without
+		 * telling Svelte, so anything derived from `templates` — the editor's
+		 * gallery — never recomputed and the canvas stayed empty. Fetched in
+		 * parallel while we are here; four sequential round trips was four times
+		 * the wait for no reason.
+		 */
+		templates = await Promise.all(templateNames.map((name) => getTemplate(name)));
 		if (templates.length > 0) {
 			const requestedTemplate = $page?.url?.searchParams?.get?.('template');
 			if (requestedTemplate) {
@@ -177,149 +148,7 @@
 		}
 	});
 
-	function addItem() {
-		invoiceData.items = [...invoiceData.items, { description: '', quantity: 1, price: 0 }];
-	}
 
-	function removeItem(index) {
-		invoiceData.items = invoiceData.items.filter((_, i) => i !== index);
-	}
-
-	function calculateTotal() {
-		return (
-			invoiceData.items.reduce((total, item) => total + item.quantity * item.price, 0) +
-			(invoiceData.taxRate > 0
-				? (invoiceData.items.reduce((total, item) => total + item.quantity * item.price, 0) *
-						invoiceData.taxRate) /
-				  100
-				: 0)
-		);
-	}
-
-	function updateLogo(event) {
-		const file = event.target.files[0];
-		if (file) {
-			const reader = new FileReader();
-			reader.onload = (e) => {
-				invoiceData.logo = e.target.result;
-				updateHTML(selectedTemplate);
-			};
-			reader.readAsDataURL(file);
-		}
-	}
-
-	async function generateInvoice() {
-		// Track generation in global limits store
-		generationLimits.increment();
-		isImageGenerating = true;
-
-		const iframe = invoiceTemplateWrapper?.querySelector('iframe');
-		const doc = iframe?.contentWindow?.document;
-		if (!doc?.documentElement) {
-			isImageGenerating = false;
-			toast.set({
-				message: 'Preview is still loading. Please try again.',
-				type: 'error',
-				duration: 3000
-			});
-			return;
-		}
-		let html = doc.documentElement.outerHTML;
-
-		// No guest watermark: the toolbar promises NO WATERMARK.
-
-		try {
-			const { image } = await createImagePublic({
-				html,
-				width: 800
-			});
-			imageUrl = image.url;
-
-			// Track successful invoice generation
-			analytics.trackImageGenerated({
-				tool_name: 'online_invoice_generator',
-				format: 'png',
-				with_watermark: !isUserLoggedIn
-			});
-		} catch (error) {
-			toast.set({
-				message: 'Failed to generate invoice. Please try again.',
-				type: 'error',
-				duration: 3000
-			});
-		}
-		isImageGenerating = false;
-	}
-
-	function updateTemplate(template) {
-		selectedTemplate = template;
-		updateHTML(selectedTemplate);
-		// Here you would update the invoice preview based on the selected template
-	}
-
-	function updateHTML(html) {
-		if (!invoiceTemplateWrapper) {
-			return;
-		}
-		const iframe = invoiceTemplateWrapper.querySelector('iframe');
-
-		const document = iframe?.contentWindow?.document;
-		// document.body is null until the srcdoc parses; a missing template node
-		// should degrade to a skipped write, not a thrown TypeError.
-		if (!document?.body) return;
-		const companyName = document.querySelector('#company-name');
-		const companyAddress = document.querySelector('#company-address');
-		const clientName = document.querySelector('#client-name');
-		const clientAddress = document.querySelector('#client-address');
-		const invoiceNumber = document.querySelector('#invoice-number');
-		const invoiceDate = document.querySelector('#invoice-date');
-		const dueDate = document.querySelector('#due-date');
-		const items = document.querySelector('#line-items');
-		const notes = document.querySelector('#additional-notes');
-		const taxAmount = document.querySelector('#tax-amount');
-		const subtotal = document.querySelector('#subtotal');
-
-		const logo = document.querySelector('.logo');
-		const itemsHTML = invoiceData.items
-			.map((item) => {
-				return `
-        <tr>
-          <td>${item.description}</td>
-          <td>${item.quantity}</td>
-          <td>$${item.price?.toFixed(2) || 0}</td>
-          <td>$${(item.quantity * (item.price || 0)).toFixed(2)}</td>
-        </tr>
-      `;
-			})
-			.join('');
-		if (companyName) companyName.innerHTML = invoiceData.companyName || '';
-		if (companyAddress) companyAddress.innerHTML = invoiceData.companyAddress || '';
-		if (clientName) clientName.innerHTML = invoiceData.clientName || '';
-		if (clientAddress) clientAddress.innerHTML = invoiceData.clientAddress || '';
-		if (invoiceNumber) invoiceNumber.innerHTML = invoiceData.invoiceNumber || '';
-		if (invoiceDate) invoiceDate.innerHTML = invoiceData.invoiceDate || '';
-		if (dueDate) dueDate.innerHTML = invoiceData.dueDate || '';
-		if (items) items.innerHTML = `<tbody id="line-items">${itemsHTML}</tbody>`;
-		if (notes) notes.innerHTML = invoiceData.notes || '';
-
-		if (logo?.parentNode) {
-			const updatedLogo = document.createElement('img');
-			updatedLogo.src = invoiceData.logo;
-			updatedLogo.classList.add('logo');
-			logo.parentNode.replaceChild(updatedLogo, logo);
-		}
-
-		total = calculateTotal();
-		const tax = (total * invoiceData.taxRate) / 100;
-		const totalElement = document.querySelector('#total-amount');
-		if (totalElement) totalElement.innerHTML = `$${total.toFixed(2)}`;
-		if (taxAmount) taxAmount.innerHTML = `$${tax.toFixed(2)}`;
-		if (subtotal)
-			subtotal.innerHTML = `$${invoiceData.items
-				.reduce((total, item) => total + item.quantity * item.price, 0)
-				.toFixed(2)}`;
-		html = document.documentElement.outerHTML;
-	}
 
 	const TOOL_NAME = 'online_invoice_generator';
 	const TOOL_PATH = '/tools/online-invoice-generator';
@@ -385,6 +214,10 @@
 	breadcrumbLabel="Online Invoice Generator"
 />
 
+<!-- The editor raises toasts for render and quota failures; without this
+     they set the store and nothing appears. -->
+<Toast />
+
 <ToolPageShell
 	toolName={TOOL_NAME}
 	toolPath={TOOL_PATH}
@@ -406,253 +239,34 @@
 	</HeroSub>
 
 	<div slot="tool">
-		<ToolCard>
-			<div class="grid grid-cols-1 items-start gap-6 p-5 lg:grid-cols-2 lg:gap-8 lg:p-7">
-				<div class="bg-brand-paper border border-brand-ink overflow-hidden">
-					<!-- Panel header. A chrome label, so it is a <p> (D2). -->
-					<div class="flex items-center gap-2 border-b border-brand-ink bg-brand-press px-4 py-2.5">
-						<p class="font-mono text-xs tracking-[0.06em] text-white">
-							<span class="animate-pulse">_</span> INVOICE DETAILS
-						</p>
-					</div>
-
-					<div class="p-4 sm:p-6 space-y-4">
-						<!-- Company Section -->
-						<div class="space-y-3">
-							<p
-								class="flex items-center gap-2 text-xs font-semibold tracking-wider text-brand-ink"
-							>
-								<span
-									class="w-6 h-6 bg-brand-field border border-brand-ink flex items-center justify-center text-xs"
-									>1</span
-								>
-								Your Company
-							</p>
-							<input
-								bind:value={invoiceData.companyName}
-								type="text"
-								class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none"
-								placeholder="Company Name"
-								on:input={updateHTML(selectedTemplate)}
-							/>
-							<div class="relative">
-								<input
-									type="file"
-									class="w-full border border-brand-ink p-3 font-bold text-sm file:mr-4 file:py-1 file:px-3 file:border-[2px] file:border-black file:bg-brand-field file:font-bold file:text-brand-ink file:text-xs file: cursor-pointer"
-									accept="image/*"
-									on:change={updateLogo}
-								/>
-							</div>
-							<textarea
-								bind:value={invoiceData.companyAddress}
-								class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none resize-none"
-								placeholder="Company Address"
-								rows="2"
-								on:input={updateHTML(selectedTemplate)}
-							/>
-						</div>
-
-						<!-- Client Section -->
-						<div class="space-y-3">
-							<p
-								class="flex items-center gap-2 text-xs font-semibold tracking-wider text-brand-ink"
-							>
-								<span
-									class="w-6 h-6 bg-data-sky border border-brand-ink flex items-center justify-center text-xs text-white"
-									>2</span
-								>
-								Client Info
-							</p>
-							<input
-								bind:value={invoiceData.clientName}
-								type="text"
-								class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none"
-								placeholder="Client Name"
-								on:input={updateHTML(selectedTemplate)}
-							/>
-							<textarea
-								bind:value={invoiceData.clientAddress}
-								class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none resize-none"
-								placeholder="Client Address"
-								rows="2"
-								on:input={updateHTML(selectedTemplate)}
-							/>
-						</div>
-
-						<!-- Invoice Details -->
-						<div class="space-y-3">
-							<p
-								class="flex items-center gap-2 text-xs font-semibold tracking-wider text-brand-ink"
-							>
-								<span
-									class="w-6 h-6 bg-data-violet border border-brand-ink flex items-center justify-center text-xs text-white"
-									>3</span
-								>
-								Invoice Details
-							</p>
-							<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-								<input
-									bind:value={invoiceData.invoiceNumber}
-									type="text"
-									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none"
-									placeholder="Invoice #"
-									on:input={updateHTML(selectedTemplate)}
-								/>
-								<input
-									bind:value={invoiceData.invoiceDate}
-									type="date"
-									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none"
-									on:input={updateHTML(selectedTemplate)}
-								/>
-								<input
-									bind:value={invoiceData.dueDate}
-									type="date"
-									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none"
-									on:input={updateHTML(selectedTemplate)}
-								/>
-							</div>
-						</div>
-
-						<!-- Line Items -->
-						<div class="space-y-3">
-							<p
-								class="flex items-center gap-2 text-xs font-semibold tracking-wider text-brand-ink"
-							>
-								<span
-									class="w-6 h-6 bg-brand-pink border border-brand-ink flex items-center justify-center text-xs text-white"
-									>4</span
-								>
-								Line Items
-							</p>
-							{#each invoiceData.items as item, index}
-								<div class="flex flex-wrap gap-2">
-									<input
-										bind:value={item.description}
-										type="text"
-										class="flex-grow min-w-[120px] border border-brand-ink p-2 font-bold text-sm transition-all outline-none"
-										placeholder="Description"
-										on:input={updateHTML(selectedTemplate)}
-									/>
-									<input
-										bind:value={item.quantity}
-										type="number"
-										class="w-16 border border-brand-ink p-2 font-bold text-sm text-center transition-all outline-none"
-										placeholder="Qty"
-										on:input={updateHTML(selectedTemplate)}
-									/>
-									<input
-										bind:value={item.price}
-										type="number"
-										class="w-20 border border-brand-ink p-2 font-bold text-sm text-center transition-all outline-none"
-										placeholder="Price"
-										on:input={updateHTML(selectedTemplate)}
-									/>
-									<button
-										on:click={() => removeItem(index)}
-										class="w-10 h-10 bg-brand-pink border border-brand-ink text-white font-semibold flex items-center justify-center transition-all"
-									>
-										×
-									</button>
-								</div>
-							{/each}
-							<button
-								on:click={addItem}
-								class="px-4 py-2 bg-brand-ink text-white border border-brand-ink font-bold text-xs tracking-wider transition-all flex items-center gap-2"
-							>
-								<span>+</span> Add Item
-							</button>
-						</div>
-
-						<!-- Tax & Notes -->
-						<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-							<div>
-								<label class="block text-xs font-semibold text-brand-ink tracking-wider mb-2"
-									>Tax Rate (%)</label
-								>
-								<input
-									bind:value={invoiceData.taxRate}
-									type="number"
-									class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none"
-									placeholder="0"
-									on:input={updateHTML(selectedTemplate)}
-								/>
-							</div>
-							<div class="flex items-end">
-								<div class="w-full p-4 bg-brand-pink text-white border border-brand-ink">
-									<span class="text-xs font-semibold tracking-wider block">Total</span>
-									<span class="text-2xl font-semibold">${total.toFixed(2)}</span>
-								</div>
-							</div>
-						</div>
-
-						<textarea
-							bind:value={invoiceData.notes}
-							class="w-full border border-brand-ink p-3 font-bold text-sm transition-all outline-none resize-none"
-							placeholder="Additional Notes..."
-							rows="2"
-							on:input={updateHTML(selectedTemplate)}
-						/>
-					</div>
-				</div>
-				<div class="flex flex-col gap-4">
-					<div class="bg-brand-paper border border-brand-ink overflow-hidden">
-						<!-- Preview Header -->
-						<div
-							class="bg-[#e5e7eb] px-4 py-2 border-b border-brand-ink flex items-center justify-between"
-						>
-							<span class="font-mono text-xs font-bold tracking-wider">LIVE PREVIEW</span>
-							<div class="flex gap-1">
-								<div class="w-2 h-2 bg-brand-ink" />
-								<div class="w-2 h-2 bg-brand-ink" />
-								<div class="w-2 h-2 bg-brand-ink" />
-							</div>
-						</div>
-						<div
-							bind:this={invoiceTemplateWrapper}
-							bind:clientWidth={previewContainerWidth}
-							class="overflow-hidden bg-brand-paper flex justify-center"
-						>
-							<InvoiceTemplate
-								html={selectedTemplate}
-								width={800}
-								height={1200}
-								scale={iframeScale}
-							/>
-						</div>
-					</div>
-					{#if isImageGenerating}
-						<div class="bg-brand-paper border border-brand-ink p-4">
-							<p class="text-center font-bold mb-3">Generating Image...</p>
-							<div class="w-full bg-brand-rule border border-brand-ink h-4">
-								<div class="bg-brand-ink h-full loading-bar" />
-							</div>
-						</div>
-					{/if}
-				</div>
+		<!-- TS-8. Edited in place on the shared embed. `?studio=v1` for one release. -->
+		{#if useLegacyTool}
+			<ToolCard>
+				<p class="p-6 font-sans text-[13.5px] leading-[19px] text-brand-slate">
+					The classic generator has been replaced by the editor.
+					<a href="?" class="text-brand-royal underline">Open it</a>.
+				</p>
+			</ToolCard>
+		{:else if editorTemplates.length}
+			<ToolEditor
+				templates={editorTemplates}
+				width={A4_PORTRAIT_WIDTH}
+				height={A4_PORTRAIT_HEIGHT}
+				sourceKind="invoice"
+				toolName="online_invoice_generator"
+				downloadName="invoice"
+				defaultTab="inputs"
+				formats={['pdf', 'png']}
+			/>
+		{:else}
+			<div
+				class="flex h-[560px] items-center justify-center rounded-[12px] border-[1.5px] border-brand-ink bg-brand-paper"
+			>
+				<p class="font-mono text-[11px] uppercase tracking-[0.08em] text-brand-mute">
+					Loading the editor…
+				</p>
 			</div>
-
-			<svelte:fragment slot="toolbar-left">
-				<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">LINE ITEMS → PNG</span>
-			</svelte:fragment>
-
-			<svelte:fragment slot="toolbar-right">
-				<QuotaMeter
-					remaining={guestRemaining}
-					loggedIn={isUserLoggedIn}
-					toolName={TOOL_NAME}
-					toolPath={TOOL_PATH}
-				/>
-				<GenerateButton
-					label="Generate Invoice"
-					loading={isImageGenerating}
-					remaining={guestRemaining}
-					loggedIn={isUserLoggedIn}
-					toolName={TOOL_NAME}
-					toolPath={TOOL_PATH}
-					on:generate={generateInvoice}
-				/>
-			</svelte:fragment>
-		</ToolCard>
+		{/if}
 	</div>
 
 	<div slot="result">
@@ -689,7 +303,7 @@
 							class="relative bg-brand-paper border-[1.5px] {selectedTemplate === template
 								? 'border-brand-danger'
 								: 'border-black'} p-3 overflow-hidden transition-all cursor-pointer"
-							on:click={() => updateTemplate(template)}
+							on:click={() => openTemplateInEditor(templates.indexOf(template))}
 						>
 							{#if selectedTemplate === template}
 								<div
