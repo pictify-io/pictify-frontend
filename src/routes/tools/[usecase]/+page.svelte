@@ -9,16 +9,13 @@
 	 */
 	import Nav from '$lib/components/landing/Nav.svelte';
 	import Footer from '$lib/components/landing/Footer.svelte';
-	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
 	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
 	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
-	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
-	import HtmlTemplateEditor from '$lib/components/tools/HtmlTemplateEditor.svelte';
+	import ToolEditor from '$lib/components/tools/ToolEditor.svelte';
 	import MarkdownEditor from '$lib/components/tools/MarkdownEditor.svelte';
 	import TableEditor from '$lib/components/tools/TableEditor.svelte';
 	import BarcodeEditor from '$lib/components/tools/BarcodeEditor.svelte';
-	import TemplateGallery from '$lib/components/tools/TemplateGallery.svelte';
 	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
 	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
 	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
@@ -37,17 +34,11 @@
 		useCaseDetails,
 		formats,
 		popularSizes,
-		baseFormatUrl,
-		sizeUrl,
 		parseSize
 	} from '$lib/pseo/config.js';
 	import { getHtmlTemplatesForUseCase } from '$lib/pseo/useCaseHtmlTemplates.js';
-	import { onMount } from 'svelte';
 	import { user } from '../../../store/user.store';
-	import { toast } from '../../../store/toast.store';
 	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
-	import { createImagePublic } from '../../../api/image.js';
-	import { downloadFile } from '$lib/utils/download.js';
 
 	// User login state
 	let isUserLoggedIn = false;
@@ -68,66 +59,44 @@
 	$: canonical = validCase ? `https://pictify.io/tools/${useCaseId}` : 'https://pictify.io/tools';
 
 	// Generation state
-	let isGenerating = false;
-	let generatedImageUrl = '';
-	let generationError = '';
-	let editorRef;
 
 	// Quick generate from the edited HTML template.
 	// Uses the public HTML endpoint (no auth required, rate limited) — the same
 	// render engine as the authenticated /image API.
-	async function handleQuickGenerate() {
-		const sel =
-			editorRef?.getSelected?.() ||
-			(toolTemplates[0] && {
-				html: toolTemplates[0].html,
-				width: toolTemplates[0].width,
-				height: toolTemplates[0].height
-			});
-		if (!sel?.html) {
-			toast.set({ message: 'No template available', type: 'error', duration: 2000 });
-			return;
-		}
-
-		// Track generation in global limits store
-		generationLimits.increment();
-		isGenerating = true;
-		generationError = '';
-		generatedImageUrl = '';
-
-		try {
-			const { image } = await createImagePublic({
-				html: sel.html,
-				width: sel.width,
-				height: sel.height,
-				fileExtension: 'png'
-			});
-
-			if (image?.url) {
-				generatedImageUrl = image.url;
-				generatedDims = { width: sel.width, height: sel.height };
-				toast.set({ message: 'Image generated successfully!', type: 'success', duration: 2000 });
-			} else {
-				throw new Error('No image URL in response');
-			}
-		} catch (e) {
-			// Handle rate limit error
-			if (e.message?.includes('rate') || e.status === 429) {
-				generationError = 'Too many requests. Please wait a moment and try again.';
-			} else {
-				generationError = e.message || 'Failed to generate image';
-			}
-			toast.set({ message: generationError, type: 'error', duration: 3000 });
-		} finally {
-			isGenerating = false;
-		}
-	}
-
 	// HTML starter templates for this use case (empty for the code-editor tools)
+	/**
+	 * Which "From a …" block each of these tools opens with, from the §9b matrix.
+	 * Anything not listed is a card with two or three fields, which is the
+	 * shape the membership and portfolio tools want.
+	 */
+	const SOURCE_KIND = {
+		'social-proof-card': 'social-proof',
+		'email-header': 'email-header',
+		badge: 'badge',
+		leaderboard: 'table',
+		'membership-card': 'card',
+		'portfolio-card': 'card'
+	};
+	/** A leaderboard is rows before it is prose. */
+	const INPUTS_FIRST = new Set(['leaderboard']);
+
+	/*
+	 * These template sets already carry names and descriptions, so nothing is
+	 * derived. They do NOT carry `template-*` ids, so the tokeniser finds no
+	 * variables in them — Inputs says so honestly, and a visitor can promote any
+	 * text to a variable with "Show a variable here". Giving them ids is a
+	 * content pass, not a code one.
+	 */
+	$: editorTemplates = toolTemplates.map((t) => ({
+		key: t.id,
+		name: t.name,
+		category: null,
+		html: t.html
+	}));
+
 	$: toolTemplates = validCase ? getHtmlTemplatesForUseCase(useCaseId) : [];
 	$: templateWidth = toolTemplates[0]?.width || 1200;
 	$: templateHeight = toolTemplates[0]?.height || 630;
-	let generatedDims = { width: 1200, height: 630 };
 
 	// Escape HTML for code display
 	function escapeHtml(source) {
@@ -185,8 +154,6 @@
 		config && config.recommendedSizes && config.recommendedSizes.length
 			? config.recommendedSizes
 			: popularSizes;
-	$: primarySizeFormat =
-		(formatOptions && formatOptions.length && String(formatOptions[0]).toLowerCase()) || 'jpg';
 
 	// Structured data for SEO
 	$: structuredData = validCase
@@ -214,21 +181,6 @@
 		: null;
 
 	// FAQ structured data for SEO
-	$: faqSchema =
-		validCase && config.faqs && config.faqs.length > 0
-			? {
-					'@context': 'https://schema.org',
-					'@type': 'FAQPage',
-					mainEntity: config.faqs.map((faq) => ({
-						'@type': 'Question',
-						name: faq.q,
-						acceptedAnswer: {
-							'@type': 'Answer',
-							text: faq.a
-						}
-					}))
-			  }
-			: null;
 
 	// API example snippet
 	$: apiSnippet = `curl -X POST https://api.pictify.io/image \\
@@ -244,7 +196,6 @@
 	const TOOL_NAME = 'usecase_tool';
 
 	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
-	$: lastFreeRender = !isUserLoggedIn && guestRemaining <= 1;
 
 	// Three neighbours from the same shelf on /tools, so the cards match the hub.
 	const RELATED = ['html-to-image', 'csv-to-pdf', 'certificate-generator'];
@@ -277,8 +228,7 @@
 		facts="FREE · 5 RENDERS A DAY · NO SIGNUP · RENDER BY API"
 		related={RELATED}
 		loggedIn={isUserLoggedIn}
-		hasResult={!!generatedImageUrl}
-		longform="column"
+			longform="column"
 	>
 		<HeroTitle slot="h1">
 			Generate
@@ -325,84 +275,38 @@
 						/>
 					</svelte:fragment>
 				</ToolCard>
+			{:else if toolTemplates.length}
+				<!--
+					TS-8. Six of the pSEO tools — social proof, email header, badge,
+					membership and portfolio cards, leaderboard — share this branch, so
+					they move onto the embed in one change rather than six.
+				-->
+				<!--
+					`toolName` is the use-case id, NOT the page's shared `usecase_tool`.
+					The editor keys its local draft on that name, so one name for nine
+					tools meant the badge page restored whatever you last made on the
+					social proof page — a testimonial card under a gallery of badges.
+				-->
+				<ToolEditor
+					templates={editorTemplates}
+					width={templateWidth}
+					height={templateHeight}
+					sourceKind={SOURCE_KIND[useCaseId] || 'card'}
+					toolName={useCaseId}
+					downloadName={useCaseId}
+					defaultTab={INPUTS_FIRST.has(useCaseId) ? 'inputs' : 'say'}
+				/>
 			{:else}
 				<ToolCard>
-					<div class="flex flex-col gap-6 p-5 lg:p-7">
-						<div class="relative z-10 flex flex-col items-center gap-8 w-full">
-							<!-- HTML template editor: live preview + editable source -->
-							{#if toolTemplates.length}
-								<HtmlTemplateEditor bind:this={editorRef} templates={toolTemplates} />
-							{:else}
-								<div
-									class="w-full h-[315px] flex items-center justify-center bg-brand-subtle border border-brand-ink"
-								>
-									<p class="font-bold text-brand-mute">Preview not available</p>
-								</div>
-							{/if}
-						</div>
+					<div
+						class="flex h-[315px] w-full items-center justify-center border border-brand-ink bg-brand-subtle"
+					>
+						<p class="font-bold text-brand-mute">Preview not available</p>
 					</div>
-
-					<svelte:fragment slot="toolbar-left">
-						<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">
-							TEMPLATE → PNG
-						</span>
-					</svelte:fragment>
-
-					<svelte:fragment slot="toolbar-right">
-						<QuotaMeter
-							remaining={guestRemaining}
-							loggedIn={isUserLoggedIn}
-							toolName={TOOL_NAME}
-							toolPath={`/tools/${useCaseId}`}
-						/>
-						<GenerateButton
-							label="Generate Image"
-							loading={isGenerating}
-							remaining={guestRemaining}
-							loggedIn={isUserLoggedIn}
-							toolName={TOOL_NAME}
-							toolPath={`/tools/${useCaseId}`}
-							on:generate={handleQuickGenerate}
-						/>
-					</svelte:fragment>
 				</ToolCard>
 			{/if}
 		</div>
 
-		<div slot="result">
-			{#if generatedImageUrl}
-				<ResultCard
-					imageUrl={generatedImageUrl}
-					formatLabel="PNG"
-					fileExtension="png"
-					width={generatedDims.width}
-					height={generatedDims.height}
-					loggedIn={isUserLoggedIn}
-					lastFree={lastFreeRender}
-					toolName={TOOL_NAME}
-					toolPath={`/tools/${useCaseId}`}
-				/>
-			{:else if generationError}
-				<div class="max-w-3xl mx-auto px-4 mb-12">
-					<div
-						class="flex items-center gap-4 rounded-tile border border-brand-danger bg-red-50 p-6"
-					>
-						<div
-							class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center border-2 border-red-500 text-red-500"
-						>
-							!
-						</div>
-						<div>
-							<h4 class="font-semibold text-red-900">Generation Failed</h4>
-							<p class="text-red-700 font-medium">{generationError}</p>
-						</div>
-						<button on:click={handleQuickGenerate} class="ml-auto underline font-bold text-red-900"
-							>Retry</button
-						>
-					</div>
-				</div>
-			{/if}
-		</div>
 
 		<!--
 			The API block moves out of the reading column into the automate slot,
