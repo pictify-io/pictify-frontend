@@ -76,13 +76,13 @@
 	$: headDescription = hasSize
 		? `Convert HTML to ${
 				(currentFormat && currentFormat.fullName) || 'image'
-		  } at ${sizeString} instantly. Paste your code, preview live, and export. No file upload needed.`
+		  } at ${sizeString} instantly. Paste your code or upload an .html file, preview live, and export.`
 		: format === 'png'
-		? `Paste HTML + CSS, preview it live, and export a high-quality PNG in one click. Free online converter with a built-in code editor. No signup, no file upload. API available for automation.`
+		? `Paste HTML + CSS or upload an .html file, preview it live, and export a high-quality PNG in one click. Free online converter with a built-in code editor. No signup. API available for automation.`
 		: format === 'jpg'
-		? `Free online HTML to JPG converter: paste HTML + CSS, preview it live, and download a high-quality JPG in one click. No signup, no file upload. API available for automation.`
+		? `Free online HTML to JPG converter: paste HTML + CSS or upload an .html file, preview it live, and download a high-quality JPG in one click. No signup. API available for automation.`
 		: format === 'image'
-		? `Convert HTML and CSS to an image (PNG, JPG, or WebP) instantly. Paste code, preview live, and export, or automate with the API. Free, no signup, no file upload.`
+		? `Convert HTML and CSS to an image (PNG, JPG, or WebP) instantly. Paste code or upload an .html file, preview live, and export, or automate with the API. Free, no signup.`
 		: `Convert HTML to ${
 				(format && format.toUpperCase()) || 'IMAGE'
 		  } images instantly. Paste your code, preview live, and export. Free online tool with built-in editor and API access.`;
@@ -101,7 +101,7 @@
 	$: ogDescription = hasSize
 		? `Convert HTML to high-quality ${
 				(currentFormat && currentFormat.fullName) || 'Image'
-		  } at ${sizeString}. Paste code, preview live, export instantly. No file upload needed.`
+		  } at ${sizeString}. Paste code or upload an .html file, preview live, export instantly.`
 		: `Paste HTML + CSS and get a high-quality ${
 				(format && format.toUpperCase()) || 'image'
 		  } in one click. Free online converter with a live code editor and API access for developers.`;
@@ -319,40 +319,10 @@
 	let editorHeight = 630;
 
 	/*
-	 * TS-10. The document the code pane opens on.
-	 *
-	 * NO REMOTE ASSETS, deliberately. The paste report flags anything loaded
-	 * from another host, and a starter that trips its own warning teaches the
-	 * visitor to ignore it — which is the one thing that report cannot afford.
-	 * Everything here is inline, so it renders identically in the preview and
-	 * on the server.
+	 * TS-07 B. The page opens on the empty drop target, not a starter; the
+	 * hero's "Upload .html" opens the same picker the pane does.
 	 */
-	const STARTER_HTML = `<html>
-  <head>
-    <style>
-      body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; }
-      .card {
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding: 0 5rem;
-        background: #fff4da;
-        box-sizing: border-box;
-      }
-      h1 { margin: 0 0 1rem; font-size: 76px; line-height: 1.05; color: #14110f; }
-      p { margin: 0; font-size: 26px; line-height: 1.4; color: #57534e; max-width: 42ch; }
-      .rule { width: 96px; height: 10px; background: #ff6b6b; margin-bottom: 2.5rem; }
-    </style>
-  </head>
-  <body>
-    <div class="card">
-      <div class="rule"></div>
-      <h1>Edit this HTML</h1>
-      <p>Change anything on the left and the preview follows. Press Download for the file.</p>
-    </div>
-  </body>
-</html>`;
+	let toolEditor;
 
 	const TOC = [
 		{ id: 'key-features', label: 'Key Features' },
@@ -384,7 +354,7 @@
 		},
 		{
 			q: 'Max file size?',
-			a: 'Our free tool supports HTML files up to 5MB in size. For larger files or batch conversions, consider upgrading to our premium plan or API service.'
+			a: 'Our free tool supports HTML files up to 2MB in size. For larger files or batch conversions, consider upgrading to our premium plan or API service.'
 		},
 		{
 			q: 'Privacy?',
@@ -395,7 +365,7 @@
 	$: HOW_TO_STEPS = [
 		{
 			title: 'Input Code',
-			body: 'Paste your HTML code in the editor above or use our default template.'
+			body: 'Paste your HTML code in the editor above, or upload your .html file.'
 		},
 		{
 			title: 'Preview',
@@ -536,9 +506,9 @@
 								name: `How do I convert HTML to ${currentFormat?.fullName || 'image'}?`,
 								acceptedAnswer: {
 									'@type': 'Answer',
-									text: `Paste your HTML and CSS code into Pictify's free online editor, see a live preview, then click "Capture" to download a high-quality ${
+									text: `Paste your HTML and CSS code into Pictify's free online editor or upload an .html file, see a live preview, then click "Download" to get a high-quality ${
 										currentFormat?.fullName || 'image'
-									} file. No file upload or signup needed. You can also use the Pictify API to convert HTML to ${
+									} file. No signup needed. You can also use the Pictify API to convert HTML to ${
 										currentFormat?.fullName || 'image'
 									} programmatically.`
 								}
@@ -620,15 +590,35 @@
 		{/if}
 	</HeroTitle>
 
-	<HeroSub slot="hero-sub">
-		{#if format === 'image'}
-			Convert your HTML &amp; CSS into an image in one click: export PNG, JPG, or WebP.
-			<span class="text-brand-slate">Perfect for {currentFormat.bestFor}</span>
-		{:else}
-			Transform your HTML code into high-quality {currentFormat.fullName} images instantly.
-			<span class="text-brand-slate">Perfect for {currentFormat.bestFor}</span>
-		{/if}
-	</HeroSub>
+	<svelte:fragment slot="hero-sub">
+		<HeroSub>
+			{#if format === 'image'}
+				Convert your HTML &amp; CSS into an image in one click: export PNG, JPG, or WebP.
+				<span class="text-brand-slate">Perfect for {currentFormat.bestFor}</span>
+			{:else}
+				Transform your HTML code into high-quality {currentFormat.fullName} images instantly.
+				<span class="text-brand-slate">Perfect for {currentFormat.bestFor}</span>
+			{/if}
+		</HeroSub>
+		<!--
+			TS-07 B: the one addition to a hero that is otherwise settled. A
+			secondary, because pasting into the pane below stays the main way in;
+			this is for the visitor who is holding a file. The .zip line is here
+			because a saved web page is usually a folder, and that is the first
+			thing someone with one will try.
+		-->
+		<div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-2">
+			<button
+				type="button"
+				on:click={() => toolEditor?.chooseFile('hero')}
+				class="h-10 rounded-btn border-[1.5px] border-brand-ink bg-brand-paper px-4 font-sans text-[14px] font-semibold text-brand-ink hover:bg-brand-ink hover:text-white"
+				>Upload .html</button
+			>
+			<span class="font-mono text-[11px] tracking-[0.06em] text-brand-ink"
+				>OR PASTE IT BELOW · ONE FILE UP TO 2 MB · .ZIP NOT SUPPORTED YET</span
+			>
+		</div>
+	</svelte:fragment>
 
 	<!-- ── Tool ──────────────────────────────────────────────────────── -->
 	<div slot="tool">
@@ -638,8 +628,8 @@
 			refresh. Replaces the CodeEditor + Generate block wholesale.
 		-->
 		<ToolEditor
+			bind:this={toolEditor}
 			templates={[]}
-			starterHtml={STARTER_HTML}
 			width={hasSize ? dimWidth : editorWidth}
 			height={hasSize ? dimHeight : editorHeight}
 			leftPanel="code"

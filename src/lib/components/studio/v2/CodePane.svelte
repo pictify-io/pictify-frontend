@@ -149,6 +149,10 @@
 			{/if}
 		</div>
 		<div class="flex items-center gap-3">
+			<!-- Where the text comes from, ahead of what to do with it. The tools
+			     put Paste and Upload .html here (board TS-07 `LMJ-0`); the studio
+			     has nothing to add. -->
+			<slot name="actions" />
 			<button
 				type="button"
 				on:click={() => dispatch('format')}
@@ -229,6 +233,19 @@
 				class="absolute inset-0 h-full w-full resize-none overflow-auto whitespace-pre bg-transparent py-3 pr-3.5 font-mono text-[11.5px] leading-[18px] text-transparent caret-white outline-none placeholder:text-white/35 disabled:opacity-60"
 			></textarea>
 		</div>
+
+		{#if !html && $$slots.empty}
+			<!--
+				The empty state sits OVER the textarea and lets clicks through
+				(`pointer-events-none`), so a click anywhere lands in the real
+				textarea and ⌘V pastes the way it always has. Anything inside that
+				needs a click of its own opts back in with `pointer-events-auto`.
+				It goes the moment there is a character to show.
+			-->
+			<div class="pointer-events-none absolute inset-0 z-20 bg-brand-press p-3">
+				<slot name="empty" />
+			</div>
+		{/if}
 	</div>
 
 	<!-- Footer -->

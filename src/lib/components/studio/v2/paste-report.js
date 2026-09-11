@@ -97,28 +97,68 @@ export function inspectPastedHtml(html) {
 	if (uniqueHandlers.length) scripts.push(`inline handlers (${uniqueHandlers.slice(0, 4).join(', ')})`);
 	if (/javascript:/i.test(src)) scripts.push('javascript: links');
 
-	// Stylesheets from elsewhere. Google Fonts is the one allowed exception.
+	// Stylesheets from elsewhere. Google Fonts is the one allowed exception —
+	// and the families it brings are recorded, so the report can say they were
+	// KEPT: someone whose file uses a web font is otherwise left wondering
+	// whether the render will fall back to Times.
 	const styles = [];
+	const fonts = [];
 	for (const tag of tagsNamed(src, 'link')) {
 		if (!/rel\s*=\s*["']?stylesheet/i.test(tag)) continue;
 		const href = attr(tag, 'href');
 		const origin = originOf(href);
-		if (!origin || origin.relative || origin.host === FONT_CSS_HOST) continue;
+		if (origin?.host === FONT_CSS_HOST) {
+			for (const m of href.matchAll(/family=([^&:;]+)/gi)) {
+				const family = decodeURIComponent(m[1].replace(/\+/g, ' ')).trim();
+				if (family && !fonts.includes(family)) fonts.push(family);
+			}
+			continue;
+		}
+		if (!origin || origin.relative) continue;
 		styles.push({ href, host: origin.host });
 	}
 	if (/@import\b/i.test(src)) styles.push({ href: '@import in a <style> block', host: null });
 
 	return {
+		// Kept fonts do not make it not-ok: nothing about them changes.
 		ok: assets.length === 0 && scripts.length === 0 && styles.length === 0,
 		assets,
 		scripts,
 		styles,
+		fonts,
 		counts: { assets: assets.length, scripts: scripts.length, styles: styles.length }
 	};
 }
 
-/** One line per finding, in the order they cost something. */
-export function reportLines(report) {
+/**
+ * What survives, as lines in the same shape: `tone: 'proof'`.
+ *
+ * Separate from `reportLines` because only some surfaces say it. The html
+ * tools do (board TS-07 `LMJ-0`: "Google Fonts link kept"), where the visitor
+ * brought a whole file and wants to know what made it through; the studio's
+ * paste report lists changes only.
+ */
+export function keptLines(report) {
+	if (!report?.fonts?.length) return [];
+	const families = report.fonts;
+	return [
+		{
+			tone: 'proof',
+			label: 'Google Fonts kept',
+			detail: `${families.slice(0, 3).join(', ')}${
+				families.length > 3 ? ` and ${families.length - 3} more` : ''
+			} load in the render too.`
+		}
+	];
+}
+
+/**
+ * One line per finding, in the order they cost something.
+ *
+ * `canUpload`: the surface offers "Upload the images", so a relative path has
+ * a fix right there and the line names the first one it would need.
+ */
+export function reportLines(report, { canUpload = false } = {}) {
 	if (!report) return [];
 	const lines = [];
 	const remote = report.assets.filter((a) => a.host);
@@ -137,8 +177,9 @@ export function reportLines(report) {
 		lines.push({
 			tone: 'alarm',
 			label: `${relative.length} relative path${relative.length === 1 ? '' : 's'}`,
-			detail:
-				'A render has no page to resolve these against, so they arrive empty. Use full https URLs.'
+			detail: canUpload
+				? `A render has no page to resolve ${relative[0].url} against, so it arrives empty. Upload the images, or use full https URLs.`
+				: 'A render has no page to resolve these against, so they arrive empty. Use full https URLs.'
 		});
 	}
 	if (report.scripts.length) {

@@ -53,6 +53,12 @@
 	export let canUndo = false;
 	export let canRedo = false;
 	export let busy = false;
+	/**
+	 * False while there is nothing to render — the code-first tools open on an
+	 * empty pane, and a download of nothing would spend a free render on a
+	 * blank file.
+	 */
+	export let canDownload = true;
 	/** From the server's `X-Guest-*` headers, never from localStorage alone. */
 	export let downloadsLeft = null;
 	export let downloadsLimit = 5;
@@ -381,7 +387,7 @@
 				<button
 					type="button"
 					on:click={() => dispatch('download')}
-					disabled={busy}
+					disabled={busy || !canDownload}
 					class="h-9 rounded-btn bg-brand-ink px-4 font-sans text-[13px] font-semibold text-white shadow-[3px_3px_0_0_var(--brand-pink,#E61C80)] disabled:opacity-40"
 					>{busy ? 'Rendering…' : `Download ${format.toUpperCase()}`}</button
 				>

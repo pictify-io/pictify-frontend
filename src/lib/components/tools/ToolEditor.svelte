@@ -38,8 +38,24 @@
 	import { writeInstruction } from '$lib/tools/write-instruction.js';
 	import { tokeniseTemplate } from '$lib/tools/tokenise-template.js';
 	import { proposeFields } from '$lib/tools/propose-fields.js';
-	import { inspectPastedHtml, reportLines } from '$lib/components/studio/v2/paste-report.js';
+	import {
+		inspectPastedHtml,
+		reportLines,
+		keptLines
+	} from '$lib/components/studio/v2/paste-report.js';
 	import CodePane from '$lib/components/studio/v2/CodePane.svelte';
+	import HtmlUploadSummary from './HtmlUploadSummary.svelte';
+	import {
+		MAX_IMAGE_BYTES,
+		checkHtmlFiles,
+		documentFacts,
+		relativeAssetPaths,
+		matchImages,
+		embedImages,
+		describeEmbed,
+		stripScripts,
+		readAsDataUrl
+	} from '$lib/tools/html-upload.js';
 	import { nodeForOffset, rangeForNode } from '$lib/components/studio/v2/code-map.js';
 	import { downloadFile } from '$lib/utils/download.js';
 	import { analytics } from '$lib/telemetry.js';
@@ -73,14 +89,12 @@
 	 * whose markup has no ids for the tokeniser to read.
 	 */
 	export let initialSamples = {};
-	/**
-	 * The document a code-first tool opens on, when it has no gallery.
-	 *
-	 * Not a blank canvas: an empty stage gives a visitor nothing to change and
-	 * nothing to render, so the first thing they do is leave. A short, entirely
-	 * self-contained document is something they can edit a word of and see move.
+	/*
+	 * No starter for code-first tools (TS-07 B, user 2026-09-09: "We don't need
+	 * starter template for HTML to image"). The visitor arrives with markup of
+	 * their own, so the first thing they see is where to put it — the drop
+	 * target — not somebody else's card to delete first.
 	 */
-	export let starterHtml = '';
 
 	const AI_LIMIT = 3;
 
@@ -152,7 +166,166 @@
 	 * the tab they copied it from, and simply absent here.
 	 */
 	$: pasteReport = codeBuffer.trim() ? inspectPastedHtml(codeBuffer) : null;
-	$: pasteLines = pasteReport && !pasteReport.ok ? reportLines(pasteReport) : [];
+	$: pasteLines = pasteReport
+		? [...reportLines(pasteReport, { canUpload: true }), ...keptLines(pasteReport)]
+		: [];
+	$: relativePaths = codeBuffer.trim() ? relativeAssetPaths(codeBuffer) : [];
+
+	/* ── upload .html (TS-07 B) ─────────────────────────────────────────── */
+	/*
+	 * A file is just another way of filling the pane. It goes through
+	 * `loadSource` — the same `setHtmlFromCode` a paste or a keystroke uses —
+	 * so the report, the canvas, undo and the draft all treat it exactly as
+	 * text the visitor typed. There is no separate upload render.
+	 */
+	let codePane = null;
+	let fileInput = null;
+	let imageInput = null;
+	let root = null;
+	/** `{ name, size, lineCount, stylesKept }` for the file in the pane, else null. */
+	let uploaded = null;
+	/** The loaded card is showing, until Continue. */
+	let reviewingUpload = false;
+	let uploadError = null;
+	let embedNote = null;
+	let embedding = false;
+	/** A file is being dragged over the pane. */
+	let dragging = false;
+
+	function loadSource(text, label) {
+		codeBuffer = text;
+		editor.setHtmlFromCode(text, { label });
+		lastBufferedHtml = $editor.html;
+	}
+
+	/** Also the hero's "Upload .html": the page calls it through `bind:this`. */
+	export function chooseFile(source = 'pane') {
+		uploadError = null;
+		pickSource = source;
+		fileInput?.click();
+	}
+
+	async function takeFiles(fileList, source) {
+		const { file, error, kind } = checkHtmlFiles(fileList);
+		if (!file) {
+			uploadError = error;
+			if (error) analytics?.track?.('tool_editor_upload_rejected', { tool_name: toolName, kind });
+			return;
+		}
+		let text;
+		try {
+			text = await file.text();
+		} catch {
+			uploadError = `We couldn’t read ${file.name}. Try again, or paste it instead.`;
+			return;
+		}
+		uploadError = null;
+		embedNote = null;
+		loadSource(text, 'Upload');
+		uploaded = { name: file.name, size: file.size, ...documentFacts(text) };
+		reviewingUpload = true;
+		// The hero button is a long way above the embed; bring the result into view.
+		if (source === 'hero') root?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		const report = inspectPastedHtml(text);
+		analytics?.track?.('tool_editor_html_uploaded', {
+			tool_name: toolName,
+			source,
+			size_kb: Math.round(file.size / 1024),
+			lines: uploaded.lineCount,
+			relative: report.assets.filter((a) => a.relative).length,
+			scripts: report.scripts.length > 0
+		});
+	}
+
+	let pickSource = 'pane';
+	function onFileInput(event) {
+		const files = event.currentTarget.files;
+		takeFiles(files, pickSource);
+		// Cleared so choosing the same file again still fires `change`.
+		event.currentTarget.value = '';
+		pickSource = 'pane';
+	}
+
+	/** Paste from the header button. The textarea's own ⌘V needs none of this. */
+	async function pasteFromClipboard() {
+		try {
+			const text = await navigator.clipboard.readText();
+			if (text?.trim()) {
+				loadSource(text, 'Paste');
+				uploaded = null;
+				reviewingUpload = false;
+				uploadError = null;
+				return;
+			}
+		} catch {
+			/* no permission, or no clipboard API: fall through to the keyboard */
+		}
+		codePane?.focusLine(1);
+		toast.set({ message: 'Press ⌘V (Ctrl+V) to paste into the pane.', type: 'info', duration: 3000 });
+	}
+
+	/*
+	 * "Upload the images": the picked files become data URLs in the document,
+	 * so a render matches what the visitor sees on their own machine. Matched
+	 * by file name — a picker hands over `logo.png`, never `img/logo.png`.
+	 */
+	async function takeImages(fileList) {
+		const paths = relativePaths;
+		const { matched, missing } = matchImages(paths, [...(fileList || [])]);
+		if (!matched.length && !missing.length) return;
+		embedding = true;
+		const replacements = new Map();
+		const tooBig = [];
+		for (const { path, file } of matched) {
+			if (file.size > MAX_IMAGE_BYTES) {
+				if (!tooBig.includes(file.name)) tooBig.push(file.name);
+				continue;
+			}
+			try {
+				replacements.set(path, await readAsDataUrl(file));
+			} catch {
+				missing.push(path);
+			}
+		}
+		if (replacements.size) loadSource(embedImages(codeBuffer, replacements), 'Embedded images');
+		embedNote = describeEmbed({ embedded: replacements.size, total: paths.length, missing, tooBig });
+		embedding = false;
+		analytics?.track?.('tool_editor_images_embedded', {
+			tool_name: toolName,
+			embedded: replacements.size,
+			total: paths.length
+		});
+	}
+
+	function onImageInput(event) {
+		takeImages(event.currentTarget.files);
+		event.currentTarget.value = '';
+	}
+
+	/* Drag and drop. Only drags that carry FILES are ours: dragging a word
+	   around inside the textarea must keep working as it always has. */
+	const carriesFiles = (event) => [...(event.dataTransfer?.types || [])].includes('Files');
+
+	function onDragOver(event) {
+		if (!carriesFiles(event)) return;
+		event.preventDefault();
+		event.dataTransfer.dropEffect = 'copy';
+		dragging = true;
+	}
+
+	function onDragLeave(event) {
+		// Leaving for a child of the pane is not leaving the pane.
+		if (event.currentTarget.contains(event.relatedTarget)) return;
+		dragging = false;
+	}
+
+	function onDrop(event) {
+		if (!carriesFiles(event)) return;
+		// Without this the browser navigates to the file and the draft is gone.
+		event.preventDefault();
+		dragging = false;
+		takeFiles(event.dataTransfer.files, 'drop');
+	}
 
 	function onCodeChange(event) {
 		codeBuffer = event.detail.html;
@@ -273,7 +446,12 @@
 		} else {
 			draftId = newDraftId();
 			if (templates.length) useTemplate(templates[0], { silent: true });
-			else if (starterHtml) editor.load({ html: starterHtml, revision: 1 });
+			/*
+			 * Loaded EMPTY rather than left alone: the store is a module singleton,
+			 * so arriving here from the OG tool would otherwise open the pane on
+			 * the OG card the visitor just left.
+			 */
+			else editor.load({ html: '', revision: 1 });
 		}
 		await tick();
 		refreshQuota();
@@ -433,15 +611,24 @@
 
 	/* ── download ──────────────────────────────────────────────────────── */
 	async function download() {
-		if (rendering) return;
+		if (rendering || !html.trim()) return;
 		rendering = true;
 		try {
 			/*
 			 * Substituted before rendering. The visitor is looking at their sample
 			 * values, and a download that came back with `{{name}}` printed on it
 			 * would be a different thing from the one on screen.
+			 *
+			 * And stripped, on the code-first tools: their report tells the
+			 * visitor scripts are removed, and until now nothing removed them —
+			 * the public route hands the html to the renderer as it comes, where
+			 * a script would run in our browser.
 			 */
-			const source = substitute(stageApi?.serialize?.() || $editor.html, sampleValues);
+			const authored = stageApi?.serialize?.() || $editor.html;
+			const source = substitute(
+				leftPanel === 'code' ? stripScripts(authored) : authored,
+				sampleValues
+			);
 			/*
 			 * `fileExtension` is what makes this a PDF rather than a picture of
 			 * one — and until TS-12 it did not: the route flattened 'pdf' to
@@ -493,6 +680,26 @@
 	}
 </script>
 
+<div bind:this={root} class="scroll-mt-6">
+{#if leftPanel === 'code'}
+	<!-- Read in the browser. `accept` narrows the picker; `checkHtmlFiles`
+	     still decides, because "All files" is one click away in every OS. -->
+	<input
+		bind:this={fileInput}
+		type="file"
+		accept=".html,.htm,text/html"
+		class="hidden"
+		on:change={onFileInput}
+	/>
+	<input
+		bind:this={imageInput}
+		type="file"
+		accept="image/*,.svg"
+		multiple
+		class="hidden"
+		on:change={onImageInput}
+	/>
+{/if}
 <EmbeddedStudio
 	{templates}
 	{activeTemplate}
@@ -509,6 +716,7 @@
 	{downloadsLeft}
 	{downloadsLimit}
 	busy={rendering}
+	canDownload={Boolean(html.trim())}
 	canUndo={$editor.canUndo}
 	canRedo={$editor.canRedo}
 	on:pick={(e) => useTemplate(e.detail.template)}
@@ -520,17 +728,112 @@
 	on:expand={() => (window.location.hash = 'editor')}
 >
 	<svelte:fragment slot="code">
-		<CodePane
-			html={codeBuffer}
-			busy={aiBusy}
-			selectedLine={codeSelectedLine}
-			variableCount={codeVariableCount}
-			valid={codeValid}
-			fileLabel="{downloadName}.html"
-			on:change={onCodeChange}
-			on:caret={onCodeCaret}
-		/>
-		{#if pasteLines.length}
+		<!--
+			The whole zone is the drop target, not just the empty state: dropping a
+			second file onto a full pane replaces it, which is what "Replace" says.
+		-->
+		<!-- `min-h` below lg: stacked, the zone has no height but its content's,
+		     and an EMPTY pane has one line of content, so the drop target
+		     would collapse over the header. -->
+		<div
+			class="relative flex min-h-[300px] flex-1 flex-col lg:min-h-0"
+			role="region"
+			aria-label="Your HTML"
+			on:dragenter={onDragOver}
+			on:dragover={onDragOver}
+			on:dragleave={onDragLeave}
+			on:drop={onDrop}
+		>
+			{#if reviewingUpload && uploaded}
+				<HtmlUploadSummary
+					file={uploaded}
+					lines={pasteLines}
+					relativeCount={relativePaths.length}
+					{embedNote}
+					busy={embedding}
+					on:replace={() => chooseFile()}
+					on:continue={() => (reviewingUpload = false)}
+					on:images={() => imageInput?.click()}
+				/>
+			{:else}
+				<!-- A ROW, so the pane stretches to the zone's height. In a column it
+				     sizes to its content, and the empty drop target is one line tall. -->
+				<div class="flex min-h-0 flex-1 bg-brand-press">
+				<CodePane
+					bind:this={codePane}
+					html={codeBuffer}
+					busy={aiBusy}
+					selectedLine={codeSelectedLine}
+					variableCount={codeVariableCount}
+					valid={codeValid}
+					fileLabel={uploaded?.name || `${downloadName}.html`}
+					on:change={onCodeChange}
+					on:caret={onCodeCaret}
+				>
+					<svelte:fragment slot="actions">
+						<button
+							type="button"
+							on:click={pasteFromClipboard}
+							class="font-sans text-[12px] text-brand-powder hover:text-white">Paste</button
+						>
+						<button
+							type="button"
+							on:click={() => chooseFile()}
+							class="font-sans text-[12px] text-brand-powder hover:text-white">Upload .html</button
+						>
+					</svelte:fragment>
+					<!-- Board TS-07 `LMJ-0` frame B: where the page opens. -->
+					<div
+						slot="empty"
+						class="flex h-full flex-col items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-dashed border-brand-field px-6 text-center {dragging
+							? 'bg-[#D8F34A24]'
+							: 'bg-[#D8F34A0F]'}"
+					>
+						<p class="font-sans text-[13px] font-semibold leading-[18px] text-white">
+							{dragging ? 'Drop it' : 'Drop your .html file here'}
+						</p>
+						<p class="font-sans text-[12px] leading-4 text-brand-powder">
+							or paste, or <button
+								type="button"
+								on:click={() => chooseFile()}
+								class="pointer-events-auto underline decoration-brand-field underline-offset-2 hover:text-white"
+								>choose a file</button
+							>
+						</p>
+						<p class="mt-1.5 font-mono text-[10px] tracking-[0.08em] text-brand-mute">
+							.HTML · .HTM · UP TO 2 MB · ONE FILE
+						</p>
+						{#if uploadError}
+							<p class="mt-2 flex items-start gap-1.5 text-left" role="alert">
+								<span class="mt-1 block h-2 w-2 flex-shrink-0 bg-brand-alarm" aria-hidden="true" />
+								<span class="font-sans text-[12px] leading-4 text-white">{uploadError}</span>
+							</p>
+						{/if}
+					</div>
+				</CodePane>
+				</div>
+			{/if}
+
+			{#if dragging && codeBuffer}
+				<!-- Over a full pane the drop REPLACES, so it says so before it happens. -->
+				<div
+					class="pointer-events-none absolute inset-2 z-30 flex items-center justify-center rounded-[8px] border-[1.5px] border-dashed border-brand-field bg-brand-press/90"
+				>
+					<p class="font-sans text-[13px] font-semibold text-white">
+						Drop to replace {uploaded?.name || 'this HTML'}
+					</p>
+				</div>
+			{/if}
+		</div>
+
+		{#if !reviewingUpload && codeBuffer && uploadError}
+			<!-- A refused drop onto a full pane: the reason, where the eye already is. -->
+			<p class="flex items-start gap-2 border-t border-brand-rule bg-brand-paper p-3" role="alert">
+				<span class="mt-1 block h-2 w-2 flex-shrink-0 bg-brand-alarm" aria-hidden="true" />
+				<span class="font-sans text-[12px] leading-4 text-brand-ink">{uploadError}</span>
+			</p>
+		{/if}
+		{#if !reviewingUpload && pasteLines.length}
 			<div
 				class="flex max-h-[184px] flex-col gap-2 overflow-auto border-t border-brand-rule bg-brand-paper p-3"
 			>
@@ -542,7 +845,9 @@
 						<span
 							class="mt-1 block h-2 w-2 flex-shrink-0 {line.tone === 'alarm'
 								? 'bg-brand-alarm'
-								: 'bg-brand-field'}"
+								: line.tone === 'proof'
+									? 'bg-brand-proof'
+									: 'bg-brand-field'}"
 							aria-hidden="true"
 						/>
 						<span class="min-w-0">
@@ -555,6 +860,21 @@
 						</span>
 					</p>
 				{/each}
+				{#if embedNote}
+					<p class="font-sans text-[12px] leading-4 text-brand-slate" aria-live="polite">
+						{embedNote.text}
+					</p>
+				{/if}
+				{#if relativePaths.length}
+					<!-- A pasted page has the same missing images an uploaded one does. -->
+					<button
+						type="button"
+						on:click={() => imageInput?.click()}
+						disabled={embedding}
+						class="h-8 self-start rounded-btn border border-brand-ink px-3 font-sans text-[12.5px] text-brand-ink disabled:opacity-40"
+						>{embedding ? 'Embedding…' : 'Upload the images'}</button
+					>
+				{/if}
 			</div>
 		{/if}
 	</svelte:fragment>
@@ -585,6 +905,10 @@
 				on:selection={(e) => (selection = e.detail || null)}
 				on:transaction={(e) => editor.commit(e.detail.label, e.detail.html)}
 			/>
+		{:else if leftPanel === 'code'}
+			<p class="font-mono text-[10.5px] uppercase tracking-[0.08em] text-brand-mute">
+				Your HTML renders here
+			</p>
 		{/if}
 	</svelte:fragment>
 
@@ -752,3 +1076,4 @@
 		>
 	</svelte:fragment>
 </EmbeddedStudio>
+</div>

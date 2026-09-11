@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { inspectPastedHtml, reportLines } from './paste-report.js';
+import { inspectPastedHtml, reportLines, keptLines } from './paste-report.js';
 
 /**
  * PS-6. The report is shown BEFORE the paste is accepted, so what it claims
@@ -83,6 +83,29 @@ describe('remote stylesheets', () => {
 		);
 		assert.equal(r.styles.length, 0);
 		assert.equal(r.ok, true);
+	});
+
+	test('the families Google Fonts brings are recorded as kept', () => {
+		const r = inspectPastedHtml(
+			'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono&display=swap">'
+		);
+		assert.deepEqual(r.fonts, ['Inter', 'JetBrains Mono']);
+		assert.deepEqual(keptLines(r).map((l) => l.tone), ['proof']);
+		assert.match(keptLines(r)[0].detail, /Inter, JetBrains Mono/);
+	});
+
+	test('no fonts, no kept line — and reportLines never says it', () => {
+		assert.deepEqual(keptLines(inspectPastedHtml('<p>x</p>')), []);
+		const r = inspectPastedHtml(
+			'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter">'
+		);
+		assert.deepEqual(reportLines(r), []);
+	});
+
+	test('where images can be uploaded, the relative line names the first path', () => {
+		const r = inspectPastedHtml('<img src="img/logo.png">');
+		assert.match(reportLines(r, { canUpload: true })[0].detail, /img\/logo\.png.*Upload the images/);
+		assert.doesNotMatch(reportLines(r)[0].detail, /Upload/);
 	});
 
 	test('any other stylesheet is reported', () => {
