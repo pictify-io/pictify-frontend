@@ -42,6 +42,22 @@
 	let unsubscribe = () => {};
 
 	const numberFormatter = new Intl.NumberFormat('en-US');
+
+	/*
+	 * The head, from the same source as the table. /pricing shipped with no
+	 * <title>, no description and no canonical — search had nothing to show for
+	 * the page that closes the sale.
+	 *
+	 * The free tier's render count is read, not typed: a description promising
+	 * a number the table contradicts is worse than no description. PDF output
+	 * is deliberately absent from the sentence — it is false on the free plan.
+	 */
+	const freeRenders = PLAN_FEATURES[PLANS.STARTER][FEATURES.RENDERS];
+	const metaTitle = 'Pricing: Pay by the Render, Free Tier Included | Pictify';
+	const metaDescription = `Three plans, one render pool. Start free with ${numberFormatter.format(
+		freeRenders
+	)} renders a month, then pay by the render. Overage never surprises you.`;
+	const canonical = 'https://pictify.io/pricing';
 	const popularPlanNames = ['Pro'];
 
 	const CARD_PLANS = [PLANS.BASIC, PLANS.STANDARD, PLANS.BUSINESS];
@@ -347,7 +363,24 @@
 </script>
 
 <svelte:head>
+	<title>{metaTitle}</title>
+	<meta name="description" content={metaDescription} />
+	<link rel="canonical" href={canonical} />
+
+	<!-- Open Graph -->
+	<meta property="og:title" content={metaTitle} />
+	<meta property="og:description" content={metaDescription} />
+	<meta property="og:url" content={canonical} />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Pictify" />
 	<meta property="og:image" content="https://pictify.io/og/v2/pricing.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+
+	<!-- Twitter Card -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content={metaTitle} />
+	<meta name="twitter:description" content={metaDescription} />
 	<meta name="twitter:image" content="https://pictify.io/og/v2/pricing.png" />
 </svelte:head>
 

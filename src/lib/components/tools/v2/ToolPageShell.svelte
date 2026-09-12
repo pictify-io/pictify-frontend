@@ -100,7 +100,15 @@
 	<main class="w-full pb-20">
 		<!-- ── Tool card ─────────────────────────────────────────────── -->
 		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
-			<div class="-mt-8 lg:mt-10">
+			<!--
+				`relative`, and it is load-bearing. The panel rises 32px into the
+				hero by design, but the hero is a positioned element and this block
+				was not, so the hero painted OVER it: below 1024 the first row of
+				every tool panel — the URL field on url-to-image, the Design/Preview
+				toggle on html-to-*  — was under the green band and unclickable.
+				Measured at 390: hero bottom 364, panel top 332.
+			-->
+			<div class="relative z-10 -mt-8 lg:mt-10">
 				<slot name="tool" />
 			</div>
 

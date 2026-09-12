@@ -73,14 +73,26 @@
 			badgeClass: 'bg-brand-field',
 			// Literal shadow classes: Tailwind scans this file as text, so the
 			// utilities have to appear spelled out somewhere in it.
-			shadow: 'shadow-[4px_4px_0_0_#0054A6] hover:shadow-[6px_6px_0_0_#0054A6]'
+			shadow: 'shadow-[4px_4px_0_0_#0054A6] hover:shadow-[6px_6px_0_0_#0054A6]',
+			/*
+			 * CONTAINED, not cropped. This drawing is 286×116 landscape and the
+			 * pane is 190px portrait, so `cover` blew it up until the arrow was
+			 * enormous and the document it points at fell off the right edge.
+			 * The ground is the drawing's own powder, so letterboxing is
+			 * invisible (board LYK-0, pane `MPM-0`).
+			 */
+			artFit: 'object-contain p-4',
+			artBg: 'bg-brand-powder'
 		},
 		{
 			...TOOL_CARDS['certificate-generator'],
 			slug: 'certificate-generator',
 			badge: 'BATCH READY',
 			badgeClass: 'bg-brand-powder',
-			shadow: 'shadow-[4px_4px_0_0_#FF48B0] hover:shadow-[6px_6px_0_0_#FF48B0]'
+			shadow: 'shadow-[4px_4px_0_0_#FF48B0] hover:shadow-[6px_6px_0_0_#FF48B0]',
+			// 190×195 portrait against a 190px portrait pane: it fills correctly.
+			artFit: 'object-cover',
+			artBg: 'bg-brand-rose'
 		}
 	];
 
@@ -383,14 +395,14 @@
 							>
 						</div>
 						<div
-							class="flex-shrink-0 overflow-hidden border-b border-brand-ink lg:w-[190px] lg:border-b-0 lg:border-l"
+							class="flex-shrink-0 overflow-hidden border-b border-brand-ink {tool.artBg} lg:w-[190px] lg:border-b-0 lg:border-l"
 						>
 							<img
 								src={tool.art}
 								alt=""
 								aria-hidden="true"
 								loading="lazy"
-								class="h-[140px] w-full object-cover lg:h-full"
+								class="h-[140px] w-full {tool.artFit} lg:h-full"
 							/>
 						</div>
 					</a>
