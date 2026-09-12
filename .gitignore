@@ -13,3 +13,6 @@ vite.config.ts.timestamp-*
 .antigravitycli/
 studio/dist
 studio/.sanity
+
+# Font cache downloaded by scripts/og-v2.py when it renders a share card.
+scripts/fonts-src/
