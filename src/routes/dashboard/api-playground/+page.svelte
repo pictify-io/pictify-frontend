@@ -25,7 +25,7 @@
 	import { linter } from '@codemirror/lint';
 	import { EditorView, lineNumbers } from '@codemirror/view';
 	import { analytics } from '$lib/telemetry.js';
-	import { showToast } from '../../../store/toast.store.js';
+	import { notify, showToast } from '../../../store/toast.store.js';
 	import { activeApiToken, getAPITokenAction } from '../../../store/user.store';
 	import { usageWidget, initPLG } from '../../../store/plg.store.js';
 	import { getTemplateVariables } from '../../../api/template.js';
@@ -34,7 +34,6 @@
 	import { copyToClipboard } from '$lib/utils/format.js';
 	import TemplateSelector from '$lib/components/TemplateSelector.svelte';
 	import CodeBlock from '$lib/components/studio/CodeBlock.svelte';
-	import Toast from '$lib/components/Toast.svelte';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	const DOCS = 'https://docs.pictify.io';
@@ -510,9 +509,9 @@
 				headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
 				body: '{}'
 			});
-			showToast('Batch cancelled.', 'success', 3000);
+
 		} catch (e) {
-			showToast(e?.message || 'Could not cancel that batch.', 'error', 4000);
+			notify.fail('Cancel batch', e);
 		}
 	}
 
@@ -681,7 +680,6 @@
 <svelte:head><title>API playground | Pictify.io</title></svelte:head>
 <svelte:window on:keydown={onKeydown} />
 
-<Toast />
 
 <div class="flex h-full w-full flex-col gap-5 bg-brand-paper px-6 py-6 lg:px-8 lg:py-7">
 	<!-- ── Title ───────────────────────────────────────────────────── -->

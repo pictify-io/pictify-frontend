@@ -15,7 +15,7 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { analytics } from '$lib/telemetry.js';
-	import { showToast } from '../../../store/toast.store.js';
+	import { notify, showToast } from '../../../store/toast.store.js';
 	import StudioTopBar from './StudioTopBar.svelte';
 	import SayItRail from './SayItRail.svelte';
 	import HtmlPane from './HtmlPane.svelte';
@@ -196,8 +196,13 @@
 			if (!saved) throw new Error('Could not save that change.');
 			saveState = 'saved';
 		} catch (err) {
+			/*
+			 * The pill owns save (board S1 `GTP-0`): SAVE FAILED · RETRY, in the
+			 * top bar, where the state already lives. A toast as well would be
+			 * the same sentence twice for something that autosaves — and it
+			 * would fire on every debounce while a backend is down.
+			 */
 			saveState = 'error';
-			showToast(err?.message || 'Could not save that change.', 'error', 3000);
 		}
 	}
 
@@ -332,10 +337,10 @@
 			);
 			const url = res?.url || res?.image?.url || res?.results?.[0]?.url;
 			analytics.track('studio_rendered', { format: outputFormat });
-			showToast(url ? 'Rendered — find it on Renders.' : 'Rendered.', 'success', 4000);
+			notify.done('RENDERED', url ? 'Opened in a new tab, and saved to Renders.' : 'Saved to Renders.');
 			if (url) window.open(url, '_blank', 'noopener');
 		} catch (err) {
-			showToast(err?.message || 'That render did not go through.', 'error', 4000);
+			notify.fail('Render', err, { retry: () => onRender(), id: `studio-render:${uid}` });
 		} finally {
 			rendering = false;
 		}

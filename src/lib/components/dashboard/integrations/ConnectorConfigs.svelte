@@ -10,7 +10,7 @@
 	} from '../../../../api/integrations';
 	import Loader from '$lib/components/Loader.svelte';
 	import FeatureGate from '$lib/components/plg/FeatureGate.svelte';
-	import { toast } from '../../../../store/toast.store';
+	import { notify } from '../../../../store/toast.store';
 	import { FEATURES, checkFeatureAccessSync } from '../../../../store/plg.store';
 	import { openUpgradeModal } from '../../../../store/upgrade-modal.store';
 
@@ -108,7 +108,7 @@
 			await deleteConnectorConfig(uid);
 			connectors = connectors.filter((c) => c.uid !== uid);
 		} catch (err) {
-			toast.set({ message: 'Failed to delete connector', type: 'error', duration: 3000 });
+			notify.fail('Delete connector', err, { retry: () => handleDelete(uid) });
 		}
 	}
 
@@ -117,17 +117,19 @@
 		try {
 			const result = await testConnectorConfig(uid);
 			if (result.success) {
-				toast.set({ message: 'Connection successful!', type: 'success', duration: 2000 });
+				notify.done('CONNECTION TESTED', 'The connector answered.');
 				// Update status in list
 				connectors = connectors.map((c) => (c.uid === uid ? { ...c, status: 'active' } : c));
 			} else {
-				toast.set({ message: 'Connection test failed', type: 'error', duration: 3000 });
+				// A 200 whose body says the connector refused: the server answered,
+				// the connector did not, so the message is the connector's.
+				notify.fail('Test connection', { data: result }, { retry: () => handleTest(uid) });
 				connectors = connectors.map((c) =>
 					c.uid === uid ? { ...c, status: 'error', lastError: result.message } : c
 				);
 			}
 		} catch (err) {
-			toast.set({ message: 'Connection test failed', type: 'error', duration: 3000 });
+			notify.fail('Test connection', err, { retry: () => handleTest(uid) });
 		} finally {
 			testingId = null;
 		}

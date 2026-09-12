@@ -95,7 +95,9 @@
 		}
 
 		const [templatesData, imagesData, gifsData, pdfsData, status, health] = await Promise.all([
-			getTemplates({ page: 1, limit: 4, sort: 'newest' }),
+			// Each read carries its own failure: one dead endpoint empties its
+			// own strip instead of blanking the whole dashboard.
+			getTemplates({ page: 1, limit: 4, sort: 'newest' }).catch(() => null),
 			getImages({ limit: 100 }),
 			getGifs({ limit: 30 }),
 			getPdfs({ limit: 30 }),

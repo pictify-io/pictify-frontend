@@ -102,6 +102,16 @@ export const getUser = async () => {
 		}
 	} catch (error) {
 		clearUser();
+		/*
+		 * "Nobody is signed in" is an ANSWER, not a failure. `/api/users` 401s
+		 * for every logged-out visitor, and every caller here — the dashboard
+		 * and workspace layout guards, the login page — branches on null to
+		 * send them to /login. Since the API wrapper stopped swallowing, this
+		 * is the one place that has to keep translating it, or a logged-out
+		 * visit to /dashboard throws in onMount and sits on the loader
+		 * forever. Anything else is a real failure and still propagates.
+		 */
+		if (error?.status === 401 || error?.status === 403) return null;
 		throw error;
 	}
 	return userData;
@@ -202,12 +212,20 @@ export const getUserAction = async () => {
 };
 
 export const getAPITokenAction = async () => {
-	const response = await getApiToken();
-	if (response && response.apiTokens) {
-		setApiTokens(response.apiTokens);
-	} else {
+	/*
+	 * Reading the keys is page furniture: a failure empties the list and lets
+	 * the surface say so, rather than throwing out of an onMount that has no
+	 * catch. Creating and revoking DO propagate — those are actions someone
+	 * clicked, and the toast needs the error.
+	 */
+	let response = null;
+	try {
+		response = await getApiToken();
+	} catch {
 		setApiTokens([]);
+		return null;
 	}
+	setApiTokens(response?.apiTokens || []);
 	return response;
 };
 
@@ -231,7 +249,13 @@ export const deleteAPITokenAction = async (apiTokenId) => {
 };
 
 export const getPlanDetailsAction = async () => {
-	const response = await getPlanDetails();
+	// Also page furniture (the usage card, the plan gate): unknown, not fatal.
+	let response = null;
+	try {
+		response = await getPlanDetails();
+	} catch {
+		response = null;
+	}
 	user.update((user) => {
 		return {
 			...user,

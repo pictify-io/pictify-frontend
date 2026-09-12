@@ -25,8 +25,7 @@
 	} from '../../../api/billing.js';
 	import { PLAN_FEATURES, FEATURES, normalizePlan } from '../../../config/plan-features.js';
 	import ConfirmModal from '$lib/components/billing/ConfirmModal.svelte';
-	import Toast from '$lib/components/Toast.svelte';
-	import { showToast } from '../../../store/toast.store.js';
+	import { notify, showToast } from '../../../store/toast.store.js';
 
 	let loaded = false;
 	let formatCounts = null;
@@ -123,11 +122,11 @@
 			// The billing wrappers resolve with a payload rather than throwing on
 			// a refusal, so a falsy result is the failure signal.
 			if (!res) throw new Error('Could not cancel that subscription.');
-			showToast('Plan cancelled. You keep access until the period ends.', 'success', 5000);
+			notify.note('PLAN CANCELLED', 'You keep access until the period ends.');
 			cancelOpen = false;
 			await load();
 		} catch (e) {
-			showToast(e?.message || 'Could not cancel that subscription.', 'error', 5000);
+			notify.fail('Cancel plan', e, { retry: () => doCancel() });
 		} finally {
 			cancelling = false;
 		}
@@ -141,7 +140,6 @@
 
 <svelte:head><title>Usage & billing | Pictify.io</title></svelte:head>
 
-<Toast />
 
 <div class="min-h-full w-full px-6 py-8 lg:px-11 lg:py-9">
 	<div class="mx-auto flex max-w-page flex-col gap-6">

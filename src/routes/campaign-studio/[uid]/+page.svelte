@@ -58,7 +58,7 @@
 		aiProofRendered
 	} from '$lib/campaigns/analytics.js';
 	import backend from '../../../service/backend';
-	import { showToast } from '../../../store/toast.store';
+	import { notify, showToast } from '../../../store/toast.store';
 	import Toast from '$lib/components/Toast.svelte';
 
 	$: uid = $page.params.uid;
@@ -880,7 +880,10 @@
 		usingDesign = false;
 
 		if (!res?.campaign) {
-			showToast('That design could not be recorded on the campaign.', 'error', 5000);
+			// The wrapper resolves with a payload rather than throwing, so a
+			// missing campaign IS the failure. Retry is safe: recording the
+			// revision twice records the same revision.
+			notify.fail('Use this design', { data: res }, { retry: () => useThisDesign() });
 			return;
 		}
 

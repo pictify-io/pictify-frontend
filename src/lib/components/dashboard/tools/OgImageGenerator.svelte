@@ -16,7 +16,6 @@
 		deleteTemplateAction,
 		getTemplatesForTypeAction
 	} from '../../../../store/template.store';
-	import Toast from '$lib/components/Toast.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 	import EmailVerificationRequired from '$lib/components/dashboard/EmailVerificationRequired.svelte';
 	import OgImageEditor from './OgImageEditor.svelte';
@@ -1239,7 +1238,6 @@
 	</div>
 {/if}
 
-<Toast />
 
 <style>
 	:global(body) {

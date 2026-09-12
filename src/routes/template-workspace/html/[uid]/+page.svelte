@@ -35,7 +35,6 @@
 	import AiLock from '$lib/components/studio/v2/AiLock.svelte';
 	import SelectionRail from '$lib/components/studio/v2/SelectionRail.svelte';
 	import VariablePopover from '$lib/components/studio/v2/VariablePopover.svelte';
-	import Toast from '$lib/components/Toast.svelte';
 
 	import { editor } from '$lib/components/studio/v2/editor-store.js';
 	import { stageFromAgentEvent } from '$lib/tools/agent-stage.js';
@@ -60,7 +59,7 @@
 	} from '$lib/campaigns/analytics.js';
 	import { activeApiToken, getAPITokenAction } from '../../../../store/user.store';
 	import backend from '../../../../service/backend';
-	import { showToast } from '../../../../store/toast.store';
+	import { notify, showToast } from '../../../../store/toast.store';
 
 	$: uid = $page.params.uid;
 	$: preview = $page.url.searchParams.get('preview');
@@ -303,6 +302,7 @@
 			// success is worse than an error, because it looks like it worked.
 			if (!url) {
 				renderError = res?.error || 'The renderer returned no file.';
+				notify.fail('Render', { data: { message: renderError } }, { retry: () => onRender() });
 				return;
 			}
 			proof = {
@@ -320,9 +320,17 @@
 			mode = 'proof';
 		} catch (err) {
 			if (err?.status === 429) {
+				// The quota ladder owns this one: the upgrade modal is the answer,
+				// and a toast behind it would be the same news, smaller.
 				quotaMessage = err?.data?.message || err?.message || 'Plan limit reached.';
 			} else {
 				renderError = err?.data?.message || err?.message || 'That render did not go through.';
+				/*
+				 * Inline in the proof area AND a toast (board TO-01): the proof
+				 * can be scrolled off or the rail closed, and this is the one
+				 * action in the studio that costs a render.
+				 */
+				notify.fail('Render', err, { retry: () => onRender(), id: `studio-render:${uid}` });
 			}
 		} finally {
 			rendering = false;
@@ -921,4 +929,3 @@
 	</div>
 {/if}
 
-<Toast />

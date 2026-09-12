@@ -17,7 +17,6 @@
 	import { goto } from '$app/navigation';
 	import { createTemplate } from '../../../../api/template';
 	import TemplateStart from '$lib/components/studio/v2/TemplateStart.svelte';
-	import Toast from '$lib/components/Toast.svelte';
 	import { toast } from '../../../../store/toast.store';
 
 	let busy = false;
@@ -110,7 +109,6 @@
 	<title>New template | Pictify.io</title>
 </svelte:head>
 
-<Toast />
 
 <div class="flex min-h-screen justify-center bg-brand-canvas px-6 py-10">
 	<div class="h-fit w-full max-w-[420px] rounded-[12px] bg-brand-paper">

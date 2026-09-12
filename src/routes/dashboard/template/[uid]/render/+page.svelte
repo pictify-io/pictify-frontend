@@ -11,7 +11,7 @@
 	import { createShareResult } from '../../../../../api/public-templates.js';
 	import { getApiToken, createApiToken } from '../../../../../api/user';
 	import { user } from '../../../../../store/user.store';
-	import { toast } from '../../../../../store/toast.store';
+	import { notify, toast } from '../../../../../store/toast.store';
 	import Loader from '$lib/components/Loader.svelte';
 	import RenderForm from '$lib/components/render/RenderForm.svelte';
 	import EmailVerificationRequired from '$lib/components/dashboard/EmailVerificationRequired.svelte';
@@ -137,7 +137,7 @@
 			if (thisLoadVersion !== currentLoadVersion) return;
 
 			if (!templateRes?.template) {
-				toast.set({ message: 'Template not found', type: 'error', duration: 3000 });
+				notify.fail('Open template', { status: 404 });
 				goto('/dashboard/template');
 				return;
 			}
@@ -172,7 +172,19 @@
 			// Check if this load is still current
 			if (thisLoadVersion !== currentLoadVersion) return;
 
-			toast.set({ message: 'Failed to load template', type: 'error', duration: 3000 });
+			/*
+			 * A deleted or foreign template used to arrive as a null response
+			 * and hit the "Template not found" branch above, which sends the
+			 * visitor back to the list. Now it arrives as a 404 here, so the
+			 * redirect has to live in the catch too — otherwise the page sits
+			 * blank on a template that no longer exists.
+			 */
+			if (error?.status === 404) {
+				notify.fail('Open template', error);
+				goto('/dashboard/template');
+				return;
+			}
+			notify.fail('Load template', error, { retry: () => loadTemplate() });
 		} finally {
 			if (thisLoadVersion === currentLoadVersion) {
 				isLoading = false;
@@ -229,7 +241,9 @@
 			if (thisRenderVersion !== currentRenderVersion) return;
 
 			renderError = error.message || 'Failed to render template';
-			toast.set({ message: renderError, type: 'error', duration: 3000 });
+			// Inline in the proof area AND a toast: the proof may be scrolled
+			// off, and this is an action the visitor clicked.
+			notify.fail('Render', error, { retry: () => handleRender(), id: `render:${uid}` });
 
 			// Track render error
 			analytics.trackRenderError({
@@ -253,10 +267,10 @@
 			if (result?.apiToken) {
 				apiTokens = [...apiTokens, result.apiToken];
 				selectedApiKey = result.apiToken.token;
-				toast.set({ message: 'API key created', type: 'success', duration: 2000 });
+				notify.done('KEY CREATED', 'It is selected and ready to render with.');
 			}
 		} catch (error) {
-			toast.set({ message: 'Failed to create API key', type: 'error', duration: 3000 });
+			notify.fail('Create key', error, { retry: () => handleCreateToken() });
 		} finally {
 			isCreatingToken = false;
 		}
@@ -320,14 +334,14 @@
 			}
 			const urlToCopy = cachedShareUrl || firstResult.url;
 			await navigator.clipboard.writeText(urlToCopy);
-			toast.set({ message: 'Share link copied to clipboard', type: 'success', duration: 2000 });
+			notify.done('LINK COPIED', 'The share link is on your clipboard.');
 
 			// Track copy
 			analytics.trackCopy({ content_type: 'url', context: 'template_render' });
 		} catch (e) {
 			// Fallback to CDN URL if share creation fails
 			await navigator.clipboard.writeText(renderResult.url);
-			toast.set({ message: 'URL copied to clipboard', type: 'success', duration: 2000 });
+			notify.done('URL COPIED', 'The render URL is on your clipboard.');
 		} finally {
 			isCopyingUrl = false;
 		}
@@ -369,7 +383,7 @@ console.log(result.url); // CDN URL of rendered image
 // <img loading="lazy" src="${urlParamUrl}" />`;
 
 		navigator.clipboard.writeText(code);
-		toast.set({ message: 'API code copied to clipboard', type: 'success', duration: 2000 });
+		notify.done('SNIPPET COPIED', 'The API call is on your clipboard.');
 
 		// Track copy
 		analytics.trackCopy({ content_type: 'code', context: 'api_snippet' });

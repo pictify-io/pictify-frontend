@@ -10,8 +10,7 @@
 		fetchPdfs,
 		fetchVideos
 	} from '../../../../store/media.store';
-	import Toast from '$lib/components/Toast.svelte';
-	import { toast } from '../../../../store/toast.store';
+	import { notify } from '../../../../store/toast.store';
 	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
 	import {
 		copyToClipboard as sharedCopy,
@@ -76,7 +75,7 @@
 			}
 			const shareUrl = shareUrlCache.get(cdnUrl) || cdnUrl;
 			await navigator.clipboard.writeText(shareUrl);
-			toast.set({ message: 'Share link copied!', type: 'success', duration: 1500 });
+			notify.done('LINK COPIED', 'The share link is on your clipboard.');
 		} catch (e) {
 			// Fallback to raw CDN URL
 			sharedCopy(cdnUrl, 'URL copied to clipboard!');
@@ -94,7 +93,7 @@
 		document.body.appendChild(link);
 		link.click();
 		document.body.removeChild(link);
-		toast.set({ message: 'Download started!', type: 'success', duration: 2000 });
+		notify.done('DOWNLOAD STARTED', 'Check your downloads folder.');
 	}
 
 	function openLightbox(media) {
@@ -752,7 +751,6 @@
 	</div>
 {/if}
 
-<Toast />
 
 <style>
 	.media-card {

@@ -7,11 +7,22 @@
 	import { initPLG } from '../../store/plg.store';
 	import { initializeTeamState } from '../../store/team.store';
 	import Loader from '$lib/components/Loader.svelte';
+	import Toast from '$lib/components/Toast.svelte';
+	import { notify } from '../../store/toast.store';
 
 	let isVerifying = true;
 
 	onMount(async () => {
-		const currentUser = await getUser();
+		let currentUser = null;
+		try {
+			currentUser = await getUser();
+		} catch (err) {
+			// Unreachable server, not a signed-out visitor: show the studio
+			// chrome and say so rather than redirecting to /login.
+			notify.fail('Load workspace', err, { retry: () => window.location.reload() });
+			isVerifying = false;
+			return;
+		}
 		if (!currentUser || !currentUser.email) {
 			goto('/login');
 			return;
@@ -42,3 +53,7 @@
 		<slot />
 	</div>
 {/if}
+
+<!-- One mount for the studio, outside the verifying branch so a failure that
+     arrives while the user check is still running is not swallowed. -->
+<Toast />

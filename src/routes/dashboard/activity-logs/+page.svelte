@@ -11,9 +11,8 @@
 	 */
 	import { onMount } from 'svelte';
 	import { analytics } from '$lib/telemetry.js';
-	import { showToast } from '../../../store/toast.store.js';
+	import { notify, showToast } from '../../../store/toast.store.js';
 	import { fetchAuditLogs, exportAuditLogs } from '../../../api/audit.js';
-	import Toast from '$lib/components/Toast.svelte';
 
 	const PAGE_SIZE = 100;
 
@@ -134,7 +133,7 @@
 			setTimeout(() => URL.revokeObjectURL(url), 10_000);
 			analytics.track('activity_exported');
 		} catch (e) {
-			showToast(e?.message || 'Could not export those logs.', 'error', 4000);
+			notify.fail('Export logs', e, { retry: () => exportCsv() });
 		} finally {
 			exporting = false;
 		}
@@ -148,7 +147,6 @@
 
 <svelte:head><title>Activity logs | Pictify.io</title></svelte:head>
 
-<Toast />
 
 <div class="min-h-full w-full px-6 py-8 lg:px-11 lg:py-9">
 	<div class="mx-auto flex max-w-page flex-col gap-6">

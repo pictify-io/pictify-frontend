@@ -11,6 +11,7 @@
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import { analytics } from '$lib/telemetry.js';
+	import { notify } from '../../../store/toast.store';
 	import TemplateCard from '$lib/components/dashboard/v2/TemplateCard.svelte';
 	import ProofSheet from '$lib/components/dashboard/v2/ProofSheet.svelte';
 	import {
@@ -108,10 +109,20 @@
 		});
 
 	async function load() {
-		const [imagesData, videosData] = await Promise.all([
-			getTemplates({ page: 1, limit: 100, sort: 'newest' }),
-			getVideoTemplates().catch(() => null)
-		]);
+		let imagesData = null;
+		let videosData = null;
+		try {
+			[imagesData, videosData] = await Promise.all([
+				getTemplates({ page: 1, limit: 100, sort: 'newest' }),
+				getVideoTemplates().catch(() => null)
+			]);
+		} catch (err) {
+			// Inline, in the place the content would be — the list failing to
+			// load is not an action anyone clicked, so it is not a toast.
+			errorMessage = err?.data?.message || 'Could not load your templates. Reload the page.';
+			loaded = true;
+			return;
+		}
 		const images = (imagesData?.templates || []).map((t) => ({ ...t, isVideo: false }));
 		imageTotal = imagesData?.pagination?.total ?? images.length;
 		const videos = (videosData?.templates || videosData || []).map?.((t) => ({
@@ -175,7 +186,12 @@
 			}
 			await load();
 		} catch (e) {
-			errorMessage = e?.message || 'Could not duplicate that template.';
+			/*
+			 * A toast, not the page-top slot: the row the visitor clicked can be
+			 * anywhere in a list of a hundred, and a sentence at the top of the
+			 * page is off-screen exactly when it matters.
+			 */
+			notify.fail('Duplicate', e, { retry: () => handleDuplicate(event), id: `dup:${t.uid}` });
 		} finally {
 			busyUid = '';
 		}
@@ -195,7 +211,8 @@
 			else imageTotal -= 1;
 			analytics.track('template_deleted', { isVideo: Boolean(t.isVideo) });
 		} catch (e) {
-			errorMessage = e?.message || 'Could not delete that template.';
+			// The row stays: nothing was deleted, so nothing disappears.
+			notify.fail('Delete', e, { retry: () => handleDelete(event), id: `del:${t.uid}` });
 		} finally {
 			busyUid = '';
 		}
@@ -326,6 +343,9 @@
 					<div class="h-[260px] animate-pulse rounded-[10px] bg-brand-canvas"></div>
 				{/each}
 			</div>
+		{:else if errorMessage}
+			<!-- Nothing further: "you have no templates" under "we could not load
+			     your templates" is a claim the page cannot make. -->
 		{:else if templates.length === 0 || previewEmpty}
 			<div class="flex flex-col gap-6 pt-1">
 				<!-- The empty state teaches: what a template is, the two ways to get

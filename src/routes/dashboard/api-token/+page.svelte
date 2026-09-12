@@ -12,13 +12,12 @@
 	import { analytics } from '$lib/telemetry.js';
 	import { user, activeApiToken, getAPITokenAction } from '../../../store/user.store';
 	import { currentTeam, initializeTeamState } from '../../../store/team.store';
-	import { showToast } from '../../../store/toast.store.js';
+	import { notify } from '../../../store/toast.store.js';
 	import { copyToClipboard, timeAgo } from '$lib/utils/format.js';
 	import { getApiToken, createApiToken, deleteApiToken } from '../../../api/user.js';
 	import { getRenders } from '../../../api/media.js';
 	import { requestAccountDeletion } from '../../../api/account.js';
 	import backend from '../../../service/backend';
-	import Toast from '$lib/components/Toast.svelte';
 
 	let loaded = false;
 	let tokens = [];
@@ -56,11 +55,10 @@
 			const res = await createApiToken();
 			if (!res) throw new Error('Could not create a key.');
 			analytics.track('api_key_created');
-			showToast('New key created.', 'success', 3000);
 			await load();
 			await getAPITokenAction().catch(() => {});
 		} catch (e) {
-			showToast(e?.message || 'Could not create a key.', 'error', 4000);
+			notify.fail('Create key', e, { retry: () => newKey() });
 		} finally {
 			busy = '';
 		}
@@ -83,11 +81,11 @@
 			const removed = await deleteApiToken(token.uid);
 			if (!removed) throw new Error('New key created, but the old one is still active — revoke it manually.');
 			analytics.track('api_key_rotated');
-			showToast('Key rotated. Update your callers with the new one.', 'success', 6000);
+			notify.note('KEY ROTATED', 'Update your callers with the new one.');
 			await load();
 			await getAPITokenAction().catch(() => {});
 		} catch (e) {
-			showToast(e?.message || 'Could not rotate that key.', 'error', 6000);
+			notify.fail('Rotate key', e, { retry: () => rotate(token) });
 			await load();
 		} finally {
 			busy = '';
@@ -102,10 +100,9 @@
 			const res = await deleteApiToken(token.uid);
 			if (!res) throw new Error('Could not revoke that key.');
 			analytics.track('api_key_revoked');
-			showToast('Key revoked.', 'success', 3000);
 			await load();
 		} catch (e) {
-			showToast(e?.message || 'Could not revoke that key.', 'error', 4000);
+			notify.fail('Revoke key', e, { retry: () => revoke(token) });
 		} finally {
 			busy = '';
 		}
@@ -114,9 +111,9 @@
 	async function changePassword() {
 		try {
 			await backend.post('/auth/forgot-password', { email: $user?.email });
-			showToast(`Password reset link sent to ${$user?.email}.`, 'success', 5000);
+			notify.done('RESET LINK SENT', `Check ${$user?.email} for the link.`);
 		} catch (e) {
-			showToast(e?.message || 'Could not send a reset link.', 'error', 4000);
+			notify.fail('Send reset link', e, { retry: () => changePassword() });
 		}
 	}
 
@@ -124,12 +121,12 @@
 		deleting = true;
 		try {
 			const res = await requestAccountDeletion(deleteConfirm);
-			showToast(res?.message || 'Your account is closed.', 'success', 8000);
+			notify.note('ACCOUNT CLOSED', res?.message || 'Your account is closed.');
 			analytics.track('account_deletion_requested');
 			// The server dropped the session; get out of the dashboard.
 			setTimeout(() => goto('/'), 1500);
 		} catch (e) {
-			showToast(e?.message || 'Could not close this account.', 'error', 6000);
+			notify.fail('Close account', e);
 			deleting = false;
 		}
 	}
@@ -143,7 +140,6 @@
 
 <svelte:head><title>Settings | Pictify.io</title></svelte:head>
 
-<Toast />
 
 <div class="min-h-full w-full px-6 py-8 lg:px-11 lg:py-9">
 	<div class="mx-auto flex max-w-page flex-col gap-6">

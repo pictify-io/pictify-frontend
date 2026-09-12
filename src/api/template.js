@@ -14,79 +14,51 @@ const getTemplates = async ({
 	outputFormat = 'all',
 	hasDynamicLink
 } = {}) => {
-	try {
-		const params = new URLSearchParams({
-			page: page.toString(),
-			limit: limit.toString(),
-			sort,
-			outputFormat
-		});
+	const params = new URLSearchParams({
+		page: page.toString(),
+		limit: limit.toString(),
+		sort,
+		outputFormat
+	});
 
-		if (hasDynamicLink !== undefined) {
-			params.append('hasDynamicLink', hasDynamicLink.toString());
-		}
-
-		const response = await backend.get(`/templates?${params}`);
-		return response;
-	} catch (error) {
-		return null;
+	if (hasDynamicLink !== undefined) {
+		params.append('hasDynamicLink', hasDynamicLink.toString());
 	}
+
+	const response = await backend.get(`/templates?${params}`);
+	return response;
 };
 
 const getTemplateById = async (uid) => {
-	try {
-		const response = await backend.get(`/templates/${uid}`);
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.get(`/templates/${uid}`);
+	return response;
 };
 
 const createTemplate = async (template) => {
-	try {
-		const response = await backend.post('/templates', template);
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.post('/templates', template);
+	return response;
 };
 
 const updateTemplate = async (template) => {
-	try {
-		const response = await backend.put(`/templates/${template.uid}`, template);
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.put(`/templates/${template.uid}`, template);
+	return response;
 };
 
 const deleteTemplate = async (uid) => {
-	try {
-		const response = await backend.delete(`/templates/${uid}`);
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.delete(`/templates/${uid}`);
+	return response;
 };
 
 const searchTemplates = async (search, { page = 1, limit = 12 } = {}) => {
-	try {
-		const response = await backend.get(
-			`/templates/search?q=${encodeURIComponent(search)}&page=${page}&limit=${limit}`
-		);
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.get(
+		`/templates/search?q=${encodeURIComponent(search)}&page=${page}&limit=${limit}`
+	);
+	return response;
 };
 
 const getTemplatesForType = async (type) => {
-	try {
-		const response = await backend.get(`/templates/type/${type}`);
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.get(`/templates/type/${type}`);
+	return response;
 };
 
 /**
@@ -173,12 +145,8 @@ const renderTemplateMultiSize = async (uid, variables = {}, sizes = [], options 
  * @returns {Promise<Object>} - { templateUid, templateName, variables }
  */
 const getTemplateVariables = async (uid) => {
-	try {
-		const response = await backend.get(`/templates/${uid}/variables`);
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.get(`/templates/${uid}/variables`);
+	return response;
 };
 
 /**
@@ -229,12 +197,8 @@ const getBatchJobResults = async (batchId) => {
  * @returns {Promise<Object>} - { batchId, status, message }
  */
 const cancelBatchJob = async (batchId) => {
-	try {
-		const response = await backend.post(`/templates/batch/${batchId}/cancel`, {});
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.post(`/templates/batch/${batchId}/cancel`, {});
+	return response;
 };
 
 /**
@@ -295,12 +259,8 @@ const uploadCsvForBatch = async (file) => {
  * @returns {Promise<Object>} - { message, thumbnail }
  */
 const regenerateThumbnail = async (uid) => {
-	try {
-		const response = await backend.post(`/templates/${uid}/regenerate-thumbnail`, {});
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.post(`/templates/${uid}/regenerate-thumbnail`, {});
+	return response;
 };
 
 /**
@@ -308,86 +268,54 @@ const regenerateThumbnail = async (uid) => {
  * @returns {Promise<Object>} - { message, success, failed, skipped }
  */
 const regenerateAllThumbnails = async () => {
-	try {
-		const response = await backend.post('/templates/regenerate-thumbnails', {});
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.post('/templates/regenerate-thumbnails', {});
+	return response;
 };
 
 // Expression Engine APIs
 const validateExpression = async (expression) => {
-	try {
-		const response = await backend.post('/templates/expression/validate', { expression });
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.post('/templates/expression/validate', { expression });
+	return response;
 };
 
 const testExpression = async (expression, variables = {}) => {
-	try {
-		const response = await backend.post('/templates/expression/test', { expression, variables });
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.post('/templates/expression/test', { expression, variables });
+	return response;
 };
 
 const interpolateText = async (text, variables = {}) => {
-	try {
-		const response = await backend.post('/templates/expression/interpolate', { text, variables });
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.post('/templates/expression/interpolate', { text, variables });
+	return response;
 };
 
 const getExpressionFunctions = async () => {
-	try {
-		const response = await backend.get('/templates/expression/functions');
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.get('/templates/expression/functions');
+	return response;
 };
 
 // Public Templates APIs
 const getPublicTemplates = async (params = {}) => {
-	try {
-		const queryParams = new URLSearchParams();
-		if (params.category) queryParams.append('category', params.category);
-		if (params.type) queryParams.append('type', params.type);
-		if (params.tag) queryParams.append('tag', params.tag);
-		if (params.search) queryParams.append('search', params.search);
-		if (params.sort) queryParams.append('sort', params.sort);
-		if (params.page) queryParams.append('page', params.page);
-		if (params.limit) queryParams.append('limit', params.limit);
+	const queryParams = new URLSearchParams();
+	if (params.category) queryParams.append('category', params.category);
+	if (params.type) queryParams.append('type', params.type);
+	if (params.tag) queryParams.append('tag', params.tag);
+	if (params.search) queryParams.append('search', params.search);
+	if (params.sort) queryParams.append('sort', params.sort);
+	if (params.page) queryParams.append('page', params.page);
+	if (params.limit) queryParams.append('limit', params.limit);
 
-		const response = await backend.get(`/public/templates?${queryParams}`);
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.get(`/public/templates?${queryParams}`);
+	return response;
 };
 
 const getPublicTemplate = async (uid) => {
-	try {
-		const response = await backend.get(`/public/templates/${uid}`);
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.get(`/public/templates/${uid}`);
+	return response;
 };
 
 const forkTemplate = async (uid) => {
-	try {
-		const response = await backend.post(`/public/templates/${uid}/fork`, {});
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.post(`/public/templates/${uid}/fork`, {});
+	return response;
 };
 
 // PDF Operations

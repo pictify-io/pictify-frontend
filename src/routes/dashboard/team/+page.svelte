@@ -12,9 +12,8 @@
 	import { analytics } from '$lib/telemetry.js';
 	import { plgStatus, initPLG } from '../../../store/plg.store';
 	import { currentTeam, initializeTeamState } from '../../../store/team.store';
-	import { showToast } from '../../../store/toast.store.js';
+	import { notify, showToast } from '../../../store/toast.store.js';
 	import { timeAgo } from '$lib/utils/format.js';
-	import Toast from '$lib/components/Toast.svelte';
 	import {
 		getTeamMembers,
 		getTeamInvitations,
@@ -99,10 +98,10 @@
 			if (!res) throw new Error('That invite did not send.');
 			email = '';
 			analytics.track('team_invite_sent');
-			showToast(`Invite sent to ${address}.`, 'success', 4000);
+			notify.done('INVITE SENT', `${address} has 7 days to accept.`);
 			await load();
 		} catch (e) {
-			showToast(e?.message || 'That invite did not send.', 'error', 4000);
+			notify.fail('Invite', e, { retry: () => invite() });
 		} finally {
 			inviting = false;
 		}
@@ -121,14 +120,16 @@
 				res = await removeMember(teamId, row.uid);
 			}
 			if (!res) throw new Error('That did not go through.');
-			showToast(
-				kind === 'resend' ? 'Invite sent again.' : kind === 'revoke' ? 'Invite revoked.' : 'Member removed.',
-				'success',
-				3000
-			);
+			// Resending is the one with no visible result; the other two change
+			// the list in front of the visitor.
+			if (kind === 'resend') notify.done('INVITE SENT AGAIN', `${row.email} has 7 more days.`);
 			await load();
 		} catch (e) {
-			showToast(e?.message || 'That did not go through.', 'error', 4000);
+			notify.fail(
+				kind === 'revoke' ? 'Revoke invite' : kind === 'resend' ? 'Resend invite' : 'Remove member',
+				e,
+				{ retry: () => act(kind, row) }
+			);
 		} finally {
 			busyUid = '';
 		}
@@ -144,7 +145,6 @@
 
 <svelte:head><title>Team &amp; invites | Pictify.io</title></svelte:head>
 
-<Toast />
 
 <div class="min-h-full w-full px-6 py-8 lg:px-11 lg:py-9">
 	<div class="mx-auto flex max-w-page flex-col gap-6">

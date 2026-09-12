@@ -3,6 +3,8 @@
 	import '../../app.css';
 	import RailV2 from '$lib/components/dashboard/v2/RailV2.svelte';
 	import CommandPalette from '$lib/components/dashboard/CommandPalette.svelte';
+	import Toast from '$lib/components/Toast.svelte';
+	import { notify } from '../../store/toast.store';
 	import PLGProvider from '$lib/components/plg/PLGProvider.svelte';
 	import ProactiveUpgradeModal from '$lib/components/plg/ProactiveUpgradeModal.svelte';
 	import { getUser } from '../../store/user.store';
@@ -20,7 +22,21 @@
 	$: if ($page.url.pathname) railOpen = false;
 
 	onMount(async () => {
-		user = await getUser();
+		try {
+			user = await getUser();
+		} catch (err) {
+			/*
+			 * A 401 comes back as null (the store translates it) and falls into
+			 * the redirect below. Anything else here is the server being
+			 * unreachable, NOT a signed-out visitor — bouncing them to /login
+			 * would be a lie, and leaving the promise to reject leaves the
+			 * dashboard as an empty shell with a rail and no page. So: say it,
+			 * and render the chrome.
+			 */
+			notify.fail('Load dashboard', err, { retry: () => window.location.reload() });
+			isUserLoaded = true;
+			return;
+		}
 		if (!user || !user?.email) {
 			goto('/login');
 			return;
@@ -99,4 +115,10 @@
 	{/if}
 
 	<CommandPalette />
+
+	<!--
+		ONE mount for the whole dashboard. It used to be imported per page, so
+		six surfaces called showToast with nothing in their tree to render it.
+	-->
+	<Toast />
 </PLGProvider>

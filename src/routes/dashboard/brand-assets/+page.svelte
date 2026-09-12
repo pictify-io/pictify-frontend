@@ -25,8 +25,7 @@
 	 * pay should be able to see what they would be buying.
 	 */
 	import { onMount } from 'svelte';
-	import Toast from '$lib/components/Toast.svelte';
-	import { showToast } from '../../../store/toast.store.js';
+	import { notify, showToast } from '../../../store/toast.store.js';
 	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
 	import CardPreview from '$lib/components/campaigns/CardPreview.svelte';
 	import BrandSetupDialog from '$lib/components/campaigns/BrandSetupDialog.svelte';
@@ -204,9 +203,9 @@
 			dropLogo(removing);
 			removing = null;
 			typed = '';
-			showToast('Removed from the kit. Approved editions keep the revision they were approved with.', 'success', 5000);
+			notify.note('REMOVED FROM THE KIT', 'Approved editions keep the revision they were approved with.');
 		} catch (err) {
-			showToast(brandKitError(err).message, 'error', 5000);
+			notify.fail('Remove asset', err, { retry: () => confirmRemove() });
 		} finally {
 			removeBusy = false;
 		}
@@ -234,7 +233,9 @@
 				draft = { ...draft, logos: [...logos, { ...asset, kind: uploadKind }] };
 			}
 		} catch (err) {
-			showToast(brandKitError(err).message, 'error', 5000);
+			// No retry: the file input is empty again, so there is nothing to
+			// re-send without the visitor picking the file a second time.
+			notify.fail('Upload', err);
 		}
 	}
 
@@ -250,16 +251,16 @@
 			saved = structuredClone(draft);
 			usedBy = res.usedBy || usedBy;
 			detected = null;
-			showToast(`Saved as brand rev ${res.revision}.`, 'success', 4000);
+
 		} catch (err) {
 			const e = brandKitError(err);
 			if (e.status === 409) {
 				// Another tab saved first. Reload rather than overwrite: the other
 				// version is somebody's work too.
-				showToast('Someone else saved this kit. Reloading their version.', 'error', 6000);
+				notify.note('SOMEONE ELSE SAVED FIRST', 'Reloading their version so nothing is overwritten.');
 				await load();
 			} else {
-				showToast(e.message, 'error', 5000);
+				notify.fail('Save kit', err, { retry: () => save() });
 			}
 		} finally {
 			saving = false;
@@ -311,7 +312,6 @@
 
 <svelte:head><title>Brand assets | Pictify.io</title></svelte:head>
 
-<Toast />
 
 <input
 	type="file"
