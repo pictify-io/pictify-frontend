@@ -399,7 +399,7 @@
 		</div>
 
 		<!-- ── Ledger body ───────────────────────────────────────────── -->
-		<div class="mx-auto flex w-full max-w-page gap-10 px-5 pt-11 lg:px-10">
+		<div class="mx-auto flex w-full max-w-page gap-10 px-5 pt-14 lg:px-10 lg:pt-16">
 			<!-- Index rail · 216px, ≥1200 only -->
 			<aside class="hidden w-[216px] flex-shrink-0 border-t-2 border-brand-ink pt-2 min-[1200px]:block">
 				<div class="sticky top-24 flex flex-col gap-6">
@@ -411,7 +411,7 @@
 							{#each railShelves as shelf (shelf.key)}
 								<a
 									href="#shelf-{shelf.key}"
-									class="flex items-center gap-2.5 py-[7px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-royal"
+									class="flex items-center gap-2.5 py-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-royal"
 								>
 									<span
 										class="h-[18px] w-[3px] flex-shrink-0 {activeShelf === shelf.key
@@ -486,11 +486,11 @@
 				{/if}
 
 				{#if shown.length}
-					<div class="flex flex-col gap-10">
+					<div class="flex flex-col gap-16">
 						{#each shelves as shelf (shelf.key)}
 							<section id="shelf-{shelf.key}" data-shelf={shelf.key} class="scroll-mt-28">
 								<div
-									class="flex flex-wrap items-baseline gap-x-3.5 gap-y-1 border-t-2 border-brand-ink pb-1.5 pt-3.5"
+									class="flex flex-wrap items-baseline gap-x-3.5 gap-y-1 border-t-2 border-brand-ink pb-3.5 pt-4"
 								>
 									<!--
 										An <h2>, as the old shelf eyebrows were. The handoff guessed
@@ -516,7 +516,7 @@
 
 								<!-- Two columns from 1200 up: the rows are 440px on the board and
 								     a single column of 18 would be a very long page. -->
-								<div class="grid grid-cols-1 gap-x-10 min-[1200px]:grid-cols-2">
+								<div class="grid grid-cols-1 gap-x-14 min-[1200px]:grid-cols-2">
 									<!--
 										Below 768 a shelf shows four rows and expands in place. The
 										cut is CSS, not a shorter list, so the rows are in the DOM

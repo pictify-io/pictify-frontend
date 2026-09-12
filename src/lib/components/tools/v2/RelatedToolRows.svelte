@@ -31,7 +31,7 @@
 		A <p>, not an <h2>: the routes' heading outlines are frozen for search,
 		and this line is the shell's, not the page's.
 	-->
-	<div class="flex flex-wrap items-baseline gap-x-3.5 gap-y-1 border-t-2 border-brand-ink pb-1 pt-3.5">
+	<div class="flex flex-wrap items-baseline gap-x-3.5 gap-y-1 border-t-2 border-brand-ink pb-3.5 pt-4">
 		<p class="font-display text-[22px] font-bold tracking-[-0.02em] text-brand-ink">
 			More from the counter
 		</p>
@@ -49,7 +49,7 @@
 			<a
 				href={tool.href}
 				on:click={() => track(tool.href)}
-				class="group flex items-center gap-3.5 border-b border-brand-rule py-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-royal"
+				class="group flex items-center gap-3.5 border-b border-brand-rule py-3.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-royal"
 			>
 				<ToolStamp outputs={tool.outputs} />
 				<span class="flex min-w-0 flex-col gap-[3px] sm:w-[300px] sm:flex-shrink-0">

@@ -16,7 +16,7 @@
 
 <a
 	href={tool.href}
-	class="group flex items-center gap-3 border-b border-brand-rule py-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-royal"
+	class="group flex items-center gap-3.5 border-b border-brand-rule py-3.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-royal"
 >
 	<ToolStamp outputs={tool.outputs} />
 	<span class="flex min-w-0 flex-1 flex-col gap-[3px]">
