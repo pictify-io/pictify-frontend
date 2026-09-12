@@ -27,7 +27,6 @@
 	import FeatureGrid from '$lib/components/tools/v2/longform/FeatureGrid.svelte';
 	import StepCards from '$lib/components/tools/v2/longform/StepCards.svelte';
 	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
-	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 
 	// User login state
 	let isUserLoggedIn = false;
@@ -194,7 +193,6 @@
 		}
 	];
 
-	const RELATED = ['csv-to-pdf', 'certificate-generator', 'table'];
 </script>
 
 <ToolSeoHead
@@ -223,7 +221,6 @@
 	toolPath={TOOL_PATH}
 	breadcrumb="INVOICE GENERATOR"
 	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · PNG OR PDF"
-	related={RELATED}
 	loggedIn={isUserLoggedIn}
 	hasResult={!!imageUrl}
 	longform="column"
@@ -370,16 +367,4 @@
 		</LongformSection>
 	</svelte:fragment>
 
-	<svelte:fragment slot="footer-links">
-		<RelatedLinks
-			toolName={TOOL_NAME}
-			links={[
-				{ href: '/tools/receipt', label: 'Receipt Generator' },
-				{ href: '/tools/certificate', label: 'Certificate Generator' },
-				{ href: '/tools/membership-card', label: 'Membership Card' },
-				{ href: '/tools/event-ticket', label: 'Event Ticket' },
-				{ href: '/tools', label: 'View all tools →' }
-			]}
-		/>
-	</svelte:fragment>
 </ToolPageShell>

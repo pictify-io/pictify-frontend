@@ -28,7 +28,7 @@
 </script>
 
 {#if !loggedIn}
-	<section class="mt-20 w-full bg-brand-blue px-5 py-14 lg:px-10 lg:py-20">
+	<section class="w-full bg-brand-blue px-5 py-14 lg:px-10 lg:py-20">
 		<div class="mx-auto flex w-full max-w-page flex-col gap-10">
 			<div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-20">
 				<div class="flex flex-col gap-3.5 lg:w-[640px] lg:flex-shrink-0">

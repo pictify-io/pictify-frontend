@@ -1,8 +1,8 @@
 <script>
 	/**
-	 * The footer internal-link block — the v2 replacement for RelatedTools,
-	 * which shipped v1 brutalist chrome directly under the v2 art cards so
-	 * seven routes showed two related-tools blocks in two design languages.
+	 * A mono link list for a longform section (comparisons, guides). It began
+	 * as the page-footer "Also on the counter" block; that block was folded into
+	 * the RelatedToolCards strip, so the footer form is no longer rendered.
 	 *
 	 * The eyebrow is a <p>, not a heading: these pages' heading outlines are
 	 * frozen for search and this block is the shell's furniture, not the page's
@@ -13,7 +13,7 @@
 	/** [{ href, label }] — hrefs and anchor text carry over verbatim. */
 	export let links = [];
 	export let toolName = '';
-	export let eyebrow = 'ALSO ON THE COUNTER';
+	export let eyebrow = 'RELATED';
 	/**
 	 * Inside a LongformSection rather than under the page: drops the page gutter
 	 * and top margin, since the section already provides both.

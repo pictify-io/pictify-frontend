@@ -18,7 +18,6 @@
 	import StepCards from '$lib/components/tools/v2/longform/StepCards.svelte';
 	import LinkCardGrid from '$lib/components/tools/v2/longform/LinkCardGrid.svelte';
 	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
-	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 	import JumpLink from '$lib/components/tools/v2/longform/JumpLink.svelte';
 	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
 	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
@@ -331,7 +330,6 @@
 		}
 	];
 
-	const RELATED = ['csv-to-pdf', 'badge', 'membership-card'];
 
 	/** Eight sections, so the column gets the rail rather than running full width. */
 	const TOC = [
@@ -383,7 +381,6 @@
 	toolPath={TOOL_PATH}
 	breadcrumb="CERTIFICATE GENERATOR"
 	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · 5 TEMPLATES"
-	related={RELATED}
 	loggedIn={isUserLoggedIn}
 	toc={TOC}
 	longform="rail"
@@ -609,16 +606,4 @@
 		</LongformPair>
 	</svelte:fragment>
 
-	<svelte:fragment slot="footer-links">
-		<RelatedLinks
-			toolName={TOOL_NAME}
-			links={[
-				{ href: '/tools/badge', label: 'Badge maker' },
-				{ href: '/tools/course-certificate', label: 'Course certificate' },
-				{ href: '/tools/receipt', label: 'Receipt generator' },
-				{ href: '/tools/event-ticket', label: 'Event ticket' },
-				{ href: '/tools', label: 'View all tools →' }
-			]}
-		/>
-	</svelte:fragment>
 </ToolPageShell>

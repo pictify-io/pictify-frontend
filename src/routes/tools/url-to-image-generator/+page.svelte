@@ -782,7 +782,6 @@
 		}
 	];
 
-	const RELATED = ['html-to-image', 'og-image-generator', 'code-to-image'];
 </script>
 
 <ToolSeoHead
@@ -809,7 +808,6 @@
 	toolPath={TOOL_PATH}
 	breadcrumb="URL TO IMAGE"
 	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · ANY PUBLIC URL"
-	related={RELATED}
 	loggedIn={isUserLoggedIn}
 	hasResult={!!imageUrl}
 	longform="column"

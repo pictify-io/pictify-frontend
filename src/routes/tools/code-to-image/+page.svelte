@@ -33,7 +33,6 @@
 	import ComparisonTable from '$lib/components/tools/v2/longform/ComparisonTable.svelte';
 	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
 	import TagList from '$lib/components/tools/v2/longform/TagList.svelte';
-	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 	let stickyBar;
 
 	// Syntax highlighting via refractor (Prism under the hood)
@@ -872,7 +871,6 @@
 	const selectCls =
 		'h-10 w-full rounded border-[1.5px] border-brand-ink bg-white px-2.5 font-sans text-sm font-semibold text-brand-ink focus:outline-none focus:ring-2 focus:ring-brand-royal cursor-pointer';
 
-	const RELATED = ['markdown', 'html-to-image', 'tweet-screenshot'];
 
 	/** Eight sections, so the column gets the rail. */
 	const TOC = [
@@ -909,7 +907,6 @@
 	toolPath={TOOL_PATH}
 	breadcrumb="CODE TO IMAGE"
 	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · 20+ LANGUAGES"
-	related={RELATED}
 	loggedIn={isUserLoggedIn}
 	hasResult={!!generatedImage}
 	toc={TOC}
@@ -1464,19 +1461,6 @@
 		pill list used to render one under the other. Union of both hrefs, anchor
 		text unchanged.
 	-->
-	<svelte:fragment slot="footer-links">
-		<RelatedLinks
-			toolName={TOOL_NAME}
-			links={[
-				{ href: '/tools/html-to-png', label: 'HTML to PNG' },
-				{ href: '/tools/url-to-image-generator', label: 'URL to Image' },
-				{ href: '/tools/og-image-generator', label: 'OG Image Generator' },
-				{ href: '/tools/markdown', label: 'Markdown to Image' },
-				{ href: '/alternatives', label: 'Compare Alternatives' },
-				{ href: '/tools', label: 'View all tools →' }
-			]}
-		/>
-	</svelte:fragment>
 </ToolPageShell>
 
 {#if showFirstGenerationPrompt}

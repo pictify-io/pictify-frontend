@@ -19,10 +19,10 @@
 	import Footer from '$lib/components/landing/Footer.svelte';
 	import RailSignupCard from './RailSignupCard.svelte';
 	import ClosingBand from './ClosingBand.svelte';
-	import RelatedToolCards from './RelatedToolCards.svelte';
+	import RelatedToolRows from './RelatedToolRows.svelte';
 	import PixelCluster from '$lib/components/landing/PixelCluster.svelte';
 	import { HERO_CLUSTER, BASELINE_RUN } from '$lib/components/landing/hero-clusters.js';
-	import { resolveToolCards } from '$lib/pseo/tool-cards.js';
+	import { relatedRows, slugFromPath, toolList } from '$lib/pseo/tool-cards.js';
 
 	/** Analytics name, e.g. `html_to_png`. */
 	export let toolName = '';
@@ -34,12 +34,6 @@
 	export let facts = '';
 	/** [{ id, label }] — drives the rail TOC and the mobile chip row. */
 	export let toc = [];
-	/**
-	 * Three art-strip cards. Slugs into the shared registry
-	 * (`related={['table', 'code-to-image']}`) or full card objects; routes move
-	 * to slugs one at a time, so both forms resolve.
-	 */
-	export let related = [];
 	export let loggedIn = false;
 	/** 'rail' | 'column' | null (decide from `toc`). */
 	export let longform = null;
@@ -51,7 +45,12 @@
 	 */
 	export let hasResult = false;
 
-	$: relatedCards = resolveToolCards(related);
+	/*
+	 * Derived from the registry off the page's own path, so adding a tool
+	 * updates every foot on the site with no route edit. `related` only leads.
+	 */
+	$: footRows = relatedRows(slugFromPath(toolPath));
+	$: toolCount = toolList().length;
 	$: mode = longform || (toc.length >= 6 ? 'rail' : 'column');
 	$: showRail = mode === 'rail';
 </script>
@@ -96,7 +95,9 @@
 		</div>
 	</section>
 
-	<main class="w-full">
+	<!-- pb-20 is the gap to whatever follows: the closing band when logged out,
+	     the footer when logged in (the band is not rendered for accounts). -->
+	<main class="w-full pb-20">
 		<!-- ── Tool card ─────────────────────────────────────────────── -->
 		<div class="mx-auto w-full max-w-page px-5 lg:px-10">
 			<div class="-mt-8 lg:mt-10">
@@ -181,24 +182,12 @@
 			{/if}
 		</div>
 
-		<!-- ── Related tools ─────────────────────────────────────────── -->
-		{#if relatedCards.length}
-			<section class="mx-auto mt-16 w-full max-w-page px-5 lg:px-10">
-				<!--
-					A <p>, not an <h2>: the routes' heading outlines are frozen for
-					search, and this line is the shell's, not the page's.
-				-->
-				<p class="font-display text-[22px] font-bold tracking-[-0.02em] text-brand-ink">
-					More from the counter
-				</p>
-				<div class="mt-5">
-					<RelatedToolCards tools={relatedCards} {toolName} />
-				</div>
-			</section>
+		<!-- ── More from the counter (HB-04) ─────────────────────────── -->
+		{#if footRows.length}
+			<div class="mt-16">
+				<RelatedToolRows tools={footRows} {toolName} total={toolCount} />
+			</div>
 		{/if}
-
-		<!-- Routes keep their existing internal-link block for SEO. -->
-		<slot name="footer-links" />
 	</main>
 
 	<ClosingBand {toolName} {toolPath} {loggedIn} />

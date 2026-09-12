@@ -17,7 +17,6 @@
 	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
 	import Prose from '$lib/components/tools/v2/longform/Prose.svelte';
 	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
-	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 	import Papa from 'papaparse';
 	import { user } from '../../../store/user.store';
 	import { toast } from '../../../store/toast.store';
@@ -74,7 +73,6 @@
 		}
 	];
 
-	const RELATED = ['table', 'certificate-generator', 'online-invoice-generator'];
 
 	// ── CSV state ────────────────────────────────────────────────────────────
 	let rows = []; // array of objects keyed by header
@@ -369,7 +367,6 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 	toolPath={TOOL_PATH}
 	breadcrumb="CSV TO PDF"
 	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · TABLE OR ONE PAGE PER ROW"
-	related={RELATED}
 	loggedIn={isUserLoggedIn}
 	hasResult={!!pdfBlobUrl}
 	longform="column"
@@ -615,16 +612,4 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 		</LongformSection>
 	</svelte:fragment>
 
-	<svelte:fragment slot="footer-links">
-		<RelatedLinks
-			toolName={TOOL_NAME}
-			links={[
-				{ href: '/tools/table', label: 'Table to Image' },
-				{ href: '/tools/json-to-image', label: 'JSON to Image' },
-				{ href: '/tools/markdown', label: 'Markdown to Image' },
-				{ href: '/tools/receipt', label: 'Receipt Generator' },
-				{ href: '/tools', label: 'View all tools →' }
-			]}
-		/>
-	</svelte:fragment>
 </ToolPageShell>

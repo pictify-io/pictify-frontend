@@ -35,7 +35,6 @@
 	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
 	import ProseGroup from '$lib/components/tools/v2/longform/ProseGroup.svelte';
 	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
-	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 
 	// Optional platform prop to specialize content (e.g., 'wordpress')
 	export let platform = null;
@@ -367,7 +366,6 @@
 		}
 	];
 
-	const RELATED = ['linkedin-banner-generator', 'tweet-screenshot', 'html-to-image'];
 </script>
 
 {#if !isPlatform}
@@ -399,7 +397,6 @@
 	toolPath={TOOL_PATH}
 	breadcrumb={isPlatform ? `OG IMAGE · ${platformLabel.toUpperCase()}` : 'OG IMAGE GENERATOR'}
 	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · 1200×630"
-	related={RELATED}
 	loggedIn={isUserLoggedIn}
 	hasResult={!!imageUrl}
 	longform="column"
@@ -566,16 +563,4 @@
 		</LongformSection>
 	</svelte:fragment>
 
-	<svelte:fragment slot="footer-links">
-		<RelatedLinks
-			toolName={TOOL_NAME}
-			links={[
-				{ href: '/tools/youtube-thumbnail', label: 'YouTube Thumbnail' },
-				{ href: '/tools/linkedin-banner', label: 'LinkedIn Banner' },
-				{ href: '/tools/twitter-header', label: 'Twitter Header' },
-				{ href: '/tools/responsive-images', label: 'Responsive Images' },
-				{ href: '/tools', label: 'View all tools →' }
-			]}
-		/>
-	</svelte:fragment>
 </ToolPageShell>

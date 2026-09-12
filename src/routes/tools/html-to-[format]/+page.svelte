@@ -335,7 +335,6 @@
 		{ id: 'use-cases', label: 'Use Cases & Technical Specs' }
 	];
 
-	const RELATED = ['table', 'code-to-image', 'og-image-generator'];
 
 	/**
 	 * The visible FAQ. Deliberately NOT the FAQPage in `schemaMarkup` below:
@@ -578,7 +577,6 @@
 		.map((f) => f.toUpperCase())
 		.join(' & ')}`}
 	toc={TOC}
-	related={RELATED}
 	loggedIn={isUserLoggedIn}
 	longform="rail"
 >

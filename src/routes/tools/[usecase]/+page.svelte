@@ -27,7 +27,6 @@
 	import StepCards from '$lib/components/tools/v2/longform/StepCards.svelte';
 	import CheckList from '$lib/components/tools/v2/longform/CheckList.svelte';
 	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
-	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 	import { page } from '$app/stores';
 	import {
 		useCases,
@@ -138,14 +137,6 @@
 	];
 
 	/** Same hrefs and anchor text the pill list carried. */
-	$: relatedWorkflowLinks = [
-		...(config?.related || []).map((id) => ({
-			href: `/tools/${id}`,
-			label: useCaseDetails[id]?.label || id
-		})),
-		{ href: '/tools', label: 'View All Tools →' }
-	];
-
 	$: formatOptions =
 		config && config.recommendedFormats && config.recommendedFormats.length
 			? config.recommendedFormats
@@ -197,8 +188,12 @@
 
 	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
 
-	// Three neighbours from the same shelf on /tools, so the cards match the hub.
-	const RELATED = ['html-to-image', 'csv-to-pdf', 'certificate-generator'];
+	/*
+	 * No list here any more: the foot is derived from the registry off the
+	 * page's own path (HB-04, board note "SELECTION RULE · NO HAND-PICKED
+	 * LISTS"), which is also what keeps a new tool from needing an edit on
+	 * every route that should now mention it.
+	 */
 </script>
 
 <ToolSeoHead
@@ -226,9 +221,8 @@
 		toolPath={`/tools/${useCaseId}`}
 		breadcrumb={config.label.toUpperCase()}
 		facts="FREE · 5 RENDERS A DAY · NO SIGNUP · RENDER BY API"
-		related={RELATED}
 		loggedIn={isUserLoggedIn}
-			longform="column"
+		longform="column"
 	>
 		<HeroTitle slot="h1">
 			Generate
@@ -355,10 +349,6 @@
 			<LongformSection index="04" id="faq" title="Frequently Asked Questions">
 				<FaqList faqs={config.faqs} />
 			</LongformSection>
-		</svelte:fragment>
-
-		<svelte:fragment slot="footer-links">
-			<RelatedLinks links={relatedWorkflowLinks} toolName={TOOL_NAME} eyebrow="RELATED WORKFLOWS" />
 		</svelte:fragment>
 	</ToolPageShell>
 {:else}

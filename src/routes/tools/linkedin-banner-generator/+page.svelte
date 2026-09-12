@@ -28,7 +28,6 @@
 	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
 	import ProseGroup from '$lib/components/tools/v2/longform/ProseGroup.svelte';
 	import StepCards from '$lib/components/tools/v2/longform/StepCards.svelte';
-	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 
 	// Social proof counter
 
@@ -167,7 +166,6 @@
 		}
 	];
 
-	const RELATED = ['og-image-generator', 'tweet-screenshot', 'html-to-image'];
 </script>
 
 <ToolSeoHead
@@ -194,7 +192,6 @@
 	toolPath={TOOL_PATH}
 	breadcrumb="LINKEDIN BANNER"
 	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · 1584×396"
-	related={RELATED}
 	loggedIn={isUserLoggedIn}
 	hasResult={!!imageUrl}
 	longform="column"
@@ -309,15 +306,4 @@
 		</LongformSection>
 	</svelte:fragment>
 
-	<svelte:fragment slot="footer-links">
-		<RelatedLinks
-			toolName={TOOL_NAME}
-			links={[
-				{ href: '/tools/twitter-header', label: 'Twitter Header' },
-				{ href: '/tools/youtube-thumbnail', label: 'YouTube Thumbnail' },
-				{ href: '/tools/responsive-image-generator', label: 'Responsive Image Generator' },
-				{ href: '/tools', label: 'View all tools →' }
-			]}
-		/>
-	</svelte:fragment>
 </ToolPageShell>

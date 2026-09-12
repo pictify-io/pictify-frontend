@@ -20,7 +20,6 @@
 	import Prose from '$lib/components/tools/v2/longform/Prose.svelte';
 	import ProseGroup from '$lib/components/tools/v2/longform/ProseGroup.svelte';
 	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
-	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 	import { onMount } from 'svelte';
 	import { user } from '../../../store/user.store';
 	import { toast } from '../../../store/toast.store';
@@ -461,7 +460,6 @@ print(res.json()['image']['url'])`;
 
 	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
 
-	const RELATED = ['code-to-image', 'markdown', 'og-image-generator'];
 </script>
 
 <ToolSeoHead
@@ -494,7 +492,6 @@ print(res.json()['image']['url'])`;
 	toolPath={TOOL_PATH}
 	breadcrumb="TWEET SCREENSHOT"
 	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · NO TWITTER API KEY"
-	related={RELATED}
 	loggedIn={isUserLoggedIn}
 	hasResult={!!generatedImageUrl}
 	longform="column"
@@ -866,15 +863,4 @@ print(res.json()['image']['url'])`;
 		</LongformSection>
 	</svelte:fragment>
 
-	<svelte:fragment slot="footer-links">
-		<RelatedLinks
-			toolName={TOOL_NAME}
-			links={[
-				{ href: '/tools/certificate', label: 'Certificate Generator' },
-				{ href: '/tools/markdown', label: 'Markdown to Image' },
-				{ href: '/tools/code', label: 'Code to Image' },
-				{ href: '/tools', label: 'View all tools →' }
-			]}
-		/>
-	</svelte:fragment>
 </ToolPageShell>
