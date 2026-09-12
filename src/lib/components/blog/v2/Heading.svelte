@@ -32,18 +32,29 @@
 		<slot />
 	</h1>
 {:else if depth === 2}
-	<h2 {id} class="mt-14 scroll-mt-28 border-t border-brand-ink pt-6">
+	<!--
+		THE NUMERAL IS A SIBLING, NOT PART OF THE HEADING. Inside the <h2> its
+		text joined the heading's, so what search read was "01 Introduction" on
+		a page that ranks for "Introduction". The rule and the rhythm move to
+		the wrapper; the <h2> keeps the id the rail anchors to and holds nothing
+		but the heading.
+	-->
+	<div class="mt-14 border-t border-brand-ink pt-6">
 		{#if index !== null}
-			<span class="mb-2 block font-mono text-[12px] tracking-[0.14em] text-brand-royal">
+			<span
+				class="mb-2 block font-mono text-[12px] tracking-[0.14em] text-brand-royal"
+				aria-hidden="true"
+			>
 				{String(index).padStart(2, '0')}
 			</span>
 		{/if}
-		<span
-			class="block font-display text-[30px] font-extrabold leading-[1.12] tracking-[-0.025em] text-brand-ink"
+		<h2
+			{id}
+			class="scroll-mt-28 font-display text-[30px] font-extrabold leading-[1.12] tracking-[-0.025em] text-brand-ink"
 		>
 			<slot />
-		</span>
-	</h2>
+		</h2>
+	</div>
 {:else if depth === 3}
 	<h3
 		{id}

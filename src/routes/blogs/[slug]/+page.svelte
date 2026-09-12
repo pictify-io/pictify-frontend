@@ -336,9 +336,11 @@
 		<aside class="w-full flex-shrink-0 lg:sticky lg:top-6 lg:h-fit lg:w-[240px]">
 			{#if toc.length}
 				<nav class="hidden lg:block" aria-label="On this page">
-					<h2 class="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute">
+					<!-- A <p>: the nav's aria-label already names this list, and as an
+					     <h2> it entered the outline of every article. -->
+					<p class="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute">
 						On this page
-					</h2>
+					</p>
 					<ul class="flex flex-col gap-0.5">
 						{#each toc as item (item.id)}
 							<li>
@@ -374,7 +376,7 @@
 			{/if}
 
 			<div class="mt-7 hidden lg:block">
-				<h2 class="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute">Share</h2>
+				<p class="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-brand-mute">Share</p>
 				<div class="flex items-center gap-2">
 					<a
 						href={shareX}

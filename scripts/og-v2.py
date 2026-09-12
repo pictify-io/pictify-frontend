@@ -70,8 +70,46 @@ def tools():
     return registry("./src/lib/pseo/tool-cards.js",
                     "Object.entries(m.TOOL_CARDS).map(([slug,t])=>({slug,...t}))")
 
+SANITY = "https://ayq6mmxw.api.sanity.io/v2023-05-03/data/query/production"
+
+def sanity_comparisons():
+    """
+    The competitor pages the CMS owns.
+
+    `/alternatives/[slug]` reads Sanity first and falls back to
+    comparisons.js, so the cards have to come from the same place or the two
+    slugs that live only in Sanity get no card at all. Read-only, no token:
+    the dataset is public, which is what the site's own client relies on.
+
+    Published documents only: the read is unauthenticated, so drafts are not
+    visible. Where a published sentence is one we no longer ship, SUBS below
+    overrides it.
+    """
+    import urllib.request, urllib.parse, urllib.error
+    where = '_type=="comparison" && defined(slug.current) && !(_id in path("drafts.**"))'
+    q = '*[%s]{"slug":slug.current,competitor,headline,metaDescription}' % where
+    try:
+        raw = urllib.request.urlopen(
+            SANITY + "?query=" + urllib.parse.quote(q), timeout=20).read()
+    except (urllib.error.URLError, TimeoutError):
+        return []
+    return json.loads(raw).get("result", [])
+
 def alternatives():
-    return registry("./src/lib/pseo/comparisons.js", "m.alternatives")
+    """Local entries, with the CMS winning on slug — the route's own order."""
+    merged = {a["slug"]: a for a in registry("./src/lib/pseo/comparisons.js", "m.alternatives")}
+    for doc in sanity_comparisons():
+        slug = doc.get("slug")
+        if not slug:
+            continue
+        entry = dict(merged.get(slug, {}))
+        entry.update({k: v for k, v in doc.items() if v})
+        entry.setdefault("competitor", slug)
+        # Sanity carries no headline today; the page builds this same sentence.
+        entry.setdefault("headline", "The Best %s Alternative for Developers" % entry["competitor"])
+        entry["slug"] = slug
+        merged[slug] = entry
+    return sorted(merged.values(), key=lambda a: a["slug"])
 
 # Per-slug headline overrides, for a route whose card should not say what the
 # registry says. Empty today: the dedicated routes' H1s are the registry titles
@@ -104,14 +142,28 @@ def card_for_format(fmt):
                 headline="HTML to " + label, sub=base["desc"],
                 path="/tools/html-to-" + fmt, hsize=92, hline=92)
 
+# Published Sanity copy we do not print on a card.
+#
+# Both sentences still promise that Pictify "emails each result to its
+# recipient" — the delivery claim the product retired in 2026-09 and scrubbed
+# from every other surface. Scrubbed replacements are staged as drafts in
+# Sanity; when those are published this dict goes and the card regenerates to
+# the same words.
+SUBS = {
+    "shotstack": "Shotstack renders video from a JSON template. Pictify renders video and documents "
+                 "from one API token, with AI-authored templates and a CDN link per row.",
+    "json2video": "JSON2Video renders video from templates. Pictify renders video and documents from "
+                  "one API token, with AI-authored templates and a CDN link per row.",
+}
+
 def card_for_alt(slug):
     alt = next((a for a in alternatives() if a["slug"] == slug), None)
     if not alt:
         sys.exit("unknown alternative: %s" % slug)
-    headline = alt["headline"]
+    headline = alt.get("headline") or ("The Best %s Alternative for Developers" % alt["competitor"])
     size = (58, 62) if len(headline) > 38 else (76, 78)
     return dict(eyebrow="%s alternative · 2026" % alt["competitor"],
-                headline=headline, sub=alt["metaDescription"],
+                headline=headline, sub=SUBS.get(slug, alt["metaDescription"]),
                 path="/alternatives/" + slug, hsize=size[0], hline=size[1])
 
 if sys.argv[1] == "--list":
@@ -127,6 +179,11 @@ elif name.startswith("fmt:"):
     raw = card_for_format(name.split(":", 1)[1])
 elif name.startswith("alt:"):
     raw = card_for_alt(name.split(":", 1)[1])
+elif name.startswith("card:"):
+    # An ad-hoc card from a JSON file: {eyebrow, headline, sub, path, hsize?, hline?}.
+    # Used for content that lives outside the repo (blog posts in Sanity), where
+    # the caller has already fetched the copy.
+    raw = json.load(open(name.split(":", 1)[1]))
 else:
     raw = PAGES[name]
 p = {"hsize": 92, "hline": 92}; p.update(raw)

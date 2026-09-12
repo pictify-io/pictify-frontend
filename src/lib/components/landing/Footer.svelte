@@ -55,11 +55,18 @@
 			<div class="flex flex-1 flex-wrap gap-6 lg:gap-14">
 				{#each columns as col (col.title)}
 					<nav class="flex min-w-[110px] flex-1 flex-col gap-3" aria-label={col.title}>
-						<h2
+						<!--
+							A <p>, not an <h2>. These four labels are furniture on every
+							page of the site, so as headings they put "Product",
+							"Developers", "Integrations" and "Company" into the outline of
+							pages that rank on their own H2s. The <nav>'s aria-label
+							already names the group.
+						-->
+						<p
 							class="font-mono text-[10px] uppercase tracking-[0.1em] text-[#6B7280] lg:text-[11px]"
 						>
 							{col.title}
-						</h2>
+						</p>
 						{#each col.links as [label, href] (href)}
 							<a {href} class="font-sans text-sm text-white hover:underline lg:text-[15px]"
 								>{label}</a
