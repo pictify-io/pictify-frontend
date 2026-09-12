@@ -893,10 +893,10 @@
 	ogTitle="Code to Image: Code Screenshot Generator (25+ Themes, Free API) | Pictify"
 	ogDescription="Turn code snippets into beautiful screenshots with syntax highlighting: 25+ languages, 18+ themes, custom fonts. Export PNG free or automate with the API."
 	ogSiteName="Pictify"
-	ogImage="https://media.pictify.io/by55n-1775406886142.png"
+	ogImage="https://pictify.io/og/tools/code-to-image.png"
 	twitterTitle="Code to Image: Code Screenshot Generator (25+ Themes, Free API) | Pictify"
 	twitterDescription="Turn code snippets into beautiful screenshots with syntax highlighting: 25+ languages, 18+ themes, custom fonts. Export PNG free or automate with the API."
-	twitterImage="https://media.pictify.io/by55n-1775406886142.png"
+	twitterImage="https://pictify.io/og/tools/code-to-image.png"
 	twitterUrl="https://pictify.io/tools/code-to-image"
 	faqs={FAQS}
 	breadcrumbLabel="Code to Image"

@@ -793,10 +793,10 @@
 	ogTitle="URL to Image: Capture Any Webpage as PNG/JPG Free | Pictify"
 	ogDescription="Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access."
 	ogSiteName="Pictify"
-	ogImage="https://media.pictify.io/vombm-1775406853373.png"
+	ogImage="https://pictify.io/og/tools/url-to-image-generator.png"
 	twitterTitle="URL to Image: Capture Any Webpage as PNG/JPG Free | Pictify"
 	twitterDescription="Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access."
-	twitterImage="https://media.pictify.io/vombm-1775406853373.png"
+	twitterImage="https://pictify.io/og/tools/url-to-image-generator.png"
 	twitterUrl="https://pictify.io/tools/url-to-image-generator"
 	webApplicationSchema={structuredData}
 	extraSchemas={[faqSchema]}

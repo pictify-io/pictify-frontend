@@ -558,12 +558,12 @@
 	canonical={canonicalUrl}
 	ogTitle={headTitle}
 	{ogDescription}
-	ogImage="https://media.pictify.io/gre6p-1775406841745.png"
+	ogImage={`https://pictify.io/og/tools/html-to-${format}.png`}
 	ogSiteName="Pictify.io"
 	ogLocale="en_US"
 	twitterTitle={headTitle}
 	twitterDescription={headDescription}
-	twitterImage="https://media.pictify.io/gre6p-1775406841745.png"
+	twitterImage={`https://pictify.io/og/tools/html-to-${format}.png`}
 	twitterSite="@pictify_io"
 	webApplicationSchema={schemaMarkup}
 	breadcrumbLabel={`HTML to ${format ? format.toUpperCase() : 'Image'}`}

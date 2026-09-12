@@ -353,10 +353,10 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 	ogTitle="CSV to PDF Converter: Every Row Becomes a Document | Pictify"
 	ogDescription="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row. Then deliver each one by email."
 	ogSiteName="Pictify"
-	ogImage="https://media.pictify.io/v3g37-1775406808141.png"
+	ogImage="https://pictify.io/og/tools/csv-to-pdf.png"
 	twitterTitle="CSV to PDF Converter: Every Row Becomes a Document | Pictify"
 	twitterDescription="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row."
-	twitterImage="https://media.pictify.io/v3g37-1775406808141.png"
+	twitterImage="https://pictify.io/og/tools/csv-to-pdf.png"
 	webApplicationSchema={structuredData}
 	{faqs}
 	breadcrumbLabel="CSV to PDF"

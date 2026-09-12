@@ -206,10 +206,10 @@
 		'HTML to Image'}, image generator, automation, Pictify, API"
 	ogTitle={title}
 	ogDescription={description}
-	ogImage={config?.ogImage || 'https://media.pictify.io/qyl7z-1775406830860.png'}
+	ogImage={config?.ogImage || `https://pictify.io/og/tools/${useCaseId}.png`}
 	twitterTitle={title}
 	twitterDescription={description}
-	twitterImage={config?.ogImage || 'https://media.pictify.io/qyl7z-1775406830860.png'}
+	twitterImage={config?.ogImage || `https://pictify.io/og/tools/${useCaseId}.png`}
 	webApplicationSchema={structuredData}
 	faqs={validCase ? config.faqs : null}
 	breadcrumbLabel={config?.label || 'Tool'}

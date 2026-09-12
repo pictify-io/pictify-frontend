@@ -1,4 +1,23 @@
-import json, sys, html
+"""
+The 1200x630 share card, in the Repro Shop brand (Paper board BIM-0).
+
+Prints ONE card's HTML to stdout; rasterise it at 1200x630 with any headless
+Chrome (the gstack `browse` binary was used for the committed PNGs):
+
+    python3 scripts/og-v2.py home > /tmp/og.html      # a named page
+    python3 scripts/og-v2.py tool:csv-to-pdf          # any registry tool
+    python3 scripts/og-v2.py alt:cloudinary           # any competitor page
+    python3 scripts/og-v2.py --list tool              # slugs, one per line
+
+TOOLS AND ALTERNATIVES ARE NOT LISTED HERE. They are read from
+`src/lib/pseo/tool-cards.js` and `src/lib/pseo/comparisons.js` through node, so
+a new tool or competitor gets a card without an edit to this file — the same
+rule the /tools ledger follows.
+
+Headlines can be overridden per slug in HEADLINES below, for the few routes
+whose H1 is not the registry title.
+"""
+import json, sys, html, subprocess, os
 
 TEMPLATE = """<!doctype html><html><head><meta charset="utf-8">
 <style>
@@ -32,11 +51,85 @@ PAGES = {
   "alternatives":dict(eyebrow="Compare · HCTI · Bannerbear · Placid · Vercel OG", headline="The HTML-first alternative.", sub="How Pictify compares on formats, price and the API, side by side.", path="/alternatives"),
   "solutions":   dict(eyebrow="Solutions", headline="Images and PDFs from your data.", sub="One template, every row. Certificates, reports, cards and banners.", path="/solutions"),
   "campaigns":   dict(eyebrow="Campaigns · customer value updates · private pilot", headline="Show customers what they got.", sub="A spreadsheet in, one branded card per customer out. Your tool sends.", path="/campaigns", hsize=84, hline=86),
+  "blog":        dict(eyebrow="Pictify blog", headline="Notes from the press.", sub="How templated media gets built, shipped and automated.", path="/blogs"),
   "free-account":dict(eyebrow="Free account", headline="Start free. No card.", sub="Renders, templates and the API from day one. Upgrade when you outgrow it.", path="/free-account"),
 }
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+
+def registry(module, expr):
+    """Read a JS module's data through node, so this file holds no copy of it."""
+    out = subprocess.run(
+        ["node", "--input-type=module", "-e",
+         "import('%s').then(m=>console.log(JSON.stringify(%s)))" % (module, expr)],
+        cwd=ROOT, capture_output=True, text=True, check=True)
+    return json.loads(out.stdout)
+
+def tools():
+    return registry("./src/lib/pseo/tool-cards.js",
+                    "Object.entries(m.TOOL_CARDS).map(([slug,t])=>({slug,...t}))")
+
+def alternatives():
+    return registry("./src/lib/pseo/comparisons.js", "m.alternatives")
+
+# Per-slug headline overrides, for a route whose card should not say what the
+# registry says. Empty today: the dedicated routes' H1s are the registry titles
+# in caps, and the nine use-case routes say "Generate Badge Generator" and
+# "Generate Membership Card Generator" — a copy bug worth fixing on the pages
+# rather than reprinting on a share card.
+HEADLINES = {}
+
+def card_for_tool(slug):
+    tool = next((t for t in tools() if t["slug"] == slug), None)
+    if not tool:
+        sys.exit("unknown tool: %s" % slug)
+    headline = HEADLINES.get(slug, tool["title"])
+    # A long headline gets the smaller of the two sizes the board allows,
+    # so it cannot run past three lines in a LinkedIn preview.
+    size = (76, 78) if len(headline) > 22 else (92, 92)
+    return dict(eyebrow="Free tool · " + tool["meta"], headline=headline,
+                sub=tool["desc"], path="/tools/" + slug,
+                hsize=size[0], hline=size[1])
+
+# /tools/html-to-png|jpg|webp are separate ranking pages sharing one registry
+# entry, so they get their own cards: a card headlined "HTML to image" under a
+# link that says PNG is a worse preview than the page deserves.
+FORMATS = {"png": "PNG", "jpg": "JPG", "webp": "WebP"}
+
+def card_for_format(fmt):
+    base = next(t for t in tools() if t["slug"] == "html-to-image")
+    label = FORMATS[fmt]
+    return dict(eyebrow="Free tool · HTML → " + label.upper(),
+                headline="HTML to " + label, sub=base["desc"],
+                path="/tools/html-to-" + fmt, hsize=92, hline=92)
+
+def card_for_alt(slug):
+    alt = next((a for a in alternatives() if a["slug"] == slug), None)
+    if not alt:
+        sys.exit("unknown alternative: %s" % slug)
+    headline = alt["headline"]
+    size = (58, 62) if len(headline) > 38 else (76, 78)
+    return dict(eyebrow="%s alternative · 2026" % alt["competitor"],
+                headline=headline, sub=alt["metaDescription"],
+                path="/alternatives/" + slug, hsize=size[0], hline=size[1])
+
+if sys.argv[1] == "--list":
+    kind = sys.argv[2]
+    items = tools() if kind == "tool" else alternatives()
+    print("\n".join(i["slug"] for i in items))
+    sys.exit(0)
+
 name = sys.argv[1]
-p = {"hsize": 92, "hline": 92}; p.update(PAGES[name])
+if name.startswith("tool:"):
+    raw = card_for_tool(name.split(":", 1)[1])
+elif name.startswith("fmt:"):
+    raw = card_for_format(name.split(":", 1)[1])
+elif name.startswith("alt:"):
+    raw = card_for_alt(name.split(":", 1)[1])
+else:
+    raw = PAGES[name]
+p = {"hsize": 92, "hline": 92}; p.update(raw)
 import os, io, base64, re, urllib.request
 from fontTools import subset
 from fontTools.ttLib import TTFont
@@ -69,7 +162,6 @@ def face(fam, text):
     sub = subset.Subsetter(o); sub.populate(text=text); sub.subset(f)
     buf = io.BytesIO(); f.flavor = "woff2"; f.save(buf)
     return "@font-face{font-family:'%s';font-weight:%d;src:url(data:font/woff2;base64,%s) format('woff2')}" % (fam, SRC[fam][1], base64.b64encode(buf.getvalue()).decode())
-raw = PAGES[name]
 fonts = "\n".join([
     face("Bricolage Grotesque", raw["headline"] + "Pictify"),
     face("Inter", raw["sub"]),

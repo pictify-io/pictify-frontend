@@ -777,7 +777,7 @@ export const useCaseDetails = {
 	'barcode-generator': {
 		label: 'Barcodes',
 		seoTitle: 'Barcode Generator API: Bulk Barcodes for Labels & Inventory (Free) | Pictify',
-		ogImage: 'https://media.pictify.io/que8z-1775618085943.png',
+		ogImage: 'https://pictify.io/og/tools/barcode-generator.png',
 		description:
 			'Generate Code 128, EAN-13, UPC-A, and ITF-14 barcodes: free online tool plus a bulk barcode generator API for product labels, inventory, and shipping at scale.',
 		seoKeywords: [

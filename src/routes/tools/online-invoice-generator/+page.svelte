@@ -202,11 +202,11 @@
 	canonical="https://pictify.io/tools/online-invoice-generator"
 	ogTitle="Online Invoice Generator | Pictify.io"
 	ogDescription="Create custom invoices to streamline your billing process and maintain a professional image."
-	ogImage="https://media.pictify.io/qyl7z-1775406830860.png"
+	ogImage="https://pictify.io/og/tools/online-invoice-generator.png"
 	twitterSite="@pictify_io"
 	twitterTitle="Online Invoice Generator | Pictify.io"
 	twitterDescription="Create custom invoices to streamline your billing process and maintain a professional image."
-	twitterImage="https://media.pictify.io/qyl7z-1775406830860.png"
+	twitterImage="https://pictify.io/og/tools/online-invoice-generator.png"
 	webApplicationSchema={structuredData}
 	faqs={invoiceFaqs}
 	breadcrumbLabel="Online Invoice Generator"

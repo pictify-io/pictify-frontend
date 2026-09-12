@@ -69,6 +69,13 @@
 	$: updatedLabel = formatDate(blog.updatedAt);
 	$: canonicalUrl = `https://pictify.io/blogs/${blog.slug || $page.params.slug}`;
 	$: blogImage = blog.heroImage || blog.image;
+	/*
+	 * The share card falls back to the branded one; the hero plate above does
+	 * not fall back at all. A post without an image should still arrive in a
+	 * feed as Pictify rather than as a bare link, but inventing a hero for it
+	 * would put the same picture on top of every unillustrated post.
+	 */
+	$: shareImage = blogImage || 'https://pictify.io/og/v2/blog.png';
 
 	/*
 	 * One slugger per article, shared with every Heading the renderer mounts.
@@ -173,7 +180,7 @@
 	{#if metaDescription}
 		<meta property="og:description" content={metaDescription} />
 	{/if}
-	<meta property="og:image" content={blogImage} />
+	<meta property="og:image" content={shareImage} />
 	<meta property="og:url" content={canonicalUrl} />
 	<meta property="og:type" content="article" />
 	<meta property="og:site_name" content="Pictify.io" />
@@ -194,12 +201,12 @@
 	{#if metaDescription}
 		<meta name="twitter:description" content={metaDescription} />
 	{/if}
-	<meta name="twitter:image" content={blogImage} />
+	<meta name="twitter:image" content={shareImage} />
 	{@html `<script type="application/ld+json">${JSON.stringify({
 		'@context': 'https://schema.org/',
 		'@type': 'BlogPosting',
 		headline: blog.title,
-		image: blogImage,
+		image: shareImage,
 		url: canonicalUrl,
 		mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
 		author: { '@type': 'Person', name: blog.author },

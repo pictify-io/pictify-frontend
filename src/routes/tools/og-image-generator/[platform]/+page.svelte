@@ -86,10 +86,10 @@
 	ogTitle={title}
 	ogDescription={description}
 	ogSiteName="Pictify"
-	ogImage="https://media.pictify.io/31hxg-1775406864453.png"
+	ogImage="https://pictify.io/og/tools/og-image-generator.png"
 	twitterTitle={title}
 	twitterDescription={description}
-	twitterImage="https://media.pictify.io/31hxg-1775406864453.png"
+	twitterImage="https://pictify.io/og/tools/og-image-generator.png"
 	twitterUrl={canonical}
 	extraSchemas={[schema]}
 />

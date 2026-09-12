@@ -227,7 +227,7 @@
 		],
 		screenshot: {
 			'@type': 'ImageObject',
-			url: 'https://media.pictify.io/31hxg-1775406864453.png',
+			url: 'https://pictify.io/og/tools/og-image-generator.png',
 			width: '1200',
 			height: '630'
 		},
@@ -378,10 +378,10 @@
 		ogTitle="Free OG Image Generator: Create Open Graph Images in Seconds | Pictify"
 		ogDescription="Pick a template, customize colors and text, export your OG image. 20+ templates for Twitter, LinkedIn, Facebook. Free, no signup."
 		ogSiteName="Pictify"
-		ogImage="https://media.pictify.io/31hxg-1775406864453.png"
+		ogImage="https://pictify.io/og/tools/og-image-generator.png"
 		twitterTitle="Free OG Image Generator: Create Open Graph Images in Seconds | Pictify"
 		twitterDescription="Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds."
-		twitterImage="https://media.pictify.io/31hxg-1775406864453.png"
+		twitterImage="https://pictify.io/og/tools/og-image-generator.png"
 		twitterUrl="https://pictify.io/tools/og-image-generator"
 		webApplicationSchema={structuredData}
 		extraSchemas={[faqSchema, breadcrumbSchema]}
