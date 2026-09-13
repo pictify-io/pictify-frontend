@@ -1,4 +1,5 @@
 <script>
+	import { maskApiKey } from '$lib/utils/api-key.js';
 	import {
 		user,
 		getAPITokenAction,
@@ -310,7 +311,7 @@
 												<code
 													class="font-mono text-xs sm:text-sm font-bold text-gray-800 truncate mr-2 sm:mr-4"
 												>
-													{token.token.slice(0, 12)}...{token.token.slice(-4)}
+													{maskApiKey(token.token, { tail: 4 })}
 												</code>
 												<button
 													class="min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-white rounded-md border border-transparent hover:border-gray-300 transition-all hover:shadow-sm flex-shrink-0"
@@ -411,7 +412,7 @@
 					{#if tokenToRevoke}
 						<div class="bg-gray-50 rounded-lg border-2 border-gray-200 p-3 mb-6">
 							<code class="font-mono text-xs font-bold text-gray-600">
-								{tokenToRevoke.token.slice(0, 12)}...{tokenToRevoke.token.slice(-4)}
+								{maskApiKey(tokenToRevoke.token, { tail: 4 })}
 							</code>
 						</div>
 					{/if}

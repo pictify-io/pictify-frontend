@@ -1,4 +1,5 @@
 <script>
+	import { maskApiKey } from '$lib/utils/api-key.js';
 	/**
 	 * Settings — keys, account, and the way out.
 	 *
@@ -30,7 +31,7 @@
 	$: teamName = $currentTeam?.name || '';
 	$: expectedConfirm = teamName || $user?.email || '';
 
-	const masked = (t) => (t ? `pic_live_••••${t.slice(-5)}` : '—');
+	const masked = (t) => maskApiKey(t, { fallback: '—' });
 
 	async function load() {
 		try {

@@ -1,4 +1,5 @@
 <script>
+	import { maskApiKey } from '$lib/utils/api-key.js';
 	/**
 	 * The guide slot, fal-style: a dismissible strip whose columns depend on
 	 * stage. S0 teaches the path to a first file; S1 keeps only the key (the
@@ -19,7 +20,7 @@
 	let inviteEmail = '';
 	let copied = false;
 
-	$: keyTail = apiKey ? `pic_live_••••${apiKey.slice(-5)}` : 'YOUR_API_KEY';
+	$: keyTail = maskApiKey(apiKey);
 	$: doneCount = 1 + (hasTemplate ? 1 : 0);
 
 	async function copySnippet() {

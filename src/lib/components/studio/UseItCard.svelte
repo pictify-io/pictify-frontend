@@ -1,4 +1,5 @@
 <script>
+	import { maskApiKey } from '$lib/utils/api-key.js';
 	/**
 	 * "Use it" — the call that produces the thing on screen, with the values
 	 * currently on screen.
@@ -57,7 +58,7 @@
 	// Shown masked, copied whole: a live secret rendered in full sits on screen
 	// for every passer-by and screenshot, and the snippet is only useful if what
 	// lands on the clipboard is real.
-	$: keyMasked = apiKey ? `pic_live_••••${apiKey.slice(-5)}` : 'YOUR_API_KEY';
+	$: keyMasked = maskApiKey(apiKey);
 	$: varsJson = inputs.length ? JSON.stringify(sampleObject, null, 2).replace(/\n/g, '\n  ') : null;
 
 	$: noun = kind === 'video' ? 'video' : 'image';

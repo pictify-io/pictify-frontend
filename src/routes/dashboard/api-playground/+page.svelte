@@ -1,4 +1,5 @@
 <script>
+	import { maskApiKey } from '$lib/utils/api-key.js';
 	/**
 	 * API playground — a workbench, not a reference index.
 	 *
@@ -243,7 +244,7 @@
 	$: call = ALL.find((c) => c.id === openId) || ALL[0];
 	$: state = selection[call.id] || {};
 	$: key = $activeApiToken?.token || '';
-	$: keyMasked = key ? `pic_live_••••${key.slice(-5)}` : 'YOUR_API_KEY';
+	$: keyMasked = maskApiKey(key);
 	$: rendersLeft = Math.max(0, ($usageWidget?.limit ?? 0) - ($usageWidget?.current ?? 0));
 
 	/**

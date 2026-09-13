@@ -1,4 +1,5 @@
 <script>
+	import { maskApiKey } from '$lib/utils/api-key.js';
 	/**
 	 * Callers — everything that renders through the account, on one switchboard.
 	 *
@@ -89,7 +90,7 @@
 	$: tab = $page.url.searchParams.get('tab') === 'webhooks' ? 'webhooks' : 'callers';
 
 	$: apiKey = $activeApiToken?.token || '';
-	$: keyMasked = apiKey ? `API key pic_live_••••${apiKey.slice(-5)}` : 'No API key yet';
+	$: keyMasked = apiKey ? `API key ${maskApiKey(apiKey)}` : 'No API key yet';
 
 	$: statsBySource = Object.fromEntries((stats || []).map((s) => [s.source, s]));
 

@@ -1,4 +1,5 @@
 <script>
+	import { maskApiKey } from '$lib/utils/api-key.js';
 	/**
 	 * The shell's rail: context (team) at the top, location (nav) in the middle,
 	 * the meters at the bottom. The meters are the house signature — usage drawn
@@ -121,7 +122,7 @@
 	$: memberCount = $teamMembers?.length || 0;
 	$: planName = PLAN_DISPLAY_NAMES[$usageWidget?.plan] || 'Free';
 	$: subline = memberCount > 1 ? `${memberCount} members` : planName + ' plan';
-	$: keyMasked = $activeApiToken?.token ? `pic_live_••••${$activeApiToken.token.slice(-5)}` : null;
+	$: keyMasked = $activeApiToken?.token ? maskApiKey($activeApiToken.token) : null;
 
 	$: campaignsMode = $isCampaignExperience;
 

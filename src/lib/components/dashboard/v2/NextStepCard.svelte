@@ -1,4 +1,5 @@
 <script>
+	import { maskApiKey } from '$lib/utils/api-key.js';
 	/**
 	 * S1's single ask, walked rather than asserted: tabs pick the exact target,
 	 * numbered steps carry real account facts (key, template, its variables),
@@ -45,7 +46,7 @@
 	}
 
 	$: key = apiKey || 'YOUR_API_KEY';
-	$: keyTail = apiKey ? `pic_live_••••${apiKey.slice(-5)}` : 'YOUR_API_KEY';
+	$: keyTail = maskApiKey(apiKey);
 	$: templateSlug = templateName || 'your-template';
 	$: varNames = (variables || []).map((v) => (typeof v === 'string' ? v : v?.name)).filter(Boolean);
 	$: samplePrompt = `Render my "${templateSlug}" template with sample data`;
