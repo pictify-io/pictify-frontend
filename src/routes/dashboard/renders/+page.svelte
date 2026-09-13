@@ -95,7 +95,10 @@
 
 	$: selectedTemplate = templateOptions.find((t) => t.uid === templateFilter) || null;
 	$: filtered = forceEmpty || forceFilterEmpty ? [] : renders;
-	$: libraryEmpty = forceEmpty || (loaded && counts.ALL === 0);
+	// A list with rows in it is never "empty", whatever the counts say: the
+	// two come from different queries on the server, and on 2026-09-14 the
+	// counts were 0 for every account without a team while the list was full.
+	$: libraryEmpty = forceEmpty || (loaded && counts.ALL === 0 && renders.length === 0);
 	$: groups = groupByDay(filtered);
 
 	function groupByDay(list) {
