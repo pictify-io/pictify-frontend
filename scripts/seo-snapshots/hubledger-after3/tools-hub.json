@@ -1,0 +1,450 @@
+{
+  "route": "/tools",
+  "title": "Free tools: render images, PDFs and cards | Pictify.io",
+  "canonical": "https://pictify.io/tools",
+  "metas": {
+    "description": "Eighteen free tools built on the Pictify render API. Spreadsheets to PDF, HTML and markdown to image, screenshots, certificates, badges and cards. No signup to try.",
+    "keywords": "free tools, CSV to PDF, certificate generator, HTML to image, OG image generator, screenshot API, Pictify.io",
+    "og:description": "Eighteen free tools built on the Pictify render API. Every one of them is one API call underneath.",
+    "og:image": "https://pictify.io/og/v2/tools.png",
+    "og:title": "Free tools: render images, PDFs and cards | Pictify.io",
+    "og:url": "https://pictify.io/tools",
+    "twitter:card": "summary_large_image",
+    "twitter:image": "https://pictify.io/og/v2/tools.png"
+  },
+  "jsonLd": [
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "description": "Free browser tools built on the Pictify render API: spreadsheets to PDF, HTML and markdown to image, screenshots, certificates, badges and cards.",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "A spreadsheet in, one polished PDF out. Or one document per row, when you sign in.",
+            "name": "CSV to PDF",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/csv-to-pdf"
+          },
+          "position": 1
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Five templates, live preview, clean PNG. Point a sheet at it and every attendee gets theirs.",
+            "name": "Certificate generator",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/certificate-generator"
+          },
+          "position": 2
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Convert HTML & CSS to PNG, JPG, or WebP. Free converter with API access.",
+            "name": "HTML to image",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/html-to-image"
+          },
+          "position": 3
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Turn code snippets into beautiful images with themes and fonts.",
+            "name": "Code to image",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/code-to-image"
+          },
+          "position": 4
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Convert markdown to shareable images with themes and fonts.",
+            "name": "Markdown to image",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/markdown"
+          },
+          "position": 5
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Turn CSV data or HTML tables into polished, shareable table images.",
+            "name": "Table to image",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/table"
+          },
+          "position": 6
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Create custom Open Graph images for social sharing and search previews.",
+            "name": "OG image generator",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/og-image-generator"
+          },
+          "position": 7
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Paste any tweet URL, edit every field, download a clean PNG. No API key needed.",
+            "name": "Tweet screenshot",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/tweet-screenshot"
+          },
+          "position": 8
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Create LinkedIn banners from 20+ templates for developers, marketers, and more.",
+            "name": "LinkedIn banner",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/linkedin-banner-generator"
+          },
+          "position": 9
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Turn a review or testimonial into a branded card image.",
+            "name": "Social proof card",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/social-proof-card"
+          },
+          "position": 10
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Screenshot any URL at any size, straight from the browser or the API.",
+            "name": "URL to image",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/url-to-image-generator"
+          },
+          "position": 11
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Create professional invoices quickly with a free online generator.",
+            "name": "Invoice generator",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/online-invoice-generator"
+          },
+          "position": 12
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Generate branded email header images for campaigns and newsletters.",
+            "name": "Email header",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/email-header"
+          },
+          "position": 13
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Render barcodes and QR codes as images from any value.",
+            "name": "Barcode & QR",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/barcode-generator"
+          },
+          "position": 14
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Build status and achievement badges as images.",
+            "name": "Badge maker",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/badge"
+          },
+          "position": 15
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Turn ranked rows into a shareable leaderboard card.",
+            "name": "Leaderboard",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/leaderboard"
+          },
+          "position": 16
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Generate membership and loyalty cards for every member on file.",
+            "name": "Membership card",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/membership-card"
+          },
+          "position": 17
+        },
+        {
+          "@type": "ListItem",
+          "item": {
+            "@type": "WebApplication",
+            "applicationCategory": "DesignApplication",
+            "description": "Render profile and portfolio cards from a template.",
+            "name": "Portfolio card",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "url": "https://pictify.io/tools/portfolio-card"
+          },
+          "position": 18
+        }
+      ],
+      "name": "Pictify.io free tools"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "description": "API-first image, document, and video generation. Every row of a spreadsheet or webhook becomes a rendered, personalized certificate, badge, report, or video.",
+      "logo": "https://pictify.io/logo.png",
+      "name": "Pictify",
+      "sameAs": [
+        "https://github.com/pictify-io"
+      ],
+      "url": "https://pictify.io"
+    }
+  ],
+  "outline": [
+    {
+      "tag": "h1",
+      "text": "Free tools"
+    },
+    {
+      "tag": "h2",
+      "text": "HTML to image"
+    },
+    {
+      "tag": "h2",
+      "text": "Certificate generator"
+    },
+    {
+      "tag": "h2",
+      "text": "Markup → image"
+    },
+    {
+      "tag": "h3",
+      "text": "HTML to image"
+    },
+    {
+      "tag": "h3",
+      "text": "Code to image"
+    },
+    {
+      "tag": "h3",
+      "text": "Markdown to image"
+    },
+    {
+      "tag": "h3",
+      "text": "Table to image"
+    },
+    {
+      "tag": "h2",
+      "text": "Social & OG"
+    },
+    {
+      "tag": "h3",
+      "text": "OG image generator"
+    },
+    {
+      "tag": "h3",
+      "text": "Tweet screenshot"
+    },
+    {
+      "tag": "h3",
+      "text": "LinkedIn banner"
+    },
+    {
+      "tag": "h3",
+      "text": "Social proof card"
+    },
+    {
+      "tag": "h2",
+      "text": "Documents & PDF"
+    },
+    {
+      "tag": "h3",
+      "text": "CSV to PDF"
+    },
+    {
+      "tag": "h3",
+      "text": "Certificate generator"
+    },
+    {
+      "tag": "h3",
+      "text": "Invoice generator"
+    },
+    {
+      "tag": "h2",
+      "text": "Capture & screenshots"
+    },
+    {
+      "tag": "h3",
+      "text": "URL to image"
+    },
+    {
+      "tag": "h2",
+      "text": "Widgets & cards"
+    },
+    {
+      "tag": "h3",
+      "text": "Email header"
+    },
+    {
+      "tag": "h3",
+      "text": "Barcode & QR"
+    },
+    {
+      "tag": "h3",
+      "text": "Badge maker"
+    },
+    {
+      "tag": "h3",
+      "text": "Leaderboard"
+    },
+    {
+      "tag": "h3",
+      "text": "Membership card"
+    },
+    {
+      "tag": "h3",
+      "text": "Portfolio card"
+    },
+    {
+      "tag": "h2",
+      "text": "This, but on autopilot."
+    },
+    {
+      "tag": "h2",
+      "text": "Product"
+    },
+    {
+      "tag": "h2",
+      "text": "Developers"
+    },
+    {
+      "tag": "h2",
+      "text": "Integrations"
+    },
+    {
+      "tag": "h2",
+      "text": "Company"
+    }
+  ]
+}

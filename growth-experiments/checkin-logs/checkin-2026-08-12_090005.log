@@ -1,0 +1,50 @@
+=== Pictify experiment weekly check-in: Wed Aug 12 09:00:05 IST 2026 ===
+CSV is well-formed (22 columns, all rows consistent) and the temp runner is cleaned up. Nothing committed, as instructed.
+
+---
+
+# Weekly Check-In — Pictify Growth Experiments · wk10 · 2026-08-12 (69d cumulative)
+
+## 🟢 Guardrail status: NO breaches — no same-day action needed
+
+## Per-experiment results
+
+### 1. `url-tool-capture-flow-v1` (374736) — THE powered read · **SHIPPED, now confirmed deployed**
+| arm | rage_pct | gen_pct (cumulative) | gen_pct (post-ship 07-29→) |
+|---|---|---|---|
+| control | 10.60% (163/1538) | 23.34% | **49.24%** |
+| guided-capture | 8.64% (68/787) | 24.02% | **48.85%** |
+| auto-capture | 8.75% (67/766) | 55.09% | 66.67% |
+
+- **The ship deployed and is live in prod.** Post-ship, control & guided generation jumped ~2.5× (from their whole-run ~18–19% up to ~49%), converging toward auto — the exact signature of hardcoding auto-capture for all arms (flag read removed 07-29). Daily data shows control matching/exceeding auto from 08-03 on. Arm labels are now **cosmetic**.
+- A growing **None arm** (post-ship sessions with no flag read: 745 openers, ~1% gen) confirms the flag is falling out of code.
+- **Guardrail HELD** — no arm's gen_pct below control cumulatively.
+- **Decision:** Ship already executed; **remaining action = ARCHIVE the PostHog experiment + flag 699577** (still assigning → still spawning cosmetic arms). Cleanup, carried from wk8.
+
+### 2. `tool-signup-cta-v2` (374737) — directional
+| arm | click/gen | signups |
+|---|---|---|
+| control | 20.77% (70/337) | 20 |
+| inline-value-prop | 23.03% (70/304) | **21** |
+| sticky-bar | 21.82% (72/330) | 16 |
+
+- **Fully converged / null** — razor-thin inline lead, consistent since wk4.
+- **Guardrail instrumentation is FIXED** (was blind wk1–wk8): content_downloaded 158/77u + content_copied 81/53u now firing. Per-arm content-action/gen: control 13.9% | inline 11.8% | sticky 14.2% — inline marginally lowest but **within noise, no cannibalization breach**.
+- **Decision:** RECOMMEND CONCLUDE (null) — ship `inline-value-prop` as permanent default (never below control on cumulative signups) and retire the flag. Human call per power constraint. The 8-week instrumentation-debt blocker is **cleared** → successor CTA experiment now unblocked.
+
+### 3. `welcome-experiment-a` (374738) — assignment health only
+- signups **239** · assigned welcome=72 / control=81 · **assigned_welcome/signups = 30.1%** → **FAILS ~50%** (7th consecutive read).
+- Coverage is the failure: only **64%** of signups fire `welcome_assigned` (~36% fire none). Arm split 47/53 is **balanced — randomization is fine**; the bug is the flag-await/event-fire path on some auth flows (welcome_viewed 89 > assigned 72 anomaly persists).
+- Guardrail welcome_skipped 43.8% (flat vs wk7/wk8).
+- **Decision:** Keep running; do NOT trust the `api_render_completed` primary. Prioritize the coverage bug (unfixed 10 weeks).
+
+## Sequenced experiments — still NOT ready to launch
+`onboarding-value-first-skip` (374739), `dashboard-checklist-value-first` (374740), `verify-copy-v1` (374741) remain **HELD** — gated on `welcome-experiment-a` reaching healthy ~50% assignment, which it has not. 374741 stays deferred regardless (verify-surface impressions too low). **Nothing launched.**
+
+## Recommended actions (priority order)
+1. **Archive** PostHog experiment/flag `374736`/`699577` — ship is deployed; flag still assigning cosmetic arms.
+2. **Debug** the `welcome-experiment-a` assignment-coverage bug (~36% of signups never fire `welcome_assigned`) — blocks the entire sequenced pipeline; unfixed 10 weeks.
+3. **Conclude** `tool-signup-cta-v2` — ship inline-value-prop as default, retire flag; guardrail now clean so a successor experiment is unblocked.
+
+All `result_week1` + `decision` fields updated in `experiments.csv` (not committed).
+=== done: Wed Aug 12 09:05:22 IST 2026 ===

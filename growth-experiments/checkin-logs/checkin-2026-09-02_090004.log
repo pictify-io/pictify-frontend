@@ -1,0 +1,50 @@
+=== Pictify experiment weekly check-in: Wed Sep  2 09:00:04 IST 2026 ===
+CSV validated (all rows parse, 22 columns each, wk13 entries landed on all three live experiments; file edited, not committed). Temp script removed.
+
+---
+
+# Weekly Check-In — wk13 read, 2026-09-02 (89d cumulative, START 2026-06-04)
+
+## 1. `url-tool-capture-flow-v1` (374736) — powered read + daily guardrail
+| arm | opened | rage_pct | gen_pct |
+|---|---|---|---|
+| control | 1877 | 11.03% | 32.29% |
+| guided-capture | 950 | 8.95% | 32.32% |
+| auto-capture | 955 | 9.21% | **58.32% (1.81x)** |
+| None (post-ship, no flag read) | 1126 | 0.53% | 0.98% |
+
+- **Guardrail: HELD — no breach, no same-day action.** Both treatments at-or-above control on cumulative gen_pct; guided's wk12 −1.26pp dip **reversed** (now +0.03pp above control). Daily reads show auto's *labelled* cohort under control on a few small-N days (08-25, 08-31) — cosmetic label noise: the ship (2026-07-29) hardcoded auto-capture for everyone, so all arms execute identical code and there is **no live arm to kill**. Recent-7d gen_pct is high across the board (control 70.4% / guided 84.9% / auto 61.1%) — post-ship convergence.
+- Rage primary moot post-ship (guided z≈1.72, auto z≈1.50).
+- **Decision: ship already executed + deployed; keep as post-ship monitor only.**
+- ⚠️ **Carried action, 6th consecutive week: ARCHIVE PostHog experiment 374736 + flag 699577.** The flag is still being assigned (None arm grew 993→1126 openers) — archiving is the only thing left to close this out.
+
+## 2. `tool-signup-cta-v2` (374737) — directional
+| arm | gens | click/gen | signups | content-action/gen (guardrail) |
+|---|---|---|---|---|
+| control | 510 | 16.67% | 27 | 31.18% |
+| inline-value-prop | 472 | 19.28% | 28 | 31.14% |
+| sticky-bar | 490 | 18.78% | 24 | 31.63% |
+
+- **Still fully converged, 13 weeks in** — inline holds only a razor-thin lead on both metrics, within noise.
+- **Guardrail re-pulled this week: CLEAN.** Content-action rates virtually identical across arms — no cannibalization (inline's mild wk10 dip gone).
+- **Decision: RECOMMEND CONCLUDE (null result)** — ship inline-value-prop as permanent default (never below control on cumulative signups in any of 13 reads), retire the flag to free the post-gen CTA slot. Human call per the power-constraint rule; not auto-killed.
+
+## 3. `welcome-experiment-a` (374738) — assignment health only
+- signups **318**; assigned welcome **106** / control **107** → assigned_welcome/signups = **33.3% — FAILS the ~50% criterion, 10th consecutive failing read.**
+- Failure mode unchanged since wk3: **coverage** — 213/318 = 67% of signups fire `welcome_assigned`, ~33% fire none. Arm split itself is healthy (49.8% welcome-share) → randomization fine. `welcome_viewed` 128 > `assigned_welcome` 106 anomaly persists.
+- Guardrail: `welcome_skipped` 54/128 = 42.2% (slightly improved vs 42.9%). `curl_ok` flat at 19.
+- **Decision: keep running; do NOT trust the `api_render_completed` primary.** The flag-await/event-fire bug on some auth flows is now **unfixed for 13 weeks** — this debug is the highest-leverage item in the portfolio.
+
+## Sequenced experiments — launch readiness
+**None ready — all HELD.** The gate (welcome-experiment-a ~50% assignment) continues to fail.
+- `onboarding-value-first-skip` (374739): instrumentation healthy (`welcome_wizard_viewed` 358/222u) — gated on assignment health only.
+- `dashboard-checklist-value-first` (374740): instrumentation healthy (`dashboard_page_viewed` 605/230u, `checklist_step_cta_clicked` 47/44u) — gated on assignment health only.
+- `verify-copy-v1` (374741): **stays deferred regardless** — `verify_wall_shown` only 10 events/8 users in 89 days; far too low for any A/B.
+
+## Bottom line
+- 🟢 **No guardrail breach — no SAME-DAY ACTION needed.**
+- 🔧 Recommended actions, in priority order:
+  1. **Fix the `welcome_assigned` coverage bug** (~33% of signups unassigned, 13 weeks running) — blocks the entire sequenced portfolio.
+  2. **Archive PostHog experiment 374736 + flag 699577** (carried 6 weeks).
+  3. **Human decision on tool-signup-cta-v2**: conclude as null, ship inline-value-prop, retire the flag.
+=== done: Wed Sep  2 09:03:22 IST 2026 ===

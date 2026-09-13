@@ -1,0 +1,49 @@
+=== Pictify experiment weekly check-in: Wed Aug 26 09:00:04 IST 2026 ===
+CSV intact — 22 columns per row, wk12 recorded on all three live experiments, file not committed (per instructions).
+
+---
+
+# Weekly Check-In — wk12 (2026-08-26, 82 days cumulative)
+
+## Guardrail status: ✅ NO same-day action needed
+No live guardrail breach. The one number that trips the mechanical rule — **guided-capture gen 28.52% sitting 1.26pp below control 29.78%** — is **not a real regression**: guided was hardcoded out of the code on 2026-07-29, so all live sessions execute auto-capture and the guided/control labels are now cosmetic. There is no live guided arm to kill. (Auto-capture, the shipped path, is at 57.90% gen = 1.94× control.)
+
+## Per-experiment reads
+
+**1. url-tool-capture-flow-v1 (374736) — powered read**
+| arm | opened | rage% | gen% |
+|---|---|---|---|
+| control | 1763 | 10.78 | 29.78 |
+| guided-capture | 887 | 8.91 | 28.52 |
+| auto-capture | 886 | 9.03 | **57.90 (1.94×)** |
+| None (no-flag) | 993 | 0.60 | 1.01 |
+
+Post-ship steady state. None arm grew 868→993 openers — flag correctly dropping out of code paths. Auto rage z~1.40 (moot post-ship).
+**Decision:** SHIP already executed + deployed. **Carried action (5th week flagged): ARCHIVE PostHog experiment 374736 + flag 699577** — still being assigned, which is the only reason cosmetic arms + a growing None arm still appear in queries.
+
+**2. tool-signup-cta-v2 (374737) — directional**
+| arm | click/gen% | signups |
+|---|---|---|
+| control | 17.75 (79/445) | 26 |
+| inline-value-prop | 19.70 (80/406) | 27 |
+| sticky-bar | 19.46 (86/442) | 20 |
+
+Fully converged, 12 weeks in. inline retakes a razor-thin lead on both metrics (within noise); control CTR dipped on a big +64-gen jump in its denominator. Cannibalization guardrail cleared at wk10, no breach.
+**Decision:** keep running / RECOMMEND CONCLUDE (null) — ship inline-value-prop as permanent default (never below control on cumulative signups in any read), retire flag. Human call, not auto-killed.
+
+**3. welcome-experiment-a (374738) — assignment health only**
+- assigned_welcome/signups = 92/281 = **32.7% — FAILS ~50% (9th consecutive failing read)**
+- Coverage 66.2% (186/281 fire welcome_assigned; ~34% fire none) — unchanged failure mode
+- Arm split 92/94 = 49.5% welcome-share → randomization is fine
+- welcome_viewed 112 > assigned_welcome 92 (persistent anomaly); skip 42.9% (flat)
+
+**Decision:** UNHEALTHY on coverage — a flag-await/event-fire path bug now unfixed 12 weeks. Keep running, do NOT trust the api_render_completed primary. **Prioritize the coverage debug.**
+
+## Sequenced experiments (374739 / 374740 / 374741)
+**None ready to launch** — all gated on welcome-experiment-a showing healthy ~50% assignment, which continues to fail. verify-copy-v1 (374741) stays deferred regardless (verify surfaces too low-volume). Nothing launched, per instructions.
+
+## Recommended actions (priority order)
+1. **Archive PostHog experiment 374736 + flag 699577** (cleanup, carried 5 weeks) — stops cosmetic-arm/None-arm query noise.
+2. **Debug welcome_assigned coverage** (34% of signups never fire it) — the blocker gating three sequenced experiments and the welcome primary read.
+3. **Conclude tool-signup-cta-v2** — ship inline-value-prop as default, free the post-gen CTA slot (human decision).
+=== done: Wed Aug 26 09:03:49 IST 2026 ===

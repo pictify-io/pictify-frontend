@@ -1,0 +1,194 @@
+{
+  "route": "/tools/og-image-generator",
+  "title": "Free OG Image Generator: Create Open Graph Images in Seconds | Pictify",
+  "canonical": "https://pictify.io/tools/og-image-generator",
+  "metas": {
+    "description": "Pick a template, customize colors and text, and export your OG image in one click. 20+ templates for Twitter, LinkedIn, Facebook. Free, no signup. API available.",
+    "og:description": "Pick a template, customize colors and text, export your OG image. 20+ templates for Twitter, LinkedIn, Facebook. Free, no signup.",
+    "og:image": "https://media.pictify.io/31hxg-1775406864453.png",
+    "og:site_name": "Pictify",
+    "og:title": "Free OG Image Generator: Create Open Graph Images in Seconds | Pictify",
+    "og:type": "website",
+    "og:url": "https://pictify.io/tools/og-image-generator",
+    "robots": "index, follow, max-image-preview:large",
+    "twitter:card": "summary_large_image",
+    "twitter:description": "Create stunning social media cards with our free OG Image Generator. Design custom Open Graph images in seconds.",
+    "twitter:image": "https://media.pictify.io/31hxg-1775406864453.png",
+    "twitter:title": "Free OG Image Generator: Create Open Graph Images in Seconds | Pictify",
+    "twitter:url": "https://pictify.io/tools/og-image-generator"
+  },
+  "jsonLd": [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/",
+          "name": "Home",
+          "position": 1
+        },
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/tools",
+          "name": "Tools",
+          "position": 2
+        },
+        {
+          "@type": "ListItem",
+          "name": "OG Image Generator",
+          "position": 3
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Add the og:image meta tag in your page's <head> section with the absolute URL of your image."
+          },
+          "name": "How do I add an OG image?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The recommended size is 1200×630 pixels (1.91:1 ratio) for optimal display on Facebook, Twitter, and LinkedIn."
+          },
+          "name": "What size should it be?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Use our REST API to generate OG images programmatically. Perfect for blogs, e-commerce, and SaaS platforms."
+          },
+          "name": "Is there an API?"
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "description": "API-first image, document, and video generation. Every row of a spreadsheet or webhook becomes a rendered, personalized certificate, badge, report, or video.",
+      "logo": "https://pictify.io/logo.png",
+      "name": "Pictify",
+      "sameAs": [
+        "https://github.com/pictify-io"
+      ],
+      "url": "https://pictify.io"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "bestRating": "5",
+        "ratingCount": "4192",
+        "ratingValue": "4.9",
+        "worstRating": "1"
+      },
+      "applicationCategory": [
+        "DesignApplication",
+        "SEO Tool"
+      ],
+      "creator": {
+        "@type": "Organization",
+        "logo": "https://pictify.io/logo.png",
+        "name": "Pictify.io",
+        "url": "https://pictify.io"
+      },
+      "description": "Create custom Open Graph images for improved social media engagement and SEO.",
+      "featureList": [
+        "Customizable templates",
+        "Automatic website info extraction",
+        "Color and font customization",
+        "API access",
+        "Social media preview"
+      ],
+      "interactionStatistic": {
+        "@type": "InteractionCounter",
+        "interactionType": "https://schema.org/UseAction",
+        "userInteractionCount": "45897"
+      },
+      "keywords": [
+        "OG image generator",
+        "Open Graph images",
+        "social media images",
+        "SEO",
+        "content marketing"
+      ],
+      "mainEntityOfPage": {
+        "@id": "https://pictify.io/tools/og-image-generator",
+        "@type": "WebPage"
+      },
+      "name": "Pictify OG Image Generator",
+      "offers": {
+        "@type": "Offer",
+        "availability": "https://schema.org/InStock",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "operatingSystem": "Web",
+      "screenshot": {
+        "@type": "ImageObject",
+        "height": "630",
+        "url": "https://media.pictify.io/31hxg-1775406864453.png",
+        "width": "1200"
+      },
+      "softwareHelp": {
+        "@type": "CreativeWork",
+        "name": "OG Image Generator Documentation",
+        "url": "https://docs.pictify.io/api-reference/generation/images"
+      },
+      "softwareVersion": "1.2.0",
+      "url": "https://pictify.io/tools/og-image-generator"
+    }
+  ],
+  "outline": [
+    {
+      "tag": "h1",
+      "text": "OG IMAGE GENERATOR"
+    },
+    {
+      "tag": "h2",
+      "text": "Automate with the API"
+    },
+    {
+      "tag": "h2",
+      "text": "Choose Template"
+    },
+    {
+      "tag": "h3",
+      "text": "What is an OG Image?"
+    },
+    {
+      "tag": "h3",
+      "text": "Why Use This Tool?"
+    },
+    {
+      "tag": "h2",
+      "text": "FAQ"
+    },
+    {
+      "tag": "h2",
+      "text": "Product"
+    },
+    {
+      "tag": "h2",
+      "text": "Developers"
+    },
+    {
+      "tag": "h2",
+      "text": "Integrations"
+    },
+    {
+      "tag": "h2",
+      "text": "Company"
+    }
+  ]
+}
