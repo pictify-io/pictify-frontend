@@ -1,23 +1,30 @@
 <script>
 	import Wordmark from './Wordmark.svelte';
 
+	/*
+	 * Every target here is a page that exists and wears the v2 chrome. The
+	 * previous list pointed at /docs/api, /docs/sdks, /docs/mcp, /status and
+	 * /video, none of which existed (five 404s in the footer of every page),
+	 * and at "Templates", which silently redirected to the tools hub. Docs
+	 * links go to docs.pictify.io directly rather than through a redirect.
+	 */
 	const columns = [
 		{
 			title: 'Product',
 			links: [
 				['HTML to image', '/tools/html-to-image'],
-				['Templates', '/templates'],
-				['Video', '/video'],
+				['Free tools', '/tools'],
+				['Campaigns', '/campaigns/customer-value-updates'],
 				['Pricing', '/pricing']
 			]
 		},
 		{
 			title: 'Developers',
 			links: [
-				['Documentation', '/docs'],
-				['API reference', '/docs/api'],
-				['SDKs', '/docs/sdks'],
-				['MCP server', '/docs/mcp']
+				['Documentation', 'https://docs.pictify.io'],
+				['API reference', 'https://docs.pictify.io/api-reference/overview'],
+				['SDKs', 'https://docs.pictify.io/sdks/nodejs'],
+				['MCP server', 'https://docs.pictify.io/agent-integration/mcp-server']
 			]
 		},
 		{
@@ -33,6 +40,8 @@
 			title: 'Company',
 			links: [
 				['Blog', '/blogs'],
+				['Alternatives', '/alternatives'],
+				['Support', 'mailto:support@pictify.io'],
 				['Terms', '/terms'],
 				['Privacy', '/privacy']
 			]
@@ -81,15 +90,15 @@
 			<p class="font-mono text-[11px] text-[#6B7280] lg:text-xs">© 2026 Pictify</p>
 			<ul class="flex items-center gap-4 lg:gap-[22px]">
 				<li>
-					<a href="/status" class="font-mono text-[11px] text-[#6B7280] hover:text-white lg:text-xs"
+					<a href="https://status.pictify.io" class="font-mono text-[11px] text-[#6B7280] hover:text-white lg:text-xs"
 						>status</a
 					>
 				</li>
 				<li>
 					<a
-						href="https://x.com/pictify_io"
+						href="https://x.com/pictifyio"
 						class="hidden font-mono text-xs text-[#6B7280] hover:text-white lg:block"
-						>x.com/pictify_io</a
+						>x.com/pictifyio</a
 					>
 				</li>
 				<li>

@@ -1,6 +1,6 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
+	import Nav from '$lib/components/landing/Nav.svelte';
+	import Footer from '$lib/components/landing/Footer.svelte';
 	import { integrations, integrationCategories } from '$lib/pseo/config.js';
 	import { brandIcons } from '$lib/config/brandIcons.js';
 

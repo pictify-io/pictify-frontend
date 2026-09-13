@@ -11,8 +11,8 @@
 	 *
 	 * See plan: docs/plans/2026-04-15-002-refactor-tool-scaffold-plan.md
 	 */
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
+	import Nav from '$lib/components/landing/Nav.svelte';
+	import Footer from '$lib/components/landing/Footer.svelte';
 </script>
 
 <section class="w-full min-h-screen bg-brand-bg relative overflow-x-hidden font-['Manrope']">

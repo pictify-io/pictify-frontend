@@ -45,7 +45,7 @@ export function createOrganizationSchema() {
 			width: 512,
 			height: 512
 		},
-		sameAs: ['https://twitter.com/pictifyio', 'https://github.com/pictify']
+		sameAs: ['https://x.com/pictifyio', 'https://github.com/pictify-io']
 	};
 }
 

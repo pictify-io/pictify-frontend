@@ -79,7 +79,7 @@
 		content="One HTML template declares its variables. Anything that can fill them makes a file — PNG, JPG, PDF, GIF or MP4."
 	/>
 	<meta name="twitter:image" content="https://pictify.io/og/v2/home.png" />
-	<meta name="twitter:site" content="@pictify_io" />
+	<meta name="twitter:site" content="@pictifyio" />
 	<link rel="canonical" href="https://pictify.io/" />
 	{@html `<script type="application/ld+json">${JSON.stringify({
 		'@context': 'https://schema.org',

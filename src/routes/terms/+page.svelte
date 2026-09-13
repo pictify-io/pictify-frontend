@@ -1,6 +1,6 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
+	import Nav from '$lib/components/landing/Nav.svelte';
+	import Footer from '$lib/components/landing/Footer.svelte';
 </script>
 
 <section>
@@ -154,7 +154,7 @@
 				</p>
 				<h2 class="text-xl font-semibold mt-8">10. Contact Us</h2>
 				<p class="text-lg mt-2">
-					If you have any questions about these Terms, please contact us at support@airtribe.live
+					If you have any questions about these Terms, please contact us at support@pictify.io
 				</p>
 				<p class="text-lg mt-8">
 					Please review these terms periodically for changes. Your continued use of or access to the
