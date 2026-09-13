@@ -333,13 +333,13 @@
 			</span>
 			<span class="flex items-center gap-2.5">
 				<span class="flex h-5 w-5 flex-shrink-0 items-center justify-center bg-black/[0.07] font-mono text-[10px] text-brand-ink">3</span>
-				<span class="font-sans text-[13px] text-brand-slate">Upload it and every row renders.</span>
+				<span class="font-sans text-[13px] text-brand-slate">Drop it on the CSV tool and every row renders.</span>
 				<a
-					href="/dashboard/workflows/new"
+					href="/tools/csv-to-pdf"
 					on:click={() => analytics.track('home_next_step_clicked', { variant, what: 'upload' })}
 					class="rounded-[4px] border-[1.5px] border-brand-ink px-3.5 py-[5px] font-sans text-xs font-bold text-brand-ink transition-colors hover:bg-brand-ink hover:text-white"
 				>
-					Upload CSV
+					Open CSV to PDF
 				</a>
 			</span>
 			<span class="flex items-center gap-2 pl-[30px] opacity-60">

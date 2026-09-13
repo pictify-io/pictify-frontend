@@ -111,27 +111,27 @@
 		},
 		{
 			q: 'What formats can I download certificates in?',
-			a: 'This free tool generates high-quality PNG images at 1920x1080 resolution. With a free account, the API and workflows also render certificates as PDF (including multi-page), JPG, and WebP.'
+			a: 'This free tool generates high-quality PNG images at 1920x1080 resolution. With a free account, the API also renders certificates as PDF (including multi-page), JPG, and WebP.'
 		},
 		{
 			q: 'Can I bulk generate certificates for events or training programs?',
-			a: 'Yes! Pictify works as a bulk certificate generator for events, training programs, and courses. Upload a CSV in a workflow (one row per attendee) and every row renders its own certificate. Or use the API to batch generate up to 500 certificates per call. Perfect for course completions, event attendance, and employee recognition programs.'
+			a: 'Yes! Pictify works as a bulk certificate generator for events, training programs, and courses. Post a CSV to the batch API (one row per attendee) and every row renders its own certificate, up to 500 certificates per call. Perfect for course completions, event attendance, and employee recognition programs.'
 		},
 		{
 			q: 'Can I generate certificates in bulk automatically?',
-			a: 'Yes, this is what makes Pictify different from other certificate makers. A batch run renders every row of your CSV against the same template in one job, and hands back a CDN link per certificate plus a per-row status you can poll. A webhook fires when the run finishes, so your own system can pick the files up without anyone watching a progress bar.'
+			a: 'Yes, this is what makes Pictify different from other certificate makers. A batch API call renders every row of your CSV against the same template in one job, and hands back a CDN link per certificate plus a per-row status you can poll. A webhook fires when the run finishes, so your own system can pick the files up without anyone watching a progress bar.'
 		},
 		{
 			q: 'Can I generate certificates from Google Sheets?',
-			a: 'Export your Sheet as CSV and upload it to a workflow; columns map to certificate variables in the wizard. Unlike Sheets add-ons such as Autocrat, the merge runs on managed infrastructure (no Apps Script 6-minute timeouts) and delivery never touches your Gmail quota.'
+			a: 'Export your Sheet as CSV and post it to the batch API; columns map to certificate variables by name. Unlike Sheets add-ons such as Autocrat, the merge runs on managed infrastructure (no Apps Script 6-minute timeouts) and delivery never touches your Gmail quota.'
 		},
 		{
 			q: 'Can my LMS or form tool trigger certificates automatically?',
-			a: 'Yes. Every workflow exposes a signed webhook. Point your LMS completion event, Typeform, or a Zapier/Make/n8n flow at it and each payload renders one certificate, with the same per-row status tracking as a CSV run.'
+			a: 'Yes. Every template can be rendered from a signed webhook. Point your LMS completion event, Typeform, or a Zapier/Make/n8n flow at it and each payload renders one certificate, with the same per-row status tracking as a CSV run.'
 		},
 		{
 			q: 'Can I add my company logo?',
-			a: 'Yes. In a workflow, templates are HTML: drop an <img> tag with your logo URL anywhere in the design, or upload it as a brand asset. Because templates are code, there is no limit on layout, fonts, or imagery.'
+			a: 'Yes. Templates are HTML: drop an <img> tag with your logo URL anywhere in the design, or upload it as a brand asset. Because templates are code, there is no limit on layout, fonts, or imagery.'
 		},
 		{
 			q: 'Are the generated certificates printable?',
@@ -216,7 +216,7 @@
 				'@type': 'HowToStep',
 				position: 6,
 				name: 'Download',
-				text: 'Download your certificate, or start a batch run to render them in bulk from a CSV.'
+				text: 'Download your certificate, or batch-render them from a CSV with the API.'
 			}
 		]
 	};
@@ -505,7 +505,7 @@
 			/>
 			<Prose>
 				<p>
-					A Pictify batch run does the whole job: upload the attendee CSV, every row renders its own
+					A Pictify batch call does the whole job: post the attendee CSV, every row renders its own
 					certificate against the same template, and each one comes back as a
 					<strong>CDN link with a per-row status</strong>, with a webhook when the run finishes.
 					Re-run any single row on its own if a value was wrong. That's the difference between a
@@ -596,12 +596,12 @@
 			<LongformSection index="08" id="bulk-run" compact title="Need Three Hundred, Not Just One?">
 				<Prose>
 					<p>
-						Start a workflow run to generate personalized certificates in bulk: one render per row,
-						a CDN link for each, and a webhook when the run finishes. Perfect for events, courses,
-						and training programs.
+						Post a CSV to the batch API to generate personalized certificates in bulk: one render per
+						row, a CDN link for each, and a webhook when the batch finishes. Perfect for events,
+						courses, and training programs.
 					</p>
 				</Prose>
-				<JumpLink href="/dashboard/workflows/new">Start a Run (Free) →</JumpLink>
+				<JumpLink href="/signup">Start Free →</JumpLink>
 			</LongformSection>
 		</LongformPair>
 	</svelte:fragment>

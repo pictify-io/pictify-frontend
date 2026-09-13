@@ -47,8 +47,6 @@
 	// Legacy destinations the new IA hasn't absorbed yet. Plain rows, no icons —
 	// visibly temporary.
 	const MORE = [
-		{ href: '/dashboard/agents', label: 'MCP & agents' },
-		{ href: '/dashboard/workflows', label: 'Workflows' },
 		{ href: '/dashboard/brand-assets', label: 'Brand assets' },
 		{ href: '/dashboard/analytics', label: 'Analytics' },
 		{ href: '/dashboard/activity-logs', label: 'Activity logs' }

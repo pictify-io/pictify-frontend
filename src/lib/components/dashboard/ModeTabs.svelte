@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 
-	export let activeMode = 'render'; // 'render' | 'bulk' (workflow)
+	export let activeMode = 'render'; // 'render'
 	export let uid = '';
 
 	const modes = [
@@ -13,12 +13,6 @@
 			// The studio is the render surface; /render redirects here anyway for
 			// HTML templates, so point straight at it and skip the bounce.
 			href: (uid) => `/template-workspace/html/${uid}`
-		},
-		{
-			id: 'bulk',
-			label: 'Workflow',
-			color: '#ff6b6b',
-			href: (uid) => `/dashboard/workflows/new`
 		}
 	];
 </script>
