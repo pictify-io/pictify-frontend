@@ -155,6 +155,26 @@ const PREFIX_REDIRECTS = [
 	{ prefix: '/template-workspace/pdf', to: '/dashboard/template' }
 ];
 
+/*
+ * HTML IS NEVER CACHED PAST A DEPLOY WINDOW.
+ *
+ * These pages used to ship `public, max-age=<days>`. Cloudflare honoured it at
+ * the edge, and nothing purges the edge on deploy (no token with cache-purge
+ * scope exists in this toolchain), so on 2026-09-14 the integrations pages
+ * kept serving the pre-redesign nav and footer for hours after the fix was
+ * live: the same URL with a query string was fresh, the bare URL was not.
+ *
+ * The config's maxAge/swr now express how long a page may be served STALE
+ * while the edge revalidates in the background; the fresh window is short and
+ * shared. Browsers get five minutes, the edge ten, then a revalidation that
+ * costs one cheap SSR. A deploy is therefore visible everywhere within ten
+ * minutes, no purge required.
+ */
+const EDGE_FRESH_SECONDS = 600;
+const BROWSER_FRESH_SECONDS = 300;
+const edgeCacheControl = (config) =>
+	`public, max-age=${BROWSER_FRESH_SECONDS}, s-maxage=${EDGE_FRESH_SECONDS}, stale-while-revalidate=${Math.max(config.swr || 0, config.maxAge || 0)}`;
+
 /**
  * Handle function - runs for every request
  */
@@ -212,10 +232,7 @@ export async function handle({ event, resolve }) {
 	// Check PSEO cache patterns
 	for (const [pattern, config] of Object.entries(PSEO_CACHE_PATTERNS)) {
 		if (pathname.startsWith(pattern) || pathname.includes(pattern)) {
-			response.headers.set(
-				'Cache-Control',
-				`public, max-age=${config.maxAge}, stale-while-revalidate=${config.swr}`
-			);
+			response.headers.set('Cache-Control', edgeCacheControl(config));
 			return response;
 		}
 	}
@@ -231,7 +248,7 @@ export async function handle({ event, resolve }) {
 		pathname === '/templates' ||
 		pathname === '/blogs'
 	) {
-		response.headers.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+		response.headers.set('Cache-Control', edgeCacheControl({ maxAge: 3600, swr: 86400 }));
 	}
 
 	return response;
