@@ -1,6 +1,18 @@
 <script>
-	import Nav from '$lib/components/landing/Nav.svelte';
-	import Footer from '$lib/components/landing/Footer.svelte';
+	/**
+	 * /solutions — the shelf of use-case guides, on the v2 frame.
+	 *
+	 * Data is Sanity (see +page.js). The heading outline is the live one and
+	 * stays byte-identical: the H1, the pillar guide as its own H2 ("Start
+	 * here"), "Use-case guides", and one H3 per other guide. That is why the
+	 * pillar keeps a section of its own rather than joining the card grid.
+	 */
+	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
+	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
+	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
+	import LinkCardGrid from '$lib/components/tools/v2/longform/LinkCardGrid.svelte';
+	import ToolStamp from '$lib/components/tools/v2/ToolStamp.svelte';
 
 	export let data;
 	$: pillar = data.solutions.find((s) => s.isPillar);
@@ -10,6 +22,25 @@
 	const description =
 		'Guides for turning spreadsheet rows into branded documents: bulk certificates, badges, personalized PDFs and video, rendered one per row over an API.';
 	const canonical = 'https://pictify.io/solutions';
+
+	const crumbs = [{ label: 'SOLUTIONS' }];
+
+	/**
+	 * The format a guide produces, for its stamp. Sanity carries no format
+	 * field, so it is read off the guide's own words: a video guide renders
+	 * MP4, everything else in this cluster is a document.
+	 */
+	function outputsFor(solution) {
+		const text = `${solution.slug} ${solution.keyword || ''}`;
+		return /video/i.test(text) ? ['MP4'] : ['PDF'];
+	}
+
+	$: guideCards = others.map((s) => ({
+		href: `/solutions/${s.slug}`,
+		title: s.breadcrumbLabel,
+		body: s.summary,
+		outputs: outputsFor(s)
+	}));
 </script>
 
 <svelte:head>
@@ -35,104 +66,55 @@
 	<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
 </svelte:head>
 
-<div class="min-h-screen bg-brand-bg">
-	<Nav />
+<ToolPageShell
+	{crumbs}
+	facts="ONE ROW IN · ONE RENDERED FILE OUT · OVER AN API"
+	longform="column"
+	showSignup={false}
+	showRelated={false}
+	showClosing={false}
+>
+	<HeroTitle slot="h1">
+		Data in.<br />
+		<span>Branded documents out.</span>
+	</HeroTitle>
 
-	<main class="max-w-6xl mx-auto px-4 py-20">
-		<nav class="mb-8 flex justify-center">
-			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
-			>
-				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
-				<li class="text-gray-300">/</li>
-				<li class="text-gray-900">Solutions</li>
-			</ol>
-		</nav>
+	<HeroSub slot="hero-sub">
+		Guides for every workflow that turns rows into documents: certificates, personalized PDFs,
+		badges, and video, rendered one per row over an API.
+	</HeroSub>
 
-		<header class="text-center mb-16">
-			<h1 class="text-5xl md:text-6xl font-black text-gray-900 leading-[0.95] mb-6">
-				Data in.<br />
-				<span class="text-brand-danger">Branded documents out.</span>
-			</h1>
-			<p class="text-xl text-gray-700 font-medium max-w-2xl mx-auto">
-				Guides for every workflow that turns rows into documents: certificates, personalized PDFs,
-				badges, and video, rendered one per row over an API.
-			</p>
-		</header>
-
+	<svelte:fragment slot="longform">
 		{#if pillar}
-			<a
-				href="/solutions/{pillar.slug}"
-				class="block mb-12 bg-white border-[3px] border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#ffc480] hover:shadow-[12px_12px_0_0_#ffc480] hover:-translate-y-1 transition-all duration-300 overflow-hidden"
-			>
-				<div class="bg-brand-accent px-6 py-2 border-b-[3px] border-gray-900">
-					<span class="text-xs font-black uppercase tracking-widest text-gray-900">Start here</span>
-				</div>
-				<div class="p-8">
-					<h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-3">
-						{pillar.breadcrumbLabel}
-					</h2>
-					<p class="text-lg text-gray-700 font-medium">{pillar.summary}</p>
-					<div
-						class="mt-4 text-sm font-black uppercase tracking-widest text-gray-500 inline-flex items-center gap-1.5"
+			<LongformSection index="01" id="start-here" first title={pillar.breadcrumbLabel}>
+				<a
+					href="/solutions/{pillar.slug}"
+					class="group flex flex-col gap-4 rounded-tile border-[1.5px] border-brand-ink bg-brand-paper p-6 transition-[transform,box-shadow] duration-150 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[4px_4px_0_0_#000000] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-royal motion-reduce:transition-none sm:flex-row sm:items-center sm:gap-6 lg:p-8"
+				>
+					<ToolStamp outputs={outputsFor(pillar)} />
+					<span class="flex flex-1 flex-col gap-1.5">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-blue">START HERE</span>
+						<span class="font-sans text-lg leading-[27px] text-brand-ink">{pillar.summary}</span>
+					</span>
+					<span
+						class="font-mono text-xs tracking-[0.06em] text-brand-ink group-hover:underline"
+						aria-hidden="true">READ THE GUIDE →</span
 					>
-						Read the guide
-						<svg
-							class="w-3 h-3"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							stroke-width="3"
-							><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg
-						>
-					</div>
-				</div>
-			</a>
+				</a>
+			</LongformSection>
 		{/if}
 
-		<h2 class="text-2xl md:text-3xl font-black uppercase tracking-wider text-gray-400 mb-6">
-			Use-case guides
-		</h2>
-		<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-			{#each others as s, i}
-				{@const colors = [
-					'bg-brand-danger',
-					'bg-data-green',
-					'bg-brand-accent',
-					'bg-data-violet',
-					'bg-[#06b6d4]',
-					'bg-[#ec4899]'
-				]}
-				<a
-					href="/solutions/{s.slug}"
-					class="group bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl hover:shadow-[10px_10px_0_0_#1f2937] hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+		<LongformSection index={pillar ? '02' : '01'} id="guides" first={!pillar} title="Use-case guides">
+			{#if guideCards.length}
+				<LinkCardGrid items={guideCards} columns={3} toolName="solutions_index" />
+			{:else if !pillar}
+				<!-- Sanity returned nothing: say so rather than leave the section blank. -->
+				<p
+					class="border-y border-brand-rule py-4 font-mono text-xs tracking-[0.06em] text-brand-mute"
 				>
-					<div class="{colors[i % colors.length]} h-2 border-b-[3px] border-gray-900" />
-					<div class="p-6">
-						<h3
-							class="font-black text-gray-900 mb-2 text-lg leading-tight group-hover:text-brand-danger transition-colors"
-						>
-							{s.breadcrumbLabel}
-						</h3>
-						<p class="text-sm text-gray-600 leading-relaxed mb-4">{s.summary}</p>
-						<div
-							class="text-xs font-black uppercase tracking-widest text-gray-500 group-hover:text-gray-900 transition-colors inline-flex items-center gap-1.5"
-						>
-							Read the guide
-							<svg
-								class="w-3 h-3 transform group-hover:translate-x-1 transition-transform"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								stroke-width="3"
-								><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg
-							>
-						</div>
-					</div>
-				</a>
-			{/each}
-		</div>
-	</main>
-
-	<Footer />
-</div>
+					GUIDES ARE BEING WRITTEN
+				</p>
+			{/if}
+		</LongformSection>
+	</svelte:fragment>
+</ToolPageShell>

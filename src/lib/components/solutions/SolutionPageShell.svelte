@@ -1,20 +1,21 @@
 <script>
 	/**
-	 * Shell for /solutions/* pages. Wraps the tool scaffold primitives so every
-	 * solution page has identical SEO, breadcrumb, and page-chrome boilerplate —
-	 * the consumer only provides content inside the default slot and an optional
-	 * "faq" slot is replaced by a faqs prop.
+	 * Shell for /solutions/* pages: identical SEO head, breadcrumb and page
+	 * chrome for every guide, on the v2 tool frame.
 	 *
-	 * Keeps tool-scaffold components reusable without duplicating their behavior
-	 * in /solutions/. Positioning, CTAs, and the "Related solutions" block are
-	 * delivered via SolutionClosingCta and a consumer-rendered related list.
+	 * The consumer passes the hero through the `h1`, `hero-sub` and
+	 * `hero-actions` slots, the guide's blocks through the default slot, and the
+	 * closing block through `closing-block`. The FAQ is rendered here from the
+	 * `faqs` prop so the visible answers and the FAQPage JSON-LD come from the
+	 * same array.
 	 *
-	 * See plan: docs/plans/2026-04-15-003-strategy-automated-images-cluster-plan.md
+	 * The tool furniture (signup card, related tool rows, the "this tool, on an
+	 * account" band) is off: a guide sells a workflow, not a tool.
 	 */
-	import ToolPageShell from '$lib/components/tools/scaffold/ToolPageShell.svelte';
-	import ToolBreadcrumb from '$lib/components/tools/scaffold/ToolBreadcrumb.svelte';
+	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
 	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
-	import ToolFaq from '$lib/components/tools/scaffold/ToolFaq.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
+	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
 
 	// SEO — passed through to ToolSeoHead
 	export let title = '';
@@ -25,8 +26,10 @@
 	export let ogImageWidth = 1200;
 	export let ogImageHeight = 630;
 
-	/** The label that appears third in the breadcrumb and in structured data. */
+	/** The label that appears last in the breadcrumb and in structured data. */
 	export let breadcrumbLabel = '';
+	/** Short mono line under the hero copy (the guide's eyebrow). */
+	export let eyebrow = '';
 
 	/** WebApplication JSON-LD payload. If omitted, no WebApplication schema is emitted. */
 	export let webApplicationSchema = null;
@@ -35,12 +38,19 @@
 	export let howToSteps = null;
 	export let howToMeta = null;
 
-	/** Optional FAQs rendered via ToolFaq and also emitted as FAQPage JSON-LD. */
+	/** Optional FAQs rendered as a FaqList and also emitted as FAQPage JSON-LD. */
 	export let faqs = null;
 
-	/** Whether to render the page-level FAQ block in the default place. Consumer can set to false and render their own. */
+	/** Whether to render the page-level FAQ block in the default place. */
 	export let renderFaq = true;
 	export let faqHeading = 'Frequently asked questions';
+	/** Section number shown beside the FAQ heading. */
+	export let faqIndex = '';
+
+	$: crumbs = [
+		{ label: 'SOLUTIONS', href: '/solutions' },
+		{ label: String(breadcrumbLabel || '').toUpperCase() }
+	];
 </script>
 
 <ToolSeoHead
@@ -70,11 +80,29 @@
 	{howToMeta}
 />
 
-<ToolPageShell>
-	<ToolBreadcrumb label={breadcrumbLabel} marginClass="mb-8" parent={{ href: '/solutions', label: 'Solutions' }} />
-	<slot />
-	{#if renderFaq && faqs && faqs.length > 0}
-		<ToolFaq {faqs} heading={faqHeading} />
-	{/if}
-	<slot name="after-faq" />
+<ToolPageShell
+	{crumbs}
+	facts={eyebrow ? String(eyebrow).toUpperCase() : ''}
+	longform="column"
+	showSignup={false}
+	showRelated={false}
+	showClosing={false}
+>
+	<svelte:fragment slot="h1"><slot name="h1" /></svelte:fragment>
+	<svelte:fragment slot="hero-sub"><slot name="hero-sub" /></svelte:fragment>
+	<svelte:fragment slot="hero-actions"><slot name="hero-actions" /></svelte:fragment>
+
+	<svelte:fragment slot="longform">
+		<slot />
+
+		<slot name="closing-block" />
+
+		{#if renderFaq && faqs && faqs.length > 0}
+			<LongformSection index={faqIndex} id="faq" title={faqHeading}>
+				<FaqList {faqs} />
+			</LongformSection>
+		{/if}
+
+		<slot name="after-faq" />
+	</svelte:fragment>
 </ToolPageShell>

@@ -12,6 +12,7 @@
 	 * grids carry.
 	 */
 	import { analytics } from '$lib/telemetry.js';
+	import ToolStamp from '../ToolStamp.svelte';
 
 	/** [{ href, title, body, badge? }] */
 	export let items = [];
@@ -39,7 +40,10 @@
 			on:click={() => track(item.href)}
 			class="group flex items-center gap-4 border border-brand-ink bg-brand-paper p-5 transition-all hover:bg-brand-field"
 		>
-			{#if item.badge}
+			{#if item.outputs?.length}
+				<!-- A format stamp, same as every tool listing: `outputs` wins over `badge`. -->
+				<ToolStamp outputs={item.outputs} />
+			{:else if item.badge}
 				<div
 					class="flex h-12 w-12 flex-shrink-0 items-center justify-center border border-brand-rule bg-brand-ink text-sm font-semibold text-white group-hover:border-black group-hover:bg-brand-paper group-hover:text-brand-ink"
 				>

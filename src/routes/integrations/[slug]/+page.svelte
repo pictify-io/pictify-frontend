@@ -1,11 +1,28 @@
 <script>
+	/**
+	 * /integrations/[slug] — board A62-0 ("Integrations v2 — Zapier"); Make,
+	 * n8n, WordPress and Shopify render from the same template with their own
+	 * entry in $lib/pseo/integrations.js.
+	 *
+	 * Frozen for search: the <head> (title, description, canonical, keywords,
+	 * OG/Twitter, the SoftwareApplication JSON-LD) and the heading outline —
+	 * H1 "{name} + Pictify", H3 "About Integration", H2s "Key Capabilities",
+	 * "Common Use Cases", "Integration Guide", "Ready to build with {name}?",
+	 * and "Related Integrations" only where the live page has it (same-category
+	 * siblings exist). The other pages list the same cards under a mono label
+	 * rather than grow a heading they never had.
+	 */
 	import Nav from '$lib/components/landing/Nav.svelte';
 	import Footer from '$lib/components/landing/Footer.svelte';
+	import PixelCluster from '$lib/components/landing/PixelCluster.svelte';
+	import BrandMark from '$lib/components/landing/BrandMark.svelte';
+	import { HERO_CLUSTER, BASELINE_RUN } from '$lib/components/landing/hero-clusters.js';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { integrations, integrationCategories } from '$lib/pseo/config.js';
-	import { brandIcons } from '$lib/config/brandIcons.js';
+	import { analytics } from '$lib/telemetry.js';
+	import { user } from '../../../store/user.store';
 
 	$: slug = $page.params.slug;
 	$: integration = integrations.find((i) => i.slug === slug);
@@ -13,18 +30,19 @@
 	$: category = integration
 		? integrationCategories.find((c) => c.id === integration.category)
 		: null;
-	$: icon = validIntegration
-		? brandIcons[integration.icon] || brandIcons.default
-		: brandIcons.default;
 	// Redirect if not found
 	$: if (browser && !validIntegration && slug) {
 		goto('/integrations');
 	}
 
-	// Related integrations (same category)
-	$: relatedIntegrations = integration
-		? integrations.filter((i) => i.category === integration.category && i.slug !== slug).slice(0, 3)
-		: [];
+	$: loggedIn = !!$user?.email;
+
+	// Same-category siblings decide whether the live page has the "Related
+	// Integrations" H2; the cards themselves show every other integration.
+	$: hasRelatedHeading = integration
+		? integrations.some((i) => i.category === integration.category && i.slug !== slug)
+		: false;
+	$: otherIntegrations = integration ? integrations.filter((i) => i.slug !== slug).slice(0, 4) : [];
 
 	// SEO
 	$: title = validIntegration
@@ -53,6 +71,53 @@
 				}
 		  }
 		: null;
+
+	/** Short brand name for chips and the docs link ("Make (Integromat)" → "Make"). */
+	$: shortName = integration ? integration.name.replace(/\s*\(.*\)\s*$/, '') : '';
+	$: isNoCode = integration?.category === 'automation';
+	$: steps = integration?.tutorial?.steps || [];
+	$: estimated = integration?.tutorial?.estimatedTime || '';
+	/** "10 minutes" → "10-MINUTE"; anything else is upper-cased as written. */
+	$: setupLabel = estimated
+		? estimated.replace(/^(\d+)\s*minutes?$/i, '$1-MINUTE').toUpperCase()
+		: '';
+	$: facts = [
+		category?.label?.toUpperCase(),
+		isNoCode ? 'NO CODE' : null,
+		setupLabel ? `${setupLabel} SETUP` : null
+	]
+		.filter(Boolean)
+		.join(' · ');
+
+	$: signupHref = `/signup?redirect=${encodeURIComponent(`/integrations/${slug}`)}`;
+
+	/** Trigger tile colour by what kind of event starts the recipe. */
+	const KIND_TILE = {
+		content: 'bg-brand-powder',
+		events: 'bg-brand-rose',
+		data: 'bg-brand-field',
+		commerce: 'bg-brand-sky'
+	};
+
+	/** Category label on the related cards, board wording. */
+	const CARD_LABEL = { automation: 'AUTOMATION', cms: 'PLATFORM', ecommerce: 'PLATFORM' };
+
+	function trackSignup(location) {
+		analytics.track('integration_signup_click', { integration: slug, cta_location: location });
+	}
+
+	let copiedStep = null;
+	async function copyCode(index, code) {
+		try {
+			await navigator.clipboard.writeText(code);
+			copiedStep = index;
+			setTimeout(() => {
+				if (copiedStep === index) copiedStep = null;
+			}, 1500);
+		} catch {
+			// Clipboard blocked (insecure context or permission): the code is still selectable.
+		}
+	}
 </script>
 
 <svelte:head>
@@ -82,495 +147,506 @@
 	{/if}
 </svelte:head>
 
-<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
+<div class="landing-v2 flex min-h-screen w-full flex-col bg-brand-canvas">
 	<Nav />
 
-	<!-- Background Elements -->
-	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
-	/>
-	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
+	{#if validIntegration}
+		<!-- ── Hero (AED-0) ─────────────────────────────────────────────── -->
+		<section class="relative w-full overflow-hidden bg-brand-field">
+			<PixelCluster
+				cells={HERO_CLUSTER}
+				cell={22}
+				origin="e"
+				delay={320}
+				cycle={3}
+				class="right-0 top-6 hidden lg:block"
+			/>
+			<PixelCluster
+				cells={BASELINE_RUN}
+				cell={14}
+				origin="w"
+				delay={520}
+				class="-bottom-3 left-[40%] hidden lg:block"
+			/>
 
-	<main class="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-12 pb-24 relative z-10">
-		{#if validIntegration}
-			<!-- Breadcrumb -->
-			<nav class="mb-12 flex justify-center">
-				<ol
-					class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
+			<div
+				class="relative mx-auto flex w-full max-w-page flex-col gap-3 px-5 pb-14 pt-8 lg:px-10 lg:pb-14 lg:pt-11"
+			>
+				<nav aria-label="Breadcrumb">
+					<ol class="flex flex-wrap items-center gap-2.5 font-mono text-[11px] tracking-[0.06em]">
+						<li><a href="/integrations" class="text-brand-royal hover:underline">INTEGRATIONS</a></li>
+						<li class="text-brand-mute" aria-hidden="true">·</li>
+						<li class="text-brand-ink" aria-current="page">{shortName.toUpperCase()}</li>
+					</ol>
+				</nav>
+
+				<h1
+					class="font-display text-[38px] font-extrabold leading-[1.04] tracking-[-0.02em] text-brand-ink lg:text-[44px] lg:leading-[50px]"
 				>
-					<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
-					<li class="text-gray-300">/</li>
-					<li>
-						<a href="/integrations" class="text-gray-500 hover:text-gray-900 transition-colors"
-							>Integrations</a
-						>
-					</li>
-					<li class="text-gray-300">/</li>
-					<li class="text-gray-900">{integration.name}</li>
-				</ol>
-			</nav>
+					{integration.name} + Pictify
+				</h1>
 
-			<!-- Hero Section -->
-			<div class="relative flex flex-col items-center justify-center text-center mb-20 pt-4">
-				<!-- Animated Icon Pair -->
-				<div class="flex items-center gap-6 mb-10">
-					<!-- Integration Icon -->
-					<div class="relative group">
-						<div
-							class="absolute inset-0 bg-brand-accent rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-brutal-lg"
-						/>
-						<div
-							class="relative w-20 h-20 bg-white border-[3px] border-gray-900 rounded-2xl flex items-center justify-center text-4xl shadow-brutal-lg group-hover:-translate-y-2 transition-transform duration-300"
-							style="color: {icon.color || '#1f2937'}"
-						>
-							{#if icon.type === 'url'}
-								<img loading="lazy" src={icon.url} alt={integration.name} class="w-10 h-10" />
-							{:else if icon.type === 'text'}
-								<span class="text-2xl font-black" style="color: {icon.color}">{icon.text}</span>
-							{:else if icon.type === 'svg'}
-								<svg class="w-10 h-10" fill="currentColor" viewBox={icon.viewBox}>
-									<path d={icon.path} />
-								</svg>
-							{:else if icon.type === 'fa'}
-								<i class="{icon.class} text-5xl" />
+				<p
+					class="max-w-[640px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
+				>
+					{integration.description}
+				</p>
+
+				{#if facts}
+					<p class="mt-1 font-mono text-[11px] tracking-[0.06em] text-brand-ink">{facts}</p>
+				{/if}
+
+				<div class="mt-6 flex flex-col gap-6 lg:flex-row">
+					<!-- About card (AEP-0) -->
+					<div
+						class="flex flex-1 flex-col gap-2 rounded-tile border-[1.5px] border-brand-ink bg-brand-paper px-6 py-5 shadow-[4px_4px_0_0_#000000]"
+					>
+						<h3 class="font-mono text-[11px] uppercase tracking-[0.06em] text-brand-blue">
+							About Integration
+						</h3>
+						<p class="font-sans text-base leading-[25px] text-brand-ink">
+							{integration.longDescription}
+						</p>
+						<div class="flex flex-wrap gap-2.5 pt-1.5">
+							{#if loggedIn}
+								<a
+									href="/dashboard"
+									class="rounded-lg bg-brand-ink px-[18px] py-[11px] font-sans text-sm font-semibold leading-[18px] text-white shadow-[2px_2px_0_0_#FF48B0] transition-opacity hover:opacity-90"
+								>
+									Open dashboard
+								</a>
 							{:else}
-								🔌
+								<a
+									href={signupHref}
+									on:click={() => trackSignup('int_hero')}
+									class="rounded-lg bg-brand-ink px-[18px] py-[11px] font-sans text-sm font-semibold leading-[18px] text-white shadow-[2px_2px_0_0_#FF48B0] transition-opacity hover:opacity-90"
+								>
+									Start on Free
+								</a>
+							{/if}
+							{#if integration.docsUrl}
+								<a
+									href={integration.docsUrl}
+									target="_blank"
+									rel="noopener"
+									class="rounded-lg border-[1.5px] border-brand-ink bg-brand-paper px-[18px] py-[11px] font-sans text-sm font-semibold leading-[18px] text-brand-ink transition-colors hover:bg-brand-subtle"
+								>
+									Read the docs
+								</a>
 							{/if}
 						</div>
 					</div>
 
-					<!-- Connector -->
-					<div class="flex flex-col items-center gap-1">
-						<div class="w-2 h-2 rounded-full bg-gray-900" />
-						<div class="w-2 h-2 rounded-full bg-gray-300" />
-						<div class="w-2 h-2 rounded-full bg-gray-900" />
-					</div>
-
-					<!-- Pictify Icon -->
-					<div class="relative group">
-						<div
-							class="absolute inset-0 bg-brand-accent rounded-2xl -rotate-6 group-hover:-rotate-12 transition-transform duration-300 border-[3px] border-gray-900 shadow-brutal-lg"
-						/>
-						<div
-							class="relative w-20 h-20 bg-gray-900 border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-brutal-accent group-hover:-translate-y-2 transition-transform duration-300"
-						>
-							<svg
-								class="w-10 h-10 text-white"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M13 10V3L4 14h7v7l9-11h-7z"
-								/>
-							</svg>
-						</div>
-					</div>
-				</div>
-
-				<!-- Title -->
-				<h1
-					class="text-5xl sm:text-6xl md:text-7xl font-black text-gray-900 tracking-tighter mb-8 leading-[0.9]"
-				>
-					{integration.name} <br />
-					<span class="text-brand-danger">+ Pictify</span>
-				</h1>
-
-				<!-- Description -->
-				<p class="text-xl text-gray-600 font-bold leading-relaxed max-w-2xl mx-auto mb-8">
-					{integration.description}
-				</p>
-
-				<!-- Category Badge -->
-				<div class="inline-flex">
-					<span
-						class="px-4 py-1 bg-white border-[3px] border-gray-900 rounded-full text-sm font-black uppercase tracking-widest shadow-brutal-lg"
+					<!-- Lockup (AEF-0) -->
+					<div
+						class="flex flex-col items-center justify-center gap-2.5 rounded-tile border-[1.5px] border-brand-ink bg-brand-paper p-5 lg:w-[360px] lg:flex-shrink-0"
 					>
-						{category?.label || 'Integration'}
-					</span>
+						<div class="flex flex-wrap items-center justify-center gap-3.5">
+							<span class="flex items-center gap-2 rounded-lg bg-brand-ink px-3.5 py-2.5">
+								<span class="h-3.5 w-3.5 flex-shrink-0 bg-brand-pink" aria-hidden="true" />
+								<span class="font-display text-base font-bold leading-[22px] text-white">Pictify</span>
+							</span>
+							<span class="font-mono text-xs text-brand-mute" aria-hidden="true">+</span>
+							<span
+								class="flex items-center gap-2 rounded-lg border-[1.5px] border-brand-ink px-3.5 py-2.5"
+							>
+								<BrandMark mark={integration.icon} size={16} />
+								<span class="font-sans text-base font-semibold leading-5 text-brand-ink"
+									>{shortName}</span
+								>
+							</span>
+						</div>
+						<p class="text-center font-sans text-[13px] leading-4 text-brand-slate">
+							Trigger in any app → render in Pictify → use the URL
+						</p>
+					</div>
 				</div>
 			</div>
+		</section>
 
-			<!-- Long Description -->
-			<section class="mb-20">
-				<div
-					class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-brutal-2xl relative overflow-hidden"
-				>
-					<div
-						class="absolute top-0 left-0 w-full h-3 bg-brand-accent border-b-[3px] border-gray-900"
-					/>
-					<h3 class="text-2xl font-black text-gray-900 mb-6">About Integration</h3>
-					<p class="text-xl text-gray-600 font-medium leading-relaxed">
-						{integration.longDescription}
-					</p>
-				</div>
-			</section>
-
-			<!-- Features Grid -->
-			{#if integration.features?.length}
-				<section class="mb-20">
-					<div class="flex items-center gap-4 mb-10">
-						<h2 class="text-3xl font-black uppercase tracking-tighter text-gray-900">
-							Key Capabilities
-						</h2>
-						<div class="flex-1 h-[3px] bg-gray-900 border-b-[3px] border-dashed border-gray-300" />
-					</div>
-
-					<div class="grid sm:grid-cols-2 gap-6">
-						{#each integration.features as feature}
-							<div
-								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-brutal-xl hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-lg transition-all"
+		<main class="w-full">
+			<!-- ── 01 Capabilities + 02 Use cases (AHB-0) ──────────────────── -->
+			<section
+				class="mx-auto flex w-full max-w-page flex-col gap-10 px-5 pt-14 lg:px-10 lg:pt-16 min-[1100px]:flex-row min-[1100px]:items-start"
+			>
+				{#if integration.features?.length}
+					<div class="flex flex-col gap-4 min-[1100px]:w-[360px] min-[1100px]:flex-shrink-0">
+						<div class="flex items-baseline gap-3">
+							<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">01</span>
+							<h2
+								class="font-display text-[26px] font-bold leading-8 tracking-[-0.02em] text-brand-ink lg:text-[28px] lg:leading-9"
 							>
-								<div class="flex items-start gap-4">
-									<div
-										class="w-10 h-10 bg-data-green border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]"
-									>
-										<svg
-											class="w-5 h-5 text-gray-900"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="3"
-												d="M5 13l4 4L19 7"
-											/>
-										</svg>
-									</div>
-									<p class="text-gray-800 font-bold text-lg pt-1">{feature}</p>
-								</div>
-							</div>
-						{/each}
+								Key Capabilities
+							</h2>
+						</div>
+						<ul class="flex flex-col">
+							{#each integration.features as feature, i (feature)}
+								<li
+									class="flex gap-3 border-t border-brand-rule py-3 {i ===
+									integration.features.length - 1
+										? 'border-b'
+										: ''}"
+								>
+									<span class="mt-2 h-2 w-2 flex-shrink-0 bg-brand-proof" aria-hidden="true" />
+									<span class="font-sans text-base leading-6 text-brand-ink">{feature}</span>
+								</li>
+							{/each}
+						</ul>
 					</div>
-				</section>
-			{/if}
+				{/if}
 
-			<!-- Use Cases -->
-			{#if integration.useCases?.length}
-				<section class="mb-20">
-					<div
-						class="bg-brand-accent border-[3px] border-gray-900 rounded-2xl p-1 shadow-brutal-2xl"
-					>
-						<div class="bg-brand-bg rounded-[20px] p-8 md:p-12 border border-[#b45309]">
-							<h2 class="text-3xl font-black uppercase tracking-tighter text-gray-900 mb-8">
+				{#if integration.recipes?.length || integration.useCases?.length}
+					<div class="flex min-w-0 flex-1 flex-col gap-4">
+						<div class="flex items-baseline gap-3">
+							<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">02</span>
+							<h2
+								class="font-display text-[26px] font-bold leading-8 tracking-[-0.02em] text-brand-ink lg:text-[28px] lg:leading-9"
+							>
 								Common Use Cases
 							</h2>
-							<div class="grid gap-6">
-								{#each integration.useCases as useCase}
-									<div class="flex items-start gap-4">
-										<div
-											class="w-8 h-8 rounded-full bg-brand-accent border-[3px] border-gray-900 flex items-center justify-center flex-shrink-0 font-black text-xs"
+						</div>
+
+						{#if integration.recipes?.length}
+							<ul
+								class="flex flex-col overflow-hidden rounded-tile border-[1.5px] border-brand-ink bg-brand-paper"
+							>
+								{#each integration.recipes as recipe, i (recipe.trigger)}
+									<li
+										class="flex flex-wrap items-center gap-x-3.5 gap-y-3 px-5 py-4 {i ===
+										integration.recipes.length - 1
+											? ''
+											: 'border-b border-brand-rule'}"
+									>
+										<span class="flex w-full items-center gap-2 sm:w-[200px] sm:flex-shrink-0">
+											<span
+												class="h-7 w-7 flex-shrink-0 rounded-md border-[1.5px] border-brand-ink {KIND_TILE[
+													recipe.kind
+												] || 'bg-brand-subtle'}"
+												aria-hidden="true"
+											/>
+											<span class="font-sans text-sm leading-[18px] text-brand-ink">{recipe.trigger}</span>
+										</span>
+										<span class="hidden font-mono text-xs text-brand-mute sm:inline" aria-hidden="true"
+											>→</span
 										>
-											<svg
-												class="w-4 h-4 text-gray-900"
-												fill="none"
-												stroke="currentColor"
-												viewBox="0 0 24 24"
-												><path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="3"
-													d="M14 5l7 7m0 0l-7 7m7-7H3"
-												/></svg
+										<span class="flex w-full items-center gap-2 sm:w-[200px] sm:flex-shrink-0">
+											<span
+												class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-brand-ink"
+												aria-hidden="true"
 											>
-										</div>
-										<p class="text-gray-900 font-bold text-xl">{useCase}</p>
-									</div>
+												<span class="h-2.5 w-2.5 bg-brand-pink" />
+											</span>
+											<span class="font-sans text-sm font-medium leading-[18px] text-brand-ink"
+												>{recipe.render}</span
+											>
+										</span>
+										<span class="hidden font-mono text-xs text-brand-mute sm:inline" aria-hidden="true"
+											>→</span
+										>
+										<span class="min-w-[160px] flex-1 font-sans text-sm leading-[18px] text-brand-slate"
+											>{recipe.use}</span
+										>
+										<a
+											href="/tools"
+											class="rounded-full border border-brand-ink px-2.5 py-[5px] font-mono text-[10px] leading-3 tracking-[0.06em] text-brand-ink transition-colors hover:bg-brand-field"
+										>
+											USE TEMPLATE
+										</a>
+									</li>
 								{/each}
-							</div>
+							</ul>
+						{:else}
+							<ul class="flex flex-col">
+								{#each integration.useCases as useCase (useCase)}
+									<li class="flex gap-3 border-t border-brand-rule py-3">
+										<span class="mt-2 h-2 w-2 flex-shrink-0 bg-brand-blue" aria-hidden="true" />
+										<span class="font-sans text-base leading-6 text-brand-ink">{useCase}</span>
+									</li>
+								{/each}
+							</ul>
+						{/if}
+					</div>
+				{/if}
+			</section>
+
+			<!-- ── 03 Integration Guide (AJ2-0) ─────────────────────────────── -->
+			{#if integration.tutorial}
+				<section id="tutorial" class="mx-auto flex w-full max-w-page flex-col gap-6 px-5 pt-14 lg:px-10 lg:pt-16">
+					<div class="flex flex-wrap items-end justify-between gap-3">
+						<div class="flex items-baseline gap-3">
+							<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">03</span>
+							<h2
+								class="font-display text-[26px] font-bold leading-8 tracking-[-0.02em] text-brand-ink lg:text-[28px] lg:leading-9"
+							>
+								Integration Guide
+							</h2>
+						</div>
+						<div class="flex gap-2">
+							{#if estimated}
+								<span
+									class="rounded-full border border-brand-ink bg-brand-field px-2.5 py-[5px] font-mono text-[11px] leading-[14px] tracking-[0.06em] text-brand-ink"
+								>
+									ABOUT {estimated.toUpperCase()}
+								</span>
+							{/if}
+							<span
+								class="rounded-full border border-brand-ink bg-brand-paper px-2.5 py-[5px] font-mono text-[11px] leading-[14px] tracking-[0.06em] text-brand-ink"
+							>
+								{steps.length} STEPS
+							</span>
 						</div>
 					</div>
-				</section>
-			{/if}
 
-			<!-- Tutorial Section -->
-			{#if integration.tutorial}
-				<section class="mb-20 relative" id="tutorial">
-					<div class="absolute inset-0 bg-gray-100 -skew-y-2 scale-x-125 -z-10 opacity-50" />
-
-					<!-- Tutorial Header -->
-					<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
-						<h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter text-gray-900">
-							Integration Guide
-						</h2>
-						{#if integration.tutorial.estimatedTime}
-							<div
-								class="inline-flex items-center gap-2 px-6 py-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg"
-							>
-								<svg
-									class="w-5 h-5 text-gray-900"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
+					<div class="flex flex-col gap-10 min-[1000px]:flex-row min-[1000px]:items-start">
+						<!-- Steps (AJD-0) -->
+						<ol
+							class="flex min-w-0 flex-1 flex-col overflow-hidden rounded-tile border-[1.5px] border-brand-ink bg-brand-paper"
+						>
+							{#each steps as step, i (step.title)}
+								<li
+									class="flex gap-4 px-5 py-5 lg:gap-5 lg:px-6 {i === steps.length - 1
+										? ''
+										: 'border-b border-brand-rule'}"
 								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-									/>
-								</svg>
-								<span class="text-base font-black text-gray-900"
-									>{integration.tutorial.estimatedTime}</span
-								>
-							</div>
-						{/if}
-					</div>
-
-					<!-- Tutorial Card -->
-					<div class="space-y-12">
-						<!-- Prerequisites -->
-						{#if integration.tutorial.prerequisites?.length}
-							<div
-								class="bg-[#e0f7fa] border-[3px] border-gray-900 rounded-2xl p-8 shadow-brutal-xl"
-							>
-								<h4
-									class="text-lg font-black uppercase tracking-wide text-cyan-900 mb-4 bg-cyan-200 inline-block px-2 py-1 rounded border-2 border-cyan-800"
-								>
-									Prerequisites
-								</h4>
-								<ul class="space-y-3">
-									{#each integration.tutorial.prerequisites as prereq}
-										<li class="flex items-start gap-3">
-											<div
-												class="w-6 h-6 bg-white border-[2px] border-gray-900 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
-											>
-												<svg
-													class="w-4 h-4 text-gray-900"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="3"
-														d="M5 13l4 4L19 7"
-													/>
-												</svg>
-											</div>
-											<span class="text-gray-900 font-bold text-lg">{prereq}</span>
-										</li>
-									{/each}
-								</ul>
-							</div>
-						{/if}
-
-						{#each integration.tutorial.steps as step, i}
-							<div
-								class="bg-white border-[3px] border-gray-900 rounded-2xl overflow-hidden shadow-brutal-2xl"
-							>
-								<!-- Step Header -->
-								<div
-									class="border-b-[3px] border-gray-900 bg-gray-50 p-6 sm:p-8 flex items-center gap-6"
-								>
-									<div
-										class="w-12 h-12 bg-brand-danger border-[3px] border-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 shadow-brutal-sm"
+									<span
+										class="flex h-8 w-8 flex-shrink-0 items-center justify-center bg-brand-ink font-mono text-[13px] leading-4 text-brand-field"
+										aria-hidden="true">{i + 1}</span
 									>
-										<span class="text-white font-black text-xl">{i + 1}</span>
-									</div>
-									<h4 class="text-2xl font-black text-gray-900">{step.title}</h4>
-								</div>
+									<div class="flex min-w-0 flex-1 flex-col gap-1.5">
+										<h4 class="font-sans text-[17px] font-semibold leading-[22px] text-brand-ink">
+											{step.title}
+										</h4>
+										<p class="font-sans text-[15px] leading-[23px] text-brand-slate">
+											{step.description}
+										</p>
 
-								<div class="p-6 sm:p-8">
-									<p class="text-gray-600 font-medium text-lg leading-relaxed mb-6">
-										{step.description}
-									</p>
-
-									<!-- Code Block -->
-									{#if step.code}
-										<div class="mb-6">
-											<div
-												class="bg-gray-900 rounded-xl overflow-hidden border-[3px] border-gray-900"
-											>
+										{#if step.code}
+											<div class="mt-1.5 flex flex-col overflow-hidden rounded-lg bg-brand-press">
 												<div
-													class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700"
+													class="flex items-center justify-between border-b border-brand-slate px-3.5 py-2"
 												>
-													<span class="text-xs font-bold text-gray-400 uppercase tracking-wide"
-														>Code</span
+													<span
+														class="font-mono text-[11px] leading-[14px] tracking-[0.06em] text-brand-press-text"
+														>CODE</span
 													>
 													<button
-														class="text-xs font-bold text-gray-400 hover:text-white transition-colors px-2 py-1 rounded hover:bg-gray-700"
-														on:click={() => navigator.clipboard.writeText(step.code)}
+														type="button"
+														on:click={() => copyCode(i, step.code)}
+														class="font-mono text-[11px] leading-[14px] tracking-[0.06em] text-brand-field hover:underline"
 													>
-														Copy
+														{copiedStep === i ? 'COPIED' : 'COPY'}
 													</button>
 												</div>
-												<pre class="p-4 overflow-x-auto text-sm"><code
-														class="text-gray-300 font-mono whitespace-pre">{step.code}</code
+												<pre class="overflow-x-auto p-3.5"><code
+														class="whitespace-pre font-mono text-xs leading-[19px] text-brand-press-text"
+														>{step.code}</code
 													></pre>
 											</div>
-										</div>
-									{/if}
+										{/if}
 
-									<!-- Tip -->
-									{#if step.tip}
-										<div
-											class="flex items-start gap-4 p-4 bg-brand-accent/20 border-[2px] border-brand-accent rounded-xl"
-										>
-											<div
-												class="w-8 h-8 bg-brand-accent border-[2px] border-gray-900 rounded-full flex items-center justify-center flex-shrink-0"
+										{#if step.tip}
+											<p
+												class="mt-1.5 flex gap-2 border-l-[3px] border-brand-pink bg-brand-rose px-3 py-2"
 											>
-												<span class="text-base font-black text-gray-900">!</span>
-											</div>
-											<p class="text-gray-800 font-bold text-base pt-0.5">{step.tip}</p>
-										</div>
-									{/if}
-								</div>
-							</div>
-						{/each}
-					</div>
-				</section>
-			{/if}
+												<span
+													class="font-mono text-[11px] leading-[19px] tracking-[0.06em] text-brand-ink"
+													>TIP</span
+												>
+												<span class="font-sans text-[13px] leading-[19px] text-brand-ink">{step.tip}</span>
+											</p>
+										{/if}
+									</div>
+								</li>
+							{/each}
+						</ol>
 
-			<!-- Install Command (for SDKs) -->
-			{#if integration.installCommand}
-				<section class="mb-20">
-					<div
-						class="bg-gray-900 rounded-2xl p-8 md:p-12 text-center border-[4px] border-gray-900 shadow-[8px_8px_0_0_#4ade80]"
-					>
-						<h2 class="text-3xl font-black uppercase tracking-tight text-white mb-8">
-							Fast Install
-						</h2>
-						<div
-							class="inline-flex items-center gap-4 bg-black border border-gray-700 rounded-xl p-6 font-mono text-lg text-data-green max-w-2xl mx-auto shadow-2xl"
+						<!-- Guide rail (AKN-0) -->
+						<aside
+							class="flex flex-col gap-4 min-[1000px]:sticky min-[1000px]:top-24 min-[1000px]:w-[320px] min-[1000px]:flex-shrink-0"
 						>
-							<span class="text-brand-danger">$</span>
-							{integration.installCommand}
-							<button
-								class="ml-4 p-2 hover:bg-white/10 rounded transition-colors text-gray-400 hover:text-white"
-								on:click={() => navigator.clipboard.writeText(integration.installCommand)}
-							>
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-									/></svg
+							{#if integration.tutorial.prerequisites?.length}
+								<div
+									class="flex flex-col gap-2.5 rounded-tile border-[1.5px] border-brand-ink bg-brand-paper p-5"
 								>
-							</button>
-						</div>
+									<p class="font-mono text-[11px] leading-[14px] tracking-[0.06em] text-brand-mute">
+										BEFORE YOU START
+									</p>
+									<ul class="flex flex-col gap-2.5">
+										{#each integration.tutorial.prerequisites as prereq (prereq)}
+											<li class="flex gap-2">
+												<span
+													class="mt-1.5 h-2 w-2 flex-shrink-0 border-[1.5px] border-brand-ink"
+													aria-hidden="true"
+												/>
+												<span class="font-sans text-sm leading-5 text-brand-ink">{prereq}</span>
+											</li>
+										{/each}
+									</ul>
+								</div>
+							{/if}
+
+							{#if integration.tutorial.troubleshooting?.length}
+								<div
+									class="flex flex-col gap-2.5 rounded-tile border-[1.5px] border-brand-ink bg-brand-paper p-5"
+								>
+									<p class="font-mono text-[11px] leading-[14px] tracking-[0.06em] text-brand-mute">
+										IF SOMETHING BREAKS
+									</p>
+									{#each integration.tutorial.troubleshooting as item (item.issue)}
+										<div class="flex flex-col gap-0.5">
+											<p class="font-mono text-xs leading-4 text-brand-ink">{item.issue}</p>
+											<p class="font-sans text-[13px] leading-[19px] text-brand-slate">{item.solution}</p>
+										</div>
+									{/each}
+								</div>
+							{/if}
+
+							<div
+								class="flex flex-col gap-2.5 rounded-tile bg-brand-ink p-5 shadow-[4px_4px_0_0_#0078BF]"
+							>
+								<p
+									class="font-display text-xl font-bold leading-[26px] tracking-[-0.02em] text-white"
+								>
+									{loggedIn ? 'Your key is on the dashboard.' : 'Skip step one.'}
+								</p>
+								<p class="font-sans text-sm leading-5 text-brand-press-text">
+									{#if loggedIn}
+										Copy it from Settings → API Keys and paste it into {shortName}.
+									{:else}
+										Sign up and your API key is waiting on the dashboard. 50 renders a month, no card.
+									{/if}
+								</p>
+								{#if loggedIn}
+									<a
+										href="/dashboard"
+										class="flex justify-center rounded-lg bg-brand-field p-[11px] font-sans text-sm font-semibold leading-[18px] text-brand-ink transition-opacity hover:opacity-90"
+									>
+										Open dashboard
+									</a>
+								{:else}
+									<a
+										href={signupHref}
+										on:click={() => trackSignup('guide_rail')}
+										class="flex justify-center rounded-lg bg-brand-field p-[11px] font-sans text-sm font-semibold leading-[18px] text-brand-ink transition-opacity hover:opacity-90"
+									>
+										Get your API key
+									</a>
+								{/if}
+							</div>
+						</aside>
 					</div>
 				</section>
 			{/if}
 
-			<!-- CTA Section -->
-			<section
-				class="mb-20 bg-gray-900 border-[4px] border-gray-900 rounded-2xl p-10 md:p-16 text-center shadow-[12px_12px_0_0_#ff6b6b] relative overflow-hidden"
-			>
-				<!-- Abstract Shapes -->
+			<!-- ── Closing band (A7W-0) ──────────────────────────────────────── -->
+			<section class="mt-16 w-full bg-brand-ink px-5 py-14 lg:mt-20 lg:px-10 lg:py-[72px]">
 				<div
-					class="absolute top-0 left-0 w-32 h-32 bg-brand-danger rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"
-				/>
-				<div
-					class="absolute bottom-0 right-0 w-32 h-32 bg-data-green rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"
-				/>
+					class="mx-auto flex w-full max-w-page flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-20"
+				>
+					<div class="flex flex-col gap-3 lg:max-w-[720px]">
+						<p class="font-mono text-xs tracking-[0.06em] text-brand-field">
+							{isNoCode ? 'NO CODE REQUIRED' : 'ONE API KEY'}
+						</p>
+						<h2
+							class="font-display text-[32px] font-bold leading-[1.08] tracking-[-0.02em] text-white lg:text-[44px] lg:leading-[50px]"
+						>
+							Ready to build with {integration.name}?
+						</h2>
+						<p class="font-sans text-base leading-[25px] text-brand-press-text lg:text-lg lg:leading-[27px]">
+							Grab a free API key, pick a template, and your first render comes back{estimated
+								? ` in about ${estimated}`
+								: ''}.
+						</p>
+					</div>
 
-				<div class="relative z-10">
-					<h2 class="text-4xl md:text-5xl font-black text-white mb-6 tracking-tight">
-						Ready to build with {integration.name}?
-					</h2>
-					<p class="text-gray-400 font-bold text-xl mb-10 max-w-xl mx-auto leading-relaxed">
-						Get your API key in seconds and start generating images programmatically.
-					</p>
-					<div class="flex flex-wrap justify-center gap-6">
+					<div class="flex flex-col items-start gap-2.5 lg:items-end">
+						<a
+							href={loggedIn ? '/dashboard' : signupHref}
+							on:click={() => !loggedIn && trackSignup('int_band')}
+							class="rounded-lg bg-brand-field px-7 py-4 font-sans text-base font-semibold leading-5 text-brand-ink shadow-[3px_3px_0_0_#FF48B0] transition-opacity hover:opacity-90"
+						>
+							{loggedIn ? 'Open dashboard' : 'Start on Free'}
+						</a>
 						{#if integration.docsUrl}
 							<a
 								href={integration.docsUrl}
 								target="_blank"
 								rel="noopener"
-								class="px-8 py-4 bg-white text-gray-900 border-[3px] border-white font-black uppercase tracking-wide hover:bg-brand-accent hover:-translate-y-1 transition-all rounded-xl shadow-[4px_4px_0_0_rgba(255,255,255,0.2)]"
+								class="font-mono text-[11px] leading-[14px] tracking-[0.06em] text-brand-press-text hover:underline"
 							>
-								View Documentation
+								OR OPEN THE {shortName.toUpperCase()} DOCS →
 							</a>
 						{/if}
-						<a
-							href="/signup"
-							class="px-8 py-4 bg-brand-danger text-white border-[3px] border-brand-danger font-black uppercase tracking-wide hover:bg-data-red hover:-translate-y-1 transition-all rounded-xl shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]"
-						>
-							Start For Free
-						</a>
 					</div>
 				</div>
 			</section>
 
-			<!-- Related Integrations -->
-			{#if relatedIntegrations.length > 0}
-				<section>
-					<div class="flex items-center gap-4 mb-8">
-						<h2 class="text-xl font-black uppercase tracking-wide text-gray-600">
-							Related Integrations
-						</h2>
-						<div class="flex-1 h-[2px] bg-gray-200" />
-					</div>
-					<div class="grid sm:grid-cols-3 gap-6">
-						{#each relatedIntegrations as related}
-							{@const relatedIcon = brandIcons[related.icon] || brandIcons.default}
-							<a
-								href="/integrations/{related.slug}"
-								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-brand-accent transition-all group"
+			<!-- ── Related integrations (A7B-0) ──────────────────────────────── -->
+			{#if otherIntegrations.length}
+				<section class="mx-auto flex w-full max-w-page flex-col gap-4 px-5 pb-20 pt-14 lg:px-10 lg:pt-16">
+					<div class="flex items-baseline justify-between gap-4">
+						{#if hasRelatedHeading}
+							<h2
+								class="font-display text-[22px] font-bold leading-7 tracking-[-0.01em] text-brand-ink"
 							>
-								<div class="flex items-center gap-4">
-									<div
-										class="w-12 h-12 bg-gray-100 group-hover:bg-white border-[2px] border-gray-900 rounded-xl flex items-center justify-center text-2xl transition-colors"
-										style="color: {relatedIcon.color || '#1f2937'}"
+								Related Integrations
+							</h2>
+						{:else}
+							<p class="font-mono text-xs tracking-[0.06em] text-brand-mute">OTHER INTEGRATIONS</p>
+						{/if}
+						<a
+							href="/integrations"
+							class="font-mono text-xs tracking-[0.06em] text-brand-blue hover:underline"
+						>
+							ALL INTEGRATIONS →
+						</a>
+					</div>
+
+					<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 min-[1100px]:grid-cols-4">
+						{#each otherIntegrations as other (other.slug)}
+							<a
+								href="/integrations/{other.slug}"
+								class="group flex flex-col gap-1.5 rounded-tile border-[1.5px] border-brand-ink bg-brand-paper px-5 py-[18px] transition-[transform,box-shadow] duration-150 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[4px_4px_0_0_#000000] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-royal motion-reduce:transition-none"
+							>
+								<span class="flex items-center gap-2">
+									<BrandMark mark={other.icon} size={14} />
+									<span class="font-mono text-[11px] leading-[14px] tracking-[0.06em] text-brand-mute"
+										>{CARD_LABEL[other.category] || 'INTEGRATION'}</span
 									>
-										{#if relatedIcon.type === 'url'}
-											<img loading="lazy" src={relatedIcon.url} alt={related.name} class="w-6 h-6" />
-										{:else if relatedIcon.type === 'text'}
-											<span class="text-sm font-black" style="color: {relatedIcon.color}"
-												>{relatedIcon.text}</span
-											>
-										{:else if relatedIcon.type === 'svg'}
-											<svg class="w-6 h-6" fill="currentColor" viewBox={relatedIcon.viewBox}>
-												<path d={relatedIcon.path} />
-											</svg>
-										{:else if relatedIcon.type === 'fa'}
-											<i class="{relatedIcon.class} text-2xl" />
-										{:else}
-											🔌
-										{/if}
-									</div>
-									<span class="font-black text-gray-900 text-lg">{related.name}</span>
-								</div>
+								</span>
+								<span
+									class="font-sans text-[17px] font-semibold leading-[22px] text-brand-ink group-hover:underline"
+									>{other.name}</span
+								>
+								<span class="font-sans text-sm leading-5 text-brand-slate">{other.description}</span>
 							</a>
 						{/each}
 					</div>
 				</section>
 			{/if}
-		{:else}
-			<!-- Not Found State -->
-			<div
-				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
-			>
-				<div
-					class="w-32 h-32 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-6xl font-black text-white shadow-brutal-2xl"
+		</main>
+	{:else}
+		<!-- Not found state -->
+		<main class="flex flex-1 items-center justify-center px-5 py-24">
+			<div class="flex max-w-md flex-col items-center gap-6 text-center">
+				<p class="font-mono text-xs tracking-[0.06em] text-brand-mute">404 · INTEGRATIONS</p>
+				<h1
+					class="font-display text-[38px] font-extrabold leading-[1.04] tracking-[-0.02em] text-brand-ink lg:text-[52px] lg:leading-[56px]"
 				>
-					?
-				</div>
-				<h1 class="text-5xl md:text-7xl font-black uppercase tracking-tighter text-gray-900">
 					Integration not found
 				</h1>
-				<p class="text-xl text-gray-500 font-bold max-w-md">
+				<p class="font-sans text-base leading-[25px] text-brand-slate">
 					We couldn't find the integration you're looking for.
 				</p>
 				<a
 					href="/integrations"
-					class="px-10 py-5 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="rounded-lg bg-brand-ink px-6 py-3.5 font-sans text-[15px] font-semibold text-white transition-opacity hover:opacity-90"
 				>
 					Browse Integrations
 				</a>
 			</div>
-		{/if}
-	</main>
+		</main>
+	{/if}
 
 	<Footer />
-</section>
+</div>

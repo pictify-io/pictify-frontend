@@ -1,4 +1,18 @@
 <script>
+	/**
+	 * /r/[id] — someone opened a link to one render.
+	 *
+	 * The render is the picture: a proof-sheet frame on the canvas ground at the
+	 * render's own aspect (max 1200 wide), a mono ledger under it, the actions,
+	 * then the embed codes beside the context card (or the creator's analytics).
+	 * No decoration clusters.
+	 *
+	 * Behaviour is the live page's, untouched: getShareResult, the embed
+	 * snippets, copy link, downloadAsset() and its
+	 * /public/results/:uid/download conversion call, the creator analytics
+	 * fetch, the source-aware CTA copy, and the headings (H1 title, H2 "Result
+	 * not found" / the banner headline).
+	 */
 	import Nav from '$lib/components/landing/Nav.svelte';
 	import Footer from '$lib/components/landing/Footer.svelte';
 	import { onMount } from 'svelte';
@@ -70,6 +84,13 @@
 				bbcode: `[img]${result.assetUrl}[/img]`
 		  }
 		: {};
+
+	const embedTabs = [
+		{ key: 'img', label: 'IMG TAG' },
+		{ key: 'markdown', label: 'MARKDOWN' },
+		{ key: 'html', label: 'HTML' },
+		{ key: 'bbcode', label: 'BBCODE' }
+	];
 
 	// Source-aware CTA config
 	$: ctaConfig = getCtaConfig(result);
@@ -244,18 +265,35 @@
 		}
 	}
 
-	// Simple syntax highlighter for embed snippets
+	// Simple syntax highlighter for embed snippets (colours are v2 tokens on the press ground).
+	// The inserted spans quote their class with ' not ": the attribute-value pass matches
+	// "…", and double quotes here were being wrapped too, printing `text-brand-sky">` into
+	// the code box.
 	function highlightSnippet(code) {
 		if (!code) return '';
 		return code
 			.replace(/&/g, '&amp;')
 			.replace(/</g, '&lt;')
 			.replace(/>/g, '&gt;')
-			.replace(/(src|alt|width|height|style|loading)=/g, '<span class="text-brand-accent">$1</span>=')
-			.replace(/"([^"]*)"/g, '"<span class="text-data-green">$1</span>"')
-			.replace(/(&lt;\/?)([\w-]+)/g, '$1<span class="text-brand-danger">$2</span>')
-			.replace(/(\[\/?\w+\])/g, '<span class="text-brand-danger">$1</span>');
+			.replace(/(src|alt|width|height|style|loading)=/g, "<span class='text-brand-sky'>$1</span>=")
+			.replace(/"([^"]*)"/g, "\"<span class='text-brand-field'>$1</span>\"")
+			.replace(/(&lt;\/?)([\w-]+)/g, "$1<span class='text-brand-pink'>$2</span>")
+			.replace(/(\[\/?\w+\])/g, "<span class='text-brand-pink'>$1</span>");
 	}
+
+	$: ledger = result
+		? [
+				['FORMAT', (result.format || 'png').toUpperCase()],
+				['SIZE', result.width && result.height ? `${result.width} × ${result.height}` : null],
+				['CREATED', formatDate(result.createdAt).toUpperCase()],
+				['SOURCE', result.source ? formatSource(result.source).toUpperCase() : null],
+				template?.name ? ['FROM TEMPLATE', `“${template.name}”`] : null,
+				[
+					'VIEWS',
+					(analytics?.totalHits ? analytics.totalHits : result.viewCount || 0).toLocaleString('en-US')
+				]
+		  ].filter((row) => row && row[1])
+		: [];
 
 	onMount(() => {
 		fetchResult();
@@ -321,644 +359,366 @@
 	{/if}
 </svelte:head>
 
-<div class="bg-brand-bg min-h-screen flex flex-col relative overflow-hidden font-sans">
-	<!-- Background Elements -->
-	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
-	/>
-	<div
-		class="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
-	<div
-		class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
-	/>
-
+<div class="landing-v2 flex min-h-screen w-full flex-col bg-brand-canvas">
 	<Nav />
 
-	<main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-20 relative z-10">
+	<main class="mx-auto flex w-full max-w-page flex-1 flex-col px-5 pb-20 pt-10 lg:px-10 lg:pt-14">
 		{#if loading}
-			<!-- Loading state -->
-			<div class="flex flex-col items-center justify-center min-h-[400px]">
-				<div
-					class="w-16 h-16 border-[4px] border-gray-900 border-t-brand-danger rounded-full animate-spin"
-				/>
-				<p class="mt-6 text-xl font-black text-gray-900 uppercase tracking-widest animate-pulse">
-					Loading Asset...
-				</p>
+			<div class="flex min-h-[420px] flex-col items-center justify-center gap-4" aria-live="polite">
+				<div class="flex gap-1.5" aria-hidden="true">
+					<span class="h-3 w-3 animate-pulse bg-brand-blue" />
+					<span class="h-3 w-3 animate-pulse bg-brand-ink [animation-delay:150ms]" />
+					<span class="h-3 w-3 animate-pulse bg-brand-pink [animation-delay:300ms]" />
+				</div>
+				<p class="font-mono text-xs tracking-[0.06em] text-brand-mute">LOADING THE RENDER…</p>
 			</div>
 		{:else if error}
-			<!-- Error state -->
 			<div
-				class="max-w-2xl mx-auto text-center bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-2xl p-12 relative overflow-hidden"
+				class="mx-auto flex w-full max-w-[560px] flex-col items-start gap-4 rounded-tile border-[1.5px] border-brand-ink bg-brand-paper p-8"
 			>
-				<div class="absolute inset-0 bg-red-50/50 -z-10" />
-				<div
-					class="inline-flex items-center justify-center w-20 h-20 bg-brand-danger/10 border-[3px] border-gray-900 rounded-2xl mb-6 text-brand-danger"
+				<p class="font-mono text-xs tracking-[0.06em] text-brand-mute">SHARED LINK · 404</p>
+				<h2
+					class="font-display text-[32px] font-bold leading-[38px] tracking-[-0.02em] text-brand-ink"
 				>
-					<svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-						/>
-					</svg>
-				</div>
-				<h2 class="text-3xl font-black text-gray-900 mb-4 uppercase tracking-wide">
 					Result not found
 				</h2>
-				<p class="text-lg text-gray-600 font-medium mb-8 max-w-md mx-auto">{error}</p>
+				<p class="font-sans text-[15px] leading-[23px] text-brand-slate">{error}</p>
 				<a
 					href="/tools"
-					class="inline-block px-8 py-4 bg-brand-danger text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+					class="rounded-lg bg-brand-ink px-6 py-3.5 font-sans text-[15px] font-semibold text-white shadow-[3px_3px_0_0_#FF48B0] transition-opacity hover:opacity-90"
 				>
 					Create your own
 				</a>
 			</div>
 		{:else if result}
-			<!-- Result content -->
-			<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-				<!-- Left Column: Asset Viewer + Embed Codes -->
-				<div class="lg:col-span-8 flex flex-col gap-8">
-					<!-- "Window" Card -->
-					<div
-						class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-2xl overflow-hidden relative group"
+			<!-- ── Title ─────────────────────────────────────────────────── -->
+			<div class="flex flex-col gap-2">
+				<p class="font-mono text-[11px] tracking-[0.06em] text-brand-royal">
+					SHARED LINK <span class="text-brand-mute">·</span>
+					<span class="text-brand-ink">MADE WITH PICTIFY</span>
+				</p>
+				<h1
+					class="font-display text-[34px] font-extrabold leading-[1.06] tracking-[-0.02em] text-brand-ink lg:text-[44px] lg:leading-[50px]"
+				>
+					{result.title || 'Untitled Creation'}
+				</h1>
+			</div>
+
+			<!-- ── Proof sheet ───────────────────────────────────────────── -->
+			<figure
+				class="mx-auto mt-8 w-full max-w-[1200px] overflow-hidden rounded-tile border-[1.5px] border-brand-ink bg-brand-paper shadow-[6px_6px_0_0_#000000]"
+			>
+				<div
+					class="flex items-center justify-between gap-3 border-b-[1.5px] border-brand-ink px-4 py-2.5"
+				>
+					<span class="flex gap-1" aria-hidden="true">
+						<span class="h-2.5 w-2.5 bg-brand-blue" />
+						<span class="h-2.5 w-2.5 bg-brand-ink" />
+						<span class="h-2.5 w-2.5 bg-brand-pink" />
+					</span>
+					<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">
+						{result.width} × {result.height} PX
+					</span>
+				</div>
+				<div class="relative flex justify-center bg-brand-subtle p-3 sm:p-6">
+					<img
+						src={result.assetUrl}
+						alt={result.title || (result.contentType === 'gif' ? 'Generated GIF' : 'Generated image')}
+						width={result.width}
+						height={result.height}
+						class="h-auto max-w-full border border-brand-rule"
+					/>
+					<a
+						href="https://pictify.io"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="absolute bottom-5 right-5 flex items-center gap-1.5 rounded-full border border-brand-ink bg-brand-paper px-3 py-1.5 font-mono text-[10px] tracking-[0.06em] text-brand-ink transition-colors hover:bg-brand-field sm:bottom-9 sm:right-9"
 					>
-						<!-- Window Header -->
-						<div
-							class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between"
-						>
-							<div class="flex items-center gap-2">
-								<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
-								<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
-								<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
-							</div>
-							<div
-								class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
-							>
-								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-									/></svg
-								>
-								{result.width} x {result.height}px
-							</div>
+						<span class="h-2 w-2 bg-brand-pink" aria-hidden="true" />
+						MADE WITH PICTIFY
+					</a>
+				</div>
+			</figure>
+
+			<!-- ── Ledger + actions ──────────────────────────────────────── -->
+			<div
+				class="mx-auto mt-6 flex w-full max-w-[1200px] flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"
+			>
+				<dl class="flex flex-wrap gap-x-6 gap-y-2">
+					{#each ledger as [label, value] (label)}
+						<div class="flex items-baseline gap-2">
+							<dt class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">{label}</dt>
+							<dd class="font-mono text-xs tracking-[0.06em] text-brand-ink">{value}</dd>
 						</div>
+					{/each}
+				</dl>
 
-						<!-- Image Container -->
-						<div
-							class="bg-gray-100 relative p-4 sm:p-8 flex items-center justify-center min-h-[400px]"
+				<div class="flex flex-wrap gap-3">
+					<div class="download-dropdown relative">
+						<button
+							type="button"
+							on:click={() => (downloadOpen = !downloadOpen)}
+							aria-expanded={downloadOpen}
+							class="flex items-center gap-2 rounded-lg bg-brand-ink px-6 py-3.5 font-sans text-[15px] font-semibold text-white shadow-[3px_3px_0_0_#FF48B0] transition-opacity hover:opacity-90"
 						>
-							<!-- Checkerboard Pattern for transparency -->
+							Download
+							<span class="font-mono text-xs transition-transform {downloadOpen ? 'rotate-180' : ''}" aria-hidden="true">▾</span>
+						</button>
+						{#if downloadOpen}
 							<div
-								class="absolute inset-0 opacity-10"
-								style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
-							/>
-
-							{#if result.contentType === 'gif'}
-								<img loading="lazy"
-									src={result.assetUrl}
-									alt={result.title || 'Generated GIF'}
-									class="max-w-full h-auto shadow-2xl relative z-10 rounded-lg border-2 border-gray-200"
-								/>
-							{:else}
-								<img loading="lazy"
-									src={result.assetUrl}
-									alt={result.title || 'Generated image'}
-									class="max-w-full h-auto shadow-2xl relative z-10 rounded-lg border-2 border-gray-200"
-								/>
-							{/if}
-
-							<!-- B3: Made with Pictify Badge -->
-							<a
-								href="https://pictify.io"
-								target="_blank"
-								rel="noopener noreferrer"
-								class="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-white/80 border border-gray-200 rounded-full text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-white transition-all shadow-sm"
+								class="absolute right-0 top-full z-30 mt-2 w-48 overflow-hidden rounded-tile border-[1.5px] border-brand-ink bg-brand-paper"
 							>
-								<svg class="w-3.5 h-3.5 text-brand-danger" viewBox="0 0 24 24" fill="currentColor"
-									><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg
-								>
-								Made with Pictify
-							</a>
-						</div>
+								{#each ['png', 'jpg', 'webp'] as fmt}
+									{@const isOriginal = (result.format || 'png').toLowerCase() === fmt}
+									<button
+										type="button"
+										on:click={() => downloadAsset(fmt)}
+										class="flex w-full items-center justify-between px-4 py-3 text-left font-mono text-xs tracking-[0.06em] text-brand-ink transition-colors hover:bg-brand-field {downloading ===
+										fmt
+											? 'opacity-50'
+											: ''}"
+									>
+										<span>{fmt.toUpperCase()}</span>
+										{#if isOriginal}
+											<span class="text-[10px] text-brand-mute">ORIGINAL</span>
+										{/if}
+									</button>
+								{/each}
+							</div>
+						{/if}
 					</div>
 
-					<!-- A2: Embed Codes Panel -->
-					<div
-						class="bg-gray-900 border-[3px] border-gray-900 shadow-brutal-xl rounded-2xl overflow-hidden"
+					<button
+						type="button"
+						on:click={copyShareUrl}
+						class="rounded-lg border-[1.5px] border-brand-ink bg-brand-paper px-6 py-3.5 font-sans text-[15px] font-semibold text-brand-ink transition-colors hover:bg-brand-subtle"
 					>
-						<!-- Tab bar -->
-						<div class="flex border-b border-gray-700">
-							{#each [{ key: 'img', label: 'IMG TAG' }, { key: 'markdown', label: 'MARKDOWN' }, { key: 'html', label: 'HTML' }, { key: 'bbcode', label: 'BBCODE' }] as tab}
+						Copy link
+					</button>
+				</div>
+			</div>
+
+			<!-- ── Embed codes + context ─────────────────────────────────── -->
+			<div class="mx-auto mt-12 grid w-full max-w-[1200px] grid-cols-1 gap-8 lg:grid-cols-12">
+				<div class="flex flex-col gap-3 lg:col-span-7">
+					<p class="font-mono text-xs tracking-[0.06em] text-brand-mute">EMBED IT</p>
+					<div class="overflow-hidden rounded-tile bg-brand-press">
+						<div class="flex overflow-x-auto border-b border-brand-slate" role="tablist">
+							{#each embedTabs as tab (tab.key)}
 								<button
+									type="button"
+									role="tab"
+									aria-selected={activeEmbedTab === tab.key}
 									on:click={() => (activeEmbedTab = tab.key)}
-									class="flex-1 px-4 py-3 text-[11px] font-black uppercase tracking-wider transition-colors {activeEmbedTab ===
+									class="flex-1 whitespace-nowrap px-4 py-3 font-mono text-[11px] tracking-[0.06em] transition-colors {activeEmbedTab ===
 									tab.key
-										? 'bg-gray-800 text-data-green border-b-2 border-data-green'
-										: 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/50'}"
+										? 'border-b-2 border-brand-field text-brand-field'
+										: 'text-brand-press-text hover:text-white'}"
 								>
 									{tab.label}
 								</button>
 							{/each}
 						</div>
-						<!-- Code block -->
-						<div class="relative p-4">
+						<div class="relative p-4 pr-20">
 							<pre
-								class="text-sm font-mono text-gray-300 whitespace-pre-wrap break-all leading-relaxed"><code
+								class="whitespace-pre-wrap break-all font-mono text-xs leading-[19px] text-brand-press-text"><code
 									>{@html highlightSnippet(embedSnippets[activeEmbedTab] || '')}</code
 								></pre>
 							<button
+								type="button"
 								on:click={() => copyEmbedCode(activeEmbedTab)}
-								class="absolute top-3 right-3 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white text-xs font-bold uppercase tracking-wider rounded transition-colors flex items-center gap-1.5"
+								class="absolute right-3 top-3 font-mono text-[11px] tracking-[0.06em] text-brand-field hover:underline"
 							>
-								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-									/></svg
-								>
-								Copy
+								COPY
 							</button>
 						</div>
 					</div>
 				</div>
 
-				<!-- Right Column: Details & Actions -->
-				<div class="lg:col-span-4 flex flex-col gap-6">
-					<!-- Header Info -->
-					<div
-						class="bg-white border-[3px] border-gray-900 shadow-brutal-lg rounded-2xl p-6"
-					>
-						<div class="flex items-center gap-3 mb-4">
-							<div
-								class="inline-flex items-center gap-1.5 px-3 py-1 bg-data-green border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-900 shadow-brutal-sm"
-							>
-								Shared Link
-							</div>
-							{#if result.format}
-								<div
-									class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 border-[2px] border-gray-900 text-[11px] font-black uppercase tracking-wider rounded text-gray-500"
-								>
-									{result.format}
-								</div>
-							{/if}
-						</div>
-
-						<h1 class="text-3xl font-black text-gray-900 leading-tight mb-3">
-							{result.title || 'Untitled Creation'}
-						</h1>
-
-						<div
-							class="flex flex-col gap-2 text-sm font-medium text-gray-600 border-t-2 border-dashed border-gray-200 pt-4"
-						>
-							<div class="flex items-center gap-2">
-								<svg
-									class="w-4 h-4 text-gray-400"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-									/></svg
-								>
-								<span
-									>Created <span class="text-gray-900 font-bold"
-										>{formatDate(result.createdAt)}</span
-									></span
-								>
-							</div>
-							<div class="flex items-center gap-2">
-								<svg
-									class="w-4 h-4 text-gray-400"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M13 10V3L4 14h7v7l9-11h-7z"
-									/></svg
-								>
-								<span
-									>Source: <span class="text-gray-900 font-bold">{formatSource(result.source)}</span
-									></span
-								>
-							</div>
-							<div class="flex items-center gap-2">
-								<svg
-									class="w-4 h-4 text-gray-400"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-									/><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-									/></svg
-								>
-								<span class="flex items-center gap-1.5">
-									<span class="relative flex h-2 w-2">
-										<span
-											class="animate-ping absolute inline-flex h-full w-full rounded-full bg-data-green opacity-75"
-										/>
-										<span class="relative inline-flex rounded-full h-2 w-2 bg-data-green" />
-									</span>
-									<span class="text-gray-900 font-bold"
-										>{analytics?.totalHits
-											? analytics.totalHits.toLocaleString()
-											: result.viewCount || 0}</span
-									> views
-								</span>
-							</div>
-							<!-- B5: Social Proof -->
-							<div class="flex items-center gap-2 mt-1 pt-2 border-t border-dashed border-gray-100">
-								<svg class="w-4 h-4 text-brand-danger" viewBox="0 0 24 24" fill="currentColor"
-									><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg
-								>
-								<span class="text-xs text-gray-400 font-medium"
-									>Powered by <a
-										href="https://pictify.io"
-										class="text-brand-danger font-bold hover:underline">Pictify</a
-									> &mdash; Join 10,000+ developers</span
-								>
-							</div>
-						</div>
-					</div>
-
-					<!-- Primary Actions -->
-					<div class="flex flex-col gap-4">
-						<button
-							on:click={copyShareUrl}
-							class="w-full py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-lg group"
-						>
-							<svg
-								class="w-5 h-5 text-gray-400 group-hover:text-gray-900 transition-colors"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-								/>
-							</svg>
-							Copy Link
-						</button>
-
-						<div class="grid grid-cols-1 gap-4">
-							<!-- A3: Download Dropdown -->
-							<div class="relative download-dropdown">
-								<button
-									on:click={() => (downloadOpen = !downloadOpen)}
-									class="w-full py-3 bg-brand-accent text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl text-sm"
-								>
-									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-										/>
-									</svg>
-									Download
-									<svg
-										class="w-3 h-3 ml-1 transition-transform {downloadOpen ? 'rotate-180' : ''}"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M19 9l-7 7-7-7"
-										/></svg
-									>
-								</button>
-								{#if downloadOpen}
-									<div
-										class="absolute top-full left-0 right-0 mt-2 bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg overflow-hidden z-30"
-									>
-										{#each ['png', 'jpg', 'webp'] as fmt}
-											{@const isOriginal = (result.format || 'png').toLowerCase() === fmt}
-											<button
-												on:click={() => downloadAsset(fmt)}
-												class="w-full px-4 py-3 text-left text-sm font-bold uppercase tracking-wider hover:bg-gray-50 flex items-center justify-between transition-colors {downloading ===
-												fmt
-													? 'opacity-50'
-													: ''}"
-											>
-												<span>{fmt.toUpperCase()}</span>
-												{#if isOriginal}
-													<span
-														class="text-[10px] font-black text-data-green bg-data-green/10 px-2 py-0.5 rounded"
-														>(Original)</span
-													>
-												{/if}
-											</button>
-										{/each}
-									</div>
-								{/if}
-							</div>
-						</div>
-					</div>
-
-					<!-- B1: Context-Aware Sidebar CTA (only for non-logged-in users) -->
+				<div class="flex flex-col gap-6 lg:col-span-5">
+					<!-- Context card for visitors, styled as the rail signup card. -->
 					{#if ctaConfig && !isLoggedIn}
 						<div
-							class="bg-gradient-to-br from-gray-900 to-gray-800 border-[3px] border-gray-900 shadow-[4px_4px_0_0_#ff6b6b] rounded-2xl p-5 relative overflow-hidden"
+							class="flex flex-col gap-3.5 border-2 border-brand-ink bg-brand-paper p-6 shadow-[6px_6px_0_0_#0078BF]"
 						>
-							<div
-								class="absolute inset-0 bg-[radial-gradient(#fff_0.5px,transparent_0.5px)] [background-size:12px_12px] opacity-5"
-							/>
-							<div class="relative z-10">
-								<p class="text-[10px] font-black uppercase tracking-widest text-brand-accent mb-2">
-									{ctaConfig.sidebar.heading}
-								</p>
-								<p class="text-sm text-gray-400 font-medium mb-4">
-									{#if result.source === 'tool'}
-										Generate images like this one instantly with our free tool.
-									{:else if result.source === 'template'}
-										Customize this template with your own data and branding.
-									{:else if result.source === 'api'}
-										One API call. Any template. Infinite images.
-									{:else}
-										Create, customize, and automate image generation.
-									{/if}
-								</p>
-								<button
-									on:click={handleSidebarCta}
-									class="w-full py-3 text-center bg-brand-danger text-white font-black uppercase tracking-wider border-[2px] border-brand-danger hover:bg-data-red transition-all rounded-lg text-sm"
-								>
-									{ctaConfig.sidebar.button}
-								</button>
+							<div class="flex gap-1" aria-hidden="true">
+								<span class="h-2.5 w-2.5 bg-brand-blue" />
+								<span class="h-2.5 w-2.5 bg-brand-ink" />
+								<span class="h-2.5 w-2.5 bg-brand-pink" />
 							</div>
+							<p class="font-mono text-xs tracking-[0.06em] text-brand-mute">
+								{ctaConfig.sidebar.heading.toUpperCase()}
+							</p>
+							<p class="font-display text-2xl font-bold leading-[30px] tracking-[-0.02em] text-brand-ink">
+								Turn this design into a template.
+							</p>
+							<p class="font-sans text-[15px] leading-[23px] text-brand-slate">
+								{#if result.source === 'tool'}
+									Generate images like this one instantly with our free tool.
+								{:else if result.source === 'template'}
+									Customize this template with your own data and branding.
+								{:else if result.source === 'api'}
+									One API call. Any template. Infinite images.
+								{:else}
+									Create, customize, and automate image generation.
+								{/if}
+							</p>
+							<button
+								type="button"
+								on:click={handleSidebarCta}
+								class="flex items-center justify-center bg-brand-ink p-3.5 font-sans text-[15px] font-medium text-white shadow-[3px_3px_0_0_#FF48B0] transition-opacity hover:opacity-90"
+							>
+								{ctaConfig.sidebar.button}
+							</button>
 						</div>
 					{/if}
 
-					<!-- A1: Analytics Card (visible to creator and team members) -->
+					<!-- Analytics (visible to creator and team members) -->
 					{#if isLoggedIn && (analytics || analyticsLoading)}
-						<div
-							class="bg-white border-[3px] border-gray-900 shadow-brutal-lg rounded-2xl overflow-hidden"
-						>
-							<div
-								class="bg-gray-50 border-b-[3px] border-gray-900 px-5 py-3 flex items-center gap-1.5"
+						<div class="flex flex-col rounded-tile border-[1.5px] border-brand-ink bg-brand-paper">
+							<p
+								class="border-b border-brand-rule px-5 py-3 font-mono text-[11px] tracking-[0.06em] text-brand-mute"
 							>
-								<svg
-									class="w-3.5 h-3.5 text-purple-500"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-									/></svg
-								>
-								<span class="text-[10px] font-black uppercase tracking-widest text-purple-500"
-									>Analytics</span
-								>
-							</div>
-							<div class="p-5">
+								ANALYTICS{isCreator ? ' · YOUR RENDER' : ''}
+							</p>
+							<div class="flex flex-col gap-5 p-5">
 								{#if analyticsLoading}
-									<div class="flex items-center gap-2 text-sm text-gray-400">
-										<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"
-											><circle
-												class="opacity-25"
-												cx="12"
-												cy="12"
-												r="10"
-												stroke="currentColor"
-												stroke-width="4"
-												fill="none"
-											/><path
-												class="opacity-75"
-												fill="currentColor"
-												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-											/></svg
-										>
-										Loading analytics...
-									</div>
+									<p class="font-mono text-xs tracking-[0.06em] text-brand-mute">LOADING ANALYTICS…</p>
 								{:else if analytics}
-									<div class="space-y-4">
-										<!-- Key metrics -->
-										<div class="grid grid-cols-2 gap-2">
-											<div
-												class="bg-orange-50 rounded-lg p-2.5 text-center border border-orange-100"
+									<div class="grid grid-cols-2 gap-2">
+										<div class="flex flex-col gap-1 bg-brand-subtle p-3">
+											<span class="font-display text-2xl font-bold leading-7 text-brand-ink"
+												>{(analytics.totalHits || 0).toLocaleString()}</span
 											>
-												<div class="text-lg font-black text-gray-900">
-													{(analytics.totalHits || 0).toLocaleString()}
-												</div>
-												<div class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">
-													Total Hits
-												</div>
+											<span class="font-mono text-[10px] tracking-[0.06em] text-brand-mute">TOTAL HITS</span>
+										</div>
+										<div class="flex flex-col gap-1 bg-brand-subtle p-3">
+											<span class="font-display text-2xl font-bold leading-7 text-brand-ink"
+												>{formatBytes(analytics.totalBytes || 0)}</span
+											>
+											<span class="font-mono text-[10px] tracking-[0.06em] text-brand-mute">BANDWIDTH</span>
+										</div>
+									</div>
+
+									{#if analytics.statusCodes}
+										{@const sc = analytics.statusCodes}
+										{@const scTotal = (sc._200 || 0) + (sc._304 || 0) + (sc._other || 0)}
+										{#if scTotal > 0}
+											<div class="grid grid-cols-3 gap-2">
+												{#each [['200 OK', sc._200], ['304 CACHE', sc._304], ['OTHER', sc._other]] as [label, count] (label)}
+													<div class="flex flex-col gap-0.5 border border-brand-rule p-2">
+														<span class="font-mono text-xs text-brand-ink">{count || 0}</span>
+														<span class="font-mono text-[10px] tracking-[0.06em] text-brand-mute">{label}</span>
+													</div>
+												{/each}
 											</div>
-											<div
-												class="bg-orange-50 rounded-lg p-2.5 text-center border border-orange-100"
-											>
-												<div class="text-lg font-black text-gray-900">
-													{formatBytes(analytics.totalBytes || 0)}
-												</div>
-												<div class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">
-													Bandwidth
-												</div>
+										{/if}
+									{/if}
+
+									{#if analytics.dailyStats?.length > 1}
+										{@const maxHits = Math.max(...analytics.dailyStats.map((d) => d.hits), 1)}
+										<div class="flex flex-col gap-1.5">
+											<p class="font-mono text-[10px] tracking-[0.06em] text-brand-mute">HITS · LAST 14 DAYS</p>
+											<div class="flex h-14 items-end gap-0.5">
+												{#each analytics.dailyStats.slice(-14) as day}
+													<div
+														class="flex-1 cursor-default bg-brand-blue transition-colors hover:bg-brand-ink"
+														style="height: {Math.max((day.hits / maxHits) * 100, 4)}%"
+														title="{day.date}: {day.hits} hits"
+													/>
+												{/each}
 											</div>
 										</div>
+									{/if}
 
-										<!-- Status code breakdown -->
-										{#if analytics.statusCodes}
-											{@const sc = analytics.statusCodes}
-											{@const scTotal = (sc._200 || 0) + (sc._304 || 0) + (sc._other || 0)}
-											{#if scTotal > 0}
-												<div class="flex gap-2">
-													<div
-														class="flex-1 bg-green-50 border border-green-100 rounded-lg p-2 text-center"
-													>
-														<div class="text-xs font-black text-green-700">{sc._200 || 0}</div>
-														<div class="text-[9px] text-gray-400 font-bold uppercase">200 OK</div>
-													</div>
-													<div
-														class="flex-1 bg-blue-50 border border-blue-100 rounded-lg p-2 text-center"
-													>
-														<div class="text-xs font-black text-blue-700">{sc._304 || 0}</div>
-														<div class="text-[9px] text-gray-400 font-bold uppercase">
-															304 Cache
-														</div>
-													</div>
-													<div
-														class="flex-1 bg-gray-50 border border-gray-100 rounded-lg p-2 text-center"
-													>
-														<div class="text-xs font-black text-gray-700">{sc._other || 0}</div>
-														<div class="text-[9px] text-gray-400 font-bold uppercase">Other</div>
-													</div>
+									{#if analytics.topReferrers?.length}
+										<div class="flex flex-col gap-1.5 border-t border-brand-rule pt-4">
+											<p class="font-mono text-[10px] tracking-[0.06em] text-brand-mute">REFERRERS</p>
+											{#each analytics.topReferrers.slice(0, 5) as ref}
+												<div class="flex items-center justify-between gap-3 font-sans text-[13px]">
+													<span class="max-w-[200px] truncate text-brand-slate">{ref.referrer || 'Direct'}</span>
+													<span class="font-mono text-xs text-brand-ink">{ref.hits}</span>
 												</div>
-											{/if}
-										{/if}
+											{/each}
+										</div>
+									{/if}
 
-										<!-- Daily hits sparkline -->
-										{#if analytics.dailyStats?.length > 1}
-											{@const maxHits = Math.max(...analytics.dailyStats.map((d) => d.hits), 1)}
-											<div>
-												<p
-													class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5"
-												>
-													Hits (Last 14 Days)
-												</p>
-												<div class="h-14 flex items-end gap-0.5">
-													{#each analytics.dailyStats.slice(-14) as day}
-														<div
-															class="flex-1 bg-orange-200 hover:bg-orange-400 rounded-t transition-colors cursor-default"
-															style="height: {Math.max((day.hits / maxHits) * 100, 4)}%"
-															title="{day.date}: {day.hits} hits"
-														/>
-													{/each}
-												</div>
-											</div>
-										{/if}
-
-										<!-- Top referrers (sites embedding the image) -->
-										{#if analytics.topReferrers?.length}
-											<div class="pt-3 border-t border-dashed border-gray-200">
-												<p
-													class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1"
-												>
-													<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-														><path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="2"
-															d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-														/></svg
-													>
-													Referrers
-												</p>
-												{#each analytics.topReferrers.slice(0, 5) as ref}
-													<div class="flex items-center justify-between text-xs mb-1">
-														<span class="text-gray-600 truncate max-w-[160px]"
-															>{ref.referrer || 'Direct'}</span
+									{#if analytics.topCountries?.length}
+										<div class="flex flex-col gap-2 border-t border-brand-rule pt-4">
+											<p class="font-mono text-[10px] tracking-[0.06em] text-brand-mute">GEOGRAPHY</p>
+											{#each analytics.topCountries.slice(0, 5) as geo}
+												{@const pct = Math.round((geo.hits / (analytics.totalHits || 1)) * 100)}
+												<div class="flex flex-col gap-1">
+													<div class="flex items-center justify-between font-sans text-[13px]">
+														<span class="text-brand-slate">{geo.country}</span>
+														<span class="font-mono text-xs text-brand-ink"
+															>{geo.hits} <span class="text-brand-mute">({pct}%)</span></span
 														>
-														<span class="font-bold text-gray-900">{ref.hits}</span>
 													</div>
-												{/each}
-											</div>
-										{/if}
-
-										<!-- Geographic breakdown -->
-										{#if analytics.topCountries?.length}
-											<div class="pt-3 border-t border-dashed border-gray-200">
-												<p
-													class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1"
-												>
-													<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-														><path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="2"
-															d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-														/></svg
-													>
-													Geography
-												</p>
-												{#each analytics.topCountries.slice(0, 5) as geo}
-													{@const pct = Math.round((geo.hits / (analytics.totalHits || 1)) * 100)}
-													<div class="mb-1.5">
-														<div class="flex items-center justify-between text-xs mb-0.5">
-															<span class="text-gray-700 font-medium">{geo.country}</span>
-															<span class="font-bold text-gray-900"
-																>{geo.hits}
-																<span class="text-gray-400 font-normal">({pct}%)</span></span
-															>
-														</div>
-														<div class="h-1 bg-gray-100 rounded-full overflow-hidden">
-															<div
-																class="h-full bg-orange-300 rounded-full"
-																style="width: {pct}%"
-															/>
-														</div>
+													<div class="h-1 overflow-hidden bg-brand-subtle">
+														<div class="h-full bg-brand-blue" style="width: {pct}%" />
 													</div>
-												{/each}
-											</div>
-										{/if}
+												</div>
+											{/each}
+										</div>
+									{/if}
 
-										<!-- Last processed -->
-										{#if analytics.lastProcessedAt}
-											<div
-												class="flex items-center justify-between text-xs pt-3 border-t border-dashed border-gray-200"
-											>
-												<span class="text-gray-400">Last updated</span>
-												<span class="text-gray-600 font-medium"
-													>{formatDate(analytics.lastProcessedAt)}</span
-												>
-											</div>
-										{/if}
-									</div>
+									{#if analytics.lastProcessedAt}
+										<div
+											class="flex items-center justify-between border-t border-brand-rule pt-4 font-mono text-[11px] tracking-[0.06em]"
+										>
+											<span class="text-brand-mute">LAST UPDATED</span>
+											<span class="text-brand-ink">{formatDate(analytics.lastProcessedAt).toUpperCase()}</span>
+										</div>
+									{/if}
 								{:else}
-									<div class="text-sm text-gray-400">
-										<p>Analytics will appear here once this asset gets traffic.</p>
-									</div>
+									<p class="font-sans text-sm text-brand-slate">
+										Analytics will appear here once this asset gets traffic.
+									</p>
 								{/if}
 							</div>
 						</div>
 					{/if}
 				</div>
 			</div>
-
-			<!-- B2: Enhanced Bottom CTA Banner (only for non-logged-in users) -->
-			{#if !isLoggedIn}
-				<div class="mt-20 border-t-[3px] border-gray-900 pt-16 pb-8">
-					<div
-						class="bg-brand-danger rounded-2xl border-[3px] border-gray-900 shadow-brutal-xl p-8 md:p-12 text-center relative overflow-hidden"
-					>
-						<div
-							class="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] opacity-20"
-						/>
-						<div class="relative z-10">
-							<h2
-								class="text-3xl md:text-5xl font-black text-white mb-6 uppercase tracking-tight text-shadow-sm"
-							>
-								{ctaConfig?.banner?.headline || 'DESIGN. AUTOMATE. SCALE.'}
-							</h2>
-							<p class="text-white/90 font-bold text-lg max-w-2xl mx-auto mb-8">
-								{ctaConfig?.banner?.body || 'Create images, GIFs, and PDFs. Automate with the API.'}
-							</p>
-							<div class="flex flex-wrap justify-center gap-4">
-								<a
-									href="/signup"
-									class="px-8 py-4 bg-white text-gray-900 font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
-								>
-									{result.source === 'api' ? 'Get API Key' : 'Start Free'}
-								</a>
-								<a
-									href="/tools"
-									class="px-8 py-4 bg-gray-900 text-white font-black uppercase tracking-wider border-[3px] border-gray-900 shadow-[4px_4px_0_0_rgba(0,0,0,0.3)] hover:bg-gray-800 transition-all rounded-xl"
-								>
-									Try the Free Tools
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			{/if}
 		{/if}
 	</main>
+
+	<!-- ── Closing band (visitors only) ──────────────────────────────── -->
+	{#if result && !isLoggedIn}
+		<section class="w-full bg-brand-press-deep px-5 py-14 lg:px-10 lg:py-20">
+			<div
+				class="mx-auto flex w-full max-w-page flex-col gap-8 lg:flex-row lg:items-end lg:justify-between"
+			>
+				<div class="flex flex-col gap-3.5 lg:max-w-[680px]">
+					<p class="font-mono text-xs tracking-[0.06em] text-brand-field">MADE WITH PICTIFY</p>
+					<h2
+						class="font-display text-[32px] font-bold leading-[1.08] tracking-[-0.02em] text-white lg:text-[44px] lg:leading-[50px]"
+					>
+						{ctaConfig?.banner?.headline || 'DESIGN. AUTOMATE. SCALE.'}
+					</h2>
+					<p class="font-sans text-base leading-[25px] text-brand-press-text">
+						{ctaConfig?.banner?.body || 'Create images, GIFs, and PDFs. Automate with the API.'}
+					</p>
+				</div>
+
+				<div class="flex flex-wrap gap-3">
+					<a
+						href="/signup"
+						class="rounded-lg bg-brand-field px-7 py-4 font-sans text-base font-semibold text-brand-ink shadow-[3px_3px_0_0_#FF48B0] transition-opacity hover:opacity-90"
+					>
+						{result.source === 'api' ? 'Get API Key' : 'Start Free'}
+					</a>
+					<a
+						href="/tools"
+						class="rounded-lg border-[1.5px] border-white px-7 py-4 font-sans text-base font-semibold text-white transition-colors hover:bg-white/10"
+					>
+						Try the Free Tools
+					</a>
+				</div>
+			</div>
+		</section>
+	{/if}
 
 	<Footer />
 </div>
