@@ -5,11 +5,13 @@
  * vendor directory.
  */
 import { Control, Resizable, ResizableProps } from "@openvideo/timeline";
+import { CLIP_FILL, CLIP_LABEL_ON_DARK } from "../clip-palette";
 import { editorFont } from "../constants";
 import { createResizeControls } from "../controls";
 import {
   TIMELINE_SELECTED_BORDER_COLOR,
   TIMELINE_BORDER_WIDTH,
+  TIMELINE_SELECTED_BORDER_WIDTH,
   TIMELINE_ITEM_BORDER_RADIUS,
 } from "../constants";
 
@@ -39,7 +41,7 @@ class Effect extends Resizable {
     this.tScale = props.tScale;
     this.name = props.name;
     this.effect = props.effect;
-    this.fill = "#40836e";
+    this.fill = CLIP_FILL.effect;
   }
 
   public _render(ctx: CanvasRenderingContext2D) {
@@ -60,13 +62,13 @@ class Effect extends Resizable {
     ctx.save();
     ctx.translate(10, (this.height - 15.4) / 2);
     ctx.scale(1.2, 1.2);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+    ctx.fillStyle = CLIP_LABEL_ON_DARK;
     ctx.fill(svgPath);
     ctx.restore();
 
     // 2. Draw text second
     ctx.font = `600 11px ${editorFont.fontFamily}`;
-    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+    ctx.fillStyle = CLIP_LABEL_ON_DARK;
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
     ctx.fillText(this.name, 30, this.height / 2);
@@ -77,7 +79,9 @@ class Effect extends Resizable {
     if (!this.isSelected) return;
 
     const borderColor = TIMELINE_SELECTED_BORDER_COLOR;
-    const borderWidth = TIMELINE_BORDER_WIDTH;
+    const borderWidth = this.isSelected
+      ? TIMELINE_SELECTED_BORDER_WIDTH
+      : TIMELINE_BORDER_WIDTH;
     const borderRadius = TIMELINE_ITEM_BORDER_RADIUS;
 
     ctx.save();

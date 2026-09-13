@@ -1,16 +1,78 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
-	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
-	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
+	/**
+	 * /tools/csv-to-pdf — the v2 tool page, column mode.
+	 *
+	 * SEO copy is frozen: the two content sections, the FAQ and the three step
+	 * headings are the wording that ranks, moved into the new layout unchanged.
+	 * The quota ladder in the toolbar replaces GenerationLimitBanner.
+	 */
+	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
+	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
+	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
+	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
+	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
+	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
+	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
+	import Prose from '$lib/components/tools/v2/longform/Prose.svelte';
+	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
 	import Papa from 'papaparse';
 	import { user } from '../../../store/user.store';
 	import { toast } from '../../../store/toast.store';
-	import { generationLimits } from '../../../store/generationLimits.store';
+	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { createImagePublic } from '../../../api/image.js';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	$: isUserLoggedIn = !!$user?.email;
+
+	const TOOL_NAME = 'csv_to_pdf';
+	const TOOL_PATH = '/tools/csv-to-pdf';
+
+	// Guests share the 5/day limit with every other free tool; the ladder in the
+	// toolbar reads from the same store the render path increments.
+	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+
+	/**
+	 * D3: this was the only tool page without an API block. The snippet is the
+	 * multi-page PDF call, which is the API answer to "my sheet is longer than
+	 * the free cap".
+	 */
+	const csvToPdfExamples = [
+		{
+			id: 'curl',
+			label: 'cURL',
+			fileName: 'render.sh',
+			code: `<span class="text-[#6a9955]"># One PDF page per row, from a template</span>
+<span class="text-[#dcdcaa]">curl</span> -X POST <span class="text-[#ce9178]">'https://api.pictify.io/pdf/multi-page'</span> \\
+  -H <span class="text-[#ce9178]">'Content-Type: application/json'</span> \\
+  -H <span class="text-[#ce9178]">'Authorization: Bearer YOUR_API_KEY'</span> \\
+  -d <span class="text-[#ce9178]">'{
+    "templateUid": "your-template-uid",
+    "variableSets": [
+      { "name": "Ada Lovelace", "course": "Analytical Engines" },
+      { "name": "Alan Turing", "course": "Computability" }
+    ],
+    "options": { "preset": "A4" }
+  }'</span>`
+		},
+		{
+			id: 'javascript',
+			label: 'JavaScript',
+			fileName: 'render.js',
+			code: `<span class="text-[#6a9955]">// Every row of the CSV becomes a page</span>
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">rows</span> = <span class="text-[#9cdcfe]">csv</span>.<span class="text-[#dcdcaa]">map</span>((<span class="text-[#9cdcfe]">r</span>) =&gt; ({ <span class="text-[#9cdcfe]">name</span>: <span class="text-[#9cdcfe]">r</span>.<span class="text-[#9cdcfe]">name</span>, <span class="text-[#9cdcfe]">course</span>: <span class="text-[#9cdcfe]">r</span>.<span class="text-[#9cdcfe]">course</span> }));
+
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">res</span> = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]">'https://api.pictify.io/pdf/multi-page'</span>, {
+  <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
+  <span class="text-[#9cdcfe]">headers</span>: { <span class="text-[#ce9178]">'Content-Type'</span>: <span class="text-[#ce9178]">'application/json'</span>, <span class="text-[#ce9178]">'Authorization'</span>: <span class="text-[#ce9178]">'Bearer YOUR_API_KEY'</span> },
+  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">stringify</span>({ <span class="text-[#9cdcfe]">templateUid</span>, <span class="text-[#9cdcfe]">variableSets</span>: <span class="text-[#9cdcfe]">rows</span> })
+});
+
+<span class="text-[#c586c0]">const</span> { <span class="text-[#9cdcfe]">pdf</span> } = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]">res</span>.<span class="text-[#dcdcaa]">json</span>();`
+		}
+	];
+
 
 	// ── CSV state ────────────────────────────────────────────────────────────
 	let rows = []; // array of objects keyed by header
@@ -226,8 +288,10 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 
 		for (let i = 0; i < generatedImages.length; i++) {
 			if (i > 0) pdf.addPage();
-			// Fetch the rendered PNG and embed as data URL (CDN allows CORS-less fetch → blob)
-			const blob = await fetch(generatedImages[i].url).then((r) => r.blob());
+			// Fetch through the same-origin asset proxy: media.pictify.io serves a
+			// malformed duplicate CORS header, so a direct cross-origin fetch fails.
+			const proxied = `/api/asset?url=${encodeURIComponent(generatedImages[i].url)}`;
+			const blob = await fetch(proxied).then((r) => r.blob());
 			const dataUrl = await new Promise((resolve) => {
 				const reader = new FileReader();
 				reader.onload = () => resolve(reader.result);
@@ -249,8 +313,8 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 			a: "Yes, that is this tool's specialty. Every row renders as its own formatted document page: the first column becomes the document title and every column becomes a labeled field. With a free account you can go further and use branded templates (certificates, letters, reports) instead of the default layout."
 		},
 		{
-			q: "Can I email each row's PDF to a different recipient?",
-			a: "Yes, with a Pictify workflow. If your CSV has an email column, a workflow run renders each row's document AND emails it to that recipient, with delivered/bounced status per person. That is the part no converter, spreadsheet, or mail-merge add-on does."
+			q: 'Can I render a whole sheet at once instead of row by row?',
+			a: 'Yes, with a Pictify batch run. Point it at the same CSV and every row renders against your template in one job: a CDN link per document, a per-row status you can poll, and a webhook when the batch finishes. That is the part no converter or spreadsheet add-on does.'
 		},
 		{
 			q: 'Is there a row limit?',
@@ -266,17 +330,7 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 		}
 	];
 
-	const faqSchemaJson = JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'FAQPage',
-		mainEntity: faqs.map((faq) => ({
-			'@type': 'Question',
-			name: faq.q,
-			acceptedAnswer: { '@type': 'Answer', text: faq.a }
-		}))
-	});
-
-	const structuredDataJson = JSON.stringify({
+	const structuredData = {
 		'@context': 'https://schema.org',
 		'@type': 'WebApplication',
 		name: 'Pictify CSV to PDF Converter',
@@ -287,350 +341,275 @@ Mei-Ling Chen,Advanced Analytics Bootcamp,91,2026-07-29`;
 		operatingSystem: 'Web',
 		offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
 		creator: { '@type': 'Organization', name: 'Pictify.io', url: 'https://pictify.io' }
-	});
-
-	const breadcrumbSchemaJson = JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'BreadcrumbList',
-		itemListElement: [
-			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
-			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
-			{ '@type': 'ListItem', position: 3, name: 'CSV to PDF' }
-		]
-	});
+	};
 </script>
 
-<svelte:head>
-	<title>CSV to PDF Converter: Free, Every Row Becomes a Document | Pictify</title>
-	<meta
-		name="description"
-		content="Convert CSV to PDF free in your browser. Render the sheet as a clean table PDF, or turn every row into its own document and email each one with Pictify workflows."
-	/>
-	<meta
-		name="keywords"
-		content="csv to pdf, csv to pdf converter, convert csv to pdf, spreadsheet to pdf, csv to documents, generate pdf from spreadsheet, csv to pdf free, Pictify"
-	/>
-	<link rel="canonical" href="https://pictify.io/tools/csv-to-pdf" />
-	<meta name="robots" content="index, follow, max-image-preview:large" />
-	<meta
-		property="og:title"
-		content="CSV to PDF Converter: Every Row Becomes a Document | Pictify"
-	/>
-	<meta
-		property="og:description"
-		content="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row. Then deliver each one by email."
-	/>
-	<meta property="og:url" content="https://pictify.io/tools/csv-to-pdf" />
-	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="Pictify" />
-	<meta property="og:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta
-		name="twitter:title"
-		content="CSV to PDF Converter: Every Row Becomes a Document | Pictify"
-	/>
-	<meta
-		name="twitter:description"
-		content="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row."
-	/>
-	<meta name="twitter:image" content="https://media.pictify.io/v3g37-1775406808141.png" />
-	{@html `<script type="application/ld+json">${structuredDataJson}</script>`}
-	{@html `<script type="application/ld+json">${faqSchemaJson}</script>`}
-	{@html `<script type="application/ld+json">${breadcrumbSchemaJson}</script>`}
-</svelte:head>
+<ToolSeoHead
+	title="CSV to PDF Converter: Free, Every Row Becomes a Document | Pictify"
+	description="Convert CSV to PDF free in your browser. Render the sheet as a clean table PDF, or turn every row into its own document, then batch render the whole file through the Pictify API."
+	keywords="csv to pdf, csv to pdf converter, convert csv to pdf, spreadsheet to pdf, csv to documents, generate pdf from spreadsheet, csv to pdf free, Pictify"
+	canonical="https://pictify.io/tools/csv-to-pdf"
+	robots="index, follow, max-image-preview:large"
+	ogTitle="CSV to PDF Converter: Every Row Becomes a Document | Pictify"
+	ogDescription="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row. Then deliver each one by email."
+	ogSiteName="Pictify"
+	ogImage="https://pictify.io/og/tools/csv-to-pdf.png"
+	twitterTitle="CSV to PDF Converter: Every Row Becomes a Document | Pictify"
+	twitterDescription="Free CSV to PDF converter. Whole sheet as a table, or one formatted document per row."
+	twitterImage="https://pictify.io/og/tools/csv-to-pdf.png"
+	webApplicationSchema={structuredData}
+	{faqs}
+	breadcrumbLabel="CSV to PDF"
+/>
 
-<section class="w-full min-h-screen bg-brand-bg relative overflow-x-hidden font-['Manrope']">
-	<Nav />
+<ToolPageShell
+	toolName={TOOL_NAME}
+	toolPath={TOOL_PATH}
+	breadcrumb="CSV TO PDF"
+	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · TABLE OR ONE PAGE PER ROW"
+	loggedIn={isUserLoggedIn}
+	hasResult={!!pdfBlobUrl}
+	longform="column"
+>
+	<HeroTitle slot="h1">
+		<span>CSV</span>
+		<span>TO PDF</span>
+	</HeroTitle>
 
-	<div class="max-w-6xl mx-auto px-4 pb-20">
-		<!-- Breadcrumb -->
-		<nav class="pt-6 mb-2 flex" aria-label="Breadcrumb">
-			<ol class="inline-flex items-center gap-2 text-sm font-bold">
-				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
-				<li class="text-gray-300">/</li>
-				<li>
-					<a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a>
-				</li>
-				<li class="text-gray-300">/</li>
-				<li class="text-gray-900">CSV to PDF</li>
-			</ol>
-		</nav>
+	<HeroSub slot="hero-sub">
+		Turn a spreadsheet into
+		<span class="font-medium">real documents</span>: the whole sheet as a table, or one formatted
+		PDF page per row.
+		<span class="text-brand-slate">Free, in your browser. No signup required.</span>
+	</HeroSub>
 
-		<!-- Hero -->
-		<div class="relative flex flex-col items-center justify-center text-center mb-10 pt-4 sm:pt-10">
-			<div class="inline-flex transform -rotate-2 mb-4 sm:mb-8">
-				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-				>
-					Free Tool
-				</div>
-			</div>
-			<h1
-				class="relative z-10 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-tight mb-4 sm:mb-8"
-			>
-				<span class="block sm:inline">CSV</span>
-				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
-					<span class="relative z-10 px-2 sm:px-3 md:px-4">TO PDF</span>
-					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg -z-0"
-					/>
-				</span>
-			</h1>
-			<div class="max-w-2xl mx-auto px-2">
-				<p
-					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
-				>
-					Turn a spreadsheet into
-					<span class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
-						>real documents</span
-					>:
-					the whole sheet as a table, or one formatted PDF page per row.
-					<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
-						>Free, in your browser. No signup required.</span
-					>
-				</p>
-			</div>
-		</div>
-
-		<GenerationLimitBanner toolName="csv_to_pdf" />
-
-		<!-- Tool -->
-		<div class="max-w-4xl mx-auto mb-14">
-			<!-- Step 1: data in -->
-			<div class="bg-white border-[3px] border-black shadow-brutal-xl p-5 sm:p-8 mb-6">
-				<h2 class="font-black text-lg sm:text-xl mb-4 flex items-center gap-3">
-					<span
-						class="w-8 h-8 flex items-center justify-center bg-brand-accent border-[3px] border-black font-black"
-						>1</span
-					>
-					Add your CSV
-				</h2>
-				<div class="grid md:grid-cols-2 gap-5">
-					<label
-						class="flex flex-col items-center justify-center border-[3px] border-dashed border-gray-400 hover:border-black bg-[#fafafa] p-8 cursor-pointer transition-colors text-center"
-						on:drop|preventDefault={handleFile}
-						on:dragover|preventDefault
-					>
-						<svg
-							class="w-8 h-8 mb-2 text-gray-500"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-							/></svg
+	<div slot="tool">
+		<ToolCard>
+			<div class="flex flex-col gap-6 p-5 lg:p-7">
+				<div class="flex flex-col gap-4">
+					<p class="mb-4 flex items-center gap-3 text-lg font-semibold sm:text-xl">
+						<span
+							class="w-8 h-8 flex items-center justify-center bg-brand-field border border-brand-ink font-semibold"
+							>1</span
 						>
-						<span class="font-black text-sm">Upload or drop a .csv file</span>
-						<span class="text-xs text-gray-500 font-semibold mt-1"
-							>{fileName || 'header row required'}</span
-						>
-						<input type="file" accept=".csv,text/csv" class="hidden" on:change={handleFile} />
-					</label>
-					<div class="flex flex-col">
-						<textarea
-							bind:value={csvText}
-							rows="5"
-							placeholder={'or paste CSV here…\nname,email,score\nAda,ada@example.com,94'}
-							class="flex-1 border-[3px] border-gray-900 p-3 font-mono text-xs resize-none focus:outline-none focus:ring-0"
-						/>
-						<div class="flex gap-3 mt-3">
-							<button
-								on:click={handlePaste}
-								class="px-4 py-2 bg-gray-900 text-white border-[3px] border-gray-900 font-black text-xs uppercase tracking-wide shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
-								>Use pasted data</button
-							>
-							<button
-								on:click={loadSample}
-								class="px-4 py-2 bg-white text-gray-900 border-[3px] border-gray-900 font-black text-xs uppercase tracking-wide shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
-								>Try sample data</button
-							>
-						</div>
-					</div>
-				</div>
-				{#if parseError}
-					<p class="mt-4 text-sm font-bold text-brand-danger">{parseError}</p>
-				{/if}
-				{#if rows.length}
-					<p class="mt-4 text-sm font-bold text-gray-700">
-						Parsed <span class="bg-data-green px-1 border-b-2 border-black">{rows.length} rows</span
-						>
-						· {headers.length} columns: <span class="font-mono text-xs">{headers.join(', ')}</span>
+						Add your CSV
 					</p>
-				{/if}
-			</div>
-
-			<!-- Step 2: mode -->
-			{#if rows.length}
-				<div class="bg-white border-[3px] border-black shadow-brutal-xl p-5 sm:p-8 mb-6">
-					<h2 class="font-black text-lg sm:text-xl mb-4 flex items-center gap-3">
-						<span
-							class="w-8 h-8 flex items-center justify-center bg-brand-accent border-[3px] border-black font-black"
-							>2</span
+					<div class="grid md:grid-cols-2 gap-5">
+						<label
+							class="flex flex-col items-center justify-center border border-dashed border-brand-mute hover:border-black bg-brand-subtle p-8 cursor-pointer transition-colors text-center"
+							on:drop|preventDefault={handleFile}
+							on:dragover|preventDefault
 						>
-						Choose the output
-					</h2>
-					<div class="grid md:grid-cols-2 gap-4">
-						<button
-							class="text-left p-5 border-[3px] border-black transition-all {mode === 'per-row'
-								? 'bg-gray-900 text-white shadow-brutal-lg'
-								: 'bg-white hover:bg-gray-50'}"
-							on:click={() => (mode = 'per-row')}
-						>
-							<div class="font-black mb-1">One document per row</div>
-							<p
-								class="text-xs font-semibold {mode === 'per-row'
-									? 'text-gray-300'
-									: 'text-gray-500'}"
+							<svg
+								class="w-8 h-8 mb-2 text-brand-mute"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+								/></svg
 							>
-								Every row becomes its own formatted PDF page: titles, labeled fields, ready to
-								send. {rows.length} rows → {Math.min(rows.length, rowsToRender) || 0} pages now{rows.length >
-								rowsToRender
-									? ` (free cap)`
-									: ''}.
-							</p>
-						</button>
-						<button
-							class="text-left p-5 border-[3px] border-black transition-all {mode === 'table'
-								? 'bg-gray-900 text-white shadow-brutal-lg'
-								: 'bg-white hover:bg-gray-50'}"
-							on:click={() => (mode = 'table')}
-						>
-							<div class="font-black mb-1">Whole sheet as a table</div>
-							<p
-								class="text-xs font-semibold {mode === 'table' ? 'text-gray-300' : 'text-gray-500'}"
+							<span class="font-semibold text-sm">Upload or drop a .csv file</span>
+							<span class="text-xs text-brand-mute font-semibold mt-1"
+								>{fileName || 'header row required'}</span
 							>
-								One clean, print-ready PDF of the table itself (first 40 rows).
-							</p>
-						</button>
-					</div>
-
-					<button
-						on:click={generate}
-						disabled={isGenerating}
-						class="mt-6 w-full px-8 py-4 bg-data-green text-gray-900 border-[3px] border-black font-black text-base uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-60 disabled:cursor-wait"
-					>
-						{#if isGenerating}
-							Rendering page {progress}/{progressTotal}…
-						{:else}
-							Generate PDF
-						{/if}
-					</button>
-				</div>
-			{/if}
-
-			<!-- Step 3: result -->
-			{#if pdfBlobUrl}
-				<div class="bg-gray-900 border-[3px] border-black shadow-brutal-xl p-5 sm:p-8 text-white">
-					<h2 class="font-black text-lg sm:text-xl mb-4 flex items-center gap-3">
-						<span
-							class="w-8 h-8 flex items-center justify-center bg-data-green text-gray-900 border-[3px] border-black font-black"
-							>✓</span
-						>
-						Your PDF is ready
-					</h2>
-					<div class="flex flex-wrap gap-3 mb-6">
-						<a
-							href={pdfBlobUrl}
-							download="{(fileName || 'documents').replace(/\.csv$/i, '')}.pdf"
-							on:click={() =>
-								analytics.trackDownload({
-									content_type: 'document',
-									format: 'pdf',
-									tool_name: 'csv_to_pdf'
-								})}
-							class="px-6 py-3 bg-data-green text-gray-900 border-[3px] border-white font-black text-sm uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>Download PDF ({generatedImages.length} page{generatedImages.length === 1
-								? ''
-								: 's'})</a
-						>
-					</div>
-					{#if mode === 'per-row'}
-						<div class="border-t-[3px] border-white/20 pt-5">
-							<p class="font-bold text-gray-300 text-sm leading-relaxed">
-								<span class="text-white font-black">Next step:</span> these documents are still on
-								your disk; the deadline wants them in inboxes. A workflow run renders every row
-								{rows.length > rowsToRender ? `(all ${rows.length}, not just ${rowsToRender})` : ''}
-								with a branded template and
-								<span class="text-data-green font-black">emails each one to its recipient</span> with
-								delivered/bounced status per person.
-							</p>
-							<a
-								href="/signup?redirect=%2Fdashboard%2Fworkflows%2Fnew"
-								class="inline-block mt-4 px-6 py-3 bg-white text-gray-900 border-[3px] border-white font-black text-sm uppercase tracking-wide shadow-[4px_4px_0_0_#4ade80] hover:shadow-[2px_2px_0_0_#4ade80] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-								>Email These Documents →</a
-							>
+							<input type="file" accept=".csv,text/csv" class="hidden" on:change={handleFile} />
+						</label>
+						<div class="flex flex-col">
+							<textarea
+								bind:value={csvText}
+								rows="5"
+								placeholder={'or paste CSV here…\nname,email,score\nAda,ada@example.com,94'}
+								class="flex-1 border border-brand-ink p-3 font-mono text-xs resize-none focus:outline-none focus:ring-0"
+							/>
+							<div class="flex gap-3 mt-3">
+								<button
+									on:click={handlePaste}
+									class="px-4 py-2 bg-brand-press text-white border border-brand-ink font-semibold text-xs tracking-wide transition-all"
+									>Use pasted data</button
+								>
+								<button
+									on:click={loadSample}
+									class="px-4 py-2 bg-brand-paper text-brand-ink border border-brand-ink font-semibold text-xs tracking-wide transition-all"
+									>Try sample data</button
+								>
+							</div>
 						</div>
+					</div>
+					{#if parseError}
+						<p class="mt-4 text-sm font-bold text-brand-alarm">{parseError}</p>
+					{/if}
+					{#if rows.length}
+						<p class="mt-4 text-sm font-bold text-brand-slate">
+							Parsed <span class="bg-brand-proof px-1 border-b-2 border-brand-ink"
+								>{rows.length} rows</span
+							>
+							· {headers.length} columns:
+							<span class="font-mono text-xs">{headers.join(', ')}</span>
+						</p>
 					{/if}
 				</div>
-			{/if}
-		</div>
+				{#if rows.length}
+					<div class="flex flex-col gap-4">
+						<p class="mb-4 flex items-center gap-3 text-lg font-semibold sm:text-xl">
+							<span
+								class="w-8 h-8 flex items-center justify-center bg-brand-field border border-brand-ink font-semibold"
+								>2</span
+							>
+							Choose the output
+						</p>
+						<div class="grid md:grid-cols-2 gap-4">
+							<button
+								class="text-left p-5 border border-brand-ink transition-all {mode === 'per-row'
+									? 'bg-brand-press text-white'
+									: 'bg-brand-paper hover:bg-brand-subtle'}"
+								on:click={() => (mode = 'per-row')}
+							>
+								<div class="font-semibold mb-1">One document per row</div>
+								<p
+									class="text-xs font-semibold {mode === 'per-row'
+										? 'text-brand-press-text'
+										: 'text-brand-mute'}"
+								>
+									Every row becomes its own formatted PDF page: titles, labeled fields, ready to
+									send. {rows.length} rows → {Math.min(rows.length, rowsToRender) || 0} pages now{rows.length >
+									rowsToRender
+										? ` (free cap)`
+										: ''}.
+								</p>
+							</button>
+							<button
+								class="text-left p-5 border border-brand-ink transition-all {mode === 'table'
+									? 'bg-brand-press text-white'
+									: 'bg-brand-paper hover:bg-brand-subtle'}"
+								on:click={() => (mode = 'table')}
+							>
+								<div class="font-semibold mb-1">Whole sheet as a table</div>
+								<p
+									class="text-xs font-semibold {mode === 'table'
+										? 'text-brand-press-text'
+										: 'text-brand-mute'}"
+								>
+									One clean, print-ready PDF of the table itself (first 40 rows).
+								</p>
+							</button>
+						</div>
+					</div>
+				{/if}
+			</div>
 
-		<!-- SEO content -->
-		<div class="max-w-4xl mx-auto">
-			<section class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg p-5 sm:p-8">
-				<h2 class="text-xl sm:text-2xl md:text-3xl font-black mb-4 text-black tracking-tight">
-					A CSV to PDF converter that understands rows are people
-				</h2>
-				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium mb-4">
+			<svelte:fragment slot="toolbar-left">
+				<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">
+					{rows.length ? `${rows.length} ROWS · ${headers.length} COLUMNS` : 'CSV → PDF'}
+				</span>
+			</svelte:fragment>
+
+			<svelte:fragment slot="toolbar-right">
+				<QuotaMeter
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+				/>
+				<GenerateButton
+					label={isGenerating ? `Rendering ${progress}/${progressTotal}…` : 'Generate PDF'}
+					loading={isGenerating}
+					ready={rows.length > 0}
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+					on:generate={generate}
+				/>
+			</svelte:fragment>
+		</ToolCard>
+	</div>
+
+	<div slot="result">
+		{#if pdfBlobUrl}
+			<div class="bg-brand-press border border-brand-ink p-5 sm:p-8 text-white">
+				<p class="mb-4 flex items-center gap-3 text-lg font-semibold sm:text-xl">
+					<span
+						class="w-8 h-8 flex items-center justify-center bg-brand-proof text-brand-ink border border-brand-ink font-semibold"
+						>✓</span
+					>
+					Your PDF is ready
+				</p>
+				<div class="flex flex-wrap gap-3 mb-6">
+					<a
+						href={pdfBlobUrl}
+						download="{(fileName || 'documents').replace(/\.csv$/i, '')}.pdf"
+						on:click={() =>
+							analytics.trackDownload({
+								content_type: 'document',
+								format: 'pdf',
+								tool_name: 'csv_to_pdf'
+							})}
+						class="px-6 py-3 bg-brand-proof text-brand-ink border border-white/30 font-semibold text-sm tracking-wide transition-all"
+						>Download PDF ({generatedImages.length} page{generatedImages.length === 1
+							? ''
+							: 's'})</a
+					>
+				</div>
+				{#if mode === 'per-row'}
+					<div class="border-t border-white/20 pt-5">
+						<p class="font-bold text-brand-press-text text-sm leading-relaxed">
+							<span class="text-white font-semibold">Next step:</span> this run stopped at the free
+							cap. A batch render takes the whole sheet
+							{rows.length > rowsToRender ? `(all ${rows.length}, not just ${rowsToRender})` : ''}
+							against a branded template and gives you
+							<span class="text-brand-proof font-semibold">a result per row</span>: a CDN link for
+							each document, and a webhook when the batch finishes.
+						</p>
+						<a
+							href="/signup?redirect=%2Fdashboard%2Fworkflows%2Fnew"
+							class="inline-block mt-4 px-6 py-3 bg-brand-paper text-brand-ink border border-white/30 font-semibold text-sm tracking-wide transition-all"
+							>Render The Whole Sheet →</a
+						>
+					</div>
+				{/if}
+			</div>
+		{/if}
+	</div>
+
+	<AutomateSection
+		slot="automate"
+		toolName={TOOL_NAME}
+		description="Render the same CSV through the API: one PDF page per row against a branded template, with a CDN link per document and a webhook when the run finishes."
+		codeExamples={csvToPdfExamples}
+	/>
+
+	<svelte:fragment slot="longform">
+		<LongformSection
+			index="01"
+			id="about"
+			first
+			title="A CSV to PDF converter that understands rows are people"
+		>
+			<Prose>
+				<p>
 					Most CSV to PDF converters print your spreadsheet as one long table, fine for archiving,
 					useless when each row is a person who needs their own document. This tool does both jobs:
 					render the whole sheet as a clean table PDF, or flip one switch and every row becomes its
 					own formatted page, with the first column as the title and every column as a labeled
 					field.
 				</p>
-				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
-					And when the documents need to reach the people in the rows, a
-					<a href="/solutions/mail-merge-with-attachments" class="underline font-black"
-						>Pictify workflow</a
-					>
+				<p>
+					And when the sheet is longer than the free cap, a
+					<a href="/docs">Pictify batch run</a>
 					takes the same CSV, renders each row against a branded template (certificate, letter, report,
-					or one the
-					<span class="font-black">AI Template Maker</span> writes from your description), and emails
-					every document to its recipient with per-person delivery status.
+					or one the <strong>AI Template Maker</strong> writes from your description), and hands back
+					a CDN link per document with a webhook when the run finishes.
 				</p>
-			</section>
+			</Prose>
+		</LongformSection>
 
-			<!-- FAQ -->
-			<section class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg p-5 sm:p-8">
-				<h2 class="text-xl sm:text-2xl md:text-3xl font-black mb-6 text-black tracking-tight">
-					Frequently Asked Questions
-				</h2>
-				<div class="space-y-3">
-					{#each faqs as faq}
-						<details
-							class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-						>
-							<summary
-								class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none text-sm"
-							>
-								<span>{faq.q}</span>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300 flex-shrink-0"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-								>
-									<path
-										fill-rule="evenodd"
-										d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-										clip-rule="evenodd"
-									/>
-								</svg>
-							</summary>
-							<div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
-								{faq.a}
-							</div>
-						</details>
-					{/each}
-				</div>
-			</section>
-		</div>
+		<LongformSection index="02" id="faq" title="Frequently Asked Questions">
+			<FaqList {faqs} />
+		</LongformSection>
+	</svelte:fragment>
 
-		<RelatedTools tools={['table', 'json-to-image', 'markdown', 'receipt']} />
-	</div>
-
-	<Footer />
-</section>
+</ToolPageShell>

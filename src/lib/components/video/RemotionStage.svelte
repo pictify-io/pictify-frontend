@@ -23,6 +23,7 @@
 	import { parseSequences, retimeSequence, toTimelineBars } from '$lib/video/sequence-timing.js';
 	import { editVideoTemplateCodeStream } from '../../../api/videoTemplates';
 	import RemotionChat from './RemotionChat.svelte';
+	import { PRESS, TSX_RULES, segmentize } from '$lib/utils/press-highlight.js';
 
 	/** The composition source. */
 	export let tsx = '';
@@ -46,6 +47,7 @@
 	let playerHost = null;
 	let playerEl;
 	let editorEl;
+	let overlayEl;
 	let gutterEl;
 	let status = 'loading'; // loading | compiling | live | error
 	let hostReady = false;
@@ -53,6 +55,60 @@
 	let compileErrors = [];
 
 	$: lineCount = tsx.split('\n').length;
+	$: segments = segmentize(tsx, TSX_RULES);
+
+	// ── Transport ────────────────────────────────────────────────────────
+	//
+	// The player used to run on `autoPlay` with Remotion's own control bar and
+	// nothing else. Autoplay is a request a browser can refuse, and a remount
+	// after an edit drops it, so there were states with no way back to a playing
+	// video — which is what "the video is not playing" meant. The pill below
+	// drives the PlayerRef directly, so play is always one click away.
+	let player = null;
+	let playing = false;
+	let frame = 0;
+
+	const clock = (f) => {
+		const total = Math.max(0, f) / Math.max(1, fps);
+		const mins = Math.floor(total / 60);
+		const secs = total - mins * 60;
+		return `${mins}:${secs.toFixed(1).padStart(4, '0')}`;
+	};
+	$: elapsed = clock(frame);
+	$: total = clock(durationInFrames);
+
+	const togglePlay = () => {
+		if (!player) return;
+		if (player.isPlaying()) player.pause();
+		else player.play();
+	};
+
+	const seekToRatio = (ratio) => {
+		if (!player) return;
+		const target = Math.round(Math.min(1, Math.max(0, ratio)) * (durationInFrames - 1));
+		player.seekTo(target);
+	};
+
+	const scrub = (event) => {
+		const track = event.currentTarget;
+		const box = track.getBoundingClientRect();
+		if (!box.width) return;
+		seekToRatio((event.clientX - box.left) / box.width);
+	};
+
+	// Keyboard seeking on the scrubber: a slider a mouse can reach and a
+	// keyboard cannot is not a control, it is a picture of one.
+	const scrubKey = (event) => {
+		if (!player) return;
+		const step = event.shiftKey ? Math.round(fps) : 1;
+		if (event.key === 'ArrowRight') player.seekTo(Math.min(durationInFrames - 1, frame + step));
+		else if (event.key === 'ArrowLeft') player.seekTo(Math.max(0, frame - step));
+		else if (event.key === 'Home') player.seekTo(0);
+		else if (event.key === 'End') player.seekTo(durationInFrames - 1);
+		else if (event.key === ' ' || event.key === 'Enter') togglePlay();
+		else return;
+		event.preventDefault();
+	};
 
 	/*
 	 * The player needs a sized box. It renders into whatever element it is given
@@ -247,7 +303,14 @@
 	}`;
 
 	const syncGutter = () => {
-		if (gutterEl && editorEl) gutterEl.scrollTop = editorEl.scrollTop;
+		if (!editorEl) return;
+		// The textarea is the only scroller. The gutter and the highlight overlay
+		// are followers, or the colours drift off the code they belong to.
+		if (gutterEl) gutterEl.scrollTop = editorEl.scrollTop;
+		if (overlayEl) {
+			overlayEl.scrollTop = editorEl.scrollTop;
+			overlayEl.scrollLeft = editorEl.scrollLeft;
+		}
 	};
 
 	/** Tab indents instead of leaving the editor, which is the whole point of a code box. */
@@ -289,7 +352,10 @@
 			// The composition's own schema is the source of truth for what it can
 			// be parameterised by, so the studio's Variables tab is fed from the
 			// running code rather than from whatever was last saved.
-			onSchema: (fields) => dispatch('schema', { fields })
+			onSchema: (fields) => dispatch('schema', { fields }),
+			onFrame: (f) => (frame = f),
+			onReady: (ref) => (player = ref),
+			onPlayState: (value) => (playing = value)
 		});
 		if (ok) {
 			status = 'live';
@@ -333,35 +399,59 @@
 	});
 </script>
 
-<div class="flex h-full min-h-0 w-full">
+<!-- gap-4, matching the timeline kind: the two kinds are the same studio, so
+     the chat panel floats as its own card with the stage showing between them
+     rather than the two running together as one white slab. -->
+<div class="flex h-full min-h-0 w-full gap-4">
 	{#if showPane}
 		<!--
 			Chat first, code behind a tab. The composition is edited by describing
 			the change; the source is there for anyone who wants it, but it is no
 			longer the first thing the editor puts in front of you.
 		-->
-		<div class="flex min-h-0 w-[42%] max-w-[560px] flex-col border-r-[3px] border-black bg-gray-950">
-			<div class="flex shrink-0 items-center gap-1 border-b border-gray-800 px-2 py-1.5">
-				{#each [['chat', 'Chat'], ['code', 'Code']] as [id, label] (id)}
+		<div class="studio-card flex min-h-0 w-[42%] max-w-[560px] flex-col overflow-hidden rounded-card bg-brand-paper">
+			<div class="flex shrink-0 items-center gap-1 border-b border-brand-rule px-2 py-1.5">
+				<!-- "Say it", not "Chat": the image studio calls this rail Say it, and
+				     the two studios are one product. -->
+				{#each [['chat', 'Say it'], ['code', 'Code']] as [id, label] (id)}
 					<button
 						type="button"
 						on:click={() => (pane = id)}
-						class="rounded px-2 py-1 text-[10px] font-black uppercase tracking-widest transition-colors
-							{pane === id ? 'bg-gray-800 text-brand-accent' : 'text-gray-500 hover:text-gray-300'}"
+						class="rounded px-2 py-1 text-[10px] font-mono uppercase tracking-[0.08em] transition-colors
+							{pane === id ? 'bg-brand-subtle text-brand-ink' : 'text-brand-mute hover:text-brand-ink'}"
 					>
 						{label}
 					</button>
 				{/each}
 				<span
-					class="ml-auto rounded px-1.5 py-0.5 text-[10px] font-black uppercase tracking-widest
+					class="ml-auto rounded px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-[0.08em]
 						{status === 'live'
-						? 'bg-brand-success/15 text-brand-success'
+						? 'bg-brand-proof/15 text-brand-proof'
 						: status === 'error'
-							? 'bg-brand-danger/15 text-brand-danger'
-							: 'bg-gray-800 text-gray-400'}"
+							? 'bg-brand-alarm/15 text-brand-alarm'
+							: 'bg-brand-subtle text-brand-slate'}"
 				>
 					{status === 'live' ? 'Live' : status === 'error' ? 'Error' : 'Compiling'}
 				</span>
+
+				<!-- Hiding this panel is a view preference, so the control lives on the
+				     panel it hides rather than as a checkbox in the inspector. -->
+				<button
+					type="button"
+					on:click={() => dispatch('hidePane')}
+					aria-label="Hide the side panel"
+					title="Hide the side panel"
+					class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-btn text-brand-mute hover:bg-brand-subtle hover:text-brand-ink"
+				>
+					<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+						<path
+							d="M1 1l8 8M9 1l-8 8"
+							stroke="currentColor"
+							stroke-width="1.6"
+							stroke-linecap="round"
+						/>
+					</svg>
+				</button>
 			</div>
 
 			{#if pane === 'chat'}
@@ -374,35 +464,62 @@
 					on:revert={revertEdit}
 				/>
 			{:else}
-				<div class="flex min-h-0 flex-1">
+				<!--
+					Same overlay technique as the image studio's HtmlPane: a coloured
+					<pre> under a transparent textarea. The textarea stays a textarea,
+					so native undo, selection, IME and paste keep working — which a
+					contenteditable re-implements badly and CodeMirror brings a whole
+					parser along for.
+				-->
+				<div class="flex min-h-0 flex-1" style="background: {PRESS.bg}">
 					<!-- Line numbers scroll with the textarea rather than in their own box. -->
 					<div
 						bind:this={gutterEl}
-						class="ov-gutter shrink-0 overflow-hidden bg-gray-900 py-3 pl-3 pr-2 text-right font-mono text-[11px] leading-[1.55] text-gray-600"
+						class="ov-gutter shrink-0 overflow-hidden py-3 pl-3 pr-2 text-right font-mono text-[11px] leading-[1.55]"
+						style="color: rgba(173,185,198,0.35)"
 						aria-hidden="true"
 					>
 						{#each Array(lineCount) as _, i (i)}
 							<div>{i + 1}</div>
 						{/each}
 					</div>
-					<textarea
-						bind:this={editorEl}
-						value={tsx}
-						on:input={onInput}
-						on:scroll={syncGutter}
-						on:keydown={handleKeydown}
-						spellcheck="false"
-						autocomplete="off"
-						autocapitalize="off"
-						aria-label="Composition source"
-						class="ov-code min-h-0 flex-1 resize-none bg-gray-950 py-3 pl-2 pr-3 font-mono text-[11px] leading-[1.55] text-gray-100 outline-none"
-					></textarea>
+					<div class="relative min-w-0 flex-1">
+						<pre
+							bind:this={overlayEl}
+							aria-hidden="true"
+							class="ov-code pointer-events-none absolute inset-0 overflow-hidden py-3 pl-2 pr-3 font-mono text-[11px] leading-[1.55]"
+							style="color: {PRESS.text}"
+						>{#each segments as seg, i (i)}{#if seg.color}<span
+										style="color:{seg.color}{seg.weight ? `;font-weight:${seg.weight}` : ''}"
+										>{seg.text}</span
+									>{:else}{seg.text}{/if}{/each}</pre>
+						<textarea
+							bind:this={editorEl}
+							value={tsx}
+							on:input={onInput}
+							on:scroll={syncGutter}
+							on:keydown={handleKeydown}
+							spellcheck="false"
+							autocomplete="off"
+							autocapitalize="off"
+							aria-label="Composition source"
+							class="ov-code absolute inset-0 h-full w-full resize-none overflow-auto bg-transparent py-3 pl-2 pr-3 font-mono text-[11px] leading-[1.55] text-transparent caret-white outline-none"
+						></textarea>
+					</div>
+				</div>
+
+				<div class="flex shrink-0 items-center gap-2 border-t border-white/10 px-3 py-2.5" style="background: {PRESS.bg}">
+					<span class="block h-2 w-2 flex-shrink-0" style="background: {PRESS.token}" aria-hidden="true"
+					></span>
+					<span class="font-mono text-[11px] leading-[15px]" style="color: rgba(173,185,198,0.55)">
+						Pink schema fields are inputs — add one and it appears in the Inputs panel.
+					</span>
 				</div>
 
 				{#if compileErrors.length}
-					<div class="max-h-40 shrink-0 overflow-y-auto border-t-[3px] border-black bg-brand-danger/10 p-3">
+					<div class="max-h-40 shrink-0 overflow-y-auto border-t border-brand-rule bg-brand-alarm/10 p-3">
 						{#each compileErrors as error (error)}
-							<p class="font-mono text-[11px] leading-snug text-brand-danger">{error}</p>
+							<p class="font-mono text-[11px] leading-snug text-brand-alarm">{error}</p>
 						{/each}
 					</div>
 				{/if}
@@ -410,14 +527,93 @@
 		</div>
 	{/if}
 
-	<div class="flex min-h-0 flex-1 flex-col overflow-hidden bg-gray-950">
-		<div class="flex min-h-0 flex-1 items-center justify-center p-4">
+	{#if !showPane}
+		<!-- The way back. A panel you can close and not reopen is a panel you
+		     lose. -->
+		<button
+			type="button"
+			on:click={() => dispatch('showPane')}
+			class="studio-card flex h-full w-11 flex-shrink-0 items-center justify-center rounded-card bg-brand-paper text-brand-slate hover:text-brand-ink"
+			title="Show the side panel"
+		>
+			<span class="font-mono text-[10px] uppercase tracking-[0.08em] [writing-mode:vertical-rl]">
+				Say it
+			</span>
+		</button>
+	{/if}
+
+	<div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+		<div class="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-4">
 			<div
 				bind:this={playerEl}
 				data-testid="player-root"
-				class="overflow-hidden rounded-lg bg-black"
+				class="min-h-0 overflow-hidden rounded-lg bg-black"
 				style={playerStyle}
 			></div>
+
+			<!--
+				Transport. Sized as a pill so it reads as one control rather than a
+				toolbar: this surface has exactly one thing to do, and the scrubber
+				is the only place a frame number is worth showing.
+			-->
+			<div
+				class="flex flex-shrink-0 items-center gap-3 rounded-full bg-brand-paper py-0 pl-1.5 pr-4"
+				style="box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)"
+			>
+				<button
+					type="button"
+					on:click={togglePlay}
+					disabled={!player}
+					aria-label={playing ? 'Pause' : 'Play'}
+					class="my-1 flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-brand-ink text-white transition-opacity hover:opacity-85 disabled:opacity-40"
+				>
+					{#if playing}
+						<svg width="10" height="11" viewBox="0 0 10 11" aria-hidden="true">
+							<rect x="0" y="0" width="3.2" height="11" fill="currentColor" />
+							<rect x="6.8" y="0" width="3.2" height="11" fill="currentColor" />
+						</svg>
+					{:else}
+						<svg width="10" height="11" viewBox="0 0 10 11" aria-hidden="true">
+							<path d="M0 0l10 5.5L0 11z" fill="currentColor" />
+						</svg>
+					{/if}
+				</button>
+
+				<span class="font-mono text-[11px] tabular-nums text-brand-ink">{elapsed}</span>
+
+				<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+				<div
+					role="slider"
+					tabindex="0"
+					aria-label="Seek"
+					aria-valuemin={0}
+					aria-valuemax={Math.max(0, durationInFrames - 1)}
+					aria-valuenow={frame}
+					aria-valuetext="Frame {frame} of {Math.max(0, durationInFrames - 1)}"
+					on:click={scrub}
+					on:keydown={scrubKey}
+					class="group relative h-6 w-[180px] flex-shrink-0 cursor-pointer focus:outline-none"
+				>
+					<div class="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-brand-rule">
+						<div
+							class="h-full rounded-full bg-brand-ink"
+							style="width: {durationInFrames > 1
+								? Math.min(100, (frame / (durationInFrames - 1)) * 100)
+								: 0}%"
+						></div>
+					</div>
+					<div
+						class="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-pink opacity-0 transition-opacity group-hover:opacity-100 group-focus:opacity-100"
+						style="left: {durationInFrames > 1
+							? Math.min(100, (frame / (durationInFrames - 1)) * 100)
+							: 0}%"
+					></div>
+				</div>
+
+				<span class="font-mono text-[11px] tabular-nums text-brand-mute">
+					/ {total} · FRAME {frame}
+				</span>
+			</div>
 		</div>
 
 		{#if bars.length}
@@ -426,12 +622,12 @@
 				two numbers are safely editable from a UI; the rest of a Remotion
 				scene is arithmetic on the frame with no timeline representation.
 			-->
-			<div class="shrink-0 border-t-[3px] border-black bg-gray-900 px-3 py-2" data-testid="sequence-track">
+			<div class="shrink-0 border-t border-brand-rule bg-brand-subtle px-3 py-2" data-testid="sequence-track">
 				<div class="mb-1.5 flex items-baseline justify-between">
-					<span class="text-[10px] font-black uppercase tracking-widest text-gray-400">
+					<span class="text-[10px] font-mono uppercase tracking-[0.08em] text-brand-slate">
 						Beats
 					</span>
-					<span class="text-[10px] font-bold text-gray-500">
+					<span class="text-[10px] font-bold text-brand-mute">
 						{#if editableBars === bars.length}
 							Drag to retime
 						{:else}
@@ -455,8 +651,8 @@
 								on:pointerdown={(e) => startDrag(e, bar, 'move')}
 								class="absolute top-0 flex h-6 items-center rounded border-[2px] px-1.5 text-[10px] font-bold
 									{bar.editable
-									? 'cursor-grab border-black bg-brand-accent text-black active:cursor-grabbing'
-									: 'cursor-not-allowed border-gray-700 bg-gray-800 text-gray-400'}"
+									? 'cursor-grab border-brand-rule bg-brand-field text-black active:cursor-grabbing'
+									: 'cursor-not-allowed border-brand-rule bg-brand-subtle text-brand-slate'}"
 								style="left: {bar.left * 100}%; width: max(28px, {bar.width * 100}%);"
 							>
 								<span class="truncate">{bar.label || `Beat ${bar.index + 1}`}</span>

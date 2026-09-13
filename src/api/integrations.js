@@ -105,6 +105,27 @@ const getWebhookStats = async () => {
 	return response;
 };
 
+/**
+ * Fire a test event at one endpoint. Same queue, signing and SSRF checks as a
+ * real delivery, so a green result actually means the endpoint works.
+ * @param {string} id - Subscription UID
+ * @returns {Promise<Object>} - { queued, targetUrl }
+ */
+const sendWebhookTest = async (id) => {
+	const response = await backend.post(`/webhook-subscriptions/${id}/test`, {});
+	return response;
+};
+
+/**
+ * Recent delivery attempts across all endpoints (last 24 hours).
+ * @param {number} [limit=20]
+ * @returns {Promise<Object>} - { deliveries, windowHours, total }
+ */
+const getWebhookDeliveries = async (limit = 20) => {
+	const response = await backend.get(`/webhook-subscriptions/deliveries?limit=${limit}`);
+	return response;
+};
+
 // ============== Connector Config APIs ==============
 
 /**
@@ -256,6 +277,8 @@ export {
 	pauseWebhookSubscription,
 	resumeWebhookSubscription,
 	getWebhookStats,
+	sendWebhookTest,
+	getWebhookDeliveries,
 	// Connector Config APIs
 	createConnectorConfig,
 	getConnectorConfigs,

@@ -1,0 +1,115 @@
+{
+  "route": "/tools/og-image-generator/twitter",
+  "title": "OG Image Generator for X (Twitter) | Pictify.io",
+  "canonical": "https://pictify.io/tools/og-image-generator/twitter",
+  "metas": {
+    "description": "Create perfect Open Graph images for X (Twitter). Customize templates, colors, fonts, and logos with Pictify.io's free OG Image Generator.",
+    "og:description": "Create perfect Open Graph images for X (Twitter). Customize templates, colors, fonts, and logos with Pictify.io's free OG Image Generator.",
+    "og:image": "https://media.pictify.io/31hxg-1775406864453.png",
+    "og:site_name": "Pictify",
+    "og:title": "OG Image Generator for X (Twitter) | Pictify.io",
+    "og:type": "website",
+    "og:url": "https://pictify.io/tools/og-image-generator/twitter",
+    "robots": "index, follow, max-image-preview:large",
+    "twitter:card": "summary_large_image",
+    "twitter:description": "Create perfect Open Graph images for X (Twitter). Customize templates, colors, fonts, and logos with Pictify.io's free OG Image Generator.",
+    "twitter:image": "https://media.pictify.io/31hxg-1775406864453.png",
+    "twitter:title": "OG Image Generator for X (Twitter) | Pictify.io",
+    "twitter:url": "https://pictify.io/tools/og-image-generator/twitter"
+  },
+  "jsonLd": [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "description": "API-first image, document, and video generation. Every row of a spreadsheet or webhook becomes a rendered, personalized certificate, badge, report, or video, delivered by email.",
+      "logo": "https://pictify.io/logo.png",
+      "name": "Pictify",
+      "sameAs": [
+        "https://github.com/pictify-io"
+      ],
+      "url": "https://pictify.io"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "applicationCategory": [
+        "DesignApplication",
+        "SEO Tool"
+      ],
+      "description": "Create perfect Open Graph images for X (Twitter). Customize templates, colors, fonts, and logos with Pictify.io's free OG Image Generator.",
+      "mainEntity": [
+        {
+          "@type": "HowTo",
+          "name": "Add OG image to X (Twitter)",
+          "step": [
+            {
+              "@type": "HowToStep",
+              "text": "Add twitter:card=summary_large_image and twitter:image"
+            },
+            {
+              "@type": "HowToStep",
+              "text": "Image 1200x630 recommended, under 5MB"
+            },
+            {
+              "@type": "HowToStep",
+              "text": "Use Card Validator to refresh"
+            }
+          ]
+        }
+      ],
+      "name": "Pictify OG Image Generator for X (Twitter)",
+      "operatingSystem": "Web",
+      "url": "https://pictify.io/tools/og-image-generator/twitter"
+    }
+  ],
+  "outline": [
+    {
+      "tag": "h1",
+      "text": "OG IMAGE GENERATOR for X (Twitter)"
+    },
+    {
+      "tag": "h2",
+      "text": "Automate with the API"
+    },
+    {
+      "tag": "h2",
+      "text": "Templates for X (Twitter)"
+    },
+    {
+      "tag": "h2",
+      "text": "Ship OG images straight from your product"
+    },
+    {
+      "tag": "h3",
+      "text": "What is an OG Image?"
+    },
+    {
+      "tag": "h3",
+      "text": "Why Use This Tool?"
+    },
+    {
+      "tag": "h2",
+      "text": "FAQ"
+    },
+    {
+      "tag": "h3",
+      "text": "More Tools You'll Love"
+    },
+    {
+      "tag": "h2",
+      "text": "Product"
+    },
+    {
+      "tag": "h2",
+      "text": "Developers"
+    },
+    {
+      "tag": "h2",
+      "text": "Integrations"
+    },
+    {
+      "tag": "h2",
+      "text": "Company"
+    }
+  ]
+}

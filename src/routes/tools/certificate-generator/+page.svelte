@@ -1,120 +1,109 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
-	import NextSteps from '$lib/components/tools/NextSteps.svelte';
-	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
-	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
+	/**
+	 * /tools/certificate-generator — the v2 tool page, column mode.
+	 *
+	 * Bulk upsell, gallery, form and preview become the tool card; the quota
+	 * ladder and Generate move to its toolbar. SEO copy is frozen.
+	 */
+	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
+	import LongformPair from '$lib/components/tools/v2/longform/LongformPair.svelte';
+	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
+	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
+	import Lead from '$lib/components/tools/v2/longform/Lead.svelte';
+	import Prose from '$lib/components/tools/v2/longform/Prose.svelte';
+	import ProseGroup from '$lib/components/tools/v2/longform/ProseGroup.svelte';
+	import FeatureGrid from '$lib/components/tools/v2/longform/FeatureGrid.svelte';
+	import StepCards from '$lib/components/tools/v2/longform/StepCards.svelte';
+	import LinkCardGrid from '$lib/components/tools/v2/longform/LinkCardGrid.svelte';
+	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
+	import JumpLink from '$lib/components/tools/v2/longform/JumpLink.svelte';
+	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
+	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
+	import ToolEditor from '$lib/components/tools/ToolEditor.svelte';
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { user } from '../../../store/user.store';
-	import { toast } from '../../../store/toast.store';
-	import { generationLimits } from '../../../store/generationLimits.store';
-	import { createImagePublic } from '../../../api/image.js';
-	import { analytics } from '$lib/analytics.js';
-	import { downloadFile } from '$lib/utils/download.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { certificateHtmlTemplates } from '$lib/components/tools/CertificateHtmlTemplates.js';
 
 	// User login state (reactive — no manual subscribe needed)
 	$: isUserLoggedIn = !!$user?.email;
 
-	let selectedTemplate = certificateHtmlTemplates[0];
-	let formValues = {
-		recipientName: 'John Doe',
-		organizationName: 'Your Organization',
-		date: new Date().toLocaleDateString('en-US', {
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric'
-		}),
-		achievementText: 'for successfully completing the Advanced Training Program'
-	};
-
-	let isGenerating = false;
-	let generatedImageUrl = '';
-	let generationError = '';
-	let previewContainerWidth = 0;
-
-	// The preview HTML is rebuilt from the form on every keystroke — the same
-	// string that gets POSTed to /image/public, so preview === output.
-	$: previewHtml = selectedTemplate.render(formValues);
-	$: previewScale = previewContainerWidth
-		? Math.min(1, previewContainerWidth / selectedTemplate.width)
-		: 1;
-
-	function selectTemplate(template) {
-		selectedTemplate = template;
-		formValues = {
-			recipientName: 'John Doe',
-			organizationName: 'Your Organization',
-			date: new Date().toLocaleDateString('en-US', {
+	/*
+	 * The gallery for the embed.
+	 *
+	 * THE RECIPIENT IS RENDERED AS A VARIABLE, not as a name. That is the whole
+	 * point of a certificate template: one is also a thousand, and the visitor
+	 * should see `{{name}}` in the design and in Inputs from the first second
+	 * rather than discover the idea later. Everything else renders as sample
+	 * text they can edit directly.
+	 *
+	 * Sizes come from the templates themselves — see the note by CERT_WIDTH.
+	 */
+	/*
+	 * EVERY field the render function takes becomes a variable, not just the
+	 * recipient. These templates carry no ids for the tokeniser to find, but
+	 * `render(values)` names its inputs exactly — so the contract is known
+	 * rather than guessed, and a certificate saved from here can be called with
+	 * all four.
+	 *
+	 * The sample each one starts with is what the tool shipped, so the canvas
+	 * reads as a real certificate rather than four tokens.
+	 */
+	const CERT_FIELDS = [
+		{ key: 'recipientName', token: 'name', sample: 'Ada Lovelace' },
+		{ key: 'organizationName', token: 'organization', sample: 'Your Organization' },
+		{
+			key: 'date',
+			token: 'issued_on',
+			sample: new Date().toLocaleDateString('en-US', {
 				year: 'numeric',
 				month: 'long',
 				day: 'numeric'
-			}),
-			achievementText: 'for successfully completing the Advanced Training Program'
-		};
-		generatedImageUrl = '';
-		generationError = '';
-	}
-
-	// Generation flow (matches [usecase] page pattern) — renders the HTML
-	// template through the public endpoint, same engine as the paid API.
-	async function handleGenerate() {
-		generationLimits.increment();
-		isGenerating = true;
-		generationError = '';
-		generatedImageUrl = '';
-
-		try {
-			const { image } = await createImagePublic({
-				html: previewHtml,
-				width: selectedTemplate.width,
-				height: selectedTemplate.height,
-				fileExtension: 'png'
-			});
-
-			if (image?.url) {
-				generatedImageUrl = image.url;
-				toast.set({
-					message: 'Certificate generated successfully!',
-					type: 'success',
-					duration: 2000
-				});
-				analytics.trackImageGenerated({
-					tool_name: 'certificate_generator',
-					format: 'png',
-					with_watermark: false
-				});
-			} else {
-				throw new Error('No image URL in response');
-			}
-		} catch (e) {
-			if (e.message?.includes('rate') || e.status === 429) {
-				generationError = 'Too many requests. Please wait a moment and try again.';
-			} else {
-				generationError = e.message || 'Failed to generate certificate';
-			}
-			toast.set({ message: generationError, type: 'error', duration: 3000 });
-		} finally {
-			isGenerating = false;
+			})
+		},
+		{
+			key: 'achievementText',
+			token: 'achievement',
+			sample: 'for successfully completing the Advanced Training Program'
 		}
-	}
+	];
+	const CERT_SAMPLE = Object.fromEntries(CERT_FIELDS.map((f) => [f.key, `{{${f.token}}}`]));
+	const CERT_SAMPLE_VALUES = Object.fromEntries(CERT_FIELDS.map((f) => [f.token, f.sample]));
+	$: editorTemplates = certificateHtmlTemplates.map((t) => ({
+		key: t.id,
+		name: t.name,
+		category: null,
+		html: t.render(CERT_SAMPLE)
+	}));
+
+	/*
+	 * The shipped templates are 1920×1080. The handoff matrix asks for landscape
+	 * A4, which is a different aspect ratio (1.414 vs 1.778) — rendering these
+	 * at A4 would letterbox or crop every one of them. Reflowing five designs
+	 * for print is design work, not a prop change, so the canvas uses the
+	 * templates' own size and the A4 question stays open.
+	 */
+	const CERT_WIDTH = certificateHtmlTemplates[0]?.width || 1920;
+	const CERT_HEIGHT = certificateHtmlTemplates[0]?.height || 1080;
+
+	/** One release of escape hatch, the same lever the other tools use. */
+	$: useLegacyTool = $page?.url?.searchParams?.get?.('studio') === 'v1';
+
+
+
+	// The preview HTML is rebuilt from the form on every keystroke — the same
+
 
 	// API snippet for NextSteps — the same HTML with variables swapped in
-	const apiSnippet = `curl -X POST https://api.pictify.io/image \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
-  -d '{
-    "html": "<your certificate HTML: swap the sample values for {{recipientName}}, {{date}}...>",
-    "width": 1920,
-    "height": 1080,
-    "fileExtension": "png"
-  }'`;
 
 	// FAQ data
 	const faqs = [
 		{
 			q: 'Is this certificate generator really free?',
-			a: 'Yes, pick a template, fill in the details, and download a high-resolution PNG free, no signup required. A free account adds bulk generation, PDF output, and email delivery via workflows.'
+			a: 'Yes, pick a template, fill in the details, and download a high-resolution PNG free, no signup required. A free account adds bulk generation, PDF output, and API access.'
 		},
 		{
 			q: 'Can I customize the certificate design?',
@@ -122,27 +111,27 @@
 		},
 		{
 			q: 'What formats can I download certificates in?',
-			a: 'This free tool generates high-quality PNG images at 1920x1080 resolution. With a free account, the API and workflows also render certificates as PDF (including multi-page), JPG, and WebP.'
+			a: 'This free tool generates high-quality PNG images at 1920x1080 resolution. With a free account, the API also renders certificates as PDF (including multi-page), JPG, and WebP.'
 		},
 		{
 			q: 'Can I bulk generate certificates for events or training programs?',
-			a: 'Yes! Pictify works as a bulk certificate generator for events, training programs, and courses. Upload a CSV in a workflow (one row per attendee) and every row renders its own certificate. Or use the API to batch generate up to 500 certificates per call. Perfect for course completions, event attendance, and employee recognition programs.'
+			a: 'Yes! Pictify works as a bulk certificate generator for events, training programs, and courses. Post a CSV to the batch API (one row per attendee) and every row renders its own certificate, up to 500 certificates per call. Perfect for course completions, event attendance, and employee recognition programs.'
 		},
 		{
-			q: 'Can I email certificates to recipients automatically?',
-			a: 'Yes, this is what makes Pictify different from other certificate makers. A workflow run renders each row\'s certificate AND emails it to that recipient from an isolated sending domain (not your Gmail, so no 500/day cap). The run screen shows delivered, bounced, or suppressed per person, and a bounced address can be corrected and re-sent as a single row.'
+			q: 'Can I generate certificates in bulk automatically?',
+			a: 'Yes, this is what makes Pictify different from other certificate makers. A batch API call renders every row of your CSV against the same template in one job, and hands back a CDN link per certificate plus a per-row status you can poll. A webhook fires when the run finishes, so your own system can pick the files up without anyone watching a progress bar.'
 		},
 		{
 			q: 'Can I generate certificates from Google Sheets?',
-			a: 'Export your Sheet as CSV and upload it to a workflow; columns map to certificate variables in the wizard. Unlike Sheets add-ons such as Autocrat, the merge runs on managed infrastructure (no Apps Script 6-minute timeouts) and delivery never touches your Gmail quota.'
+			a: 'Export your Sheet as CSV and post it to the batch API; columns map to certificate variables by name. Unlike Sheets add-ons such as Autocrat, the merge runs on managed infrastructure (no Apps Script 6-minute timeouts) and delivery never touches your Gmail quota.'
 		},
 		{
 			q: 'Can my LMS or form tool trigger certificates automatically?',
-			a: 'Yes. Every workflow exposes a signed webhook. Point your LMS completion event, Typeform, or a Zapier/Make/n8n flow at it and each payload renders and delivers one certificate, with the same per-recipient status tracking as a CSV run.'
+			a: 'Yes. Every template can be rendered from a signed webhook. Point your LMS completion event, Typeform, or a Zapier/Make/n8n flow at it and each payload renders one certificate, with the same per-row status tracking as a CSV run.'
 		},
 		{
 			q: 'Can I add my company logo?',
-			a: 'Yes. In a workflow, templates are HTML: drop an <img> tag with your logo URL anywhere in the design, or upload it as a brand asset. Because templates are code, there is no limit on layout, fonts, or imagery.'
+			a: 'Yes. Templates are HTML: drop an <img> tag with your logo URL anywhere in the design, or upload it as a brand asset. Because templates are code, there is no limit on layout, fonts, or imagery.'
 		},
 		{
 			q: 'Are the generated certificates printable?',
@@ -151,7 +140,7 @@
 	];
 
 	// Structured data
-	const structuredDataJson = JSON.stringify({
+	const structuredData = {
 		'@context': 'https://schema.org',
 		'@type': 'WebApplication',
 		name: 'Pictify.io Certificate Generator',
@@ -179,32 +168,9 @@
 			name: 'Pictify.io',
 			url: 'https://pictify.io'
 		}
-	});
+	};
 
-	const faqSchemaJson = JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'FAQPage',
-		mainEntity: faqs.map((faq) => ({
-			'@type': 'Question',
-			name: faq.q,
-			acceptedAnswer: {
-				'@type': 'Answer',
-				text: faq.a
-			}
-		}))
-	});
-
-	const breadcrumbSchemaJson = JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'BreadcrumbList',
-		itemListElement: [
-			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
-			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
-			{ '@type': 'ListItem', position: 3, name: 'Certificate Generator' }
-		]
-	});
-
-	const howToSchemaJson = JSON.stringify({
+	const howToSchema = {
 		'@context': 'https://schema.org',
 		'@type': 'HowTo',
 		name: 'How to Make a Certificate Online',
@@ -250,12 +216,12 @@
 				'@type': 'HowToStep',
 				position: 6,
 				name: 'Download',
-				text: 'Download your certificate, or start a workflow run to generate and email them in bulk.'
+				text: 'Download your certificate, or batch-render them from a CSV with the API.'
 			}
 		]
-	});
+	};
 
-	const templateListSchemaJson = JSON.stringify({
+	const templateListSchema = {
 		'@context': 'https://schema.org',
 		'@type': 'ItemList',
 		name: 'Free Certificate Templates',
@@ -313,585 +279,165 @@
 				}
 			}
 		]
-	});
+	};
 
 	onMount(() => {
 		analytics.trackToolOpened({ tool_name: 'certificate_generator' });
 	});
+
+	const TOOL_NAME = 'certificate_generator';
+	const TOOL_PATH = '/tools/certificate-generator';
+
+
+	const certificateExamples = [
+		{
+			id: 'javascript',
+			label: 'JavaScript',
+			fileName: 'certificate.js',
+			code: `<span class="text-[#6a9955]">// Render a certificate from an HTML template with dynamic fields</span>
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">html</span> = <span class="text-[#9cdcfe]">template</span>.<span class="text-[#dcdcaa]">replace</span>(<span class="text-[#ce9178]">'{{name}}'</span>, <span class="text-[#9cdcfe]">recipient</span>.<span class="text-[#9cdcfe]">name</span>);
+
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">response</span> = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]">'https://api.pictify.io/image'</span>, {
+  <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
+  <span class="text-[#9cdcfe]">headers</span>: { <span class="text-[#ce9178]">'Content-Type'</span>: <span class="text-[#ce9178]">'application/json'</span>, <span class="text-[#ce9178]">'Authorization'</span>: <span class="text-[#ce9178]">'Bearer YOUR_API_KEY'</span> },
+  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">stringify</span>({ <span class="text-[#9cdcfe]">html</span>, <span class="text-[#9cdcfe]">width</span>: <span class="text-[#b5cea8]">1600</span>, <span class="text-[#9cdcfe]">height</span>: <span class="text-[#b5cea8]">1131</span> })
+});
+
+<span class="text-[#c586c0]">const</span> { <span class="text-[#9cdcfe]">image</span> } = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]">response</span>.<span class="text-[#dcdcaa]">json</span>();
+<span class="text-[#9cdcfe]">console</span>.<span class="text-[#dcdcaa]">log</span>(<span class="text-[#9cdcfe]">image</span>.<span class="text-[#9cdcfe]">url</span>); <span class="text-[#6a9955]">// loop over a CSV to issue a whole class</span>`
+		},
+		{
+			id: 'python',
+			label: 'Python',
+			fileName: 'certificate.py',
+			code: `<span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]">requests</span>
+
+<span class="text-[#c586c0]">for</span> <span class="text-[#9cdcfe]">name</span> <span class="text-[#c586c0]">in</span> <span class="text-[#9cdcfe]">recipients</span>:
+    <span class="text-[#9cdcfe]">html</span> = <span class="text-[#9cdcfe]">template</span>.<span class="text-[#dcdcaa]">replace</span>(<span class="text-[#ce9178]">"{{name}}"</span>, <span class="text-[#9cdcfe]">name</span>)
+    <span class="text-[#9cdcfe]">resp</span> = <span class="text-[#9cdcfe]">requests</span>.<span class="text-[#dcdcaa]">post</span>(<span class="text-[#ce9178]">"https://api.pictify.io/image"</span>,
+        <span class="text-[#9cdcfe]">headers</span>={<span class="text-[#ce9178]">"Authorization"</span>: <span class="text-[#ce9178]">"Bearer YOUR_API_KEY"</span>},
+        <span class="text-[#9cdcfe]">json</span>={<span class="text-[#ce9178]">"html"</span>: <span class="text-[#9cdcfe]">html</span>, <span class="text-[#ce9178]">"width"</span>: <span class="text-[#b5cea8]">1600</span>, <span class="text-[#ce9178]">"height"</span>: <span class="text-[#b5cea8]">1131</span>})
+    <span class="text-[#dcdcaa]">print</span>(<span class="text-[#9cdcfe]">resp</span>.<span class="text-[#dcdcaa]">json</span>()[<span class="text-[#ce9178]">"url"</span>])`
+		},
+		{
+			id: 'curl',
+			label: 'cURL',
+			fileName: 'certificate.sh',
+			code: `<span class="text-[#dcdcaa]">curl</span> -X POST <span class="text-[#ce9178]">https://api.pictify.io/image</span> \\
+  -H <span class="text-[#ce9178]">"Content-Type: application/json"</span> \\
+  -H <span class="text-[#ce9178]">"Authorization: Bearer YOUR_API_KEY"</span> \\
+  -d <span class="text-[#ce9178]">'{"html":"&lt;div&gt;Certificate for ...&lt;/div&gt;","width":1600,"height":1131}'</span>`
+		}
+	];
+
+
+	/** Eight sections, so the column gets the rail rather than running full width. */
+	const TOC = [
+		{ id: 'what-is', label: 'What is a Certificate Generator?' },
+		{ id: 'why-use', label: 'Why Use Our Generator?' },
+		{ id: 'how-to', label: 'How to Make One in 6 Steps' },
+		{ id: 'bulk', label: 'Bulk for Events' },
+		{ id: 'faq', label: 'FAQ' },
+		{ id: 'templates', label: 'Certificate Templates' },
+		{ id: 'free-maker', label: 'Free Online Maker' },
+		{ id: 'bulk-run', label: 'Start a Bulk Run' }
+	];
 </script>
 
-<svelte:head>
-	<title>Certificate Generator: Free Maker + Bulk API for Events & Training | Pictify</title>
-	<meta
-		name="description"
-		content="Free certificate generator with 5 professional templates: customize names, dates, and achievements, then download a high-res PNG. Bulk-generate via the free API."
-	/>
-	<meta
-		name="keywords"
-		content="certificate generator, certificate maker, certificate template, make a certificate, create a certificate, online certificate maker, certificate of achievement template, certificate builder, free certificate maker, bulk certificate generator, certificate generator API, Pictify"
-	/>
-	<link rel="canonical" href="https://pictify.io/tools/certificate-generator" />
-	<meta name="robots" content="index, follow, max-image-preview:large" />
+<ToolSeoHead
+	title="Certificate Generator: Free Maker + Bulk API for Events & Training | Pictify"
+	description="Free certificate generator with 5 professional templates: customize names, dates, and achievements, then download a high-res PNG. Bulk-generate via the free API."
+	keywords="certificate generator, certificate maker, certificate template, make a certificate, create a certificate, online certificate maker, certificate of achievement template, certificate builder, free certificate maker, bulk certificate generator, certificate generator API, Pictify"
+	canonical="https://pictify.io/tools/certificate-generator"
+	robots="index, follow, max-image-preview:large"
+	ogTitle="Certificate Generator: Free Maker + Bulk API for Events & Training | Pictify"
+	ogDescription="Free certificate generator with 5 templates. Bulk-generate certificates for events, training programs, and courses with the free API."
+	ogSiteName="Pictify"
+	ogImage="https://pictify.io/og/tools/certificate-generator.png"
+	ogImageWidth={1200}
+	ogImageHeight={630}
+	ogImageAlt="Pictify Certificate Generator: 5 free templates with API for bulk generation"
+	twitterSite="@pictify_io"
+	twitterTitle="Certificate Generator: Free Maker + Bulk API for Events & Training | Pictify"
+	twitterDescription="Free certificate generator with 5 templates. Bulk-generate certificates for events, training, and courses via API."
+	twitterImage="https://pictify.io/og/tools/certificate-generator.png"
+	twitterImageAlt="Pictify Certificate Generator: 5 free templates with API for bulk generation"
+	webApplicationSchema={structuredData}
+	{faqs}
+	breadcrumbLabel="Certificate Generator"
+	howToSteps={howToSchema.step.map((step) => ({ name: step.name, text: step.text }))}
+	howToMeta={{
+		name: howToSchema.name,
+		description: howToSchema.description,
+		totalTime: howToSchema.totalTime,
+		supply: howToSchema.supply,
+		tool: howToSchema.tool
+	}}
+	extraSchemas={[templateListSchema]}
+/>
 
-	<!-- Open Graph -->
-	<meta
-		property="og:title"
-		content="Certificate Generator: Free Maker + Bulk API for Events & Training | Pictify"
-	/>
-	<meta
-		property="og:description"
-		content="Free certificate generator with 5 templates. Bulk-generate certificates for events, training programs, and courses with the free API."
-	/>
-	<meta property="og:url" content="https://pictify.io/tools/certificate-generator" />
-	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="Pictify" />
-	<meta property="og:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
-	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="630" />
-	<meta
-		property="og:image:alt"
-		content="Pictify Certificate Generator: 5 free templates with API for bulk generation"
-	/>
+<ToolPageShell
+	toolName={TOOL_NAME}
+	toolPath={TOOL_PATH}
+	breadcrumb="CERTIFICATE GENERATOR"
+	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · 5 TEMPLATES"
+	loggedIn={isUserLoggedIn}
+	toc={TOC}
+	longform="rail"
+>
+	<HeroTitle slot="h1">
+		<span>CERTIFICATE</span>
+		<span>GENERATOR</span>
+	</HeroTitle>
 
-	<!-- Twitter Card -->
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:site" content="@pictify_io" />
-	<meta
-		name="twitter:title"
-		content="Certificate Generator: Free Maker + Bulk API for Events & Training | Pictify"
-	/>
-	<meta
-		name="twitter:description"
-		content="Free certificate generator with 5 templates. Bulk-generate certificates for events, training, and courses via API."
-	/>
-	<meta name="twitter:image" content="https://media.pictify.io/qyl7z-1775406830860.png" />
-	<meta
-		name="twitter:image:alt"
-		content="Pictify Certificate Generator: 5 free templates with API for bulk generation"
-	/>
+	<HeroSub slot="hero-sub">
+		Create <span class="font-medium">professional certificates</span> in seconds.
+		<span class="text-brand-slate">
+			5 beautiful templates with real-time preview and instant download
+		</span>
+	</HeroSub>
 
-	{@html `<script type="application/ld+json">${structuredDataJson}</script>`}
-	{@html `<script type="application/ld+json">${faqSchemaJson}</script>`}
-	{@html `<script type="application/ld+json">${breadcrumbSchemaJson}</script>`}
-	{@html `<script type="application/ld+json">${howToSchemaJson}</script>`}
-	{@html `<script type="application/ld+json">${templateListSchemaJson}</script>`}
-</svelte:head>
-
-<section class="w-full min-h-screen bg-brand-bg relative overflow-x-hidden font-['Manrope']">
-	<Nav />
-
-	<!-- Background Elements -->
-	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
-	/>
-	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
-	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
-	/>
-
-	<main
-		class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-24 md:pb-32 relative z-10"
-	>
-		<!-- Breadcrumb -->
-		<nav class="mb-12 flex justify-center">
-			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
-			>
-				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
-				<li class="text-gray-300">/</li>
-				<li>
-					<a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a>
-				</li>
-				<li class="text-gray-300">/</li>
-				<li class="text-gray-900">Certificate Generator</li>
-			</ol>
-		</nav>
-
-		<!-- Hero Section -->
-		<div
-			class="relative flex flex-col items-center justify-center text-center mb-8 sm:mb-12 lg:mb-16 pt-4 sm:pt-10"
-		>
-			<!-- Badge -->
-			<div
-				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
-			>
-				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-				>
-					Free Tool
-				</div>
-			</div>
-
-			<!-- Main Title -->
-			<h1
-				class="relative z-10 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-tight mb-4 sm:mb-8"
-			>
-				<span class="block sm:inline">CERTIFICATE</span>
-				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
-					<span class="relative z-10 px-2 sm:px-3 md:px-4">GENERATOR</span>
-					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
-					/>
-				</span>
-			</h1>
-
-			<!-- Description -->
-			<div class="max-w-2xl mx-auto px-2">
-				<p
-					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
-				>
-					Create <span class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black"
-						>professional certificates</span
-					>
-					in seconds.
-					<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
-						>5 beautiful templates with real-time preview and instant download</span
-					>
+	<div slot="tool">
+		<!-- TS-8. Edited in place on the shared embed. `?studio=v1` for one release. -->
+		{#if useLegacyTool}
+			<ToolCard>
+				<p class="p-6 font-sans text-[13.5px] leading-[19px] text-brand-slate">
+					The classic generator has been replaced by the editor.
+					<a href="?" class="text-brand-royal underline">Open it</a>.
 				</p>
-			</div>
-		</div>
-
-		<!-- Generation Limit Banner -->
-		<GenerationLimitBanner toolName="certificate_generator" />
-
-		<!-- Bulk Workflow Upsell -->
-		<div class="max-w-5xl mx-auto mb-10 sm:mb-14">
-			<div
-				class="bg-brand-accent border-[3px] border-black shadow-brutal-xl rounded-xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-6"
-			>
-				<div class="flex-1">
-					<div
-						class="inline-flex items-center gap-2 px-3 py-1 bg-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-3 shadow-brutal-sm"
-					>
-						<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M13 10V3L4 14h7v7l9-11h-7z"
-							/></svg
-						>
-						Bulk
-					</div>
-					<h2 class="text-lg sm:text-xl font-black text-black tracking-tight mb-1">
-						Need certificates for a whole list?
-					</h2>
-					<p class="text-sm sm:text-base font-bold text-gray-800">
-						Upload a CSV and email every recipient automatically. Or trigger it by webhook: issue a
-						certificate the moment your LMS reports a completion.
-					</p>
-				</div>
-				<a
-					href="/signup?redirect=%2Fdashboard%2Fworkflows%2Fnew%3Fpack%3Dcertificates"
-					class="flex-shrink-0 px-6 py-3 bg-black text-white border-[3px] border-black font-black text-sm uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl text-center"
-				>
-					Start a Bulk Run →
-				</a>
-			</div>
-		</div>
-
-		<!-- Template Gallery -->
-		<div class="max-w-5xl mx-auto mb-10 sm:mb-14">
-			<h2 class="text-xl sm:text-2xl font-black mb-6 flex items-center gap-3">
-				<span
-					class="w-8 h-8 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-brutal-sm"
-				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
-						/></svg
-					>
-				</span>
-				CHOOSE A TEMPLATE
-			</h2>
-
-			<div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
-				{#each certificateHtmlTemplates as template}
-					<button
-						class="flex-shrink-0 w-44 bg-white border-[3px] {selectedTemplate.id === template.id
-							? 'border-brand-danger shadow-[6px_6px_0_0_#ff6b6b]'
-							: 'border-black shadow-brutal-lg'} p-3 overflow-hidden hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer rounded-xl relative"
-						on:click={() => selectTemplate(template)}
-						aria-label="{template.name} certificate template: {template.description}"
-						title="{template.name} certificate template"
-					>
-						{#if selectedTemplate.id === template.id}
-							<div
-								class="absolute top-2 right-2 z-10 w-6 h-6 bg-brand-danger border-[2px] border-black flex items-center justify-center rounded-full"
-							>
-								<span class="text-white font-black text-sm">&#10003;</span>
-							</div>
-						{/if}
-						<div
-							class="w-full h-20 rounded-lg mb-2 border-[2px] border-gray-200"
-							role="img"
-							aria-label="{template.name} certificate template preview"
-							style="background-color: {template.thumbnailColor};"
-						/>
-						<span class="text-xs font-black text-gray-900 uppercase tracking-wide block text-center"
-							>{template.name}</span
-						>
-						<span
-							class="text-[10px] text-gray-500 font-medium block text-center mt-0.5 line-clamp-1"
-							>{template.description}</span
-						>
-					</button>
-				{/each}
-			</div>
-		</div>
-
-		<!-- Main Editor Stack -->
-		<div class="max-w-4xl mx-auto flex flex-col gap-6 sm:gap-8 items-stretch mb-10">
-			<!-- Left Column: Form -->
-			<div
-				class="bg-white border-[3px] border-black shadow-brutal-xl sm:shadow-brutal-2xl overflow-hidden rounded-xl"
-			>
-				<!-- Terminal Header -->
-				<div
-					class="bg-black text-white px-4 py-3 flex justify-between items-center border-b-[3px] border-black"
-				>
-					<h2 class="font-bold font-mono tracking-widest text-xs uppercase flex items-center gap-2">
-						<span class="animate-pulse">_</span> CERTIFICATE DETAILS
-					</h2>
-					<div class="flex gap-2">
-						<div class="w-3 h-3 bg-brand-danger border border-black" />
-						<div class="w-3 h-3 bg-brand-accent border border-black" />
-						<div class="w-3 h-3 bg-data-green border border-black" />
-					</div>
-				</div>
-
-				<div class="p-4 sm:p-6 space-y-5">
-					<!-- Recipient Name -->
-					<div class="space-y-2">
-						<h3
-							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
-						>
-							<span
-								class="w-6 h-6 bg-brand-accent border-[2px] border-black flex items-center justify-center text-xs"
-								>1</span
-							>
-							Recipient Name
-						</h3>
-						<input
-							bind:value={formValues.recipientName}
-							type="text"
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none rounded-lg"
-							placeholder="John Doe"
-						/>
-					</div>
-
-					<!-- Organization Name -->
-					<div class="space-y-2">
-						<h3
-							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
-						>
-							<span
-								class="w-6 h-6 bg-data-sky border-[2px] border-black flex items-center justify-center text-xs text-white"
-								>2</span
-							>
-							Organization Name
-						</h3>
-						<input
-							bind:value={formValues.organizationName}
-							type="text"
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none rounded-lg"
-							placeholder="Your Organization"
-						/>
-					</div>
-
-					<!-- Date -->
-					<div class="space-y-2">
-						<h3
-							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
-						>
-							<span
-								class="w-6 h-6 bg-data-violet border-[2px] border-black flex items-center justify-center text-xs text-white"
-								>3</span
-							>
-							Date
-						</h3>
-						<input
-							bind:value={formValues.date}
-							type="text"
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none rounded-lg"
-							placeholder="April 13, 2026"
-						/>
-					</div>
-
-					<!-- Achievement Text -->
-					<div class="space-y-2">
-						<h3
-							class="text-xs font-black text-black uppercase tracking-wider flex items-center gap-2"
-						>
-							<span
-								class="w-6 h-6 bg-brand-danger border-[2px] border-black flex items-center justify-center text-xs text-white"
-								>4</span
-							>
-							Achievement
-						</h3>
-						<textarea
-							bind:value={formValues.achievementText}
-							class="w-full border-[3px] border-black p-3 font-bold text-sm shadow-brutal-md focus:shadow-[1px_1px_0_0_#1f2937] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none resize-none rounded-lg"
-							placeholder="for successfully completing the Advanced Training Program"
-							rows="3"
-						/>
-					</div>
-
-					<!-- Workflow CTA: bulk generation + delivery -->
-					<a
-						href="/dashboard/workflows/new"
-						class="w-full py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 rounded-xl"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M13 10V3L4 14h7v7l9-11h-7z"
-							/></svg
-						>
-						Start a Certificate Run
-					</a>
-				</div>
-			</div>
-
-			<!-- Right Column: Live Preview -->
-			<div class="space-y-4 sm:space-y-6">
-				<div
-					class="bg-white border-[3px] border-black shadow-brutal-xl sm:shadow-brutal-2xl overflow-hidden rounded-xl"
-				>
-					<!-- Preview Header -->
-					<div
-						class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between"
-					>
-						<div class="flex items-center gap-2">
-							<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
-							<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
-							<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
-						</div>
-						<div
-							class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
-						>
-							<span
-								class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-gray-700"
-								>Live Preview</span
-							>
-							{selectedTemplate.width} x {selectedTemplate.height}px
-						</div>
-					</div>
-
-					<!-- Live HTML Preview (scaled iframe of the exact render HTML) -->
-					<div
-						class="p-4 sm:p-6 bg-gray-100 flex flex-col items-center justify-center relative min-h-[300px]"
-					>
-						<div
-							class="absolute inset-0 opacity-10"
-							style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
-						/>
-
-						<div class="relative z-10 w-full" bind:clientWidth={previewContainerWidth}>
-							<div
-								class="overflow-hidden bg-white border-[3px] border-gray-900 shadow-brutal-xl rounded-lg"
-								style="height: {Math.round(selectedTemplate.height * previewScale)}px;"
-							>
-								<iframe
-									title="Certificate preview"
-									srcdoc={previewHtml}
-									sandbox="allow-scripts"
-									scrolling="no"
-									style="width: {selectedTemplate.width}px; height: {selectedTemplate.height}px; border: 0; transform: scale({previewScale}); transform-origin: top left; pointer-events: none;"
-								/>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Generate Button -->
-				<button
-					on:click={handleGenerate}
-					disabled={isGenerating}
-					class="w-full bg-brand-danger hover:bg-data-red text-white px-6 py-4 border-[3px] border-black shadow-brutal-xl hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transition-all font-black uppercase tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg rounded-xl"
-				>
-					{#if isGenerating}
-						<svg
-							class="animate-spin h-5 w-5"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-						>
-							<circle
-								class="opacity-25"
-								cx="12"
-								cy="12"
-								r="10"
-								stroke="currentColor"
-								stroke-width="4"
-							/>
-							<path
-								class="opacity-75"
-								fill="currentColor"
-								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-							/>
-						</svg>
-						GENERATING...
-					{:else}
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M13 10V3L4 14h7v7l9-11h-7z"
-							/></svg
-						>
-						GENERATE CERTIFICATE
-					{/if}
-				</button>
-			</div>
-		</div>
-
-		<!-- Generated Result + NextSteps -->
-		{#if generatedImageUrl}
-			<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
-				<div
-					class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
-				>
-					<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
-
-					<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
-						Your certificate is ready!
-					</h3>
-
-					<div
-						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
-					>
-						<img
-							loading="lazy"
-							src={generatedImageUrl}
-							alt="Generated {selectedTemplate.name} certificate for {formValues.recipientName}"
-							class="max-w-full h-auto max-h-[400px]"
-						/>
-					</div>
-
-					<div class="flex flex-wrap justify-center gap-4">
-						<button
-							on:click={() =>
-								downloadFile(generatedImageUrl, 'certificate.png', {
-									tool_name: 'certificate_generator'
-								})}
-							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
-						>
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-								/></svg
-							>
-							Download PNG
-						</button>
-						<a
-							href="/dashboard/workflows/new"
-							class="px-6 py-3 bg-data-green text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
-						>
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M13 10V3L4 14h7v7l9-11h-7z"
-								/></svg
-							>
-							Send These in Bulk
-						</a>
-					</div>
-				</div>
-
-				<div class="mt-12">
-					<NextSteps
-						heading="Now Automate It"
-						description="You've proved it works. Now integrate certificate generation into your app."
-						curlSnippet={apiSnippet}
-						generatedUrl={generatedImageUrl}
-						generatedWidth={selectedTemplate.width}
-						generatedHeight={selectedTemplate.height}
-						generatedFormat="png"
-						toolName="Certificate Generator"
-					/>
-				</div>
-			</div>
-		{:else if generationError}
-			<div class="max-w-3xl mx-auto px-4 mb-12">
-				<div class="bg-red-50 border-[3px] border-red-500 rounded-2xl p-6 flex items-center gap-4">
-					<div
-						class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center border-2 border-red-500 text-red-500 font-black"
-					>
-						!
-					</div>
-					<div>
-						<h4 class="font-black text-red-900 uppercase">Generation Failed</h4>
-						<p class="text-red-700 font-medium">{generationError}</p>
-					</div>
-					<button on:click={handleGenerate} class="ml-auto underline font-bold text-red-900"
-						>Retry</button
-					>
-				</div>
-			</div>
+			</ToolCard>
+		{:else}
+			<ToolEditor
+				templates={editorTemplates}
+				initialSamples={CERT_SAMPLE_VALUES}
+				width={CERT_WIDTH}
+				height={CERT_HEIGHT}
+				sourceKind="certificate"
+				toolName="certificate_generator"
+				downloadName="certificate"
+				defaultTab="inputs"
+				bulkLeadIn={{
+					label: 'One certificate is also a thousand · Bulk from CSV',
+					href: '/signup?intent=template-editor&next=bulk-render'
+				}}
+			/>
 		{/if}
+	</div>
 
-		<!-- SEO Content Sections -->
-		<div class="max-w-5xl mx-auto mt-16 sm:mt-20">
-			<!-- Separator -->
-			<div class="border-t-[3px] sm:border-t-[4px] border-black relative mb-8 sm:mb-12 lg:mb-16">
-				<div class="absolute left-1/2 -top-4 sm:-top-5 -translate-x-1/2 bg-brand-bg px-4 sm:px-6">
-					<div
-						class="w-8 h-8 sm:w-10 sm:h-10 bg-brand-accent border-[3px] border-black flex items-center justify-center shadow-brutal-sm sm:shadow-brutal-md"
-					>
-						<span class="font-black text-sm sm:text-lg">?</span>
-					</div>
-				</div>
-			</div>
 
-			<h2
-				class="text-2xl sm:text-3xl md:text-5xl font-black mb-8 sm:mb-12 text-center text-gray-900 tracking-tighter px-2"
-			>
-				LEARN MORE ABOUT <br class="md:hidden" />
-				<span class="relative inline-block text-white mt-2">
-					<span class="relative z-10 px-2 sm:px-4">CERTIFICATES</span>
-					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-2 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
-					/>
-				</span>
-			</h2>
+	<AutomateSection
+		slot="automate"
+		title="Automate with the"
+		titleHighlight="API"
+		toolName={TOOL_NAME}
+		description="Issue certificates programmatically. Render one HTML template per recipient with a single POST — loop over a CSV to award a whole cohort, or trigger it from your LMS on completion."
+		codeExamples={certificateExamples}
+	/>
 
-			<!-- What is Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-accent border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M13 10V3L4 14h7v7l9-11h-7z"
-						/></svg
-					>
-					Overview
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
-				>
-					What is a Certificate Generator?
-				</h3>
-				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
+	<svelte:fragment slot="longform">
+		<LongformSection index="01" id="what-is" first title="What is a Certificate Generator?">
+			<Prose>
+				<p>
 					A certificate generator is a tool that lets you create professional, customizable
 					certificates for any occasion. Whether you need certificates for course completions,
 					employee awards, event attendance, or academic achievements, a certificate generator
@@ -899,366 +445,165 @@
 					design software, you can select a template, fill in the details, and generate a
 					print-ready certificate in seconds.
 				</p>
-			</section>
+			</Prose>
+		</LongformSection>
 
-			<!-- Benefits Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-						/></svg
-					>
-					Benefits
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
-				>
-					Why Use Our Certificate Generator?
-				</h3>
-				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-					{#each ['5 professionally designed certificate templates', 'Real-time live preview as you type', 'Customize recipient name, organization, date, and achievement', 'High-resolution 1920x1080px PNG output', 'API available for bulk certificate generation', 'No signup required to get started'] as benefit}
-						<div
-							class="bg-[#f8f8f8] border-[3px] border-black p-3 shadow-brutal-md flex items-center gap-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-						>
-							<span class="font-black text-data-green">&#10003;</span>
-							<span class="font-bold text-black text-sm">{benefit}</span>
-						</div>
-					{/each}
-				</div>
-			</section>
+		<LongformSection index="02" id="why-use" title="Why Use Our Certificate Generator?">
+			<FeatureGrid
+				columns={2}
+				items={[
+					{ title: '5 professionally designed certificate templates' },
+					{ title: 'Real-time live preview as you type' },
+					{ title: 'Customize recipient name, organization, date, and achievement' },
+					{ title: 'High-resolution 1920x1080px PNG output' },
+					{ title: 'API available for bulk certificate generation' },
+					{ title: 'No signup required to get started' }
+				]}
+			/>
+		</LongformSection>
 
-			<!-- How to Use Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-sky border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-						/><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-						/></svg
-					>
-					Guide
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
-				>
-					How to Make a Certificate Online in 6 Steps
-				</h3>
-				<div class="space-y-4">
-					{#each [{ num: '1', text: 'Choose a certificate template from the gallery above' }, { num: '2', text: 'Enter the recipient name, organization, date, and achievement' }, { num: '3', text: 'Preview your certificate in the interactive live preview' }, { num: '4', text: 'Watch the live preview update as you type' }, { num: '5', text: 'Click "Generate Certificate" to create a high-resolution PNG' }, { num: '6', text: 'Download your certificate, or start a workflow run to email them in bulk' }] as step}
-						<div class="flex items-start gap-4">
-							<span
-								class="bg-data-sky text-white w-8 h-8 flex items-center justify-center font-black flex-shrink-0 border-[3px] border-black shadow-brutal-sm"
-								>{step.num}</span
-							>
-							<span class="font-bold text-black text-sm pt-1">{step.text}</span>
-						</div>
-					{/each}
-				</div>
-			</section>
+		<LongformSection index="03" id="how-to" title="How to Make a Certificate Online in 6 Steps">
+			<!--
+				The cards show the step text, as they did before — the schema's short
+				step names were never on the page — and they are not headings, so the
+				outline keeps the shape it ranks with.
+			-->
+			<StepCards titleTag="p" steps={howToSchema.step.map((step) => ({ title: step.text }))} />
+		</LongformSection>
 
-			<!-- Bulk Certificates for Events: the delivery wedge -->
-			<section
-				class="mb-8 sm:mb-12 bg-gray-900 border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 rounded-none"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-gray-900 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-						/></svg
-					>
-					Bulk + Delivered
-				</div>
-				<h3 class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-white tracking-tight">
-					Bulk Certificate Generator for Events: Delivered, Not Downloaded
-				</h3>
-				<p class="text-sm sm:text-base text-gray-300 leading-relaxed font-medium mb-6">
-					Generating 300 certificates was never the hard part. Getting 300 certificates into 300
-					inboxes before the deadline is. Every other path stops one step short of the send:
+		<LongformSection
+			index="04"
+			id="bulk"
+			title="Bulk Certificate Generator for Events: One Run, Not 300 Exports"
+		>
+			<Lead>
+				Generating one certificate was never the hard part. Generating 300 of them, on brand, with
+				links your own system can fetch, before the deadline is. Every other path stops one step
+				short:
+			</Lead>
+			<LinkCardGrid
+				columns={3}
+				titleTag="h4"
+				toolName={TOOL_NAME}
+				items={[
+					{
+						href: '/alternatives/autocrat',
+						title: 'Sheets add-ons',
+						body: 'Autocrat rides Apps Script and its 6-minute execution cap, and broke across its 81M-install base in June 2026. →'
+					},
+					{
+						href: '/alternatives/canva-bulk-create',
+						title: 'Canva Bulk Create',
+						body: 'Makes beautiful variants, then stops at download. No API, no per-row links; the zip file is your problem. →'
+					},
+					{
+						href: '/alternatives',
+						title: 'Mail merge',
+						body: 'Merges text into a letter. It cannot render a designed certificate, and there is no API behind it. →'
+					}
+				]}
+			/>
+			<Prose>
+				<p>
+					A Pictify batch call does the whole job: post the attendee CSV, every row renders its own
+					certificate against the same template, and each one comes back as a
+					<strong>CDN link with a per-row status</strong>, with a webhook when the run finishes.
+					Re-run any single row on its own if a value was wrong. That's the difference between a
+					design tool and a render API.
 				</p>
-				<div class="grid sm:grid-cols-3 gap-4 mb-6">
-					<a
-						href="/alternatives/autocrat"
-						class="block bg-white border-[3px] border-black p-4 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<h4 class="font-black text-black text-sm mb-1">Sheets add-ons</h4>
-						<p class="text-xs text-gray-600 leading-relaxed">
-							Autocrat rides Apps Script (6-minute cap) and your Gmail quota, and broke across its
-							81M-install base in June 2026. →
-						</p>
-					</a>
-					<a
-						href="/alternatives/canva-bulk-create"
-						class="block bg-white border-[3px] border-black p-4 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<h4 class="font-black text-black text-sm mb-1">Canva Bulk Create</h4>
-						<p class="text-xs text-gray-600 leading-relaxed">
-							Makes beautiful variants, then stops at download. No email delivery of any kind; the
-							zip file is your problem. →
-						</p>
-					</a>
-					<a
-						href="/solutions/mail-merge-with-attachments"
-						class="block bg-white border-[3px] border-black p-4 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						<h4 class="font-black text-black text-sm mb-1">Mail merge</h4>
-						<p class="text-xs text-gray-600 leading-relaxed">
-							Word can't attach the file. Gmail caps at 500–1,500 a day and locks you out
-							mid-batch. →
-						</p>
-					</a>
-				</div>
-				<p class="text-sm sm:text-base text-gray-300 leading-relaxed font-medium">
-					A Pictify workflow run does the whole job: upload the attendee CSV, every row renders its
-					own certificate, and every certificate emails itself to its recipient from an isolated
-					sending domain. You watch <span class="text-data-green font-black"
-						>delivered / bounced / suppressed per person</span
-					>, and re-send any single row with a corrected address. That's the difference between "sent"
-					and "delivered".
-				</p>
-			</section>
+			</Prose>
+		</LongformSection>
 
-			<!-- FAQ Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+		<LongformSection index="05" id="faq" title="Frequently Asked Questions">
+			<FaqList {faqs} />
+		</LongformSection>
+
+		<!--
+			06 spans: five template descriptions do not fit a half column. 07 and 08
+			pair, which is where the two-up layout actually earns its keep.
+		-->
+		<LongformPair>
+			<LongformSection
+				index="06"
+				id="templates"
+				compact
+				span
+				title="Certificate Templates: Choose from 5 Free Designs"
 			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-brand-danger border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-						/></svg
-					>
-					FAQ
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
-				>
-					Frequently Asked Questions
-				</h3>
-				<div class="space-y-3">
-					{#each faqs as faq}
-						<details
-							class="group bg-[#f8f8f8] border-[3px] border-black overflow-hidden shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-						>
-							<summary
-								class="flex items-center justify-between cursor-pointer p-4 font-bold text-black select-none text-sm"
-							>
-								<span>{faq.q}</span>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-5 w-5 text-black group-open:rotate-180 transition-transform duration-300 flex-shrink-0"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-								>
-									<path
-										fill-rule="evenodd"
-										d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-										clip-rule="evenodd"
-									/>
-								</svg>
-							</summary>
-							<div class="p-4 pt-0 text-gray-600 border-t-[3px] border-black bg-white text-sm">
-								{faq.a}
-							</div>
-						</details>
-					{/each}
-				</div>
-			</section>
+				<Lead>
+					Every certificate template works for any certificate type: award, achievement, completion,
+					participation, or appreciation. Pick a design that matches your brand and customize the
+					title, recipient name, date, and achievement text. All templates are free and come with
+					commercial-use rights.
+				</Lead>
+				<ProseGroup
+					columns={2}
+					headingTag="h4"
+					items={[
+						{
+							heading: 'Certificate of Achievement Template',
+							bodyHtml:
+								'Recognize outstanding accomplishments with a formal certificate of achievement. The <strong>Elegant</strong> template, with gold borders and serif typography, is our most popular certificate of achievement template, ideal for awards ceremonies, academic honors, and sales milestones.'
+						},
+						{
+							heading: 'Certificate of Completion Template',
+							bodyHtml:
+								'Issue a certificate of completion for courses, training programs, workshops, and onboarding. The <strong>Modern Dark</strong> template gives completion certificates a sleek, contemporary feel that reads well on-screen and in print.'
+						},
+						{
+							heading: 'Certificate of Participation Template',
+							bodyHtml:
+								"Acknowledge attendance and engagement with a certificate of participation. The <strong>Corporate</strong> template's navy header and formal layout make it the right certificate of participation template for conferences, webinars, and corporate events."
+						},
+						{
+							heading: 'Award Certificate Template',
+							bodyHtml:
+								'Celebrate winners and honorees with a bold award certificate. The <strong>Creative</strong> template (coral accents and playful geometry) works well for employee-of-the-month awards, tournament winners, and community recognition.'
+						},
+						{
+							heading: 'Certificate of Appreciation Template',
+							bodyHtml:
+								"Thank volunteers, partners, and team members with a certificate of appreciation. The <strong>Minimalist</strong> template's generous whitespace and refined typography puts the focus on the recipient, a perfect certificate of appreciation template for donor recognition and retirement gifts."
+						}
+					]}
+				/>
+			</LongformSection>
 
-			<!-- Certificate Templates Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
+			<LongformSection
+				index="07"
+				id="free-maker"
+				compact
+				title="Use Our Online Certificate Maker for Free"
 			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-violet border-[3px] border-black text-white text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-						/></svg
-					>
-					Templates
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
-				>
-					Certificate Templates: Choose from 5 Free Designs
-				</h3>
-				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium mb-6">
-					Every certificate template works for any certificate type: award, achievement,
-					completion, participation, or appreciation. Pick a design that matches your brand and
-					customize the title, recipient name, date, and achievement text. All templates are free
-					and come with commercial-use rights.
-				</p>
-				<div class="space-y-5">
-					<div class="border-l-[4px] border-brand-accent pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">
-							Certificate of Achievement Template
-						</h4>
-						<p class="text-sm text-gray-700 font-medium">
-							Recognize outstanding accomplishments with a formal certificate of achievement. The <strong
-								>Elegant</strong
-							> template, with gold borders and serif typography, is our most popular certificate of
-							achievement template, ideal for awards ceremonies, academic honors, and sales milestones.
-						</p>
-					</div>
-					<div class="border-l-[4px] border-data-sky pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">
-							Certificate of Completion Template
-						</h4>
-						<p class="text-sm text-gray-700 font-medium">
-							Issue a certificate of completion for courses, training programs, workshops, and
-							onboarding. The <strong>Modern Dark</strong> template gives completion certificates a sleek,
-							contemporary feel that reads well on-screen and in print.
-						</p>
-					</div>
-					<div class="border-l-[4px] border-data-green pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">
-							Certificate of Participation Template
-						</h4>
-						<p class="text-sm text-gray-700 font-medium">
-							Acknowledge attendance and engagement with a certificate of participation. The <strong
-								>Corporate</strong
-							> template's navy header and formal layout make it the right certificate of participation
-							template for conferences, webinars, and corporate events.
-						</p>
-					</div>
-					<div class="border-l-[4px] border-brand-danger pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">
-							Award Certificate Template
-						</h4>
-						<p class="text-sm text-gray-700 font-medium">
-							Celebrate winners and honorees with a bold award certificate. The <strong
-								>Creative</strong
-							> template (coral accents and playful geometry) works well for employee-of-the-month
-							awards, tournament winners, and community recognition.
-						</p>
-					</div>
-					<div class="border-l-[4px] border-[#1f2937] pl-4 sm:pl-5">
-						<h4 class="text-base sm:text-lg font-black text-black mb-1">
-							Certificate of Appreciation Template
-						</h4>
-						<p class="text-sm text-gray-700 font-medium">
-							Thank volunteers, partners, and team members with a certificate of appreciation. The <strong
-								>Minimalist</strong
-							> template's generous whitespace and refined typography puts the focus on the recipient,
-							a perfect certificate of appreciation template for donor recognition and retirement gifts.
-						</p>
-					</div>
-				</div>
-			</section>
-
-			<!-- Online Certificate Maker Section -->
-			<section
-				class="mb-8 sm:mb-12 bg-white border-[3px] border-black shadow-brutal-lg sm:shadow-brutal-2xl p-4 sm:p-6 md:p-10 hover:shadow-brutal-sm sm:hover:shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] sm:hover:translate-x-[4px] sm:hover:translate-y-[4px] transition-all duration-300"
-			>
-				<div
-					class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 bg-data-green border-[3px] border-black text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6 shadow-brutal-sm sm:shadow-brutal-md"
-				>
-					<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-						/></svg
-					>
-					Free Online
-				</div>
-				<h3
-					class="text-xl sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6 text-black tracking-tight"
-				>
-					Use Our Online Certificate Maker for Free
-				</h3>
-				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium mb-4">
-					Pictify's online certificate maker runs entirely in your browser: no downloads, no
-					installs, no signup. The certificate maker supports a real-time preview that updates as
-					you type, and high-resolution PNG export at 1920×1080. Generate one certificate in under a
-					minute, or use the <strong>free certificate generator API</strong> to batch-create hundreds
-					at once from a spreadsheet or database.
-				</p>
-				<p class="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
-					Every template here is plain HTML and CSS, the same template a Pictify workflow renders
-					at scale. Connect a CSV, webhook, Zapier, or Make.com flow and each row becomes its own
-					certificate, emailed to its recipient. That's the difference between a one-off certificate
-					generator and a programmable certificate builder: the fast free tool today, delivery-grade
-					automation when you're ready to scale.
-				</p>
-			</section>
-
-			<!-- Bulk Run CTA -->
-			<section class="mb-12 sm:mb-16 text-center">
-				<div
-					class="bg-gray-900 border-[3px] border-black rounded-2xl p-8 sm:p-12 relative overflow-hidden"
-				>
-					<div
-						class="absolute top-0 right-0 w-40 h-40 bg-brand-accent/20 rounded-full blur-2xl pointer-events-none"
-					/>
-					<div
-						class="absolute bottom-0 left-0 w-32 h-32 bg-brand-danger/20 rounded-full blur-2xl pointer-events-none"
-					/>
-
-					<h3
-						class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mb-4 relative z-10"
-					>
-						Need Them Delivered, Not Just Downloaded?
-					</h3>
-					<p class="text-gray-400 font-bold mb-8 max-w-lg mx-auto relative z-10">
-						Start a workflow run to generate personalized certificates in bulk, and email each
-						one to its recipient with per-person delivery status. Perfect for events, courses,
-						and training programs.
+				<Prose>
+					<p>
+						Pictify's online certificate maker runs entirely in your browser: no downloads, no
+						installs, no signup. The certificate maker supports a real-time preview that updates as
+						you type, and high-resolution PNG export at 1920×1080. Generate one certificate in under
+						a minute, or use the <strong>free certificate generator API</strong> to batch-create hundreds
+						at once from a spreadsheet or database.
 					</p>
-					<a
-						href="/dashboard/workflows/new"
-						class="px-8 py-4 bg-brand-accent text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-[6px_6px_0_0_#ffc480] hover:shadow-[3px_3px_0_0_#ffc480] hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl relative z-10"
-					>
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M13 10V3L4 14h7v7l9-11h-7z"
-							/></svg
-						>
-						Start a Run (Free)
-					</a>
-				</div>
-			</section>
-		</div>
-	</main>
+					<p>
+						Every template here is plain HTML and CSS, the same template a Pictify batch run renders
+						at scale. Connect a CSV, webhook, Zapier, or Make.com flow and each row becomes its own
+						certificate on a CDN link your system can fetch. That's the difference between a one-off
+						certificate generator and a programmable certificate builder: the fast free tool today,
+						production-grade automation when you're ready to scale.
+					</p>
+				</Prose>
+			</LongformSection>
 
-	<RelatedTools tools={['badge', 'course-certificate', 'receipt', 'event-ticket']} />
+			<LongformSection index="08" id="bulk-run" compact title="Need Three Hundred, Not Just One?">
+				<Prose>
+					<p>
+						Post a CSV to the batch API to generate personalized certificates in bulk: one render per
+						row, a CDN link for each, and a webhook when the batch finishes. Perfect for events,
+						courses, and training programs.
+					</p>
+				</Prose>
+				<JumpLink href="/signup">Start Free →</JumpLink>
+			</LongformSection>
+		</LongformPair>
+	</svelte:fragment>
 
-	<Footer />
-</section>
+</ToolPageShell>

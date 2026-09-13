@@ -1,21 +1,13 @@
 import backend from '../service/backend';
 
 const getUser = async () => {
-	try {
-		const response = await backend.get('/api/users');
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.get('/api/users');
+	return response;
 };
 
 const getApiToken = async () => {
-	try {
-		const response = await backend.get('/api/users/api-tokens');
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.get('/api/users/api-tokens');
+	return response;
 };
 
 const createApiToken = async () => {
@@ -29,12 +21,8 @@ const deleteApiToken = async (apiTokenId) => {
 };
 
 const getPlanDetails = async () => {
-	try {
-		const response = await backend.get('/api/users/plans');
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.get('/api/users/plans');
+	return response;
 };
 
 const resetPassword = async ({ password, token }) => {

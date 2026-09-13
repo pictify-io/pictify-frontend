@@ -21,8 +21,8 @@
 	 *   2. A binding declared on a clip field that can't hold a token.
 	 */
 	import { onMount, onDestroy, tick } from 'svelte';
-	import { goto, beforeNavigate } from '$app/navigation';
-	import { analytics } from '$lib/analytics.js';
+	import { goto, beforeNavigate, replaceState } from '$app/navigation';
+	import { analytics } from '$lib/telemetry.js';
 	import {
 		createVideoTemplate,
 		updateVideoTemplate,
@@ -38,6 +38,9 @@
 	import VideoVariablesPanel from './VideoVariablesPanel.svelte';
 	import InlineTextEditor from './InlineTextEditor.svelte';
 	import RemotionStage from './RemotionStage.svelte';
+	import UseItCard from '$lib/components/studio/UseItCard.svelte';
+	import { activeApiToken, getAPITokenAction } from '../../../store/user.store';
+	import VideoTopBar from './v2/VideoTopBar.svelte';
 	import ClipBindingsPanel from './ClipBindingsPanel.svelte';
 	import {
 		detectReferences,
@@ -127,6 +130,14 @@
 	 */
 	$: previewValues = isCode ? resolveValues(variableDefinitions, testValues) : {};
 
+	// The snippet shows the values currently in the preview, so the call a user
+	// copies is the call that made what they are looking at.
+	$: useItInputs = variableDefinitions.map((v) => ({
+		name: v.name,
+		value: testValues?.[v.name] ?? v.defaultValue ?? v.default ?? ''
+	}));
+	$: apiKeyForSnippet = $activeApiToken?.token || '';
+
 	const onCodeChange = (event) => {
 		tsxSource = event.detail.tsx;
 		markDirty();
@@ -204,7 +215,16 @@
 	let canvasWrapEl;
 	/** Safe-area guides are opt-in: useful for checking, noisy for working. */
 	let showSafeAreas = false;
-	let compositionSettings = { width: 1080, height: 1920 };
+	/*
+	 * The live composition size, tracked from the engine store rather than from
+	 * `template`, which is only as fresh as the last save. Everything that
+	 * states a size — the safe-area guides, the topbar meta chip, the payload a
+	 * save sends — reads this, so they cannot disagree with the artboard.
+	 */
+	let compositionSettings = {
+		width: template?.width || 1080,
+		height: template?.height || 1920
+	};
 
 	/**
 	 * Text clips whose value runs outside its box at the current test values.
@@ -294,10 +314,94 @@
 	let suppressDirty = false;
 	let lastClips = null;
 	let lastTracks = null;
+	// null until the first store push, so opening a template does not read as
+	// an edit. See the settings comparison in onState.
+	let lastSettingsKey = null;
 
 	let isSaving = false;
 	let saveMessage = '';
 	let saveError = '';
+
+	// ── Autosave ─────────────────────────────────────────────────────────
+	//
+	// There is no Save button, matching the image studio. A template is a live
+	// document; asking someone to remember to press a button is asking them to
+	// lose work. 2s of quiet is long enough that a drag does not fire a save on
+	// every frame, short enough that closing the tab straight after a change is
+	// safe — and both of those edges are covered explicitly below anyway.
+	const SAVE_DEBOUNCE_MS = 2000;
+	let saveTimer = null;
+	/**
+	 * 'saved' | 'saving' | 'dirty' | 'error' | 'failed' — mirrored to the chip.
+	 * `error` means a retry is scheduled; `failed` means we have stopped trying.
+	 */
+	let saveState = 'saved';
+	let retryTimer = null;
+	let retryCount = 0;
+	// Three tries over ~20s. Past that it is not a blip, and a spinner that
+	// never resolves is worse than being told plainly that it did not work.
+	const RETRY_DELAYS_MS = [3000, 6000, 12000];
+	/** A hard stop, e.g. the plan's template cap. Retrying cannot fix it. */
+	let saveBlocked = '';
+
+	function queueSave() {
+		if (saveBlocked) return;
+		// A new edit is a new attempt: reset the backoff so a user who fixes
+		// their connection and keeps working is not stuck on a dead counter.
+		retryCount = 0;
+		clearTimeout(retryTimer);
+		clearTimeout(saveTimer);
+		saveTimer = setTimeout(() => {
+			flushSave();
+		}, SAVE_DEBOUNCE_MS);
+	}
+
+	/**
+	 * Save now, skipping the debounce. Used by Cmd+S, by Render (the server must
+	 * render what is on screen) and on the way out of the page.
+	 *
+	 * The chip follows the SERVER, never the intent: `persist` returns null on
+	 * failure and the api wrappers swallow their errors, so an optimistic
+	 * "Saved" here is exactly how a studio ends up lying about work it dropped.
+	 */
+	async function flushSave() {
+		clearTimeout(saveTimer);
+		if (saveBlocked || isSaving || !isDirty) return uid;
+		saveState = 'saving';
+		const result = await save({ silent: true, deferNavigation: true });
+		if (result) {
+			retryCount = 0;
+			clearTimeout(retryTimer);
+			saveState = 'saved';
+			// Shallow: the /new and /[uid] route nodes are different, so `goto`
+			// would remount the component and tear down the engine mid-session.
+			// The URL is the only thing that needs to change.
+			if (!template?.uid && typeof window !== 'undefined') {
+				const target = `/dashboard/video-templates/${result}/studio`;
+				if (window.location.pathname !== target) {
+					try {
+						replaceState(target, {});
+					} catch (error) {
+						/* shallow routing is a nicety; the save already landed */
+					}
+				}
+			}
+		} else if (saveBlocked) {
+			saveState = 'failed';
+		} else {
+			// The chip says RETRYING, so it has to actually retry.
+			const delay = RETRY_DELAYS_MS[retryCount];
+			if (delay === undefined) {
+				saveState = 'failed';
+			} else {
+				retryCount += 1;
+				saveState = 'error';
+				clearTimeout(retryTimer);
+				retryTimer = setTimeout(() => flushSave(), delay);
+			}
+		}
+		return result;
+	}
 
 	// ── Variables state ──────────────────────────────────────────────────
 	let testValues = {};
@@ -484,6 +588,10 @@
 	// ── Mount ────────────────────────────────────────────────────────────
 	onMount(async () => {
 		analytics.page('Video Studio');
+		// The studio sits outside the dashboard rail, so nothing else on this
+		// page loads the key — without this the Use it snippet would hand the
+		// user YOUR_API_KEY to paste.
+		getAPITokenAction().catch(() => {});
 		// A Remotion template has no scene graph, so none of the engine, the
 		// timeline or the clip panels apply. RemotionStage mounts its own player.
 		if (isCode) {
@@ -498,7 +606,12 @@
 				width: template?.width,
 				height: template?.height,
 				fps: template?.fps,
-				backgroundColor: '#0a0a0c',
+				// The backdrop OUTSIDE the artboard, not the video's own background.
+				// Canvas greige, so the artboard reads as a sheet on the stage the
+				// same way the image studio's proof does — and so a video with a
+				// dark background is visibly a dark video rather than blending into
+				// chrome that happens to be dark too.
+				backgroundColor: '#E2E4DD',
 				onState: (state) => {
 					canUndo = state.canUndo;
 					canRedo = state.canRedo;
@@ -511,7 +624,30 @@
 							height: state.settings.height
 						};
 					}
-					if (trackDirty && (state.clips !== lastClips || state.tracks !== lastTracks)) {
+					/*
+					 * Settings count as an edit.
+					 *
+					 * This used to compare clips and tracks only, so changing the
+					 * canvas size, the frame rate or the background never marked the
+					 * document dirty — autosave had nothing to react to, and the chip
+					 * sat on SAVED while the server still held the old size. A
+					 * composition setting is as much the document as a clip is.
+					 */
+					const settingsKey = JSON.stringify([
+						state.settings?.width,
+						state.settings?.height,
+						state.settings?.fps,
+						state.settings?.duration,
+						state.settings?.backgroundColor,
+						state.settings?.bitrate
+					]);
+					const settingsChanged = lastSettingsKey !== null && settingsKey !== lastSettingsKey;
+					lastSettingsKey = settingsKey;
+
+					if (
+						trackDirty &&
+						(state.clips !== lastClips || state.tracks !== lastTracks || settingsChanged)
+					) {
 						if (!suppressDirty) {
 							markDirty();
 							// A real user edit while previewing: keep the authored copy
@@ -708,7 +844,14 @@
 	beforeNavigate(({ cancel, willUnload }) => {
 		if (!isDirty || isSaving) return;
 		if (willUnload) return; // the beforeunload handler covers this case
-		if (!confirm('You have unsaved changes. Leave the studio and lose them?')) cancel();
+		// Autosave means a pending change is a debounce away, not lost work — so
+		// flush it and let them go. The prompt is kept ONLY for the case autosave
+		// cannot rescue: a save the server has refused outright.
+		if (!saveBlocked) {
+			flushSave();
+			return;
+		}
+		if (!confirm(`${saveBlocked} Leave anyway and lose this template?`)) cancel();
 	});
 
 	function undo() {
@@ -726,6 +869,8 @@
 	const markDirty = () => {
 		isDirty = true;
 		saveMessage = '';
+		if (!saveBlocked) saveState = 'dirty';
+		queueSave();
 	};
 
 	// ── Variable detection ───────────────────────────────────────────────
@@ -1052,6 +1197,17 @@
 		const doc = structuredClone(filling ? authoredDoc : editor.exportProject());
 		// Never persist a binding to a variable that no longer exists.
 		pruneBindings(doc, new Set(variableDefinitions.map((v) => v.name)));
+		/*
+		 * The engine's export does not carry composition settings, but
+		 * `importProject` is what rebuilds the scene on reopen — so without this
+		 * the studio would reopen at whatever size the template row says and
+		 * quietly disagree with the document again. Stamp the live size in.
+		 */
+		doc.settings = {
+			...(doc.settings || {}),
+			width: compositionSettings.width,
+			height: compositionSettings.height
+		};
 		return doc;
 	}
 
@@ -1135,13 +1291,33 @@
 		} catch (error) {
 			// 422 carries per-error compile messages; anything else is a message.
 			const errors = error?.body?.errors || error?.errors;
-			saveError = Array.isArray(errors)
-				? errors.join('  ')
-				: error?.message || 'Could not save this template.';
+			classifySaveFailure(error);
+			saveError = saveBlocked
+				? saveBlocked
+				: Array.isArray(errors)
+					? errors.join('  ')
+					: error?.message || 'Could not save this template.';
 			return null;
 		} finally {
 			isSaving = false;
 		}
+	}
+
+	/**
+	 * A save that retrying cannot fix.
+	 *
+	 * 402 on the first create is the saved-template cap. Autosave would
+	 * otherwise re-hit it every two seconds forever, which burns requests and
+	 * tells the user nothing. Latch it, say so once, and point at the fix.
+	 */
+	function classifySaveFailure(error) {
+		if (error?.status === 402) {
+			saveBlocked =
+				"You've used every template your plan allows, so this one could not be created.";
+			clearTimeout(saveTimer);
+			return true;
+		}
+		return false;
 	}
 
 	async function persist({ publish = false, silent = false, deferNavigation = false } = {}) {
@@ -1164,8 +1340,19 @@
 				name: name.trim() || 'Untitled video',
 				projectJson,
 				variableDefinitions,
-				width: Math.round(settings.width || template?.width || 1080),
-				height: Math.round(settings.height || template?.height || 1920),
+				/*
+				 * compositionSettings first: it is tracked live off the engine
+				 * store, whereas `settings` comes from the exported document and
+				 * `template` is only as fresh as the last save. When the export
+				 * omitted settings — which it does — this fell through to
+				 * `template` and wrote the size the studio was OPENED with, so a
+				 * resize could never be persisted no matter how many times it
+				 * saved.
+				 */
+				width: Math.round(compositionSettings.width || settings.width || template?.width || 1080),
+				height: Math.round(
+					compositionSettings.height || settings.height || template?.height || 1920
+				),
 				fps,
 				durationInFrames,
 				status: publish ? 'published' : status
@@ -1215,7 +1402,8 @@
 			}
 			return uid;
 		} catch (error) {
-			saveError = error?.message || 'The save failed. Please try again.';
+			classifySaveFailure(error);
+			saveError = saveBlocked || error?.message || 'The save failed. Please try again.';
 			return null;
 		} finally {
 			isSaving = false;
@@ -1300,7 +1488,10 @@
 			// Defer the URL swap: navigating to /[uid]/studio remounts this
 			// component, and the render would be lost mid-flight.
 			const wasNew = !uid;
-			const savedUid = uid && !isDirty ? uid : await save({ silent: true, deferNavigation: true });
+			// Flush, don't just save: a debounced autosave may be pending, and the
+			// server must render what is on screen rather than what was on screen
+			// two seconds ago. flushSave keeps the chip honest while it runs.
+			const savedUid = uid && !isDirty ? uid : await flushSave();
 			if (!savedUid) throw new Error(saveError || 'Save the template before rendering.');
 			const response = await renderVideoTemplate(savedUid, {
 				variables: testValues,
@@ -1350,194 +1541,62 @@
 <svelte:window
 	on:beforeunload={(event) => {
 		if (!isDirty) return;
+		// Last chance: fire the pending save before the tab goes. It may not
+		// complete, which is why the warning still stands behind it.
+		flushSave();
 		event.preventDefault();
 		event.returnValue = '';
 	}}
+	on:keydown={(event) => {
+		// Cmd/Ctrl+S. There is no Save button, but the reflex is universal and
+		// letting the browser open its Save-page dialog here would be absurd.
+		if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+			event.preventDefault();
+			flushSave();
+		}
+	}}
 />
 
-<div class="flex h-screen w-full flex-col overflow-hidden {STAGE} text-gray-100">
-	<!-- ── Top bar ───────────────────────────────────────────────────── -->
-	<header
-		class="relative flex h-14 shrink-0 items-center gap-3 border-b-[3px] border-black px-3 transition-colors
-			{filling ? 'bg-brand-accent' : 'bg-gray-900'} {Z.dock}"
-	>
-		<a
-			href="/dashboard/template?type=video"
-			class="inline-flex items-center gap-1.5 rounded-lg border-[2px] border-black px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all focus-brutal
-				{filling
-				? 'bg-black/10 text-black hover:bg-black/20'
-				: 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-gray-100'}"
-		>
-			<i class="fa fa-arrow-left text-[10px]" aria-hidden="true"></i>
-			Templates
-		</a>
-
-		<input
-			class="min-w-0 max-w-xs flex-1 rounded-lg border-[2px] border-transparent bg-transparent px-2 py-1 text-sm font-black transition-all focus:outline-none focus-brutal
-				{filling
-				? 'text-black focus:border-black focus:bg-white/40'
-				: 'text-gray-100 focus:border-brand-accent focus:bg-gray-950'}"
-			bind:value={name}
-			on:input={markDirty}
-			aria-label="Template name"
-			placeholder="Untitled video"
-		/>
-
-		<div class="flex shrink-0 items-center gap-1">
-			<button
-				type="button"
-				on:click={undo}
-				disabled={!canUndo || isBooting}
-				title="Undo (⌘Z)"
-				aria-label="Undo"
-				class="{BUTTON_ICON} {filling ? '!bg-black/10 !text-black' : ''}"
-			>
-				<i class="fa fa-rotate-left text-[11px]" aria-hidden="true"></i>
-			</button>
-			<button
-				type="button"
-				on:click={redo}
-				disabled={!canRedo || isBooting}
-				title="Redo (⌘⇧Z)"
-				aria-label="Redo"
-				class="{BUTTON_ICON} {filling ? '!bg-black/10 !text-black' : ''}"
-			>
-				<i class="fa fa-rotate-right text-[11px]" aria-hidden="true"></i>
-			</button>
-		</div>
-
-		<span
-			class="{filling ? CHIP_ACCENT : CHIP_NEUTRAL} {filling
-				? '!bg-black !text-brand-accent'
-				: ''} hidden sm:inline-flex"
-		>
-			{status === 'published' ? 'Published' : 'Draft'}
-		</span>
-		{#if variableCount > 0}
-			<button
-				type="button"
-				on:click={() => (activeTab = 'variables')}
-				class="{filling ? '!bg-black !text-brand-accent' : CHIP_NEUTRAL} {CHIP_NEUTRAL} hidden md:inline-flex focus-brutal"
-				title="Show variables"
-			>
-				{variableCount} variable{variableCount === 1 ? '' : 's'}
-			</button>
-		{/if}
-
-		<div class="flex-1"></div>
-
-		{#if filling}
-			<span class="text-[10px] font-black uppercase tracking-widest text-black">
-				Preview values · {filledPreviewCount} applied
-			</span>
-		{:else if saveMessage}
-			<span class="text-[10px] font-black uppercase tracking-widest text-data-green">
-				{saveMessage}
-			</span>
-		{:else if isDirty}
-			<span class="text-[10px] font-black uppercase tracking-widest {TEXT_FAINT}">
-				Unsaved changes
-			</span>
-		{/if}
-
-		<!--
-			Timeline-only. A composition already renders with its values, so there is
-			no state to toggle into; leaving the button here would be a control that
-			does nothing, which is what it did before this branch existed
-			(startFilling returns early with no Pixi engine).
-		-->
-		{#if !isCode}
-		<button
-			type="button"
-			on:click={toggleFilling}
-			disabled={isBooting || (!filling && variableCount === 0)}
-			title={filling
-				? 'Go back to editing the template'
-				: variableCount === 0
-					? 'Declare a variable first'
-					: 'Show your preview values on the canvas'}
-			class="inline-flex items-center gap-1.5 rounded-lg border-[2px] border-black px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all focus-brutal disabled:opacity-40 disabled:cursor-not-allowed
-				{filling
-				? 'bg-black text-brand-accent'
-				: 'bg-gray-800 text-gray-100 hover:bg-gray-700'}"
-		>
-			<i class="fa {filling ? 'fa-eye-slash' : 'fa-eye'} text-[10px]" aria-hidden="true"></i>
-			{filling ? 'Exit preview' : 'Preview'}
-		</button>
-		{:else if variableCount > 0}
-			<span
-				class="inline-flex items-center gap-1.5 rounded-lg border-[2px] border-black bg-gray-800 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-300"
-				title="A Remotion scene always renders with your values, so there is nothing to toggle"
-			>
-				<i class="fa fa-eye text-[10px]" aria-hidden="true"></i>
-				Values live
-			</span>
-		{/if}
-
-		<button
-			type="button"
-			on:click={() => save()}
-			disabled={isSaving || isBooting || filling}
-			title={filling ? 'Exit preview to save' : 'Save this template'}
-			class="{BUTTON_SECONDARY} !px-3 !py-1.5 !text-[10px]"
-		>
-			{isSaving ? 'Saving…' : isDirty || !uid ? 'Save' : 'Saved'}
-		</button>
-
-		<!-- Output format, joined to the Render button it configures -->
-		<div
-			class="inline-flex overflow-hidden rounded-lg border-[2px] border-black"
-			role="group"
-			aria-label="Render output format"
-		>
-			{#each ['mp4', 'gif'] as option}
-				<button
-					type="button"
-					on:click={() => (exportFormat = option)}
-					disabled={isExporting}
-					aria-pressed={exportFormat === option}
-					title={option === 'gif'
-						? 'Animated GIF: renders on the server, capped at 15fps for shareable file sizes'
-						: 'MP4 video'}
-					class="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest transition-colors
-						{exportFormat === option
-						? 'bg-brand-accent text-black'
-						: 'bg-gray-900 text-gray-400 hover:text-white'}
-						{option === 'mp4' ? 'border-r-[2px] border-black' : ''}"
-				>
-					{option}
-				</button>
-			{/each}
-		</div>
-
-		<button
-			type="button"
-			on:click={exportVideo}
-			disabled={isExporting || isBooting}
-			class="{BUTTON_PRIMARY} !px-4 !py-1.5 !text-[10px]"
-		>
-			{#if isExporting}
-				<i class="fa fa-spinner fa-spin text-[10px]" aria-hidden="true"></i>
-				{Math.round(exportProgress * 100)}%
-			{:else}
-				<i class="fa fa-film text-[10px]" aria-hidden="true"></i>
-				Render {exportFormat.toUpperCase()}
-			{/if}
-		</button>
-	</header>
-
+<!--
+	v2 shell: everything floats as white cards on the Repro Shop canvas, the
+	same object language as the image studio. The old shell was a dark
+	full-bleed app with ink-bordered panels; two studios in one product should
+	not look like two products.
+-->
+<div class="flex h-screen w-full flex-col overflow-hidden bg-brand-canvas">
+	<VideoTopBar
+		{name}
+		kind={template?.kind || 'timeline'}
+		saveState={isSaving ? 'saving' : saveState}
+		width={compositionSettings.width}
+		height={compositionSettings.height}
+		fps={template?.fps || 30}
+		durationInFrames={template?.durationInFrames || 150}
+		format={exportFormat}
+		rendering={isExporting}
+		renderDisabled={isBooting || filling}
+		on:rename={(e) => {
+			name = e.detail.name;
+			markDirty();
+		}}
+		on:render={exportVideo}
+	/>
 	<!-- ── Notices ───────────────────────────────────────────────────── -->
 	{#if mountError}
 		<div
-			class="shrink-0 border-b-[3px] border-brand-danger bg-brand-danger/15 px-4 py-2 font-mono text-[11px] font-bold text-brand-danger"
+			class="shrink-0 border-b-[3px] border-brand-alarm bg-brand-alarm/15 px-4 py-2 font-mono text-[11px] font-bold text-brand-alarm"
 			role="alert"
 		>
 			{mountError}
 		</div>
 	{/if}
-	{#if saveError}
+	<!-- Suppressed while `saveBlocked` is set: the cap banner above says the same
+	     thing and offers the only action that can actually resolve it. A second
+	     copy with a "Try again" button next to it would be advising a retry that
+	     is guaranteed to fail. -->
+	{#if saveError && !saveBlocked}
 		<div
-			class="flex shrink-0 items-center gap-3 border-b-[3px] border-brand-danger bg-brand-danger/15 px-4 py-2 text-[11px] font-bold text-brand-danger"
+			class="flex shrink-0 items-center gap-3 border-b border-brand-alarm bg-brand-alarm/15 px-4 py-2 text-[11px] font-bold text-brand-alarm"
 			role="alert"
 		>
 			<span class="flex-1">{saveError}</span>
@@ -1552,9 +1611,29 @@
 			</button>
 		</div>
 	{/if}
+	<!--
+		The one save failure retrying cannot fix. Stated once, with the way out,
+		instead of a chip that quietly says COULDN'T SAVE forever.
+	-->
+	{#if saveBlocked}
+		<div
+			class="flex shrink-0 items-center gap-3 border-b border-brand-rule bg-brand-rose px-4 py-2.5 text-[12px] text-brand-ink"
+			role="alert"
+		>
+			<span class="block h-2 w-2 flex-shrink-0 bg-brand-alarm" aria-hidden="true"></span>
+			<span class="flex-1">{saveBlocked}</span>
+			<a
+				href="/dashboard/upgrade"
+				class="flex-shrink-0 rounded-btn bg-brand-ink px-3 py-1.5 font-sans text-[12px] font-medium text-white hover:opacity-90"
+			>
+				See plans
+			</a>
+		</div>
+	{/if}
+
 	{#if mediaWarning}
 		<div
-			class="flex shrink-0 items-center gap-3 border-b-[3px] border-black bg-brand-accent/20 px-4 py-2 text-[11px] font-bold text-brand-accent"
+			class="flex shrink-0 items-center gap-3 border-b border-brand-rule bg-brand-rose px-4 py-2 text-[11px] font-bold text-brand-ink"
 			role="status"
 		>
 			<i class="fa fa-triangle-exclamation" aria-hidden="true"></i>
@@ -1570,8 +1649,8 @@
 		</div>
 	{/if}
 
-	<!-- ── Studio: rail | stage | panel ──────────────────────────────── -->
-	<div class="flex min-h-0 flex-1">
+	<!-- ── Studio: copilot | rail | stage | inspector ────────────────── -->
+	<div class="flex min-h-0 flex-1 gap-4 px-5 pb-4">
 		{#if isCode}
 			<!--
 				A Remotion composition has no clips, so the rail's tools (text, media,
@@ -1589,18 +1668,31 @@
 					showPane={showCodePane}
 					on:change={onCodeChange}
 					on:schema={onCodeSchema}
+					on:hidePane={() => (showCodePane = false)}
+					on:showPane={() => (showCodePane = true)}
 				/>
 			</div>
 		{:else}
-		<div bind:this={railEl} class="h-full shrink-0 border-r-[3px] border-black"></div>
+		<!--
+			No fixed width: the rail island is the icon strip AND the library
+			drawer it opens, as siblings in one flex row. Pinning the card to the
+			strip's 64px put the drawer outside a card that clips, so every tool
+			button looked dead — it was opening a panel into the void. Sizing to
+			content lets the card widen into the drawer and shrink back when it
+			closes, which is also what the flyout is supposed to look like.
+		-->
+		<div
+			bind:this={railEl}
+			class="studio-card h-full shrink-0 overflow-hidden rounded-card bg-brand-paper"
+		></div>
 
 		<div bind:this={canvasWrapEl} class="relative min-w-0 flex-1 overflow-hidden {STAGE} {Z.canvas}">
 			{#if isBooting}
 				<div class="absolute inset-0 flex flex-col items-center justify-center gap-3">
 					<div
-						class="h-10 w-10 animate-pulse rounded-xl border-[3px] border-black bg-brand-accent shadow-brutal-sm"
+						class="h-10 w-10 animate-pulse rounded-tile border border-brand-rule bg-brand-field"
 					></div>
-					<p class="text-[10px] font-black uppercase tracking-widest {TEXT_MUTED}">
+					<p class="text-[10px] font-mono uppercase tracking-[0.08em] {TEXT_MUTED}">
 						Starting the studio
 					</p>
 				</div>
@@ -1622,8 +1714,8 @@
 				on:click={() => (showSafeAreas = !showSafeAreas)}
 				aria-pressed={showSafeAreas}
 				title="Show where Reels, TikTok and YouTube put their own interface over your video"
-				class="absolute bottom-2 right-2 z-30 rounded border-[2px] border-black px-2 py-1 text-[9px] font-black uppercase tracking-widest transition-colors
-					{showSafeAreas ? 'bg-brand-accent text-black' : 'bg-gray-900/90 text-gray-300 hover:text-white'}"
+				class="absolute bottom-2 right-2 z-30 rounded border border-brand-rule px-2 py-1 text-[9px] font-mono uppercase tracking-[0.08em] transition-colors
+					{showSafeAreas ? 'bg-brand-field text-black' : 'border border-brand-rule bg-brand-paper text-brand-slate hover:text-brand-ink'}"
 			>
 				Safe areas
 			</button>
@@ -1663,10 +1755,10 @@
 								{/if}
 							</div>
 							<div
-								class="mt-3 h-2 overflow-hidden rounded-full border-[2px] border-black bg-gray-950"
+								class="mt-3 h-2 overflow-hidden rounded-full border border-brand-rule bg-brand-subtle"
 							>
 								<div
-									class="h-full bg-brand-accent transition-[width] duration-200"
+									class="h-full bg-brand-field transition-[width] duration-200"
 									style={`width: ${Math.round(exportProgress * 100)}%`}
 								></div>
 							</div>
@@ -1677,9 +1769,9 @@
 							</p>
 						{:else if exportError}
 							<div class="flex items-start gap-3">
-								<i class="fa fa-circle-exclamation mt-0.5 text-brand-danger" aria-hidden="true"></i>
+								<i class="fa fa-circle-exclamation mt-0.5 text-brand-alarm" aria-hidden="true"></i>
 								<div class="min-w-0 flex-1">
-									<p class="text-xs font-black uppercase tracking-widest text-brand-danger">
+									<p class="text-xs font-mono uppercase tracking-[0.08em] text-brand-alarm">
 										Render failed
 									</p>
 									<p class="mt-1 text-[11px] font-bold {TEXT_MUTED}">{exportError}</p>
@@ -1711,7 +1803,7 @@
 							</div>
 						{:else}
 							<div class="flex items-center justify-between gap-3">
-								<p class="text-xs font-black uppercase tracking-widest text-data-green">
+								<p class="text-xs font-mono uppercase tracking-[0.08em] text-data-green">
 									Your {renderedFormat === 'gif' ? 'GIF' : 'video'} is ready
 								</p>
 								<button
@@ -1729,21 +1821,21 @@
 								<img
 									src={renderUrl}
 									alt="Rendered GIF"
-									class="mt-3 max-h-56 w-full rounded-xl border-[3px] border-black bg-black object-contain"
+									class="mt-3 max-h-56 w-full rounded-tile border border-brand-rule bg-black object-contain"
 								/>
 							{:else}
 								<!-- svelte-ignore a11y-media-has-caption -->
 								<video
 									controls
 									src={renderUrl}
-									class="mt-3 max-h-56 w-full rounded-xl border-[3px] border-black bg-black"
+									class="mt-3 max-h-56 w-full rounded-tile border border-brand-rule bg-black"
 								></video>
 							{/if}
 							<div class="mt-3 flex flex-wrap items-center gap-2">
 								<a
 									href={renderUrl}
 									download
-									class="{BUTTON_COMPACT} !bg-brand-accent !text-black"
+									class="{BUTTON_COMPACT} !bg-brand-field !text-black"
 								>
 									<i class="fa fa-download text-[10px]" aria-hidden="true"></i>
 									Download
@@ -1771,18 +1863,18 @@
 
 		<!-- Right panel: clip properties + variables -->
 		<aside
-			class="flex h-full w-80 shrink-0 flex-col border-l-[3px] border-black {PANEL} {Z.dock}"
+			class="studio-card flex h-full w-[300px] shrink-0 flex-col overflow-hidden rounded-card {PANEL} {Z.dock}"
 			aria-label="Inspector"
 		>
-			<div class="flex shrink-0 border-b-[3px] border-black" role="tablist">
+			<div class="flex shrink-0 border-b border-brand-rule" role="tablist">
 				<button
 					role="tab"
 					aria-selected={activeTab === 'properties'}
 					on:click={() => (activeTab = 'properties')}
-					class="flex-1 px-3 py-2.5 text-[10px] font-black uppercase tracking-widest transition-colors focus-brutal
+					class="flex-1 px-3 py-2.5 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors
 						{activeTab === 'properties'
-						? 'bg-gray-800 text-brand-accent'
-						: 'text-gray-400 hover:text-gray-100'}"
+						? 'bg-brand-field text-brand-ink'
+						: 'text-brand-mute hover:text-brand-ink'}"
 				>
 					Properties
 				</button>
@@ -1790,15 +1882,15 @@
 					role="tab"
 					aria-selected={activeTab === 'variables'}
 					on:click={() => (activeTab = 'variables')}
-					class="flex-1 border-l-[3px] border-black px-3 py-2.5 text-[10px] font-black uppercase tracking-widest transition-colors focus-brutal
+					class="flex-1 border-l border-brand-rule px-3 py-2.5 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors
 						{activeTab === 'variables'
-						? 'bg-gray-800 text-brand-accent'
-						: 'text-gray-400 hover:text-gray-100'}"
+						? 'bg-brand-field text-brand-ink'
+						: 'text-brand-mute hover:text-brand-ink'}"
 				>
 					Variables
 					{#if variableCount}
 						<span
-							class="ml-1 rounded-full border-[1.5px] border-black bg-brand-accent px-1.5 text-[9px] text-black"
+							class="ml-1 rounded-btn border border-brand-ink bg-brand-paper px-1.5 text-[9px] text-brand-ink"
 						>
 							{variableCount}
 						</span>
@@ -1814,20 +1906,30 @@
 				class:hidden={activeTab !== 'properties'}
 			>
 				{#if isCode}
-					<div class="px-3 py-3">
-						<h3 class="mb-1 text-xs font-semibold text-foreground">Composition</h3>
-						<p class="mb-3 text-[11px] leading-snug text-muted-foreground">
-							This template is a Remotion scene. Describe changes in Chat, set its
-							inputs on the Variables tab, and drag its beats under the preview.
-						</p>
-						<label class="flex items-center gap-2 text-xs text-muted-foreground">
-							<input
-								type="checkbox"
-								bind:checked={showCodePane}
-								class="h-3.5 w-3.5 rounded border-border bg-muted text-primary focus:ring-1 focus:ring-primary"
-							/>
-							Show the side pane
-						</label>
+					<div class="flex flex-col gap-4 px-3 py-3">
+						<div>
+							<h3 class="mb-1 font-display text-[13px] font-bold text-brand-ink">Composition</h3>
+							<p class="text-[11px] leading-snug text-brand-slate">
+								This template is a Remotion scene. Describe changes in Say it, set its
+								inputs on the Variables tab, and drag its beats under the preview.
+							</p>
+						</div>
+
+						<!--
+							Nothing is selected in a Remotion scene — there are no clips to
+							select — so this pane is always the template-level view. What
+							belongs here is the thing a template is FOR: the call that runs
+							it. (The old "Show the side pane" checkbox lived here; hiding the
+							editor is a view preference, so it moved onto the panel it hides.)
+						-->
+						<UseItCard
+							inputs={useItInputs}
+							templateUid={uid || ''}
+							templateName={name}
+							apiKey={apiKeyForSnippet}
+							kind="video"
+							heading="Use it — the call, with these inputs"
+						/>
 					</div>
 				{/if}
 				<div bind:this={propsEl} class:hidden={isCode}></div>
@@ -1865,9 +1967,11 @@
 	<!-- Clip-only: a Remotion composition has no tracks, and the player brings
 	     its own transport. -->
 	{#if !isCode}
-	<footer class="shrink-0 {STAGE} {Z.dock}">
+	<footer class="shrink-0 px-5 pb-4 {STAGE} {Z.dock}">
+		<!-- The grab handle sits on the canvas, above the card, so the card keeps
+		     its own uninterrupted rounded edge. -->
 		<div
-			class="h-1.5 cursor-row-resize touch-none bg-gray-900 transition-colors hover:bg-brand-accent"
+			class="mx-auto mb-1 h-1 w-16 cursor-row-resize touch-none rounded-full bg-brand-rule transition-colors hover:bg-brand-ink"
 			role="separator"
 			aria-orientation="horizontal"
 			aria-label="Resize timeline"
@@ -1878,12 +1982,12 @@
 		></div>
 		<div
 			bind:this={timelineEl}
-			class="w-full border-t-[3px] border-black"
+			class="studio-card w-full overflow-hidden rounded-card bg-brand-paper"
 			style={`height: ${timelineHeight}px`}
 		>
 			{#if isBooting}
 				<div
-					class="flex h-full items-center justify-center text-[10px] font-black uppercase tracking-widest {TEXT_FAINT}"
+					class="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.08em] {TEXT_FAINT}"
 				>
 					Loading the timeline
 				</div>
@@ -1894,15 +1998,23 @@
 </div>
 
 <style>
+	/* One card treatment for every floating panel in the studio — matches the
+	   image studio's cards so the two surfaces read as one product. */
+	:global(.studio-card) {
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+	}
+
 	/* The vendored studio panels render into plain divs from React, so their
-	   primitive styling has to be global. Accent is #ffc480 (brand-accent),
-	   not the upstream yellow. */
+	   primitive styling has to be global. These are the two primitives Tailwind
+	   cannot reach through the semantic-token remap — a range input's track and
+	   thumb, and a scrollbar — so they carry literal Repro Shop hexes: rule
+	   #E5E7EB for tracks, ink #000000 for the thumb, mute #8A8A85 for the bar. */
 	:global(.ov-slider) {
 		-webkit-appearance: none;
 		appearance: none;
 		height: 4px;
 		border-radius: 9999px;
-		background: #27272a;
+		background: #E5E7EB;
 		outline: none;
 		cursor: pointer;
 	}
@@ -1912,7 +2024,7 @@
 		width: 12px;
 		height: 12px;
 		border-radius: 9999px;
-		background: #ffc480;
+		background: #000000;
 		border: none;
 		cursor: pointer;
 	}
@@ -1920,19 +2032,19 @@
 		width: 12px;
 		height: 12px;
 		border-radius: 9999px;
-		background: #ffc480;
+		background: #000000;
 		border: none;
 		cursor: pointer;
 	}
 	:global(.ov-scroll) {
 		scrollbar-width: thin;
-		scrollbar-color: #3f3f46 transparent;
+		scrollbar-color: #8A8A85 transparent;
 	}
 	:global(.ov-scroll::-webkit-scrollbar) {
 		width: 6px;
 	}
 	:global(.ov-scroll::-webkit-scrollbar-thumb) {
-		background: #3f3f46;
+		background: #8A8A85;
 		border-radius: 9999px;
 	}
 </style>

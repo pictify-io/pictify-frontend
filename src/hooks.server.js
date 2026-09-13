@@ -102,6 +102,19 @@ const PERMANENT_REDIRECTS = {
 	'/compare/pictify-vs-orshot': '/alternatives/orshot',
 	'/compare/pictify-vs-bannerbear': '/alternatives/bannerbear',
 
+	// Legacy /alternatives slugs. Unknown slugs already 301 to the index via the
+	// route loader, but the index is a worse answer than the page the visitor
+	// asked for: /alternatives/hcti-io is the highest-clicking alternatives URL
+	// in Search Console (position 7.3) and was landing on a list. These map the
+	// old naming onto the live slug, which is slugify(competitor).
+	'/alternatives/hcti-io': '/alternatives/html-css-to-image',
+	'/alternatives/hcti': '/alternatives/html-css-to-image',
+	'/alternatives/htmlcsstoimage': '/alternatives/html-css-to-image',
+	'/alternatives/puppeteer': '/alternatives/puppeteer-self-hosted',
+	'/alternatives/playwright': '/alternatives/playwright-self-hosted',
+	'/alternatives/screenshotmachine': '/alternatives/screenshot-machine',
+	'/alternatives/vercel-og-image': '/alternatives/vercel-og',
+
 	// Image-era /solutions cluster → closest live equivalent
 	'/solutions/automated-image-generation': '/solutions',
 	'/solutions/image-generation-api': '/solutions',
@@ -246,7 +259,10 @@ export async function handleFetch({ event, request, fetch }) {
  * Handle errors
  */
 export function handleError({ error, event }) {
-	// Log error for monitoring
+	// Log for monitoring. Without this a server-side render error reaches the
+	// browser as a bare "An error occurred" with no stack anywhere, which is
+	// how a broken page can look identical to a working one in the logs.
+	console.error(`[500] ${event?.url?.pathname ?? 'unknown path'}:`, error);
 
 	// Return generic error to client
 	return {

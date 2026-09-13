@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import Loader from '$lib/components/Loader.svelte';
 	import { verifyEmail } from '../../api/auth';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	let status = 'idle';
 	let message = 'Hang tight while we check your verification link.';

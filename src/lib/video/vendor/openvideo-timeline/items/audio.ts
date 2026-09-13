@@ -5,6 +5,7 @@
  * vendor directory.
  */
 import { Control, Trimmable, TrimmableProps, timeUsToUnits } from "@openvideo/timeline";
+import { CLIP_FILL, CLIP_LABEL } from "../clip-palette";
 import { Audio as OpenVideoAudio } from "@openvideo/engine-pixi";
 import { IMetadata, ITrim } from "@openvideo/timeline";
 import { createAudioControls } from "../controls";
@@ -13,6 +14,7 @@ import {
   TIMELINE_SELECTED_BORDER_COLOR,
   TIMELINE_UNSELECTED_BORDER_COLOR,
   TIMELINE_BORDER_WIDTH,
+  TIMELINE_SELECTED_BORDER_WIDTH,
   TIMELINE_ITEM_BORDER_RADIUS,
 } from "../constants";
 
@@ -78,7 +80,7 @@ class Audio extends Trimmable {
     this.display = props.display;
     this.trim = props.trim;
     this.duration = props.duration;
-    this.fill = "#00849a";
+    this.fill = CLIP_FILL.audio;
     this.src = props.src;
     this.rx = TIMELINE_ITEM_BORDER_RADIUS;
     this.ry = TIMELINE_ITEM_BORDER_RADIUS;
@@ -192,7 +194,9 @@ class Audio extends Trimmable {
     const borderColor = this.isSelected
       ? TIMELINE_SELECTED_BORDER_COLOR
       : TIMELINE_UNSELECTED_BORDER_COLOR;
-    const borderWidth = TIMELINE_BORDER_WIDTH;
+    const borderWidth = this.isSelected
+      ? TIMELINE_SELECTED_BORDER_WIDTH
+      : TIMELINE_BORDER_WIDTH;
     const borderRadius = TIMELINE_ITEM_BORDER_RADIUS;
 
     ctx.save();
@@ -255,7 +259,7 @@ class Audio extends Trimmable {
     ctx.clip();
 
     // Draw waveform
-    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+    ctx.fillStyle = CLIP_LABEL;
     ctx.imageSmoothingEnabled = false;
 
     // Calculate which bars are visible

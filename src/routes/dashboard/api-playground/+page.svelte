@@ -1,3856 +1,1341 @@
 <script>
-	import { browser } from '$app/environment';
-	import { user, getAPITokenAction } from '../../../store/user.store';
-	import { toast } from '../../../store/toast.store';
-	import Toast from '$lib/components/Toast.svelte';
-	import Loader from '$lib/components/Loader.svelte';
-	import EmailVerificationRequired from '$lib/components/dashboard/EmailVerificationRequired.svelte';
-	import TemplateSelector from '$lib/components/TemplateSelector.svelte';
-	import { createImage, createGif } from '../../../api/image';
-	import {
-		getTemplates,
-		getTemplateById,
-		createTemplate,
-		deleteTemplate,
-		searchTemplates,
-		getTemplateVariables,
-		renderTemplate as renderTemplateApi,
-		batchRenderTemplate,
-		batchRenderFromCsv,
-		getBatchJobResults,
-		cancelBatchJob
-	} from '../../../api/template';
-	import backend from '../../../service/backend';
-	import { getVideoTemplates } from '../../../api/videoTemplates';
-	import { createShareResult } from '../../../api/public-templates.js';
-	import { onMount, onDestroy } from 'svelte';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	/**
+	 * API playground — a workbench, not a reference index.
+	 *
+	 * A quiet calls list, then two cards: Input and Result.
+	 *
+	 * Three earlier shapes were rejected for the same reason — too much on
+	 * screen at once. The fix is not a smaller version of everything; it is
+	 * showing one thing at a time in the Result card. Preview, JSON and Code are
+	 * three views of the same answer, so only one needs to be on screen, and the
+	 * status chip in the header says how the call went whichever is showing.
+	 *
+	 * The calls list stays visible: it is how you learn what the API can do, and
+	 * hiding it behind a dropdown was rejected outright.
+	 *
+	 * Everything here is real: your key, your quota, and the renders land on the
+	 * Renders page like any other. The status is whatever the server said, taken
+	 * off the raw Response — never off an api/* wrapper, which returns null on
+	 * failure and is how the old page came to print "200 OK" above an error.
+	 */
+	import { onMount, tick } from 'svelte';
 	import CodeMirror from 'svelte-codemirror-editor';
-	import { json } from '@codemirror/lang-json';
 	import { html as htmlLang } from '@codemirror/lang-html';
+	import { json as jsonLang, jsonParseLinter } from '@codemirror/lang-json';
+	import { linter } from '@codemirror/lint';
+	import { EditorView, lineNumbers } from '@codemirror/view';
+	import { analytics } from '$lib/telemetry.js';
+	import { notify, showToast } from '../../../store/toast.store.js';
+	import { activeApiToken, getAPITokenAction } from '../../../store/user.store';
+	import { usageWidget, initPLG } from '../../../store/plg.store.js';
+	import { getTemplateVariables } from '../../../api/template.js';
+	import { pressTheme } from '$lib/utils/press-highlight.js';
+	import { SNIPPET_LANGS, buildSnippet } from '$lib/dashboard/playground-snippets.js';
+	import { copyToClipboard } from '$lib/utils/format.js';
+	import TemplateSelector from '$lib/components/TemplateSelector.svelte';
+	import CodeBlock from '$lib/components/studio/CodeBlock.svelte';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
-	let apiToken = '';
-	let selectedEndpoint = 'image';
-	let loading = false;
-	let response = null;
-	let responseJson = '';
-	let isUserLoggedIn = false;
-	let isEmailVerified = null;
-	let userEmail = '';
+	const DOCS = 'https://docs.pictify.io';
+	const RECENT_KEY = 'pictify.playground.recent';
+	const LANG_KEY = 'pictify.playground.lang';
 
-	// Endpoints that require email verification
-	const generationEndpoints = [
-		'image',
-		'gif',
-		'render-template',
-		'batch-render',
-		'batch-render-csv',
-		'pdf-render',
-		'pdf-multi-page',
-		'video-render',
-		'video-generate'
+	const SAMPLE_HTML = `<div style="width:1200px;height:630px;
+  display:flex;align-items:center;
+  justify-content:center;
+  background:#131417;color:#fff;
+  font-family:Inter,sans-serif">
+  <h1 style="font-size:64px">
+    Hello from Pictify
+  </h1>
+</div>`;
+
+	/**
+	 * The nine calls. `/gif` is deliberately absent — it is deprecated, and GIF
+	 * output is the `format` parameter on the video render. Template CRUD is
+	 * absent too: the studio owns it.
+	 *
+	 * `body` is a pure function of the lane's state, so the snippet, the
+	 * validation and the fetch all read the same object.
+	 */
+	const GROUPS = [
+		{
+			title: 'RENDER HTML',
+			calls: [
+				{
+					id: 'html-image',
+					name: 'HTML → Image',
+					method: 'POST',
+					path: () => '/image',
+					blurb: 'Render any HTML + CSS to a PNG, JPG or WebP. Fonts, images and JS all load.',
+					docs: `${DOCS}/api-reference/image`,
+					editor: 'html',
+					size: true,
+					formats: ['PNG', 'JPG', 'WEBP'],
+					body: (s) => ({
+						...(s.mode === 'URL' ? { url: s.url || '' } : { html: s.html ?? SAMPLE_HTML }),
+						width: Number(s.width ?? 1200),
+						height: Number(s.height ?? 630),
+						...(s.selector ? { selector: s.selector } : {}),
+						fileExtension: (s.format || 'PNG').toLowerCase()
+					})
+				},
+				{
+					id: 'html-pdf',
+					name: 'HTML → PDF',
+					method: 'POST',
+					path: () => '/pdf/multi-page',
+					blurb: 'One PDF page per row, rendered against a saved template.',
+					docs: `${DOCS}/api-reference/pdf`,
+					needsTemplate: true,
+					editor: 'sets',
+					body: (s) => ({
+						templateUid: s.uid || ':uid',
+						variableSets: s.sets ?? [{}],
+						options: { preset: s.preset || 'A4' }
+					})
+				}
+			]
+		},
+		{
+			title: 'RENDER A TEMPLATE',
+			calls: [
+				{
+					id: 'tpl-image',
+					name: 'Template → Image',
+					method: 'POST',
+					path: (s) => `/templates/${s.uid || ':uid'}/render`,
+					blurb:
+						"Fill a saved template's variables and render it. Layout and size come from the template.",
+					docs: `${DOCS}/api-reference/templates`,
+					needsTemplate: true,
+					editor: 'vars',
+					formats: ['PNG', 'JPG', 'PDF'],
+					layout: true,
+					body: (s) => ({ variables: s.variables ?? {}, format: (s.format || 'PNG').toLowerCase() })
+				},
+				{
+					id: 'tpl-pdf',
+					name: 'Template → PDF',
+					method: 'POST',
+					/*
+					 * The same render endpoint with format: 'pdf'. NOT /pdf/render —
+					 * that path is FabricJS-only and answers "Template does not have
+					 * FabricJS data" for every HTML template, which is all of them now.
+					 */
+					path: (s) => `/templates/${s.uid || ':uid'}/render`,
+					blurb: 'The same template, rendered as a PDF. Page size comes from the template.',
+					docs: `${DOCS}/api-reference/templates`,
+					needsTemplate: true,
+					editor: 'vars',
+					layout: true,
+					body: (s) => ({ variables: s.variables ?? {}, format: 'pdf' })
+				},
+				{
+					id: 'tpl-video',
+					name: 'Template → Video / GIF',
+					method: 'POST',
+					path: (s) => `/video/templates/${s.uid || ':uid'}/render`,
+					blurb: 'Render a video template. GIF is a format on this call, not a separate endpoint.',
+					docs: `${DOCS}/api-reference/video`,
+					needsTemplate: true,
+					editor: 'vars',
+					formats: ['MP4', 'GIF'],
+					body: (s) => ({ variables: s.variables ?? {}, format: (s.format || 'MP4').toLowerCase() })
+				}
+			]
+		},
+		{
+			title: 'RENDER MANY',
+			calls: [
+				{
+					id: 'batch-rows',
+					name: 'Batch from rows',
+					method: 'POST',
+					path: (s) => `/templates/${s.uid || ':uid'}/batch-render`,
+					blurb:
+						'One render per row. Answers 202 with a batch id, then finishes in the background.',
+					docs: `${DOCS}/api-reference/batch`,
+					needsTemplate: true,
+					editor: 'sets',
+					batch: true,
+					formats: ['PNG', 'JPG', 'PDF'],
+					body: (s) => ({
+						variableSets: s.sets ?? [{}],
+						format: (s.format || 'PNG').toLowerCase()
+					})
+				},
+				{
+					id: 'batch-csv',
+					name: 'Batch from CSV',
+					method: 'POST',
+					path: (s) => `/templates/${s.uid || ':uid'}/batch-render`,
+					blurb: 'The same batch, fed by a CSV. The header row names the variables.',
+					docs: `${DOCS}/api-reference/batch`,
+					needsTemplate: true,
+					editor: 'csv',
+					batch: true,
+					formats: ['PNG', 'JPG', 'PDF'],
+					body: (s) => ({
+						csv: s.csv ?? 'name,title\nMika,Designer\nPriya,Engineer',
+						format: (s.format || 'PNG').toLowerCase()
+					})
+				}
+			]
+		},
+		{
+			title: 'LOOK UP',
+			calls: [
+				{
+					id: 'tpl-vars',
+					name: 'Template variables',
+					method: 'GET',
+					path: (s) => `/templates/${s.uid || ':uid'}/variables`,
+					blurb: 'Which variables a template declares. This is what the FORM tab is built from.',
+					docs: `${DOCS}/api-reference/templates`,
+					needsTemplate: true,
+					editor: 'none'
+				},
+				{
+					id: 'batch-results',
+					name: 'Batch results',
+					method: 'GET',
+					path: (s) => `/templates/batch/${s.batchId || ':id'}/results`,
+					blurb: 'Where a batch got to, and a URL per finished row.',
+					docs: `${DOCS}/api-reference/batch`,
+					editor: 'none',
+					idField: { key: 'batchId', label: 'BATCH ID', placeholder: 'bat_…' }
+				}
+			]
+		}
 	];
 
-	/*
-	 * PDF and video parameters.
-	 *
-	 * These endpoints predate their appearance here — the MCP server has called
-	 * /pdf/render since it shipped, and video templates render over the same
-	 * Bearer token as everything else — but the playground never showed them,
-	 * so developers evaluating the API concluded PDFs and video were
-	 * dashboard-only.
+	const ALL = GROUPS.flatMap((g) => g.calls);
+
+	/** How each format is written on screen; the value sent is still the id. */
+	const FORMAT_LABELS = {
+		WEBP: 'WebP',
+		MP4: 'MP4',
+		GIF: 'GIF',
+		PNG: 'PNG',
+		JPG: 'JPG',
+		PDF: 'PDF'
+	};
+
+	let openId = 'html-image';
+	let selection = {};
+	/** 'PREVIEW' | 'JSON' | 'CODE' — which view of the answer is showing. */
+	let resultTab = 'PREVIEW';
+	let recentOpen = false;
+	let moreOptions = false;
+	let sending = false;
+	let response = null;
+	let showHeaders = false;
+	let keyRevealed = false;
+	let revealTimer = null;
+	let lang = 'NODE';
+	let recent = [];
+	let expanded = false;
+	let previewDims = '';
+	let editorView = null;
+	let batchTimer = null;
+
+	$: call = ALL.find((c) => c.id === openId) || ALL[0];
+	$: state = selection[call.id] || {};
+	$: key = $activeApiToken?.token || '';
+	$: keyMasked = key ? `pic_live_••••${key.slice(-5)}` : 'YOUR_API_KEY';
+	$: rendersLeft = Math.max(0, ($usageWidget?.limit ?? 0) - ($usageWidget?.current ?? 0));
+
+	/**
+	 * The request object. Everything downstream — the four snippets, the
+	 * validation line and `send()` — reads THIS, so the page cannot show one
+	 * call and make another.
 	 */
-	let pdfRenderParams = { templateUid: '', variables: '{}', preset: 'A4', title: '' };
-	let pdfMultiPageParams = {
-		templateUid: '',
-		pages: '[\n  { "name": "Page one" },\n  { "name": "Page two" }\n]',
-		preset: 'A4',
-		title: ''
-	};
-	let videoRenderParams = { templateUid: '', variables: '{}', format: 'mp4' };
-	let videoVariablesParams = { uid: '' };
-	let videoGenerateParams = {
-		prompt: 'A bold 8 second product launch teaser for a developer tool called ShipFast',
-		width: 1080,
-		height: 1080,
-		durationSeconds: 8,
-		brandColor: ''
-	};
-	$: requiresEmailVerification =
-		generationEndpoints.includes(selectedEndpoint) && isEmailVerified === false;
+	function buildRequest(c, s, k) {
+		const url = `${PUBLIC_BACKEND_URL}${c.path(s)}`;
+		const headers = { Authorization: `Bearer ${k}` };
+		if (c.method !== 'GET') headers['Content-Type'] = 'application/json';
+		const body = c.method === 'GET' || !c.body ? undefined : c.body(s);
+		return { method: c.method, url, headers, body };
+	}
 
-	let hasTriedToFetchTokens = false;
-	let unsubscribe = () => {};
-	let copiedCurl = false;
-	let expandedCategory = 'HTML Rendering'; // Default expanded category
+	$: request = buildRequest(call, state, keyMasked);
+	$: sendableRequest = buildRequest(call, state, key || 'YOUR_API_KEY');
+	$: shownSnippet = buildSnippet(lang, request);
+	$: copyableSnippet = buildSnippet(lang, sendableRequest);
+	$: snippetMode = (SNIPPET_LANGS.find((l) => l.id === lang) || SNIPPET_LANGS[0]).hl;
 
-	// Maximize state for CodeMirror editors
-	let maximizeImageHtml = false;
-	let maximizeGifHtml = false;
-	let maximizeRenderVars = false;
-	let maximizeBatchVars = false;
-	let maximizeCsvMappings = false;
-
-	// User templates for dropdown
-	let userTemplates = [];
-	let loadingTemplates = false;
+	// ── Editor plumbing ────────────────────────────────────────────────────
+	const grabView = EditorView.updateListener.of((u) => {
+		editorView = u.view;
+	});
 	/*
-	 * Video templates through the SAME TemplateSelector as everything else —
-	 * one selection experience across the playground. The video endpoint has
-	 * no server-side search or pagination (the list caps at 100), so the
-	 * fetcher loads once and filters in memory; posterUrl maps onto the
-	 * thumbnail slot the selector already renders.
+	 * No lineWrapping. A wrapped line stops lining up with its gutter number,
+	 * and both the validation line and the 422 fix hint count lines — "line 5"
+	 * has to mean the fifth number in the gutter. Long lines scroll sideways.
 	 */
-	let videoTemplateCache = null;
-	const videoTemplateFetcher = async ({ query }) => {
-		if (!videoTemplateCache) {
-			const result = await getVideoTemplates();
-			videoTemplateCache = (result?.templates || []).map((t) => ({
-				...t,
-				thumbnail: t.posterUrl || null
-			}));
-		}
-		const needle = query.trim().toLowerCase();
-		const templates = needle
-			? videoTemplateCache.filter((t) => (t.name || '').toLowerCase().includes(needle))
-			: videoTemplateCache;
-		return { templates, hasMore: false };
-	};
-	let manualTemplateInput = {
-		'get-template': false,
-		'delete-template': false,
-		'render-template': false,
-		'batch-render': false,
-		'batch-render-csv': false,
-		'get-variables': false,
-		'video-render': false,
-		'video-variables': false
-	};
+	$: editorExtensions =
+		call.editor === 'html'
+			? [...pressTheme, lineNumbers(), htmlLang(), grabView]
+			: [...pressTheme, lineNumbers(), jsonLang(), linter(jsonParseLinter()), grabView];
 
-	// Fetch user templates
-	async function fetchUserTemplates() {
-		if (!isUserLoggedIn) return;
+	/** The text in the editor for this call, as a string. */
+	$: editorValue =
+		call.editor === 'html'
+			? state.html ?? SAMPLE_HTML
+			: call.editor === 'csv'
+			? state.csv ?? 'name,title\nMika,Designer\nPriya,Engineer'
+			: call.editor === 'sets'
+			? state.setsText ?? JSON.stringify(state.sets ?? [{}], null, 2)
+			: state.varsText ?? JSON.stringify(state.variables ?? {}, null, 2);
 
-		loadingTemplates = true;
-		try {
-			const result = await getTemplates({ limit: 100 });
-			if (result && result.templates) {
-				userTemplates = result.templates;
+	function onEditorChange(value) {
+		if (call.editor === 'html') return setField('html', value);
+		if (call.editor === 'csv') return setField('csv', value);
+		if (call.editor === 'sets') {
+			setField('setsText', value);
+			try {
+				setField('sets', JSON.parse(value));
+			} catch {
+				/* the validation line reports it; the body keeps its last good value */
 			}
-		} catch (error) {
+			return;
+		}
+		setField('varsText', value);
+		try {
+			setField('variables', JSON.parse(value));
+		} catch {
+			/* same */
+		}
+	}
+
+	/**
+	 * One line under the editor. It tells, it does not block: Send stays enabled
+	 * so the server's own answer is always reachable, which is the point of a
+	 * playground.
+	 */
+	$: validation = validate(call, state);
+	function validate(c, s) {
+		if (c.editor === 'vars' || c.editor === 'sets') {
+			const text = c.editor === 'sets' ? s.setsText : s.varsText;
+			if (text != null) {
+				try {
+					JSON.parse(text);
+				} catch (e) {
+					const at = /position (\d+)/.exec(e.message);
+					const line = at ? text.slice(0, Number(at[1])).split('\n').length : null;
+					return {
+						text: `${e.message.replace(/ in JSON.*$/, '')}${line ? ` · line ${line}` : ''}`,
+						line
+					};
+				}
+			}
+		}
+		if (c.editor === 'vars' && Array.isArray(s.required)) {
+			const vars = s.variables || {};
+			const missing = s.required.find((n) => !vars[n]);
+			if (missing) {
+				const text = s.varsText || '';
+				const idx = text.split('\n').findIndex((l) => l.includes(`"${missing}"`));
+				return {
+					text: `${missing} is required · line ${idx + 1}`,
+					line: idx >= 0 ? idx + 1 : null
+				};
+			}
+		}
+		if (c.size) {
+			const w = Number(s.width ?? 1200);
+			const h = Number(s.height ?? 630);
+			if (!(w >= 1 && w <= 4000) || !(h >= 1 && h <= 4000))
+				return { text: 'width and height must be between 1 and 4000', line: null };
+		}
+		if (c.needsTemplate && !s.uid)
+			return { text: 'Pick a template to fill this call.', line: null };
+		return null;
+	}
+
+	function setField(field, value) {
+		selection = { ...selection, [call.id]: { ...(selection[call.id] || {}), [field]: value } };
+	}
+
+	/** Move the cursor to a line the error named, and focus the editor. */
+	async function jumpToLine(line) {
+		if (!editorView || !line) return;
+		await tick();
+		const doc = editorView.state.doc;
+		const target = Math.min(Math.max(1, line), doc.lines);
+		const pos = doc.line(target).from;
+		editorView.dispatch({ selection: { anchor: pos }, scrollIntoView: true });
+		editorView.focus();
+	}
+
+	/** Selecting a template pulls its variables in and fills the editor. */
+	async function pickTemplate(event) {
+		const uid = event.detail.uid;
+		const next = { ...(selection[call.id] || {}), uid, template: event.detail.template };
+		try {
+			const res = await getTemplateVariables(uid);
+			const names = (res?.variables || [])
+				.map((v) => (typeof v === 'string' ? v : v?.name))
+				.filter(Boolean);
+			next.required = names;
+			next.variables = Object.fromEntries(names.map((n) => [n, `sample ${n}`]));
+			next.varsText = JSON.stringify(next.variables, null, 2);
+			next.sets = [next.variables, next.variables];
+			next.setsText = JSON.stringify(next.sets, null, 2);
+		} catch {
+			// No variables is a legitimate answer; the body just has none.
+			next.required = [];
+			next.variables = {};
+			next.varsText = '{}';
+		}
+		selection = { ...selection, [call.id]: next };
+	}
+
+	function refillFromTemplate() {
+		if (!state.uid) return;
+		const dirty = state.varsText && state.varsText !== JSON.stringify(state.variables, null, 2);
+		if (dirty && !confirm('Replace your edits with the template values?')) return;
+		pickTemplate({ detail: { uid: state.uid, template: state.template } });
+	}
+
+	// ── Send ───────────────────────────────────────────────────────────────
+	/**
+	 * The raw fetch stays raw.
+	 *
+	 * Bearer, not cookies: the render endpoints sit behind verifyApiToken, and
+	 * the pane says "your real key", so it should be the key that authenticates.
+	 * The status, headers and latency come straight off the Response — an
+	 * api/* wrapper would swallow the failure and hand back null.
+	 */
+	async function send() {
+		if (!key) {
+			showToast('No API key on this account yet — create one in Settings.', 'error', 4000);
+			return;
+		}
+		sending = true;
+		response = null;
+		showHeaders = false;
+		previewDims = '';
+		recentOpen = false;
+		clearTimeout(batchTimer);
+
+		const req = sendableRequest;
+		const started = performance.now();
+		try {
+			const raw = await fetch(req.url, {
+				method: req.method,
+				headers: req.headers,
+				...(req.body === undefined ? {} : { body: JSON.stringify(req.body) })
+			});
+			const latencyMs = performance.now() - started;
+			const text = await raw.text();
+			let body;
+			try {
+				body = JSON.parse(text);
+			} catch {
+				body = { raw: text };
+			}
+			response = {
+				status: raw.status,
+				ok: raw.ok,
+				headers: Object.fromEntries(raw.headers.entries()),
+				latencyMs,
+				body
+			};
+			analytics.track('playground_call_sent', {
+				call_id: call.id,
+				status: raw.status,
+				latency_ms: Math.round(latencyMs),
+				lang_shown: lang
+			});
+			if (raw.ok) {
+				// Optimistic: the render is already counted server-side.
+				usageWidget.update((u) => ({ ...u, current: (u.current || 0) + 1 }));
+			}
+			pushRecent(raw.status, latencyMs);
+			/*
+			 * Land on whichever view actually answers the question. A 2xx that
+			 * produced a file has something to look at; anything else, the JSON is
+			 * the answer and the preview stage would just say "nothing here".
+			 */
+			const file =
+				body?.url || body?.image?.url || body?.media?.url || body?.results?.[0]?.url || null;
+			resultTab = raw.ok && file ? 'PREVIEW' : 'JSON';
+			const id = body?.batchId || body?.batch?.id;
+			if (raw.status === 202 && id) pollBatch(id);
+		} catch (e) {
+			// A transport failure is not an HTTP status, and must not be dressed
+			// up as one.
+			response = {
+				status: 0,
+				ok: false,
+				headers: {},
+				latencyMs: performance.now() - started,
+				body: { error: e?.message || 'The request never reached the server.' }
+			};
+			pushRecent(0, response.latencyMs);
+			resultTab = 'JSON';
 		} finally {
-			loadingTemplates = false;
+			sending = false;
+		}
+	}
+
+	async function pollBatch(id) {
+		for (let i = 0; i < 20; i++) {
+			await new Promise((r) => {
+				batchTimer = setTimeout(r, 2000);
+			});
+			try {
+				const raw = await fetch(`${PUBLIC_BACKEND_URL}/templates/batch/${id}/results`, {
+					headers: { Authorization: `Bearer ${key}` }
+				});
+				const body = await raw.json();
+				response = { ...response, status: raw.status, body };
+				if (['completed', 'failed', 'cancelled'].includes(body?.status)) return;
+			} catch {
+				return;
+			}
+		}
+	}
+
+	async function cancelBatch() {
+		const id = response?.body?.batchId || response?.body?.batch?.id;
+		if (!id) return;
+		clearTimeout(batchTimer);
+		try {
+			await fetch(`${PUBLIC_BACKEND_URL}/templates/batch/${id}/cancel`, {
+				method: 'POST',
+				headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+				body: '{}'
+			});
+
+		} catch (e) {
+			notify.fail('Cancel batch', e);
+		}
+	}
+
+	// ── Recent ─────────────────────────────────────────────────────────────
+	function pushRecent(status, latencyMs) {
+		const entry = {
+			callId: call.id,
+			path: call.path(state),
+			status,
+			latencyMs: Math.round(latencyMs),
+			at: Date.now(),
+			body: selection[call.id] || {}
+		};
+		recent = [entry, ...recent.filter((r) => r.at !== entry.at)].slice(0, 5);
+		try {
+			localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
+		} catch {
+			/* a private window is allowed to refuse; the list is a convenience */
+		}
+	}
+
+	function restoreRecent(entry) {
+		openId = entry.callId;
+		selection = { ...selection, [entry.callId]: { ...entry.body } };
+	}
+
+	const shortPath = (p) => (p.length > 22 ? `${p.slice(0, 10)}…${p.slice(-10)}` : p);
+	const clock = (ms) =>
+		new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
+	// ── Response reading ───────────────────────────────────────────────────
+	$: resultUrl =
+		response?.body?.url ||
+		response?.body?.image?.url ||
+		response?.body?.media?.url ||
+		response?.body?.results?.[0]?.url ||
+		null;
+	$: statusColor =
+		!response || response.status === 0
+			? 'var(--tw-pink)'
+			: response.status >= 200 && response.status < 300
+			? '#00BE43'
+			: response.status < 400
+			? '#D8F34A'
+			: '#FF48B0';
+	$: latencyText = !response
+		? ''
+		: response.latencyMs >= 10000
+		? `${Math.round(response.latencyMs / 1000)} s`
+		: `${(response.latencyMs / 1000).toFixed(2)} s`;
+	$: responseJson = response ? JSON.stringify(response.body, null, 2) : '';
+	$: responseBytes = response
+		? Number(response.headers?.['content-length']) || new Blob([responseJson]).size
+		: 0;
+	$: sizeText =
+		responseBytes > 1024 ? `${(responseBytes / 1024).toFixed(1)} KB` : `${responseBytes} B`;
+
+	/** `PNG · 1200 × 630 · 142 KB · saved to your renders` under the stage. */
+	$: resultMeta = [
+		(state.format || call.formats?.[0] || '').toUpperCase(),
+		previewDims,
+		responseBytes ? sizeText : '',
+		response?.ok ? 'saved to your renders' : ''
+	]
+		.filter(Boolean)
+		.join(' · ');
+
+	/**
+	 * The status square's colour, as a utility class pair (background, text).
+	 * Proof-green for 2xx, field-yellow for a queued 202, pink for everything
+	 * else including a transport failure, which has no HTTP status at all.
+	 */
+	$: statusClass =
+		!response || response.status === 0
+			? 'bg-brand-pink text-brand-pink'
+			: response.status === 202
+			? 'bg-brand-field text-brand-field'
+			: response.status >= 200 && response.status < 300
+			? 'bg-brand-proof text-brand-proof'
+			: response.status < 400
+			? 'bg-brand-field text-brand-field'
+			: 'bg-brand-pink text-brand-pink';
+
+	/** The header chip. Reads `Idle` until something has been sent. */
+	$: statusChip = sending
+		? 'Sending…'
+		: response
+		? `${response.status || 'ERR'} · ${latencyText}`
+		: 'Idle';
+	$: errorField = findErrorField(response);
+
+	/** The field an error names, so the hint can offer to jump to it. */
+	function findErrorField(r) {
+		if (!r || r.ok) return null;
+		const raw = r.body?.details?.field || r.body?.field || '';
+		const named = String(raw).split('.').pop();
+		if (named) return named;
+		const m = /variable:?\s*([A-Za-z_][\w]*)/i.exec(r.body?.message || '');
+		return m ? m[1] : null;
+	}
+	$: errorLine = (() => {
+		if (!errorField) return null;
+		const text = call.editor === 'sets' ? state.setsText : state.varsText;
+		if (!text) return null;
+		const idx = text.split('\n').findIndex((l) => l.includes(`"${errorField}"`));
+		return idx >= 0 ? idx + 1 : null;
+	})();
+
+	function revealKey() {
+		keyRevealed = true;
+		analytics.track('playground_key_reveal');
+		clearTimeout(revealTimer);
+		revealTimer = setTimeout(() => (keyRevealed = false), 10000);
+	}
+
+	function copySnippet() {
+		copyToClipboard(copyableSnippet, 'Snippet copied');
+		analytics.track('playground_snippet_copied', {
+			call_id: call.id,
+			lang,
+			key_revealed: keyRevealed
+		});
+	}
+
+	function resultAction(action) {
+		analytics.track('playground_result_action', { action });
+	}
+
+	function onImageLoad(e) {
+		const img = e.currentTarget;
+		previewDims = `${img.naturalWidth} × ${img.naturalHeight}`;
+	}
+
+	function onKeydown(e) {
+		if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+			e.preventDefault();
+			if (!sending) send();
 		}
 	}
 
 	onMount(() => {
-		// Subscribe to user store to get API token
-		unsubscribe = user.subscribe(async (userData) => {
-			isUserLoggedIn = !!userData.email;
-			isEmailVerified = userData.isEmailVerified;
-			userEmail = userData.email || '';
-
-			// If user is logged in but no API tokens, fetch them (only once)
-			if (
-				userData.email &&
-				(!userData.apiTokens || userData.apiTokens.length === 0) &&
-				!hasTriedToFetchTokens
-			) {
-				hasTriedToFetchTokens = true;
-				try {
-					await getAPITokenAction();
-				} catch (error) {
-					/* ignored */
-				}
-			}
-
-			// Set API token if available
-			if (userData && Array.isArray(userData.apiTokens) && userData.apiTokens.length > 0) {
-				apiToken = userData.apiTokens[0].token || '';
-			}
-
-			// Fetch templates when user is logged in
-			if (isUserLoggedIn && userTemplates.length === 0) {
-				fetchUserTemplates();
-			}
-		});
+		getAPITokenAction().catch(() => {});
+		initPLG().catch(() => {});
+		try {
+			recent = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+			lang = localStorage.getItem(LANG_KEY) || 'NODE';
+		} catch {
+			/* fine — both are conveniences */
+		}
+		analytics.track('playground_v2_viewed');
+		return () => {
+			clearTimeout(revealTimer);
+			clearTimeout(batchTimer);
+		};
 	});
 
-	onDestroy(() => {
-		unsubscribe();
-		clearTimeout(previewRetryTimer);
-	});
-
-	// Retry logic for preview images not yet available on S3
-	const PREVIEW_MAX_RETRIES = 10;
-	const PREVIEW_RETRY_DELAY = 1500;
-	let previewRetryCount = 0;
-	let previewRetryTimer = null;
-	let previewImgSrc = '';
-	let previewImgLoaded = false;
-	let lastPreviewUrl = '';
-
-	// Reset retry state only when the URL actually changes
-	$: {
-		const newUrl = response?.url || response?.gif?.url || '';
-		if (newUrl && newUrl !== lastPreviewUrl) {
-			lastPreviewUrl = newUrl;
-			previewRetryCount = 0;
-			previewImgLoaded = false;
-			clearTimeout(previewRetryTimer);
-			previewImgSrc = newUrl;
-		}
-	}
-
-	function handlePreviewImgError() {
-		const url = response?.url || response?.gif?.url;
-		if (previewRetryCount < PREVIEW_MAX_RETRIES && url) {
-			previewRetryCount++;
-			previewRetryTimer = setTimeout(() => {
-				const sep = url.includes('?') ? '&' : '?';
-				previewImgSrc = `${url}${sep}_r=${previewRetryCount}`;
-			}, PREVIEW_RETRY_DELAY);
-		}
-	}
-
-	function handlePreviewImgLoad() {
-		previewImgLoaded = true;
-		previewRetryCount = 0;
-	}
-
-	// Image endpoint parameters
-	let imageParams = {
-		html: `<div style="
-  padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  font-family: Arial, sans-serif;
-  border-radius: 10px;
-">
-  <h1>Hello World!</h1>
-  <p>This is a test image</p>
-</div>`.trim(),
-		width: 800,
-		height: 600,
-		selector: 'body',
-		url: '',
-		fileExtension: 'png'
-	};
-
-	// GIF endpoint parameters
-	let gifParams = {
-		html: `<div style="
-  padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  font-family: Arial, sans-serif;
-  border-radius: 10px;
-">
-  <h1 id="animated-text">Animated Text</h1>
-  <style>
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-    #animated-text {
-      animation: pulse 2s infinite;
-    }
-  </style>
-</div>`.trim(),
-		width: 800,
-		height: 600,
-		framesPerSecond: 15,
-		selector: 'body',
-		url: ''
-	};
-
-	// Template Management parameters
-	let getTemplateParams = {
-		uid: ''
-	};
-
-	// Create template parameters. Playground exposes only the HTML
-	// engine; the fabric engine is an internal implementation detail
-	// powering the no-code canvas editor and isn't intended for raw
-	// API use.
-	let createTemplateParams = {
-		name: 'My template',
-		// Starter content that exercises variables + a helper so the
-		// generated curl/response is self-explanatory.
-		html: '<div style="width:1080px;height:1080px;display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif;background:#FFFDF8;">\n  <h1 style="font-size:96px;font-weight:900;color:#1f2937;">{{title}}</h1>\n</div>',
-		width: 1080,
-		height: 1080,
-		outputFormat: 'image',
-		// Blank by default — backend auto-declares any {{names}} it
-		// finds in html. Shown as a JSON textarea for users who want
-		// to pre-specify types / defaults / descriptions.
-		variableDefinitions: '[]',
-		jsEnabled: false,
-		strictVariables: false
-	};
-
-	let deleteTemplateParams = {
-		uid: ''
-	};
-
-	let searchTemplatesParams = {
-		q: '',
-		page: 1,
-		limit: 12
-	};
-
-	// Template Render parameters
-	let renderTemplateParams = {
-		templateUid: '',
-		variables: '{}',
-		format: 'png',
-		quality: 0.9,
-		layout: '',
-		layouts: []
-	};
-
-	// Layout multi-select for API playground
-	let playgroundSelectedLayouts = new Set();
-	let playgroundAvailableLayouts = []; // populated when template is selected
-
-	function togglePlaygroundLayout(key) {
-		if (playgroundSelectedLayouts.has(key)) {
-			playgroundSelectedLayouts.delete(key);
-		} else {
-			playgroundSelectedLayouts.add(key);
-		}
-		playgroundSelectedLayouts = new Set(playgroundSelectedLayouts);
-		renderTemplateParams.layouts = [...playgroundSelectedLayouts];
-		renderTemplateParams.layout = ''; // clear single layout when using multi
-	}
-
-	function toggleAllPlaygroundLayouts() {
-		if (playgroundSelectedLayouts.size === playgroundAvailableLayouts.length) {
-			playgroundSelectedLayouts = new Set();
-		} else {
-			playgroundSelectedLayouts = new Set(playgroundAvailableLayouts.map((l) => l.key));
-		}
-		renderTemplateParams.layouts = [...playgroundSelectedLayouts];
-		renderTemplateParams.layout = '';
-	}
-
-	// Batch render parameters
-	let batchRenderParams = {
-		templateUid: '',
-		variableSets: JSON.stringify(
-			[
-				{ title: 'First Title', subtitle: 'First Subtitle' },
-				{ title: 'Second Title', subtitle: 'Second Subtitle' }
-			],
-			null,
-			2
-		),
-		format: 'png',
-		quality: 0.9,
-		concurrency: 5,
-		layout: ''
-	};
-
-	// Batch render from CSV parameters
-	let batchRenderCsvParams = {
-		templateUid: '',
-		csvUrl: '',
-		mappings: JSON.stringify(
-			{
-				'CSV Column Name': 'templateVariableName',
-				'Title Column': 'title',
-				'Subtitle Column': 'subtitle'
-			},
-			null,
-			2
-		),
-		format: 'png',
-		quality: 0.9,
-		concurrency: 5,
-		layout: ''
-	};
-
-	// Available layouts for batch render (populated on template select)
-	let batchAvailableLayouts = [];
-	let batchCsvAvailableLayouts = [];
-	let batchSelectedLayouts = new Set(['default']);
-	let batchCsvSelectedLayouts = new Set(['default']);
-
-	function toggleBatchLayout(key) {
-		if (batchSelectedLayouts.has(key)) batchSelectedLayouts.delete(key);
-		else batchSelectedLayouts.add(key);
-		batchSelectedLayouts = new Set(batchSelectedLayouts);
-	}
-
-	function toggleBatchCsvLayout(key) {
-		if (batchCsvSelectedLayouts.has(key)) batchCsvSelectedLayouts.delete(key);
-		else batchCsvSelectedLayouts.add(key);
-		batchCsvSelectedLayouts = new Set(batchCsvSelectedLayouts);
-	}
-
-	let batchStatusParams = {
-		batchId: ''
-	};
-
-	let cancelBatchParams = {
-		batchId: ''
-	};
-
-	// Template Utilities parameters
-	let getVariablesParams = {
-		uid: ''
-	};
-
-	// Helper function to select template from dropdown
-	function selectTemplate(endpoint, templateUid) {
-		switch (endpoint) {
-			case 'get-template':
-				getTemplateParams.uid = templateUid;
-				break;
-			case 'delete-template':
-				deleteTemplateParams.uid = templateUid;
-				break;
-			case 'render-template':
-				renderTemplateParams.templateUid = templateUid;
-				// Auto-fetch variables when template is selected
-				fetchTemplateVariables(templateUid);
-				// Fetch template to get available layouts
-				getTemplateById(templateUid)
-					.then((res) => {
-						const layouts = res?.template?.layouts || {};
-						const entries = Object.entries(layouts);
-						playgroundAvailableLayouts = [
-							{
-								key: 'default',
-								name: 'Default',
-								width: res?.template?.width || 1080,
-								height: res?.template?.height || 1080
-							},
-							...entries.map(([key, l]) => ({
-								key,
-								name: l.name || key,
-								width: l.width,
-								height: l.height
-							}))
-						];
-						playgroundSelectedLayouts = new Set(['default']);
-						renderTemplateParams.layouts = [];
-						renderTemplateParams.layout = '';
-					})
-					.catch(() => {
-						playgroundAvailableLayouts = [];
-					});
-				break;
-			case 'batch-render':
-				batchRenderParams.templateUid = templateUid;
-				// Auto-fetch variables for batch render
-				fetchTemplateVariables(templateUid, true);
-				// Fetch layouts
-				getTemplateById(templateUid)
-					.then((res) => {
-						const layouts = res?.template?.layouts || {};
-						batchAvailableLayouts = [
-							{
-								key: '',
-								name: 'Default',
-								width: res?.template?.width || 1080,
-								height: res?.template?.height || 1080
-							},
-							...Object.entries(layouts).map(([key, l]) => ({
-								key,
-								name: l.name || key,
-								width: l.width,
-								height: l.height
-							}))
-						];
-						batchRenderParams.layout = '';
-					})
-					.catch(() => {
-						batchAvailableLayouts = [];
-					});
-				break;
-			case 'batch-render-csv':
-				batchRenderCsvParams.templateUid = templateUid;
-				// Auto-fetch variables for CSV batch render mappings
-				fetchTemplateVariablesForCsv(templateUid);
-				// Fetch layouts
-				getTemplateById(templateUid)
-					.then((res) => {
-						const layouts = res?.template?.layouts || {};
-						batchCsvAvailableLayouts = [
-							{
-								key: '',
-								name: 'Default',
-								width: res?.template?.width || 1080,
-								height: res?.template?.height || 1080
-							},
-							...Object.entries(layouts).map(([key, l]) => ({
-								key,
-								name: l.name || key,
-								width: l.width,
-								height: l.height
-							}))
-						];
-						batchRenderCsvParams.layout = '';
-					})
-					.catch(() => {
-						batchCsvAvailableLayouts = [];
-					});
-				break;
-			case 'get-variables':
-				getVariablesParams.uid = templateUid;
-				break;
-		}
-	}
-
-	// Fetch template variables and auto-fill example
-	async function fetchTemplateVariables(templateUid, isBatch = false) {
-		if (!templateUid) return;
-
+	$: if (typeof localStorage !== 'undefined' && lang) {
 		try {
-			const result = await getTemplateVariables(templateUid);
-			if (result && result.variables) {
-				// Create example variables object
-				const exampleVars = {};
-				result.variables.forEach((v) => {
-					if (v.type === 'text') {
-						exampleVars[v.name] = v.defaultValue || `Example ${v.name}`;
-					} else if (v.type === 'image') {
-						exampleVars[v.name] = v.defaultValue || 'https://via.placeholder.com/300';
-					} else if (v.type === 'color') {
-						exampleVars[v.name] = v.defaultValue || '#000000';
-					}
-				});
-
-				if (isBatch) {
-					// Create two example sets for batch
-					const batchExamples = [
-						{ ...exampleVars, title: 'First Example' },
-						{ ...exampleVars, title: 'Second Example' }
-					];
-					batchRenderParams.variableSets = JSON.stringify(batchExamples, null, 2);
-				} else {
-					renderTemplateParams.variables = JSON.stringify(exampleVars, null, 2);
-				}
-			}
-		} catch (error) {
-			/* ignored */
+			localStorage.setItem(LANG_KEY, lang);
+		} catch {
+			/* ignore */
 		}
 	}
-
-	// Fetch template variables for CSV mapping
-	async function fetchTemplateVariablesForCsv(templateUid) {
-		if (!templateUid) return;
-
-		try {
-			const result = await getTemplateVariables(templateUid);
-			if (result && result.variables) {
-				// Create example mappings from variable names
-				const exampleMappings = {};
-				result.variables.forEach((v) => {
-					// Use variable name as both key and value for example
-					exampleMappings[`${v.name}_column`] = v.name;
-				});
-				batchRenderCsvParams.mappings = JSON.stringify(exampleMappings, null, 2);
-			}
-		} catch (error) {
-			/* ignored */
-		}
-	}
-
-	// Test functions for each endpoint
-	async function testEndpoint(endpointId) {
-		if (!apiToken) {
-			toast.set({ message: 'API token is required', type: 'error', duration: 1500 });
-			return;
-		}
-
-		loading = true;
-		response = null;
-		responseJson = '';
-
-		try {
-			let data;
-			switch (endpointId) {
-				// Image Generation
-				case 'image':
-					data = await createImage({
-						...imageParams,
-						apiKey: apiToken
-					});
-					break;
-
-				case 'gif':
-					data = await createGif({
-						...gifParams,
-						apiKey: apiToken
-					});
-					break;
-
-				// Template Management
-				case 'get-template':
-					if (!getTemplateParams.uid) {
-						throw new Error('Template UID is required');
-					}
-					data = await getTemplateById(getTemplateParams.uid);
-					break;
-
-				case 'create-template':
-					if (!createTemplateParams.name?.trim()) {
-						throw new Error('Template name is required');
-					}
-					if (!createTemplateParams.html?.trim()) {
-						throw new Error('HTML body is required');
-					}
-					{
-						const body = {
-							name: createTemplateParams.name,
-							engine: 'html',
-							html: createTemplateParams.html,
-							width: Number(createTemplateParams.width) || 1080,
-							height: Number(createTemplateParams.height) || 1080,
-							outputFormat: createTemplateParams.outputFormat || 'image',
-							jsEnabled: !!createTemplateParams.jsEnabled,
-							strictVariables: !!createTemplateParams.strictVariables
-						};
-						// variableDefinitions is optional — backend auto-declares
-						// every referenced {{identifier}} on save. We only include
-						// the field when the user explicitly supplied non-empty
-						// entries, so the curl preview stays clean.
-						if (createTemplateParams.variableDefinitions?.trim()) {
-							try {
-								const parsed = JSON.parse(createTemplateParams.variableDefinitions);
-								if (Array.isArray(parsed) && parsed.length > 0) {
-									body.variableDefinitions = parsed;
-								}
-							} catch (err) {
-								throw new Error('variableDefinitions must be a JSON array');
-							}
-						}
-						data = await createTemplate(body);
-					}
-					break;
-
-				case 'delete-template':
-					if (!deleteTemplateParams.uid) {
-						throw new Error('Template UID is required');
-					}
-					data = await deleteTemplate(deleteTemplateParams.uid);
-					break;
-
-				case 'search-templates':
-					if (!searchTemplatesParams.q) {
-						throw new Error('Search query is required');
-					}
-					data = await searchTemplates(searchTemplatesParams.q, {
-						page: searchTemplatesParams.page,
-						limit: searchTemplatesParams.limit
-					});
-					break;
-
-				// Template Rendering
-				case 'render-template':
-					if (!renderTemplateParams.templateUid) {
-						throw new Error('Template UID is required');
-					}
-					{
-						const opts = {
-							format: renderTemplateParams.format,
-							quality: renderTemplateParams.quality,
-							headers: { Authorization: `Bearer ${apiToken}` }
-						};
-						if (playgroundSelectedLayouts.size > 1) {
-							opts.layouts = [...playgroundSelectedLayouts];
-						} else if (
-							playgroundSelectedLayouts.size === 1 &&
-							!playgroundSelectedLayouts.has('default')
-						) {
-							opts.layout = [...playgroundSelectedLayouts][0];
-						} else if (renderTemplateParams.layout) {
-							opts.layout = renderTemplateParams.layout;
-						}
-						data = await renderTemplateApi(
-							renderTemplateParams.templateUid,
-							JSON.parse(renderTemplateParams.variables),
-							opts
-						);
-					}
-					break;
-
-				case 'batch-render':
-					if (!batchRenderParams.templateUid) {
-						throw new Error('Template UID is required');
-					}
-					data = await batchRenderTemplate(
-						batchRenderParams.templateUid,
-						JSON.parse(batchRenderParams.variableSets),
-						{
-							format: batchRenderParams.format,
-							quality: batchRenderParams.quality,
-							concurrency: batchRenderParams.concurrency,
-							...(batchSelectedLayouts.size > 1
-								? { layouts: [...batchSelectedLayouts] }
-								: batchSelectedLayouts.size === 1 && !batchSelectedLayouts.has('default')
-								? { layout: [...batchSelectedLayouts][0] }
-								: {}),
-							headers: { Authorization: `Bearer ${apiToken}` }
-						}
-					);
-					break;
-
-				case 'batch-render-csv':
-					if (!batchRenderCsvParams.templateUid) {
-						throw new Error('Template UID is required');
-					}
-					if (!batchRenderCsvParams.csvUrl) {
-						throw new Error('CSV URL is required');
-					}
-					data = await batchRenderFromCsv(
-						batchRenderCsvParams.templateUid,
-						batchRenderCsvParams.csvUrl,
-						JSON.parse(batchRenderCsvParams.mappings),
-						{
-							format: batchRenderCsvParams.format,
-							quality: batchRenderCsvParams.quality,
-							concurrency: batchRenderCsvParams.concurrency,
-							...(batchCsvSelectedLayouts.size > 1
-								? { layouts: [...batchCsvSelectedLayouts] }
-								: batchCsvSelectedLayouts.size === 1 && !batchCsvSelectedLayouts.has('default')
-								? { layout: [...batchCsvSelectedLayouts][0] }
-								: {}),
-							headers: { Authorization: `Bearer ${apiToken}` }
-						}
-					);
-					break;
-
-				case 'batch-status':
-					if (!batchStatusParams.batchId) {
-						throw new Error('Batch ID is required');
-					}
-					data = await getBatchJobResults(batchStatusParams.batchId);
-					break;
-
-				case 'cancel-batch':
-					if (!cancelBatchParams.batchId) {
-						throw new Error('Batch ID is required');
-					}
-					data = await cancelBatchJob(cancelBatchParams.batchId);
-					break;
-
-				// Template Utilities
-				case 'get-variables':
-					if (!getVariablesParams.uid) {
-						throw new Error('Template UID is required');
-					}
-					data = await getTemplateVariables(getVariablesParams.uid);
-					break;
-
-				// PDF Generation
-				case 'pdf-render':
-					if (!pdfRenderParams.templateUid) {
-						throw new Error('Template UID is required');
-					}
-					data = await backend.post('/pdf/render', {
-						templateUid: pdfRenderParams.templateUid,
-						variables: JSON.parse(pdfRenderParams.variables || '{}'),
-						options: {
-							preset: pdfRenderParams.preset || 'A4',
-							...(pdfRenderParams.title ? { title: pdfRenderParams.title } : {})
-						}
-					});
-					break;
-
-				case 'pdf-multi-page':
-					if (!pdfMultiPageParams.templateUid) {
-						throw new Error('Template UID is required');
-					}
-					{
-						const pages = JSON.parse(pdfMultiPageParams.pages || '[]');
-						if (!Array.isArray(pages) || !pages.length) {
-							throw new Error('pages must be a non-empty JSON array of variable objects');
-						}
-						data = await backend.post('/pdf/multi-page', {
-							templateUid: pdfMultiPageParams.templateUid,
-							// The backend's field is variableSets — one set per page. The
-							// UI says "pages" because that is what the user thinks in.
-							variableSets: pages,
-							options: {
-								preset: pdfMultiPageParams.preset || 'A4',
-								...(pdfMultiPageParams.title ? { title: pdfMultiPageParams.title } : {})
-							}
-						});
-					}
-					break;
-
-				case 'pdf-presets':
-					data = await backend.get('/pdf/presets');
-					break;
-
-				// Video Templates
-				case 'video-list':
-					data = await backend.get('/video/templates');
-					break;
-
-				case 'video-render':
-					if (!videoRenderParams.templateUid) {
-						throw new Error('Video template UID is required');
-					}
-					data = await backend.post(`/video/templates/${videoRenderParams.templateUid}/render`, {
-						variables: JSON.parse(videoRenderParams.variables || '{}'),
-						format: videoRenderParams.format || 'mp4'
-					});
-					break;
-
-				case 'video-variables':
-					if (!videoVariablesParams.uid) {
-						throw new Error('Video template UID is required');
-					}
-					data = await backend.get(`/video/templates/${videoVariablesParams.uid}/variables`);
-					break;
-
-				case 'video-generate':
-					if (!videoGenerateParams.prompt?.trim()) {
-						throw new Error('A prompt is required');
-					}
-					data = await backend.post('/video/templates/generate', {
-						prompt: videoGenerateParams.prompt,
-						width: Number(videoGenerateParams.width) || 1080,
-						height: Number(videoGenerateParams.height) || 1080,
-						durationSeconds: Number(videoGenerateParams.durationSeconds) || 8,
-						...(videoGenerateParams.brandColor
-							? { brandColor: videoGenerateParams.brandColor }
-							: {})
-					});
-					break;
-			}
-
-			response = data;
-			playgroundShareCache = null;
-			responseJson = JSON.stringify(data, null, 2);
-			toast.set({ message: 'Request successful!', type: 'success', duration: 1500 });
-		} catch (error) {
-			response = error.response?.data || { error: error.message };
-			responseJson = JSON.stringify(response, null, 2);
-			toast.set({
-				message: error.response?.data?.error || error.message || 'Request failed',
-				type: 'error',
-				duration: 1500
-			});
-		} finally {
-			loading = false;
-		}
-	}
-
-	function copyToClipboard(text) {
-		if (browser && navigator.clipboard) {
-			navigator.clipboard.writeText(text);
-			toast.set({ message: 'Copied to clipboard!', type: 'success', duration: 1500 });
-		} else {
-			toast.set({ message: 'Clipboard not available', type: 'error', duration: 1500 });
-		}
-	}
-
-	let playgroundShareCache = null;
-	let isCopyingShareUrl = false;
-
-	async function copyShareUrl(cdnUrl) {
-		if (!cdnUrl || !browser) return;
-		isCopyingShareUrl = true;
-		try {
-			if (!playgroundShareCache || playgroundShareCache.cdnUrl !== cdnUrl) {
-				const isGif = cdnUrl.includes('.gif') || response?.gif;
-				const params = isGif ? gifParams : imageParams;
-				const res = await createShareResult({
-					assetUrl: cdnUrl,
-					contentType: isGif ? 'gif' : 'image',
-					format: isGif ? 'gif' : 'png',
-					source: 'api',
-					title: 'API Playground Result',
-					width: response?.width || params.width,
-					height: response?.height || params.height
-				});
-				if (res.success && res.shareUrl) {
-					playgroundShareCache = { cdnUrl, shareUrl: `${window.location.origin}${res.shareUrl}` };
-				}
-			}
-			const urlToCopy = playgroundShareCache?.shareUrl || cdnUrl;
-			await navigator.clipboard.writeText(urlToCopy);
-			toast.set({ message: 'Share link copied!', type: 'success', duration: 1500 });
-		} catch (e) {
-			// Fallback to CDN URL
-			copyToClipboard(cdnUrl);
-		} finally {
-			isCopyingShareUrl = false;
-		}
-	}
-
-	function handleCopyCurl() {
-		if (!curlExample) return;
-
-		copyToClipboard(curlExample.copy);
-		copiedCurl = true;
-		setTimeout(() => {
-			copiedCurl = false;
-		}, 2000);
-	}
-
-	const escapeSingleQuotes = (value = '') => value.replace(/'/g, `'"'"'`);
-	const escapeHtml = (str = '') =>
-		str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-	function setSelectedEndpoint(endpoint) {
-		selectedEndpoint = endpoint;
-		response = null;
-		responseJson = '';
-	}
-
-	function toggleCategory(category) {
-		expandedCategory = expandedCategory === category ? null : category;
-	}
-
-	// Reactive curl example
-	$: backendBaseUrl = (() => {
-		const fallbackUrl = browser ? window.location.origin : 'https://pictify.io';
-		const rawUrl = PUBLIC_BACKEND_URL || fallbackUrl;
-		return rawUrl?.replace(/\/$/, '') || '';
-	})();
-
-	$: curlExample = (() => {
-		if (!backendBaseUrl) {
-			return null;
-		}
-		const authToken = apiToken || 'YOUR_API_TOKEN';
-
-		const buildExample = (method, path, payload = null, requiresAuth = true) => {
-			let displayLines = [`curl -X ${method} ${backendBaseUrl}${path}`];
-			let copyLines = [`curl -X ${method} ${backendBaseUrl}${path}`];
-
-			if (requiresAuth) {
-				displayLines.push(`  -H "Authorization: Bearer ${authToken}"`);
-				copyLines.push(`-H "Authorization: Bearer ${authToken}"`);
-			}
-
-			if (payload) {
-				displayLines.push(`  -H "Content-Type: application/json"`);
-				copyLines.push(`-H "Content-Type: application/json"`);
-				const payloadPretty = JSON.stringify(payload, null, 2);
-				const payloadSingleLine = JSON.stringify(payload);
-				displayLines.push(`  --data-raw '${payloadPretty}'`);
-				copyLines.push(`--data-raw '${escapeSingleQuotes(payloadSingleLine)}'`);
-			}
-
-			return {
-				display: displayLines.join(' \\\n'),
-				copy: copyLines.join(' ')
-			};
-		};
-
-		// Generate cURL based on selected endpoint
-		const endpointConfig = endpointDetails.find((e) => e.id === selectedEndpoint);
-		if (!endpointConfig) return null;
-
-		return buildExample(
-			endpointConfig.method,
-			endpointConfig.path,
-			endpointConfig.payload,
-			endpointConfig.requiresAuth !== false
-		);
-	})();
-
-	// Endpoint details for cURL generation
-	$: endpointDetails = [
-		// Image Generation
-		{
-			id: 'image',
-			method: 'POST',
-			path: '/image',
-			payload: imageParams,
-			requiresAuth: true
-		},
-		{
-			id: 'gif',
-			method: 'POST',
-			path: '/gif',
-			payload: gifParams,
-			requiresAuth: true
-		},
-		// Template Management
-		{
-			id: 'create-template',
-			method: 'POST',
-			path: '/templates',
-			payload: (() => {
-				const body = {
-					name: createTemplateParams.name,
-					engine: 'html',
-					html: createTemplateParams.html,
-					width: Number(createTemplateParams.width) || 1080,
-					height: Number(createTemplateParams.height) || 1080,
-					outputFormat: createTemplateParams.outputFormat || 'image',
-					jsEnabled: !!createTemplateParams.jsEnabled,
-					strictVariables: !!createTemplateParams.strictVariables
-				};
-				try {
-					const parsed = JSON.parse(createTemplateParams.variableDefinitions || '[]');
-					if (Array.isArray(parsed) && parsed.length > 0) body.variableDefinitions = parsed;
-				} catch {
-					/* silently elided from curl preview when invalid;
-					   the handler raises a proper error on submit */
-				}
-				return body;
-			})(),
-			requiresAuth: true
-		},
-		{
-			id: 'get-template',
-			method: 'GET',
-			path: `/templates/${getTemplateParams.uid || ':uid'}`,
-			payload: null,
-			requiresAuth: true
-		},
-		{
-			id: 'delete-template',
-			method: 'DELETE',
-			path: `/templates/${deleteTemplateParams.uid || ':uid'}`,
-			payload: null,
-			requiresAuth: true
-		},
-		{
-			id: 'search-templates',
-			method: 'GET',
-			path: `/templates/search?q=${encodeURIComponent(searchTemplatesParams.q)}&page=${
-				searchTemplatesParams.page
-			}&limit=${searchTemplatesParams.limit}`,
-			payload: null,
-			requiresAuth: true
-		},
-		// Template Rendering
-		{
-			id: 'render-template',
-			method: 'POST',
-			path: `/templates/${renderTemplateParams.templateUid || ':uid'}/render`,
-			payload: {
-				variables: JSON.parse(renderTemplateParams.variables || '{}'),
-				format: renderTemplateParams.format,
-				quality: renderTemplateParams.quality,
-				...(playgroundSelectedLayouts.size > 1 ? { layouts: [...playgroundSelectedLayouts] } : {}),
-				...(playgroundSelectedLayouts.size === 1 && !playgroundSelectedLayouts.has('default')
-					? { layout: [...playgroundSelectedLayouts][0] }
-					: {})
-			},
-			requiresAuth: true
-		},
-		{
-			id: 'batch-render',
-			method: 'POST',
-			path: `/templates/${batchRenderParams.templateUid || ':uid'}/batch-render`,
-			payload: {
-				variableSets: JSON.parse(batchRenderParams.variableSets || '[]'),
-				format: batchRenderParams.format,
-				quality: batchRenderParams.quality,
-				concurrency: batchRenderParams.concurrency,
-				...(batchSelectedLayouts.size > 1
-					? { layouts: [...batchSelectedLayouts] }
-					: batchSelectedLayouts.size === 1 && !batchSelectedLayouts.has('default')
-					? { layout: [...batchSelectedLayouts][0] }
-					: {})
-			},
-			requiresAuth: true
-		},
-		{
-			id: 'batch-render-csv',
-			method: 'POST',
-			path: `/templates/${batchRenderCsvParams.templateUid || ':uid'}/batch-render`,
-			payload: {
-				csvUrl: batchRenderCsvParams.csvUrl,
-				mappings: JSON.parse(batchRenderCsvParams.mappings || '{}'),
-				format: batchRenderCsvParams.format,
-				quality: batchRenderCsvParams.quality,
-				concurrency: batchRenderCsvParams.concurrency,
-				...(batchCsvSelectedLayouts.size > 1
-					? { layouts: [...batchCsvSelectedLayouts] }
-					: batchCsvSelectedLayouts.size === 1 && !batchCsvSelectedLayouts.has('default')
-					? { layout: [...batchCsvSelectedLayouts][0] }
-					: {})
-			},
-			requiresAuth: true
-		},
-		{
-			id: 'batch-status',
-			method: 'GET',
-			path: `/templates/batch/${batchStatusParams.batchId || ':batchId'}/results`,
-			payload: null,
-			requiresAuth: true
-		},
-		{
-			id: 'cancel-batch',
-			method: 'POST',
-			path: `/templates/batch/${cancelBatchParams.batchId || ':batchId'}/cancel`,
-			payload: null,
-			requiresAuth: true
-		},
-		// Template Utilities
-		{
-			id: 'get-variables',
-			method: 'GET',
-			path: `/templates/${getVariablesParams.uid || ':uid'}/variables`,
-			payload: null,
-			requiresAuth: true
-		},
-		// PDF Generation
-		{
-			id: 'pdf-render',
-			method: 'POST',
-			path: '/pdf/render',
-			payload: (() => {
-				try {
-					return {
-						templateUid: pdfRenderParams.templateUid || 'TEMPLATE_UID',
-						variables: JSON.parse(pdfRenderParams.variables || '{}'),
-						options: {
-							preset: pdfRenderParams.preset || 'A4',
-							...(pdfRenderParams.title ? { title: pdfRenderParams.title } : {})
-						}
-					};
-				} catch {
-					return { templateUid: pdfRenderParams.templateUid || 'TEMPLATE_UID' };
-				}
-			})(),
-			requiresAuth: true
-		},
-		{
-			id: 'pdf-multi-page',
-			method: 'POST',
-			path: '/pdf/multi-page',
-			payload: (() => {
-				try {
-					return {
-						templateUid: pdfMultiPageParams.templateUid || 'TEMPLATE_UID',
-						variableSets: JSON.parse(pdfMultiPageParams.pages || '[]'),
-						options: { preset: pdfMultiPageParams.preset || 'A4' }
-					};
-				} catch {
-					return { templateUid: pdfMultiPageParams.templateUid || 'TEMPLATE_UID' };
-				}
-			})(),
-			requiresAuth: true
-		},
-		{
-			id: 'pdf-presets',
-			method: 'GET',
-			path: '/pdf/presets',
-			payload: null,
-			requiresAuth: true
-		},
-		// Video Templates
-		{
-			id: 'video-list',
-			method: 'GET',
-			path: '/video/templates',
-			payload: null,
-			requiresAuth: true
-		},
-		{
-			id: 'video-render',
-			method: 'POST',
-			path: `/video/templates/${videoRenderParams.templateUid || ':uid'}/render`,
-			payload: (() => {
-				try {
-					return {
-						variables: JSON.parse(videoRenderParams.variables || '{}'),
-						format: videoRenderParams.format || 'mp4'
-					};
-				} catch {
-					return { variables: {}, format: videoRenderParams.format || 'mp4' };
-				}
-			})(),
-			requiresAuth: true
-		},
-		{
-			id: 'video-variables',
-			method: 'GET',
-			path: `/video/templates/${videoVariablesParams.uid || ':uid'}/variables`,
-			payload: null,
-			requiresAuth: true
-		},
-		{
-			id: 'video-generate',
-			method: 'POST',
-			path: '/video/templates/generate',
-			payload: {
-				prompt: videoGenerateParams.prompt,
-				width: Number(videoGenerateParams.width) || 1080,
-				height: Number(videoGenerateParams.height) || 1080,
-				durationSeconds: Number(videoGenerateParams.durationSeconds) || 8,
-				...(videoGenerateParams.brandColor ? { brandColor: videoGenerateParams.brandColor } : {})
-			},
-			requiresAuth: true
-		}
-	];
-
-	/*
-	 * Endpoint categories, organised by PRODUCT rather than by verb.
-	 *
-	 * An earlier layout split image templates across three groups (Management /
-	 * Rendering / Utilities) while video got one coherent group — so the same
-	 * kind of work lived in one place for video and three for images. Now each
-	 * group is one product surface: what you can do with it, top to bottom,
-	 * with the one-off HTML renders first because they are the simplest call
-	 * and the natural first request to try.
-	 */
-	const endpointCategories = [
-		{
-			name: 'HTML Rendering',
-			endpoints: [
-				{ id: 'image', path: '/image', method: 'POST', label: 'HTML to Image' },
-				{ id: 'gif', path: '/gif', method: 'POST', label: 'HTML to GIF' }
-			]
-		},
-		{
-			name: 'Image Templates',
-			endpoints: [
-				{ id: 'create-template', path: '/templates', method: 'POST', label: 'Create Template' },
-				{ id: 'get-template', path: '/templates/:uid', method: 'GET', label: 'Get Template' },
-				{
-					id: 'search-templates',
-					path: '/templates/search',
-					method: 'GET',
-					label: 'Search Templates'
-				},
-				{
-					id: 'get-variables',
-					path: '/templates/:uid/variables',
-					method: 'GET',
-					label: 'Get Variables'
-				},
-				{
-					id: 'render-template',
-					path: '/templates/:uid/render',
-					method: 'POST',
-					label: 'Render Template'
-				},
-				{
-					id: 'delete-template',
-					path: '/templates/:uid',
-					method: 'DELETE',
-					label: 'Delete Template'
-				}
-			]
-		},
-		{
-			name: 'Batch Rendering',
-			endpoints: [
-				{
-					id: 'batch-render',
-					path: '/templates/:uid/batch-render',
-					method: 'POST',
-					label: 'Batch Render (Rows)'
-				},
-				{
-					id: 'batch-render-csv',
-					path: '/templates/:uid/batch-render',
-					method: 'POST',
-					label: 'Batch Render (CSV)'
-				},
-				{
-					id: 'batch-status',
-					path: '/templates/batch/:batchId/results',
-					method: 'GET',
-					label: 'Batch Status'
-				},
-				{
-					id: 'cancel-batch',
-					path: '/templates/batch/:batchId/cancel',
-					method: 'POST',
-					label: 'Cancel Batch'
-				}
-			]
-		},
-		{
-			name: 'PDF Generation',
-			endpoints: [
-				{ id: 'pdf-render', path: '/pdf/render', method: 'POST', label: 'Template to PDF' },
-				{
-					id: 'pdf-multi-page',
-					path: '/pdf/multi-page',
-					method: 'POST',
-					label: 'Multi-page PDF'
-				},
-				{ id: 'pdf-presets', path: '/pdf/presets', method: 'GET', label: 'Page Presets' }
-			]
-		},
-		{
-			name: 'Video Templates',
-			endpoints: [
-				{ id: 'video-list', path: '/video/templates', method: 'GET', label: 'List Video Templates' },
-				{
-					id: 'video-variables',
-					path: '/video/templates/:uid/variables',
-					method: 'GET',
-					label: 'Get Video Variables'
-				},
-				{
-					id: 'video-render',
-					path: '/video/templates/:uid/render',
-					method: 'POST',
-					label: 'Render Video (MP4 / GIF)'
-				},
-				{
-					id: 'video-generate',
-					path: '/video/templates/generate',
-					method: 'POST',
-					label: 'AI Generate Template'
-				}
-			]
-		}
-	];
-
-	// Get description for current endpoint
-	$: endpointDescription = (() => {
-		const descriptions = {
-			image: 'Generate a static image from HTML',
-			gif: 'Generate an animated GIF from HTML',
-			'create-template':
-				'Create a reusable HTML template. Handlebars + Puppeteer renders variables at request time.',
-			'get-template': 'Get details of a specific template',
-			'delete-template': 'Delete a template',
-			'search-templates': 'Search templates by name',
-			'render-template': 'Render a template with variables',
-			'batch-render': 'Render multiple variations in bulk (variableSets mode, max 100 items)',
-			'batch-render-csv':
-				'Batch render using CSV URL with column mappings (unified endpoint, CSV mode)',
-			'batch-status': 'Check batch job status and results',
-			'cancel-batch': 'Cancel a running batch job',
-			'get-variables': 'Get template variable definitions',
-			'pdf-render': 'Render an HTML template as a single-page PDF (A4, Letter and more)',
-			'pdf-multi-page':
-				'Render one PDF with a page per variable set: certificates or reports as a single document',
-			'pdf-presets': 'List the available page size presets',
-			'video-list': 'List your video templates with their UIDs',
-			'video-render':
-				'Render a video template with variables: MP4, or an animated GIF (15fps, palette-optimised). Renders take up to a few minutes; the request waits for the file URL.',
-			'video-variables': 'Get a video template’s variable definitions',
-			'video-generate':
-				'Generate a new video template from a prompt: an AI motion brief, compiled scene code and a visual review, returned as a draft template. Costs 5 AI credits.'
-		};
-		return descriptions[selectedEndpoint] || '';
-	})();
 </script>
 
-<svelte:head>
-	<title>API Playground - Pictify.io</title>
-</svelte:head>
+<svelte:head><title>API playground | Pictify.io</title></svelte:head>
+<svelte:window on:keydown={onKeydown} />
 
-<div class="min-h-full">
-	<div>
-		<!-- Header -->
-		<div
-			class="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12"
-		>
-			<div>
-				<div
-					class="inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 bg-gray-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded mb-2 sm:mb-3"
-				>
-					<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-brand-accent rounded-full" />
-					Dev Tools
-				</div>
-				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-					API <span class="text-gray-900">Playground</span>
-				</h1>
-			</div>
 
-			<!-- Status Badge -->
-			<div
-				class="flex items-center gap-1.5 sm:gap-2 bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-sm sm:shadow-brutal-lg"
+<div class="flex h-full w-full flex-col gap-5 bg-brand-paper px-6 py-6 lg:px-8 lg:py-7">
+	<!-- ── Title ───────────────────────────────────────────────────── -->
+	<div class="flex flex-shrink-0 items-center justify-between gap-4">
+		<h1 class="font-display text-[26px] font-bold leading-[30px] tracking-[-0.02em] text-brand-ink">
+			API playground
+		</h1>
+		<div class="flex flex-shrink-0 items-center gap-2.5">
+			<span class="font-mono text-xs text-brand-slate">{keyMasked}</span>
+			<button
+				type="button"
+				on:click={() => copyToClipboard(key, 'API key copied')}
+				class="font-sans text-[13px] font-medium text-brand-blue hover:underline">Copy key</button
 			>
-				<div class="w-2 h-2 sm:w-3 sm:h-3 bg-data-green rounded-full animate-pulse" />
-				<span class="text-[10px] sm:text-xs font-black text-gray-900 uppercase tracking-wider"
-					>System OK</span
+		</div>
+	</div>
+
+	<div class="flex min-h-0 flex-1 flex-col gap-5 min-[900px]:flex-row">
+		<!-- ── Calls ───────────────────────────────────────────────── -->
+		<!-- Quiet on purpose: no card, no rules, no method chips. The method is
+		     in the Input header, where it belongs to the call you are editing. -->
+		<div
+			class="flex flex-shrink-0 gap-0.5 overflow-x-auto pt-1 min-[900px]:w-[168px] min-[900px]:flex-col min-[900px]:overflow-visible min-[1440px]:w-[180px]"
+		>
+			{#each GROUPS as group (group.title)}
+				<p
+					class="hidden px-2 pb-1.5 pt-3.5 font-mono text-[10px] tracking-[0.08em] text-brand-mute first:pt-0 min-[900px]:block"
 				>
-			</div>
+					{group.title}
+				</p>
+				{#each group.calls as c (c.id)}
+					<button
+						type="button"
+						on:click={() => (openId = c.id)}
+						class="flex h-8 flex-shrink-0 items-center gap-2 rounded-md px-2 text-left {openId ===
+						c.id
+							? 'bg-brand-subtle'
+							: 'hover:bg-brand-subtle/60'}"
+					>
+						<span
+							class="flex-1 whitespace-nowrap font-sans text-[13.5px] leading-[18px] {openId ===
+							c.id
+								? 'font-semibold text-brand-ink'
+								: 'text-brand-slate'}"
+						>
+							{c.name}
+						</span>
+						{#if openId === c.id}
+							<span class="h-1.5 w-1.5 flex-shrink-0 bg-brand-field" aria-hidden="true" />
+						{/if}
+					</button>
+				{/each}
+			{/each}
+
+			<div class="hidden flex-1 min-[900px]:block" aria-hidden="true" />
+
+			<a
+				href={DOCS}
+				target="_blank"
+				rel="noopener"
+				class="hidden whitespace-nowrap font-sans text-[12.5px] text-brand-blue hover:underline min-[900px]:block"
+			>
+				All endpoints in the docs ↗
+			</a>
 		</div>
 
-		<!-- Main Grid -->
-		<div class="grid grid-cols-12 gap-4 sm:gap-6 md:gap-8">
-			<!-- Left Panel: Navigation & Auth -->
-			<div class="col-span-12 lg:col-span-4 space-y-4 sm:space-y-6 md:space-y-8">
-				<!-- Auth Card -->
-				<div
-					class="bg-white rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-lg sm:shadow-brutal-2xl overflow-hidden"
-				>
-					<div
-						class="bg-gray-100 p-3 sm:p-4 border-b-[2px] sm:border-b-[3px] border-gray-900 flex items-center gap-1.5 sm:gap-2"
-					>
-						<svg
-							class="w-4 h-4 sm:w-5 sm:h-5 text-gray-900"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2.5"
-								d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-							/></svg
-						>
-						<h3 class="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wide">
-							Authentication
-						</h3>
-					</div>
-					<div
-						class="p-3 sm:p-4 md:p-5 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"
-					>
-						{#if isUserLoggedIn && apiToken}
-							<div class="relative group">
-								<div
-									class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none"
-								>
-									<span class="text-[10px] sm:text-xs font-black text-gray-400">KEY</span>
-								</div>
-								<input
-									type="password"
-									class="w-full pl-8 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-3 bg-white border-[2px] sm:border-[3px] border-gray-900 rounded-lg sm:rounded-xl text-xs sm:text-sm font-mono font-bold text-gray-900 focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480] sm:focus:shadow-brutal-accent transition-all"
-									value={apiToken}
-									readonly
-								/>
+		<!-- ── Input ───────────────────────────────────────────────── -->
+		<div
+			class="flex min-h-0 flex-col gap-4 rounded-xl border border-brand-rule p-5 min-[1200px]:w-[348px] min-[1200px]:flex-shrink-0 min-[1440px]:w-[384px]"
+		>
+			<div class="flex items-baseline justify-between gap-3">
+				<h2 class="font-sans text-[15px] font-semibold leading-[18px] text-brand-ink">Input</h2>
+				<span class="truncate font-mono text-[11.5px] text-brand-mute" title={call.blurb}>
+					{call.method}
+					{call.path(state)}
+				</span>
+			</div>
+
+			{#if call.needsTemplate}
+				<div class="flex flex-col gap-2">
+					<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">Template</span>
+					<TemplateSelector
+						value={state.uid || ''}
+						selectedTemplate={state.template || null}
+						placeholder="Pick a template…"
+						on:change={pickTemplate}
+					/>
+				</div>
+			{/if}
+
+			{#if call.idField}
+				<div class="flex flex-col gap-2">
+					<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">
+						{call.idField.label}
+					</span>
+					<input
+						value={state[call.idField.key] || ''}
+						on:input={(e) => setField(call.idField.key, e.currentTarget.value)}
+						placeholder={call.idField.placeholder}
+						class="h-8 rounded-md border border-brand-rule px-2.5 font-mono text-[12.5px] text-brand-ink outline-none focus:border-brand-ink"
+					/>
+				</div>
+			{/if}
+
+			{#if call.editor !== 'none'}
+				<!-- The body field. It grows; every other row is fixed. -->
+				<div class="flex min-h-0 flex-1 flex-col gap-2">
+					<div class="flex items-center justify-between gap-3">
+						<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">
+							{call.editor === 'html'
+								? 'HTML'
+								: call.editor === 'csv'
+								? 'CSV'
+								: call.editor === 'sets'
+								? 'Variable sets'
+								: 'Variables'}
+						</span>
+						<div class="flex flex-shrink-0 gap-3.5">
+							{#if call.editor === 'html'}
 								<button
-									class="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 p-1 sm:p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-900"
-									on:click={() => copyToClipboard(apiToken)}
-									title="Copy API Key"
+									type="button"
+									on:click={() => setField('html', SAMPLE_HTML)}
+									class="font-sans text-[12.5px] text-brand-blue hover:underline"
+									>Use a sample</button
 								>
-									<svg
-										class="h-3 w-3 sm:h-4 sm:w-4"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
+							{:else if call.needsTemplate}
+								<button
+									type="button"
+									on:click={refillFromTemplate}
+									class="whitespace-nowrap font-sans text-[12.5px] text-brand-blue hover:underline"
+									>Refill from template</button
+								>
+							{/if}
+							<button
+								type="button"
+								on:click={() => (expanded = true)}
+								class="font-sans text-[12.5px] text-brand-blue hover:underline">Expand</button
+							>
+						</div>
+					</div>
+
+					{#if call.editor === 'vars' && state.varsTab === 'FORM'}
+						<div class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
+							{#each state.required || [] as name (name)}
+								<label class="flex flex-col gap-1">
+									<span class="font-mono text-[10px] tracking-[0.06em] text-brand-mute">{name}</span
 									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2.5"
-											d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-										/>
-									</svg>
-								</button>
-							</div>
-						{:else}
-							<div class="text-center py-3 sm:py-4">
-								<p class="text-xs sm:text-sm font-bold text-gray-600 mb-3 sm:mb-4">
-									API Key Required
+									<input
+										value={state.variables?.[name] ?? ''}
+										on:input={(e) => {
+											const next = { ...(state.variables || {}), [name]: e.currentTarget.value };
+											setField('variables', next);
+											setField('varsText', JSON.stringify(next, null, 2));
+										}}
+										class="h-8 rounded-md border border-brand-rule px-2.5 font-mono text-xs text-brand-ink outline-none focus:border-brand-ink"
+									/>
+								</label>
+							{:else}
+								<p class="font-sans text-[13px] text-brand-mute">
+									Pick a template to see its variables.
 								</p>
-								<a
-									href="/dashboard/api-token"
-									class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-brand-danger text-white text-xs sm:text-sm font-black uppercase tracking-wide rounded-lg border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-sm sm:shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-								>
-									Get API Key
-								</a>
-							</div>
-						{/if}
+							{/each}
+						</div>
+					{:else}
+						<div class="pg-editor min-h-[180px] flex-1 overflow-hidden rounded-lg">
+							<CodeMirror
+								value={editorValue}
+								extensions={editorExtensions}
+								on:change={(e) => onEditorChange(e.detail)}
+							/>
+						</div>
+					{/if}
+
+					{#if validation}
+						<div class="flex items-center gap-2">
+							<span class="h-1.5 w-1.5 flex-shrink-0 bg-brand-pink" aria-hidden="true" />
+							<span class="truncate font-sans text-[12.5px] text-brand-slate"
+								>{validation.text}</span
+							>
+						</div>
+					{/if}
+				</div>
+			{/if}
+
+			{#if call.size}
+				<div class="flex items-center justify-between gap-3">
+					<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">Size</span>
+					<div class="flex items-center gap-2">
+						<input
+							value={state.width ?? 1200}
+							on:input={(e) => setField('width', e.currentTarget.value)}
+							class="h-8 w-[84px] rounded-md border border-brand-rule px-2.5 font-mono text-[12.5px] text-brand-ink outline-none focus:border-brand-ink"
+						/>
+						<span class="font-mono text-xs text-brand-mute" aria-hidden="true">×</span>
+						<input
+							value={state.height ?? 630}
+							on:input={(e) => setField('height', e.currentTarget.value)}
+							class="h-8 w-[84px] rounded-md border border-brand-rule px-2.5 font-mono text-[12.5px] text-brand-ink outline-none focus:border-brand-ink"
+						/>
 					</div>
 				</div>
+			{/if}
 
-				<!-- Endpoints Menu -->
-				<div
-					class="bg-white rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] border-gray-900 shadow-brutal-lg sm:shadow-brutal-2xl overflow-hidden"
-				>
-					<div
-						class="bg-gray-100 p-3 sm:p-4 border-b-[2px] sm:border-b-[3px] border-gray-900 flex items-center gap-1.5 sm:gap-2"
-					>
-						<svg
-							class="w-4 h-4 sm:w-5 sm:h-5 text-gray-900"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2.5"
-								d="M4 6h16M4 12h16M4 18h16"
-							/></svg
-						>
-						<h3 class="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wide">
-							API Endpoints
-						</h3>
-					</div>
-					<div class="p-1.5 sm:p-2 space-y-2 bg-brand-bg max-h-[600px] overflow-y-auto">
-						{#each endpointCategories as category}
-							<div class="border rounded-lg border-gray-200 overflow-hidden">
-								<button
-									class="w-full px-3 py-2 bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors"
-									on:click={() => toggleCategory(category.name)}
-								>
-									<span class="text-xs font-black text-gray-700 uppercase tracking-wider"
-										>{category.name}</span
-									>
-									<svg
-										class="w-4 h-4 text-gray-500 transition-transform {expandedCategory ===
-										category.name
-											? 'rotate-180'
-											: ''}"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M19 9l-7 7-7-7"
-										/>
-									</svg>
-								</button>
-								{#if expandedCategory === category.name}
-									<div class="border-t border-gray-200 p-1">
-										{#each category.endpoints as endpoint}
-											<button
-												class="w-full p-2.5 rounded text-left transition-all group relative overflow-hidden mb-1 {selectedEndpoint ===
-												endpoint.id
-													? 'bg-gray-900 text-white shadow-md'
-													: 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'}"
-												on:click={() => setSelectedEndpoint(endpoint.id)}
-											>
-												<div class="flex items-center justify-between relative z-10">
-													<div class="flex items-center gap-2">
-														<span
-															class="px-1.5 py-0.5 text-[9px] font-black rounded bg-{endpoint.method ===
-															'GET'
-																? 'blue'
-																: endpoint.method === 'POST'
-																? 'green'
-																: endpoint.method === 'PUT'
-																? 'yellow'
-																: 'red'}-500 text-white">{endpoint.method}</span
-														>
-														<div class="flex flex-col">
-															<span class="text-xs font-bold">{endpoint.label}</span>
-															<span class="text-[9px] font-mono opacity-70">{endpoint.path}</span>
-														</div>
-													</div>
-													{#if selectedEndpoint === endpoint.id}
-														<div class="w-1.5 h-1.5 bg-brand-accent rounded-full animate-pulse" />
-													{/if}
-												</div>
-											</button>
-										{/each}
-									</div>
-								{/if}
-							</div>
+			{#if call.layout}
+				<div class="flex items-center justify-between gap-3">
+					<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">Layout</span>
+					<span class="font-mono text-[12.5px] text-brand-slate">
+						{state.template?.width && state.template?.height
+							? `${state.template.width} × ${state.template.height}`
+							: 'From the template'}
+					</span>
+				</div>
+			{/if}
+
+			{#if call.formats}
+				<div class="flex items-center justify-between gap-3">
+					<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">Format</span>
+					<div class="flex flex-shrink-0 rounded-md bg-brand-subtle p-0.5">
+						{#each call.formats as f (f)}
+							<button
+								type="button"
+								on:click={() => setField('format', f)}
+								class="flex h-7 items-center rounded px-3.5 font-sans text-[12.5px] {(state.format ||
+									call.formats[0]) === f
+									? 'bg-brand-paper font-semibold text-brand-ink shadow-[0_1px_2px_rgba(0,0,0,0.08)]'
+									: 'text-brand-slate'}">{FORMAT_LABELS[f] || f}</button
+							>
 						{/each}
 					</div>
 				</div>
-			</div>
+			{/if}
 
-			<!-- Right Panel: Console -->
-			<div class="col-span-12 lg:col-span-8 space-y-4 sm:space-y-6 md:space-y-8">
-				<!-- Endpoint Description -->
-				<div class="bg-brand-accent rounded-xl border-[3px] border-gray-900 p-4">
-					<div class="flex items-center gap-3">
-						<svg
-							class="w-5 h-5 text-gray-900 flex-shrink-0"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2.5"
-								d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-							/>
-						</svg>
-						<p class="text-sm font-bold text-gray-900">{endpointDescription}</p>
-					</div>
-				</div>
-
-				<!-- Request Builder -->
-				<div
-					class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden"
-				>
-					<div
-						class="bg-gray-100 p-4 border-b-[3px] border-gray-900 flex items-center justify-between"
-					>
-						<div class="flex items-center gap-3">
-							<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
-							<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
-							<div class="w-3 h-3 rounded-full bg-data-green border border-gray-900" />
-						</div>
-						<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">
-							Request Configuration
-						</h3>
-					</div>
-
-					<div class="p-6 space-y-6">
-						<!-- Dynamic form fields based on selected endpoint -->
-						{#if selectedEndpoint === 'image'}
-							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<div class="md:col-span-2">
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>HTML Content</label
-									>
-									<div class="relative">
-										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
-										>
-											<CodeMirror
-												bind:value={imageParams.html}
-												lang={htmlLang()}
-												styles={{
-													'&': {
-														height: '128px',
-														fontSize: '13px',
-														fontFamily:
-															'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-													},
-													'.cm-content': { padding: '12px' },
-													'.cm-line': { padding: '0' },
-													'.cm-gutters': {
-														backgroundColor: '#f9fafb',
-														color: '#9ca3af',
-														borderRight: '1px solid #f3f4f6',
-														minWidth: '40px'
-													},
-													'.cm-scroller': { overflow: 'auto' }
-												}}
-											/>
-										</div>
-										<button
-											class="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors z-10"
-											on:click={() => (maximizeImageHtml = true)}
-											title="Maximize editor"
-										>
-											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-												><path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-												/></svg
-											>
-										</button>
-									</div>
-								</div>
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Width (px)</label
-									>
-									<input
-										type="number"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={imageParams.width}
-									/>
-								</div>
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Height (px)</label
-									>
-									<input
-										type="number"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={imageParams.height}
-									/>
-								</div>
-							</div>
-						{:else if selectedEndpoint === 'create-template'}
-							<div class="space-y-4">
-								<!-- Name -->
-								<div>
-									<label
-										class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-									>
-										Name
-									</label>
-									<input
-										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={createTemplateParams.name}
-										placeholder="My template"
-									/>
-								</div>
-
-								<!-- HTML body -->
-								<div>
-									<label
-										class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-									>
-										HTML
-									</label>
-									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
-										<CodeMirror
-											bind:value={createTemplateParams.html}
-											lang={htmlLang()}
-											styles={{
-												'&': {
-													height: '240px',
-													fontSize: '13px',
-													fontFamily: 'ui-monospace, monospace'
-												},
-												'.cm-content': { padding: '12px' },
-												'.cm-gutters': {
-													backgroundColor: '#f9fafb',
-													color: '#9ca3af',
-													borderRight: '1px solid #f3f4f6',
-													minWidth: '40px'
-												}
-											}}
-										/>
-									</div>
-									<p class="mt-1 text-[10px] text-gray-500 font-medium">
-										Reference variables with <code class="font-mono">{'{{name}}'}</code>. Undeclared
-										names auto-register on save.
-									</p>
-								</div>
-
-								<!-- Dimensions + format -->
-								<div class="grid grid-cols-3 gap-3">
-									<div>
-										<label
-											class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1"
-										>
-											Width
-										</label>
-										<input
-											type="number"
-											min="32"
-											max="8192"
-											bind:value={createTemplateParams.width}
-											class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-mono focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480]"
-										/>
-									</div>
-									<div>
-										<label
-											class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1"
-										>
-											Height
-										</label>
-										<input
-											type="number"
-											min="32"
-											max="8192"
-											bind:value={createTemplateParams.height}
-											class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-mono focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480]"
-										/>
-									</div>
-									<div>
-										<label
-											class="block text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1"
-										>
-											Format
-										</label>
-										<select
-											bind:value={createTemplateParams.outputFormat}
-											class="w-full px-3 py-2 bg-white border-[2px] border-gray-900 rounded-lg text-sm font-bold focus:outline-none focus:shadow-brutal-accent"
-										>
-											<option value="image">image</option>
-											<option value="pdf">pdf</option>
-										</select>
-									</div>
-								</div>
-
-								<!-- Variable definitions (optional) -->
-								<div>
-									<label
-										class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-									>
-										Variable definitions <span class="text-gray-500 font-medium normal-case"
-											>(optional · JSON array)</span
-										>
-									</label>
-									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
-										<CodeMirror
-											bind:value={createTemplateParams.variableDefinitions}
-											lang={json()}
-											styles={{
-												'&': {
-													height: '120px',
-													fontSize: '13px',
-													fontFamily: 'ui-monospace, monospace'
-												},
-												'.cm-content': { padding: '12px' },
-												'.cm-gutters': {
-													backgroundColor: '#f9fafb',
-													color: '#9ca3af',
-													borderRight: '1px solid #f3f4f6',
-													minWidth: '40px'
-												}
-											}}
-										/>
-									</div>
-									<p class="mt-1 text-[10px] text-gray-500 font-medium">
-										Leave as <code class="font-mono">[]</code> to auto-declare variables from the HTML
-										body.
-									</p>
-								</div>
-
-								<!-- Safety toggles -->
-								<div class="grid grid-cols-2 gap-3">
-									<label
-										class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer"
-									>
-										<input
-											type="checkbox"
-											bind:checked={createTemplateParams.jsEnabled}
-											class="h-4 w-4 accent-gray-900"
-										/>
-										<span class="text-[11px] font-black uppercase tracking-widest text-gray-900"
-											>jsEnabled</span
-										>
-									</label>
-									<label
-										class="flex items-center gap-2 px-3 py-2 border-[2px] border-gray-900 rounded-lg bg-white cursor-pointer"
-									>
-										<input
-											type="checkbox"
-											bind:checked={createTemplateParams.strictVariables}
-											class="h-4 w-4 accent-gray-900"
-										/>
-										<span class="text-[11px] font-black uppercase tracking-widest text-gray-900"
-											>strictVariables</span
-										>
-									</label>
-								</div>
-							</div>
-						{:else if selectedEndpoint === 'get-template'}
-							<div>
-								<div class="flex items-center justify-between mb-2">
-									<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
-										>Template UID</label
-									>
-									<button
-										class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide flex items-center gap-1"
-										on:click={() =>
-											(manualTemplateInput['get-template'] = !manualTemplateInput['get-template'])}
-									>
-										{manualTemplateInput['get-template'] ? 'Select from list' : 'Enter manually'}
-										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M8 9l4 4-4 4m5-4h3"
-											/>
-										</svg>
-									</button>
-								</div>
-
-								{#if manualTemplateInput['get-template']}
-									<input
-										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={getTemplateParams.uid}
-										placeholder="Enter template UID manually"
-									/>
-								{:else}
-									<TemplateSelector
-										bind:value={getTemplateParams.uid}
-										placeholder="Select a template..."
-										on:change={(e) => selectTemplate('get-template', e.detail.uid)}
-									/>
-								{/if}
-
-								{#if getTemplateParams.uid}
-									<p class="mt-2 text-[10px] text-gray-600 font-medium">
-										Selected: <span class="font-mono">{getTemplateParams.uid}</span>
-									</p>
-								{/if}
-							</div>
-						{:else if selectedEndpoint === 'delete-template'}
-							<div>
-								<div class="flex items-center justify-between mb-2">
-									<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
-										>Template UID</label
-									>
-									<button
-										class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide flex items-center gap-1"
-										on:click={() =>
-											(manualTemplateInput['delete-template'] =
-												!manualTemplateInput['delete-template'])}
-									>
-										{manualTemplateInput['delete-template'] ? 'Select from list' : 'Enter manually'}
-										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M8 9l4 4-4 4m5-4h3"
-											/>
-										</svg>
-									</button>
-								</div>
-
-								{#if manualTemplateInput['delete-template']}
-									<input
-										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={deleteTemplateParams.uid}
-										placeholder="Enter template UID to delete"
-									/>
-								{:else}
-									<TemplateSelector
-										bind:value={deleteTemplateParams.uid}
-										placeholder="Select a template to delete..."
-										on:change={(e) => selectTemplate('delete-template', e.detail.uid)}
-									/>
-								{/if}
-
-								{#if deleteTemplateParams.uid}
-									<div class="mt-2 p-2 bg-red-50 border border-red-300 rounded">
-										<p class="text-[10px] text-red-700 font-medium">
-											⚠️ Warning: This will permanently delete template <span class="font-mono"
-												>{deleteTemplateParams.uid}</span
-											>
-										</p>
-									</div>
-								{/if}
-							</div>
-						{:else if selectedEndpoint === 'search-templates'}
-							<div class="space-y-4">
-								<div>
-									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
-											>Search Query</label
-										>
-										<div class="flex gap-2">
-											<button
-												class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide"
-												on:click={() => (searchTemplatesParams.q = 'social')}
-											>
-												Social
-											</button>
-											<button
-												class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide"
-												on:click={() => (searchTemplatesParams.q = 'banner')}
-											>
-												Banner
-											</button>
-											<button
-												class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide"
-												on:click={() => (searchTemplatesParams.q = 'og')}
-											>
-												OG
-											</button>
-										</div>
-									</div>
-									<input
-										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={searchTemplatesParams.q}
-										placeholder="Search templates by name, type, or tags"
-									/>
-								</div>
-								<div class="grid grid-cols-2 gap-4">
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Page</label
-										>
-										<input
-											type="number"
-											min="1"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={searchTemplatesParams.page}
-										/>
-									</div>
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Limit</label
-										>
-										<input
-											type="number"
-											min="1"
-											max="100"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={searchTemplatesParams.limit}
-										/>
-									</div>
-								</div>
-							</div>
-						{:else if selectedEndpoint === 'render-template'}
-							<div class="space-y-4">
-								<div>
-									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
-											>Template UID</label
-										>
-										<button
-											class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide flex items-center gap-1"
-											on:click={() =>
-												(manualTemplateInput['render-template'] =
-													!manualTemplateInput['render-template'])}
-										>
-											{manualTemplateInput['render-template']
-												? 'Select from list'
-												: 'Enter manually'}
-											<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M8 9l4 4-4 4m5-4h3"
-												/>
-											</svg>
-										</button>
-									</div>
-
-									{#if manualTemplateInput['render-template']}
-										<input
-											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={renderTemplateParams.templateUid}
-											placeholder="Enter template UID manually"
-										/>
-									{:else}
-										<TemplateSelector
-											bind:value={renderTemplateParams.templateUid}
-											placeholder="Select a template..."
-											on:change={(e) => selectTemplate('render-template', e.detail.uid)}
-										/>
-									{/if}
-								</div>
-
-								<div>
-									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
-											>Variables (JSON)</label
-										>
-										<div class="flex gap-2">
-											{#if renderTemplateParams.templateUid}
-												<button
-													class="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wide flex items-center gap-1"
-													on:click={() => fetchTemplateVariables(renderTemplateParams.templateUid)}
-												>
-													<svg
-														class="w-3 h-3"
-														fill="none"
-														stroke="currentColor"
-														viewBox="0 0 24 24"
-													>
-														<path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="2"
-															d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-														/>
-													</svg>
-													Auto-fill
-												</button>
-											{/if}
-											<button
-												class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide"
-												on:click={() => (renderTemplateParams.variables = '{}')}
-											>
-												Clear
-											</button>
-										</div>
-									</div>
-									<div class="relative">
-										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
-										>
-											<CodeMirror
-												bind:value={renderTemplateParams.variables}
-												lang={json()}
-												styles={{
-													'&': {
-														height: '128px',
-														fontSize: '13px',
-														fontFamily:
-															'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-													},
-													'.cm-content': { padding: '12px' },
-													'.cm-line': { padding: '0' },
-													'.cm-gutters': {
-														backgroundColor: '#f9fafb',
-														color: '#9ca3af',
-														borderRight: '1px solid #f3f4f6',
-														minWidth: '40px'
-													},
-													'.cm-scroller': { overflow: 'auto' }
-												}}
-											/>
-										</div>
-										<button
-											class="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors z-10"
-											on:click={() => (maximizeRenderVars = true)}
-											title="Maximize editor"
-										>
-											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-												><path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-												/></svg
-											>
-										</button>
-									</div>
-								</div>
-								<div class="grid grid-cols-2 gap-4">
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Format</label
-										>
-										<select
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all appearance-none"
-											bind:value={renderTemplateParams.format}
-										>
-											<option value="png">PNG</option>
-											<option value="jpeg">JPEG</option>
-											<option value="webp">WebP</option>
-										</select>
-									</div>
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Quality</label
-										>
-										<input
-											type="number"
-											min="0.1"
-											max="1"
-											step="0.1"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={renderTemplateParams.quality}
-										/>
-									</div>
-								</div>
-								<!-- Layout selector -->
-								{#if playgroundAvailableLayouts.length > 1}
-									<div>
-										<div class="flex items-center justify-between mb-2">
-											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
-												>Layouts to Render</label
-											>
-											<button
-												class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider transition-colors"
-												on:click={toggleAllPlaygroundLayouts}
-											>
-												{playgroundSelectedLayouts.size === playgroundAvailableLayouts.length
-													? 'Deselect All'
-													: 'Select All'}
-											</button>
-										</div>
-										<div class="grid grid-cols-2 gap-2">
-											{#each playgroundAvailableLayouts as layout}
-												<button
-													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {playgroundSelectedLayouts.has(
-														layout.key
-													)
-														? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
-														: 'bg-white border-gray-200 hover:border-gray-900'}"
-													on:click={() => togglePlaygroundLayout(layout.key)}
-												>
-													<div class="flex items-center gap-2">
-														<div
-															class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
-															{playgroundSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}"
-														>
-															{#if playgroundSelectedLayouts.has(layout.key)}
-																<svg
-																	class="w-3 h-3 text-white"
-																	fill="none"
-																	viewBox="0 0 24 24"
-																	stroke="currentColor"
-																	stroke-width="3"
-																>
-																	<path
-																		stroke-linecap="round"
-																		stroke-linejoin="round"
-																		d="M5 13l4 4L19 7"
-																	/>
-																</svg>
-															{/if}
-														</div>
-														<div>
-															<span class="block text-xs font-black text-gray-900 leading-tight"
-																>{layout.name}</span
-															>
-															<span class="block text-[10px] font-bold text-gray-500 font-mono"
-																>{layout.width}x{layout.height}</span
-															>
-														</div>
-													</div>
-												</button>
-											{/each}
-										</div>
-										<p class="text-[10px] text-gray-500 mt-1">
-											{playgroundSelectedLayouts.size} of {playgroundAvailableLayouts.length} selected
-										</p>
-									</div>
-								{:else}
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Layout <span class="text-gray-400 normal-case">(optional)</span></label
-										>
-										<input
-											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={renderTemplateParams.layout}
-											placeholder="e.g. twitter-post, facebook-post"
-										/>
-										<p class="text-[10px] text-gray-500 mt-1">Leave empty for default layout.</p>
-									</div>
-								{/if}
-							</div>
-						{:else if selectedEndpoint === 'batch-render'}
-							<div class="space-y-4">
-								<div>
-									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
-											>Template UID</label
-										>
-										<button
-											class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide flex items-center gap-1"
-											on:click={() =>
-												(manualTemplateInput['batch-render'] =
-													!manualTemplateInput['batch-render'])}
-										>
-											{manualTemplateInput['batch-render'] ? 'Select from list' : 'Enter manually'}
-											<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M8 9l4 4-4 4m5-4h3"
-												/>
-											</svg>
-										</button>
-									</div>
-
-									{#if manualTemplateInput['batch-render']}
-										<input
-											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={batchRenderParams.templateUid}
-											placeholder="Enter template UID"
-										/>
-									{:else}
-										<TemplateSelector
-											bind:value={batchRenderParams.templateUid}
-											placeholder="Select a template..."
-											on:change={(e) => selectTemplate('batch-render', e.detail.uid)}
-										/>
-									{/if}
-								</div>
-								<div>
-									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
-											>Variable Sets (JSON Array)</label
-										>
-										<div class="flex gap-2">
-											{#if batchRenderParams.templateUid}
-												<button
-													class="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wide flex items-center gap-1"
-													on:click={() =>
-														fetchTemplateVariables(batchRenderParams.templateUid, true)}
-												>
-													<svg
-														class="w-3 h-3"
-														fill="none"
-														stroke="currentColor"
-														viewBox="0 0 24 24"
-													>
-														<path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="2"
-															d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-														/>
-													</svg>
-													Auto-fill
-												</button>
-											{/if}
-											<button
-												class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide"
-												on:click={() => (batchRenderParams.variableSets = '[]')}
-											>
-												Clear
-											</button>
-										</div>
-									</div>
-									<div class="relative">
-										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
-										>
-											<CodeMirror
-												bind:value={batchRenderParams.variableSets}
-												lang={json()}
-												styles={{
-													'&': {
-														height: '128px',
-														fontSize: '13px',
-														fontFamily:
-															'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-													},
-													'.cm-content': { padding: '12px' },
-													'.cm-line': { padding: '0' },
-													'.cm-gutters': {
-														backgroundColor: '#f9fafb',
-														color: '#9ca3af',
-														borderRight: '1px solid #f3f4f6',
-														minWidth: '40px'
-													},
-													'.cm-scroller': { overflow: 'auto' }
-												}}
-											/>
-										</div>
-										<button
-											class="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors z-10"
-											on:click={() => (maximizeBatchVars = true)}
-											title="Maximize editor"
-										>
-											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-												><path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-												/></svg
-											>
-										</button>
-									</div>
-								</div>
-								<div class="grid grid-cols-3 gap-4">
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Format</label
-										>
-										<select
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all appearance-none"
-											bind:value={batchRenderParams.format}
-										>
-											<option value="png">PNG</option>
-											<option value="jpeg">JPEG</option>
-											<option value="webp">WebP</option>
-										</select>
-									</div>
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Quality</label
-										>
-										<input
-											type="number"
-											min="0.1"
-											max="1"
-											step="0.1"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={batchRenderParams.quality}
-										/>
-									</div>
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Concurrency</label
-										>
-										<input
-											type="number"
-											min="1"
-											max="10"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={batchRenderParams.concurrency}
-										/>
-									</div>
-								</div>
-								{#if batchAvailableLayouts.length > 1}
-									<div>
-										<div class="flex items-center justify-between mb-2">
-											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
-												>Layouts</label
-											>
-											<button
-												class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider"
-												on:click={() => {
-													if (batchSelectedLayouts.size === batchAvailableLayouts.length)
-														batchSelectedLayouts = new Set(['default']);
-													else
-														batchSelectedLayouts = new Set(batchAvailableLayouts.map((l) => l.key));
-												}}
-												>{batchSelectedLayouts.size === batchAvailableLayouts.length
-													? 'Deselect All'
-													: 'Select All'}</button
-											>
-										</div>
-										<div class="grid grid-cols-2 gap-2">
-											{#each batchAvailableLayouts as layout}
-												<button
-													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchSelectedLayouts.has(
-														layout.key
-													)
-														? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
-														: 'bg-white border-gray-200 hover:border-gray-900'}"
-													on:click={() => toggleBatchLayout(layout.key)}
-												>
-													<div class="flex items-center gap-2">
-														<div
-															class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
-															{batchSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}"
-														>
-															{#if batchSelectedLayouts.has(layout.key)}
-																<svg
-																	class="w-3 h-3 text-white"
-																	fill="none"
-																	viewBox="0 0 24 24"
-																	stroke="currentColor"
-																	stroke-width="3"
-																>
-																	<path
-																		stroke-linecap="round"
-																		stroke-linejoin="round"
-																		d="M5 13l4 4L19 7"
-																	/>
-																</svg>
-															{/if}
-														</div>
-														<div>
-															<span class="block text-xs font-black text-gray-900 leading-tight"
-																>{layout.name}</span
-															>
-															<span class="block text-[10px] font-bold text-gray-500 font-mono"
-																>{layout.width}x{layout.height}</span
-															>
-														</div>
-													</div>
-												</button>
-											{/each}
-										</div>
-										<p class="text-[10px] text-gray-500 mt-1">
-											{batchSelectedLayouts.size} selected
-										</p>
-									</div>
-								{/if}
-							</div>
-						{:else if selectedEndpoint === 'batch-render-csv'}
-							<div class="space-y-4">
-								<div>
-									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
-											>Template UID</label
-										>
-										<button
-											class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide flex items-center gap-1"
-											on:click={() =>
-												(manualTemplateInput['batch-render-csv'] =
-													!manualTemplateInput['batch-render-csv'])}
-										>
-											{manualTemplateInput['batch-render-csv']
-												? 'Select from list'
-												: 'Enter manually'}
-											<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M8 9l4 4-4 4m5-4h3"
-												/>
-											</svg>
-										</button>
-									</div>
-
-									{#if manualTemplateInput['batch-render-csv']}
-										<input
-											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={batchRenderCsvParams.templateUid}
-											placeholder="Enter template UID"
-										/>
-									{:else}
-										<TemplateSelector
-											bind:value={batchRenderCsvParams.templateUid}
-											placeholder="Select a template..."
-											on:change={(e) => selectTemplate('batch-render-csv', e.detail.uid)}
-										/>
-									{/if}
-								</div>
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>CSV URL</label
-									>
-									<input
-										type="url"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={batchRenderCsvParams.csvUrl}
-										placeholder="https://example.com/data.csv"
-									/>
-								</div>
-								<div>
-									<div class="flex items-center justify-between mb-2">
-										<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
-											>Column Mappings (JSON)</label
-										>
-										<div class="flex gap-2">
-											{#if batchRenderCsvParams.templateUid}
-												<button
-													class="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wide flex items-center gap-1"
-													on:click={() =>
-														fetchTemplateVariablesForCsv(batchRenderCsvParams.templateUid)}
-												>
-													<svg
-														class="w-3 h-3"
-														fill="none"
-														stroke="currentColor"
-														viewBox="0 0 24 24"
-													>
-														<path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="2"
-															d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-														/>
-													</svg>
-													Auto-fill
-												</button>
-											{/if}
-											<button
-												class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide"
-												on:click={() => (batchRenderCsvParams.mappings = '{}')}
-											>
-												Clear
-											</button>
-										</div>
-									</div>
-									<div class="relative">
-										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
-										>
-											<CodeMirror
-												bind:value={batchRenderCsvParams.mappings}
-												lang={json()}
-												styles={{
-													'&': {
-														height: '128px',
-														fontSize: '13px',
-														fontFamily:
-															'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-													},
-													'.cm-content': { padding: '12px' },
-													'.cm-line': { padding: '0' },
-													'.cm-gutters': {
-														backgroundColor: '#f9fafb',
-														color: '#9ca3af',
-														borderRight: '1px solid #f3f4f6',
-														minWidth: '40px'
-													},
-													'.cm-scroller': { overflow: 'auto' }
-												}}
-											/>
-										</div>
-										<button
-											class="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors z-10"
-											on:click={() => (maximizeCsvMappings = true)}
-											title="Maximize editor"
-										>
-											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-												><path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-												/></svg
-											>
-										</button>
-									</div>
-								</div>
-								<div class="grid grid-cols-3 gap-4">
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Format</label
-										>
-										<select
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all appearance-none"
-											bind:value={batchRenderCsvParams.format}
-										>
-											<option value="png">PNG</option>
-											<option value="jpeg">JPEG</option>
-											<option value="webp">WebP</option>
-										</select>
-									</div>
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Quality</label
-										>
-										<input
-											type="number"
-											min="0.1"
-											max="1"
-											step="0.1"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={batchRenderCsvParams.quality}
-										/>
-									</div>
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Concurrency</label
-										>
-										<input
-											type="number"
-											min="1"
-											max="10"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={batchRenderCsvParams.concurrency}
-										/>
-									</div>
-								</div>
-								{#if batchCsvAvailableLayouts.length > 1}
-									<div>
-										<div class="flex items-center justify-between mb-2">
-											<label class="block text-xs font-black text-gray-900 uppercase tracking-wide"
-												>Layouts</label
-											>
-											<button
-												class="text-[10px] font-bold text-gray-500 hover:text-gray-900 uppercase tracking-wider"
-												on:click={() => {
-													if (batchCsvSelectedLayouts.size === batchCsvAvailableLayouts.length)
-														batchCsvSelectedLayouts = new Set(['default']);
-													else
-														batchCsvSelectedLayouts = new Set(
-															batchCsvAvailableLayouts.map((l) => l.key)
-														);
-												}}
-												>{batchCsvSelectedLayouts.size === batchCsvAvailableLayouts.length
-													? 'Deselect All'
-													: 'Select All'}</button
-											>
-										</div>
-										<div class="grid grid-cols-2 gap-2">
-											{#each batchCsvAvailableLayouts as layout}
-												<button
-													class="text-left px-3 py-2 rounded-lg border-[3px] transition-all {batchCsvSelectedLayouts.has(
-														layout.key
-													)
-														? 'bg-brand-accent/20 border-gray-900 shadow-brutal-sm'
-														: 'bg-white border-gray-200 hover:border-gray-900'}"
-													on:click={() => toggleBatchCsvLayout(layout.key)}
-												>
-													<div class="flex items-center gap-2">
-														<div
-															class="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center flex-shrink-0
-															{batchCsvSelectedLayouts.has(layout.key) ? 'bg-gray-900 border-gray-900' : ''}"
-														>
-															{#if batchCsvSelectedLayouts.has(layout.key)}
-																<svg
-																	class="w-3 h-3 text-white"
-																	fill="none"
-																	viewBox="0 0 24 24"
-																	stroke="currentColor"
-																	stroke-width="3"
-																>
-																	<path
-																		stroke-linecap="round"
-																		stroke-linejoin="round"
-																		d="M5 13l4 4L19 7"
-																	/>
-																</svg>
-															{/if}
-														</div>
-														<div>
-															<span class="block text-xs font-black text-gray-900 leading-tight"
-																>{layout.name}</span
-															>
-															<span class="block text-[10px] font-bold text-gray-500 font-mono"
-																>{layout.width}x{layout.height}</span
-															>
-														</div>
-													</div>
-												</button>
-											{/each}
-										</div>
-										<p class="text-[10px] text-gray-500 mt-1">
-											{batchCsvSelectedLayouts.size} selected
-										</p>
-									</div>
-								{/if}
-							</div>
-						{:else if selectedEndpoint === 'batch-status'}
-							<div>
-								<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-									>Batch ID</label
-								>
-								<input
-									type="text"
-									class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-									bind:value={batchStatusParams.batchId}
-									placeholder="Enter batch ID (e.g., batch_ABC123)"
-								/>
-							</div>
-						{:else if selectedEndpoint === 'cancel-batch'}
-							<div>
-								<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-									>Batch ID</label
-								>
-								<input
-									type="text"
-									class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-									bind:value={cancelBatchParams.batchId}
-									placeholder="Enter batch ID to cancel"
-								/>
-							</div>
-						{:else if selectedEndpoint === 'get-variables'}
-							<div>
-								<div class="flex items-center justify-between mb-2">
-									<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
-										>Template UID</label
-									>
-									<button
-										class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide flex items-center gap-1"
-										on:click={() =>
-											(manualTemplateInput['get-variables'] =
-												!manualTemplateInput['get-variables'])}
-									>
-										{manualTemplateInput['get-variables'] ? 'Select from list' : 'Enter manually'}
-										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M8 9l4 4-4 4m5-4h3"
-											/>
-										</svg>
-									</button>
-								</div>
-
-								{#if manualTemplateInput['get-variables']}
-									<input
-										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={getVariablesParams.uid}
-										placeholder="Enter template UID"
-									/>
-								{:else}
-									<TemplateSelector
-										bind:value={getVariablesParams.uid}
-										placeholder="Select a template..."
-										on:change={(e) => selectTemplate('get-variables', e.detail.uid)}
-									/>
-								{/if}
-							</div>
-						{:else if selectedEndpoint === 'pdf-render'}
-							<div class="space-y-4">
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Template</label
-									>
-									<TemplateSelector
-										bind:value={pdfRenderParams.templateUid}
-										placeholder="Select a template..."
-									/>
-								</div>
-								<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Page Preset</label
-										>
-										<select
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={pdfRenderParams.preset}
-										>
-											{#each ['A4', 'A3', 'A5', 'Letter', 'Legal', 'Tabloid'] as preset}
-												<option value={preset}>{preset}</option>
-											{/each}
-										</select>
-									</div>
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Document Title (optional)</label
-										>
-										<input
-											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={pdfRenderParams.title}
-											placeholder="Defaults to the template name"
-										/>
-									</div>
-								</div>
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Variables (JSON)</label
-									>
-									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
-										<CodeMirror
-											bind:value={pdfRenderParams.variables}
-											lang={json()}
-											styles={{ '&': { height: '120px', fontSize: '13px' } }}
-										/>
-									</div>
-								</div>
-							</div>
-						{:else if selectedEndpoint === 'pdf-multi-page'}
-							<div class="space-y-4">
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Template</label
-									>
-									<TemplateSelector
-										bind:value={pdfMultiPageParams.templateUid}
-										placeholder="Select a template..."
-									/>
-								</div>
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Page Preset</label
-									>
-									<select
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={pdfMultiPageParams.preset}
-									>
-										{#each ['A4', 'A3', 'A5', 'Letter', 'Legal', 'Tabloid'] as preset}
-											<option value={preset}>{preset}</option>
-										{/each}
-									</select>
-								</div>
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Pages: one variable object per page (JSON array)</label
-									>
-									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
-										<CodeMirror
-											bind:value={pdfMultiPageParams.pages}
-											lang={json()}
-											styles={{ '&': { height: '160px', fontSize: '13px' } }}
-										/>
-									</div>
-								</div>
-							</div>
-						{:else if selectedEndpoint === 'pdf-presets' || selectedEndpoint === 'video-list'}
-							<p class="text-sm font-bold text-gray-500">
-								No parameters. Send the request to see the response.
-							</p>
-						{:else if selectedEndpoint === 'video-render'}
-							<div class="space-y-4">
-								<div>
-								<div class="flex items-center justify-between mb-2">
-									<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
-										>Video Template</label
-									>
-									<button
-										class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide flex items-center gap-1"
-										on:click={() =>
-											(manualTemplateInput['video-render'] = !manualTemplateInput['video-render'])}
-									>
-										{manualTemplateInput['video-render'] ? 'Select from list' : 'Enter manually'}
-										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M8 9l4 4-4 4m5-4h3"
-											/>
-										</svg>
-									</button>
-								</div>
-								{#if manualTemplateInput['video-render']}
-									<input
-										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={videoRenderParams.templateUid}
-										placeholder="Enter video template UID"
-									/>
-								{:else}
-									<TemplateSelector
-										bind:value={videoRenderParams.templateUid}
-										fetcher={videoTemplateFetcher}
-										placeholder="Select a video template..."
-										emptyText="No video templates yet. Create one in the studio"
-									/>
-								{/if}
-							</div>
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Variables (JSON)</label
-									>
-									<div class="border-[3px] border-gray-900 rounded-xl overflow-hidden">
-										<CodeMirror
-											bind:value={videoRenderParams.variables}
-											lang={json()}
-											styles={{ '&': { height: '120px', fontSize: '13px' } }}
-										/>
-									</div>
-									<p class="text-[10px] text-gray-500 mt-1">
-										Renders take up to a few minutes; the request waits and returns the file URL.
-									</p>
-								</div>
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Output Format</label
-									>
-									<select
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={videoRenderParams.format}
-									>
-										<option value="mp4">MP4 video</option>
-										<option value="gif">Animated GIF (15fps, palette-optimised)</option>
-									</select>
-								</div>
-							</div>
-						{:else if selectedEndpoint === 'video-variables'}
-							<div>
-								<div class="flex items-center justify-between mb-2">
-									<label class="text-xs font-black text-gray-900 uppercase tracking-wide"
-										>Video Template</label
-									>
-									<button
-										class="text-[10px] font-bold text-gray-600 hover:text-gray-900 uppercase tracking-wide flex items-center gap-1"
-										on:click={() =>
-											(manualTemplateInput['video-variables'] = !manualTemplateInput['video-variables'])}
-									>
-										{manualTemplateInput['video-variables'] ? 'Select from list' : 'Enter manually'}
-										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M8 9l4 4-4 4m5-4h3"
-											/>
-										</svg>
-									</button>
-								</div>
-								{#if manualTemplateInput['video-variables']}
-									<input
-										type="text"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={videoVariablesParams.uid}
-										placeholder="Enter video template UID"
-									/>
-								{:else}
-									<TemplateSelector
-										bind:value={videoVariablesParams.uid}
-										fetcher={videoTemplateFetcher}
-										placeholder="Select a video template..."
-										emptyText="No video templates yet. Create one in the studio"
-									/>
-								{/if}
-							</div>
-						{:else if selectedEndpoint === 'video-generate'}
-							<div class="space-y-4">
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Prompt</label
-									>
-									<textarea
-										rows="3"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all resize-none"
-										bind:value={videoGenerateParams.prompt}
-										placeholder="Describe the video to design"
-									></textarea>
-								</div>
-								<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Width</label
-										>
-										<input
-											type="number"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={videoGenerateParams.width}
-										/>
-									</div>
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Height</label
-										>
-										<input
-											type="number"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={videoGenerateParams.height}
-										/>
-									</div>
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Seconds</label
-										>
-										<input
-											type="number"
-											min="1"
-											max="60"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={videoGenerateParams.durationSeconds}
-										/>
-									</div>
-									<div>
-										<label
-											class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-											>Brand Color</label
-										>
-										<input
-											type="text"
-											class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-											bind:value={videoGenerateParams.brandColor}
-											placeholder="#ff5533 (optional)"
-										/>
-									</div>
-								</div>
-								<p class="text-[10px] text-gray-500">
-									Generation designs a motion brief, writes the scene code, renders frames and
-									reviews them; expect 30-60 seconds. The response is a draft template with a
-									preview URL.
-								</p>
-							</div>
-						{:else if selectedEndpoint === 'gif'}
-							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<div class="md:col-span-2">
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>HTML Content</label
-									>
-									<div class="relative">
-										<div
-											class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-all bg-white"
-										>
-											<CodeMirror
-												bind:value={gifParams.html}
-												lang={htmlLang()}
-												styles={{
-													'&': {
-														height: '128px',
-														fontSize: '13px',
-														fontFamily:
-															'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-													},
-													'.cm-content': { padding: '12px' },
-													'.cm-line': { padding: '0' },
-													'.cm-gutters': {
-														backgroundColor: '#f9fafb',
-														color: '#9ca3af',
-														borderRight: '1px solid #f3f4f6',
-														minWidth: '40px'
-													},
-													'.cm-scroller': { overflow: 'auto' }
-												}}
-											/>
-										</div>
-										<button
-											class="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors z-10"
-											on:click={() => (maximizeGifHtml = true)}
-											title="Maximize editor"
-										>
-											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-												><path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-												/></svg
-											>
-										</button>
-									</div>
-								</div>
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Width (px)</label
-									>
-									<input
-										type="number"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={gifParams.width}
-									/>
-								</div>
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>Height (px)</label
-									>
-									<input
-										type="number"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={gifParams.height}
-									/>
-								</div>
-								<div>
-									<label class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-2"
-										>FPS</label
-									>
-									<input
-										type="number"
-										min="1"
-										max="30"
-										class="w-full px-4 py-2.5 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-										bind:value={gifParams.framesPerSecond}
-									/>
-								</div>
-							</div>
-						{/if}
-
-						<div class="pt-4 border-t-[3px] border-gray-200 border-dashed space-y-4">
-							{#if requiresEmailVerification}
-								<EmailVerificationRequired
-									email={userEmail}
-									feature="image and GIF generation APIs"
-								/>
-							{/if}
-							<button
-								class="w-full py-4 bg-brand-danger text-white font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-brutal-lg"
-								on:click={() => testEndpoint(selectedEndpoint)}
-								disabled={loading || requiresEmailVerification}
+			{#if call.size}
+				<!-- Inline, not a popover: one more row when asked for, nothing when not. -->
+				{#if moreOptions}
+					<div class="flex flex-col gap-3">
+						<div class="flex items-center justify-between gap-3">
+							<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink"
+								>Selector</span
 							>
-								{#if loading}
-									<span class="flex items-center justify-center gap-2">
-										<svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-											<circle
-												class="opacity-25"
-												cx="12"
-												cy="12"
-												r="10"
-												stroke="currentColor"
-												stroke-width="4"
-											/>
-											<path
-												class="opacity-75"
-												fill="currentColor"
-												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-											/>
-										</svg>
-										Processing Request...
-									</span>
-								{:else}
-									Run Request
-								{/if}
-							</button>
+							<input
+								value={state.selector || ''}
+								on:input={(e) => setField('selector', e.currentTarget.value)}
+								placeholder="#main"
+								class="h-8 w-[176px] rounded-md border border-brand-rule px-2.5 font-mono text-xs text-brand-ink outline-none focus:border-brand-ink"
+							/>
+						</div>
+						<div class="flex items-center justify-between gap-3">
+							<span class="font-sans text-[13px] font-medium leading-4 text-brand-ink">
+								Capture a URL
+							</span>
+							<input
+								value={state.url || ''}
+								on:input={(e) => {
+									setField('url', e.currentTarget.value);
+									setField('mode', e.currentTarget.value ? 'URL' : 'HTML');
+								}}
+								placeholder="https://example.com"
+								class="h-8 w-[176px] rounded-md border border-brand-rule px-2.5 font-mono text-xs text-brand-ink outline-none focus:border-brand-ink"
+							/>
 						</div>
 					</div>
+				{:else}
+					<button
+						type="button"
+						on:click={() => (moreOptions = true)}
+						class="w-fit font-sans text-[12.5px] text-brand-blue hover:underline"
+						>More options</button
+					>
+				{/if}
+			{/if}
+
+			<button
+				type="button"
+				on:click={send}
+				disabled={sending}
+				class="flex h-11 flex-shrink-0 items-center justify-center gap-2.5 rounded-lg bg-brand-ink font-sans text-sm font-semibold text-white disabled:opacity-60"
+			>
+				{sending ? 'Sending…' : 'Send request'}
+				<span class="h-2 w-2 bg-brand-field" aria-hidden="true" />
+			</button>
+			<p class="text-center font-mono text-[10px] tracking-[0.06em] text-brand-mute">
+				COUNTS AS 1 RENDER · {rendersLeft.toLocaleString()} LEFT · ⌘⏎
+			</p>
+		</div>
+
+		<!-- ── Result ──────────────────────────────────────────────── -->
+		<div
+			class="flex min-h-[360px] min-w-0 flex-1 flex-col gap-4 rounded-xl border border-brand-rule p-5"
+		>
+			<div class="flex items-center justify-between gap-3">
+				<div class="relative flex min-w-0 items-center gap-2.5">
+					<h2 class="font-sans text-[15px] font-semibold leading-[18px] text-brand-ink">Result</h2>
+					<!-- The chip is also the way back to a previous send: recent lives
+					     behind it rather than taking a column of its own. -->
+					<button
+						type="button"
+						on:click={() => (recentOpen = !recentOpen)}
+						class="flex h-[22px] flex-shrink-0 items-center gap-1.5 rounded-btn bg-brand-subtle px-2"
+					>
+						{#if response || sending}
+							<span
+								class="h-1.5 w-1.5 flex-shrink-0 {sending
+									? 'bg-brand-mute'
+									: statusClass.split(' ')[0]}"
+								aria-hidden="true"
+							/>
+						{/if}
+						<span class="whitespace-nowrap font-mono text-[11px] text-brand-ink">{statusChip}</span>
+					</button>
+
+					{#if recentOpen}
+						<button
+							type="button"
+							class="fixed inset-0 z-40 cursor-default"
+							aria-label="Close recent calls"
+							on:click={() => (recentOpen = false)}
+						/>
+						<div
+							class="absolute left-0 top-7 z-50 w-[280px] rounded-lg border border-brand-ink bg-brand-paper p-3 shadow-[4px_4px_0_0_#000000]"
+						>
+							<p class="pb-2 font-mono text-[10px] tracking-[0.08em] text-brand-mute">
+								RECENT · THIS BROWSER
+							</p>
+							<div class="flex flex-col gap-1.5">
+								{#each recent as r (r.at)}
+									<button
+										type="button"
+										on:click={() => {
+											restoreRecent(r);
+											recentOpen = false;
+										}}
+										class="flex items-center gap-2 text-left hover:opacity-70"
+									>
+										<span
+											class="h-1.5 w-1.5 flex-shrink-0 {r.status >= 200 && r.status < 300
+												? 'bg-brand-proof'
+												: 'bg-brand-pink'}"
+											aria-hidden="true"
+										/>
+										<span class="flex-1 truncate font-mono text-[11px] text-brand-slate">
+											{shortPath(r.path)} · {r.status || 'ERR'}
+										</span>
+										<span class="font-mono text-[10px] text-brand-mute">{clock(r.at)}</span>
+									</button>
+								{:else}
+									<p class="font-sans text-[12.5px] text-brand-mute">Nothing sent yet.</p>
+								{/each}
+							</div>
+						</div>
+					{/if}
 				</div>
 
-				<!-- CURL & Response -->
-				<div class="relative group">
-					<!-- Terminal Window -->
-					<div
-						class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden flex flex-col min-h-[400px]"
-					>
-						<!-- Terminal Header -->
-						<div
-							class="bg-gray-100 border-b-[3px] border-gray-900 p-4 flex items-center justify-between shrink-0"
+				<div class="flex flex-shrink-0 rounded-md bg-brand-subtle p-0.5">
+					{#each [['PREVIEW', 'Preview'], ['JSON', 'JSON'], ['CODE', 'Code']] as [id, label] (id)}
+						<button
+							type="button"
+							on:click={() => (resultTab = id)}
+							class="flex h-7 items-center rounded px-3.5 font-sans text-[12.5px] {resultTab === id
+								? 'bg-brand-paper font-semibold text-brand-ink shadow-[0_1px_2px_rgba(0,0,0,0.08)]'
+								: 'text-brand-slate'}">{label}</button
 						>
-							<div class="flex items-center gap-3">
-								<div class="flex gap-1.5 mr-4">
-									<div class="w-3 h-3 rounded-full bg-brand-danger border border-gray-900" />
-									<div class="w-3 h-3 rounded-full bg-brand-accent border border-gray-900" />
-									<div class="w-3 h-3 rounded-full bg-data-green border border-gray-900" />
-								</div>
-								<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">
-									Terminal Output
-								</h3>
-							</div>
-
-							{#if curlExample && !response}
-								<button
-									class="flex items-center gap-2 px-3 py-1.5 bg-brand-accent text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-									on:click={handleCopyCurl}
-								>
-									{#if copiedCurl}
-										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="3"
-												d="M5 13l4 4L19 7"
-											/></svg
-										>
-										<span>Copied!</span>
-									{:else}
-										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-											/></svg
-										>
-										<span>Copy cURL</span>
-									{/if}
-								</button>
-							{:else if response}
-								<button
-									class="flex items-center gap-2 px-3 py-1.5 bg-white text-gray-600 hover:text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl border-[3px] border-gray-900 shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-									on:click={() => {
-										response = null;
-										responseJson = '';
-									}}
-								>
-									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2.5"
-											d="M6 18L18 6M6 6l12 12"
-										/></svg
-									>
-									Clear
-								</button>
-							{/if}
-						</div>
-
-						<!-- Terminal Content -->
-						<div class="flex-1 p-6 font-mono text-sm relative overflow-hidden bg-gray-50">
-							<!-- Subtle dot pattern background -->
-							<div
-								class="absolute inset-0 opacity-5 pointer-events-none"
-								style="background-image: radial-gradient(circle, #000 1px, transparent 1px); background-size: 16px 16px;"
-							/>
-
-							<div class="relative z-10">
-								{#if response}
-									<!-- Response View -->
-									<div class="space-y-6">
-										<!-- Status Bar -->
-										<div class="flex items-center gap-3 pb-4 border-b-2 border-gray-300">
-											<div class="flex items-center gap-2">
-												<div class="w-2 h-2 bg-data-green rounded-full animate-pulse" />
-												<span class="font-black text-lg text-gray-900">200 OK</span>
-											</div>
-											<span class="text-gray-400">|</span>
-											<span class="text-gray-600 text-xs font-bold"
-												>{new Date().toLocaleTimeString()}</span
-											>
-										</div>
-
-										<!-- Generated Asset Preview -->
-										{#if response.url || response.gif?.url}
-											<div
-												class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden"
-											>
-												<!-- Header -->
-												<div
-													class="px-4 py-3 bg-gray-100 border-b-[3px] border-gray-900 flex items-center justify-between"
-												>
-													<span class="text-xs font-black text-gray-900 uppercase tracking-wide"
-														>Preview Output</span
-													>
-													<div class="flex gap-2">
-														<button
-															class="p-1.5 hover:bg-white rounded-lg text-gray-600 hover:text-gray-900 transition-colors border-2 border-transparent hover:border-gray-900 disabled:opacity-50"
-															on:click={() => copyShareUrl(response.url || response.gif?.url)}
-															disabled={isCopyingShareUrl}
-															title="Copy share link"
-														>
-															{#if isCopyingShareUrl}
-																<svg class="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24"
-																	><circle
-																		class="opacity-25"
-																		cx="12"
-																		cy="12"
-																		r="10"
-																		stroke="currentColor"
-																		stroke-width="4"
-																		fill="none"
-																	/><path
-																		class="opacity-75"
-																		fill="currentColor"
-																		d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-																	/></svg
-																>
-															{:else}
-																<svg
-																	class="w-3.5 h-3.5"
-																	fill="none"
-																	stroke="currentColor"
-																	viewBox="0 0 24 24"
-																	><path
-																		stroke-linecap="round"
-																		stroke-linejoin="round"
-																		stroke-width="2.5"
-																		d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-																	/></svg
-																>
-															{/if}
-														</button>
-														<a
-															href={response.url || response.gif?.url}
-															target="_blank"
-															class="p-1.5 hover:bg-white rounded-lg text-gray-600 hover:text-gray-900 transition-colors border-2 border-transparent hover:border-gray-900"
-															title="Open in new tab"
-														>
-															<svg
-																class="w-3.5 h-3.5"
-																fill="none"
-																stroke="currentColor"
-																viewBox="0 0 24 24"
-																><path
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="2.5"
-																	d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-																/></svg
-															>
-														</a>
-													</div>
-												</div>
-												<!-- Image -->
-												<div
-													class="p-4 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxwYXRoIGQ9Ik0wIDBoNHY0SDB6bTQgNGg0djRINHoiIGZpbGw9IiNlZGVkZWQiIGZpbGwtb3BhY2l0eT0iLjUiLz48L3N2Zz4=')]"
-												>
-													{#if !previewImgLoaded}
-														<div
-															class="w-full aspect-video rounded-lg border-2 border-gray-200 bg-gray-50 flex items-center justify-center"
-														>
-															<div class="flex items-center gap-2">
-																<div
-																	class="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"
-																/>
-																<span class="text-xs font-bold text-gray-500 uppercase"
-																	>Loading image...</span
-																>
-															</div>
-														</div>
-													{/if}
-													<img loading="lazy"
-														src={previewImgSrc}
-														alt="Result"
-														class="w-full rounded-lg border-2 border-gray-200"
-														class:hidden={!previewImgLoaded}
-														on:error={handlePreviewImgError}
-														on:load={handlePreviewImgLoad}
-													/>
-												</div>
-											</div>
-										{/if}
-
-										<!-- JSON Response -->
-										<div
-											class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden"
-										>
-											<div class="px-4 py-3 bg-gray-100 border-b-[3px] border-gray-900">
-												<span class="text-xs font-black text-gray-900 uppercase tracking-wide"
-													>JSON Response</span
-												>
-											</div>
-											<div class="p-4">
-												<pre
-													class="text-gray-900 overflow-x-auto text-xs leading-relaxed font-mono bg-gray-50 p-4 rounded-lg border-2 border-gray-200">{responseJson}</pre>
-											</div>
-										</div>
-									</div>
-								{:else if curlExample}
-									<!-- cURL View -->
-									<div
-										class="bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden"
-									>
-										<div
-											class="px-4 py-3 bg-gray-100 border-b-[3px] border-gray-900 flex items-center gap-2"
-										>
-											<span class="text-data-green font-black text-sm">$</span>
-											<span class="text-xs font-black text-gray-900 uppercase tracking-wide"
-												>cURL Command</span
-											>
-										</div>
-										<div class="p-4 bg-gray-50">
-											<pre
-												class="text-gray-900 whitespace-pre-wrap break-all text-xs font-mono leading-relaxed">{@html escapeHtml(
-													curlExample.display
-												)
-													.replace(/curl/g, '<span class="text-brand-danger font-bold">curl</span>')
-													.replace(/-X/g, '<span class="text-brand-accent font-bold">-X</span>')
-													.replace(/-H/g, '<span class="text-brand-accent font-bold">-H</span>')
-													.replace(
-														/--data-raw/g,
-														'<span class="text-brand-accent font-bold">--data-raw</span>'
-													)
-													.replace(
-														/(GET|POST|PUT|DELETE)/g,
-														'<span class="text-data-green font-bold">$1</span>'
-													)
-													.replace(/Bearer/g, '<span class="text-gray-600">Bearer</span>')}</pre>
-										</div>
-									</div>
-								{:else}
-									<div class="flex flex-col items-center justify-center h-[200px]">
-										<div class="mb-4">
-											<div
-												class="w-16 h-16 rounded-full border-[3px] border-gray-300 border-t-brand-accent animate-spin"
-											/>
-										</div>
-										<p class="text-xs font-black text-gray-600 uppercase tracking-wider">
-											Select an endpoint to begin
-										</p>
-										<p class="text-[10px] text-gray-500 mt-1">Choose from the menu on the left</p>
-									</div>
-								{/if}
-							</div>
-						</div>
-					</div>
+					{/each}
 				</div>
 			</div>
+
+			{#if resultTab === 'PREVIEW'}
+				<div
+					class="flex min-h-0 flex-1 items-center justify-center overflow-auto rounded-lg bg-brand-subtle p-6"
+				>
+					{#if sending}
+						<p class="pg-pulse font-sans text-[13px] text-brand-mute">Rendering…</p>
+					{:else if !response}
+						<p class="font-sans text-[13px] text-brand-mute">
+							Send the request to see the render here.
+						</p>
+					{:else if resultUrl && /\.(png|jpe?g|webp|gif)(\?|$)/i.test(resultUrl)}
+						<img
+							src={resultUrl}
+							alt="The render this call produced"
+							on:load={onImageLoad}
+							class="max-h-full max-w-full object-contain shadow-[4px_4px_0_0_#000000]"
+						/>
+					{:else if resultUrl}
+						<a
+							href={resultUrl}
+							target="_blank"
+							rel="noopener"
+							class="rounded border border-brand-rule bg-brand-paper px-4 py-3 font-mono text-[11px] text-brand-ink"
+						>
+							{resultUrl.split('.').pop()?.slice(0, 4).toUpperCase()} · open ↗
+						</a>
+					{:else}
+						<p class="max-w-[320px] text-center font-sans text-[13px] text-brand-mute">
+							That call answered {response.status} and produced no file. The JSON tab has the answer.
+						</p>
+					{/if}
+				</div>
+
+				{#if response?.ok && resultUrl}
+					<div class="flex flex-shrink-0 flex-col items-start gap-2.5">
+						<p class="font-mono text-[11.5px] text-brand-slate">{resultMeta}</p>
+						<div class="flex flex-wrap gap-2">
+							<a
+								href={resultUrl}
+								target="_blank"
+								rel="noopener"
+								on:click={() => resultAction('open')}
+								class="flex h-8 items-center rounded-md border border-brand-ink px-3 font-sans text-[12.5px] font-medium text-brand-ink"
+								>Open</a
+							>
+							<a
+								href={resultUrl}
+								download
+								on:click={() => resultAction('download')}
+								class="flex h-8 items-center rounded-md border border-brand-rule px-3 font-sans text-[12.5px] font-medium text-brand-ink"
+								>Download</a
+							>
+							<a
+								href="/dashboard/templates"
+								on:click={() => resultAction('save_template')}
+								class="flex h-8 items-center rounded-md border border-brand-rule px-3 font-sans text-[12.5px] font-medium text-brand-ink"
+								>Save as template</a
+							>
+						</div>
+					</div>
+				{/if}
+			{:else if resultTab === 'JSON'}
+				<div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-brand-press-deep">
+					<div class="pg-rule-b flex h-9 flex-shrink-0 items-center justify-between gap-3 px-3">
+						<button
+							type="button"
+							on:click={() => (showHeaders = !showHeaders)}
+							disabled={!response}
+							class="font-sans text-[12.5px] text-brand-press-text disabled:opacity-40"
+							>{showHeaders ? 'Body' : 'Headers'}</button
+						>
+						<button
+							type="button"
+							on:click={() => copyToClipboard(responseJson, 'Response copied')}
+							disabled={!response}
+							class="font-sans text-[12.5px] text-white disabled:opacity-40">Copy</button
+						>
+					</div>
+					<div class="min-h-0 flex-1 overflow-auto px-3 py-3">
+						{#if !response}
+							<p class="font-sans text-[13px] text-brand-press-text/70">
+								Send the request to see its answer.
+							</p>
+						{:else if showHeaders}
+							{#each Object.entries(response.headers) as [k, v] (k)}
+								<div class="flex gap-3 font-mono text-[11px] leading-[18px]">
+									<span class="pg-dim w-44 flex-shrink-0">{k}</span>
+									<span class="min-w-0 break-all text-brand-press-text">{v}</span>
+								</div>
+							{/each}
+						{:else}
+							<CodeBlock
+								code={responseJson}
+								lang="json"
+								bare
+								wrap={false}
+								showCopy={false}
+								maxHeight="max-h-none"
+							/>
+							{#if !response.ok}
+								<div class="pg-rule mt-3.5 flex items-center justify-between gap-4 rounded-lg p-3">
+									<div class="flex min-w-0 flex-col gap-[3px]">
+										<p class="font-sans text-[13px] font-semibold text-white">
+											{#if errorField}
+												The template needs {errorField}.
+											{:else if response.status === 403}
+												Verify your email to render.
+											{:else if response.status === 0}
+												The request never reached the server.
+											{:else}
+												{response.body?.message || `That call answered ${response.status}.`}
+											{/if}
+										</p>
+										<p class="font-sans text-[12.5px] text-brand-press-text">
+											{#if response.status >= 500 || response.status === 0}
+												Try again; if it repeats, the request id in Headers is what support needs.
+											{:else}
+												Nothing was rendered and nothing was counted.
+											{/if}
+										</p>
+									</div>
+									{#if response.status === 403}
+										<a
+											href="/dashboard/settings"
+											class="flex-shrink-0 font-sans text-[12.5px] text-brand-field">Resend link</a
+										>
+									{:else if errorLine}
+										<button
+											type="button"
+											on:click={() => jumpToLine(errorLine)}
+											class="flex-shrink-0 whitespace-nowrap font-sans text-[12.5px] text-brand-field"
+											>Jump to line {errorLine} →</button
+										>
+									{:else}
+										<a
+											href={call.docs}
+											target="_blank"
+											rel="noopener"
+											class="flex-shrink-0 font-sans text-[12.5px] text-brand-field">Open docs ↗</a
+										>
+									{/if}
+								</div>
+							{:else if response.status === 202}
+								<div class="pg-rule mt-3.5 flex items-center justify-between gap-4 rounded-lg p-3">
+									<div class="flex flex-col gap-[3px]">
+										<p class="font-sans text-[13px] font-semibold text-white">
+											The batch is queued.
+										</p>
+										<p class="font-sans text-[12.5px] text-brand-press-text">
+											This pane follows it and shows the results when it finishes.
+										</p>
+									</div>
+									<button
+										type="button"
+										on:click={cancelBatch}
+										class="flex-shrink-0 font-sans text-[12.5px] text-brand-field">Cancel</button
+									>
+								</div>
+							{/if}
+						{/if}
+					</div>
+				</div>
+			{:else}
+				<div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-brand-press-deep">
+					<div class="pg-rule-b flex h-9 flex-shrink-0 items-center justify-between gap-3 px-3">
+						<div class="flex min-w-0 items-center gap-1">
+							{#each SNIPPET_LANGS as l (l.id)}
+								<button
+									type="button"
+									on:click={() => (lang = l.id)}
+									class="flex h-6 flex-shrink-0 items-center rounded px-2.5 font-sans text-[12.5px] {lang ===
+									l.id
+										? 'bg-brand-paper font-semibold text-brand-ink'
+										: 'text-brand-press-text'}">{l.label}</button
+								>
+							{/each}
+						</div>
+						<div class="flex flex-shrink-0 items-center gap-3">
+							<button
+								type="button"
+								on:click={revealKey}
+								class="hidden whitespace-nowrap font-sans text-[12.5px] text-brand-press-text min-[1100px]:block"
+								>{keyRevealed ? 'Key shown' : 'Key masked'}</button
+							>
+							<button
+								type="button"
+								on:click={copySnippet}
+								class="font-sans text-[12.5px] text-white">Copy</button
+							>
+						</div>
+					</div>
+					<div class="min-h-0 flex-1 overflow-auto px-3 py-3">
+						<CodeBlock
+							code={keyRevealed ? copyableSnippet : shownSnippet}
+							lang={snippetMode}
+							bare
+							wrap={false}
+							showCopy={false}
+							maxHeight="max-h-none"
+						/>
+					</div>
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>
 
-<!-- Maximized Image HTML Editor Modal -->
-{#if maximizeImageHtml}
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div
-		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
-		on:click|self={() => (maximizeImageHtml = false)}
-	>
-		<div
-			class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] w-full max-w-3xl h-[600px] flex flex-col"
-		>
-			<!-- Header -->
-			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
-				<div class="flex items-center gap-3">
-					<div
-						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
-					>
-						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-							/></svg
-						>
-					</div>
-					<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">
-						Edit HTML Content
-					</h3>
-				</div>
-				<button
-					class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-					on:click={() => (maximizeImageHtml = false)}
-					title="Close"
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/></svg
-					>
-				</button>
-			</div>
-			<!-- Editor -->
-			<div class="flex-1 min-h-0 p-5">
-				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
-				>
-					<CodeMirror
-						bind:value={imageParams.html}
-						lang={htmlLang()}
-						styles={{
-							'&': {
-								height: '100%',
-								fontSize: '13px',
-								fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-							},
-							'.cm-content': { padding: '12px' },
-							'.cm-line': { padding: '0' },
-							'.cm-gutters': {
-								backgroundColor: '#f9fafb',
-								color: '#9ca3af',
-								borderRight: '1px solid #f3f4f6',
-								minWidth: '40px'
-							},
-							'.cm-scroller': { overflow: 'auto' }
-						}}
-					/>
-				</div>
-			</div>
-			<!-- Footer -->
-			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
-				<div class="text-[10px] text-gray-500">HTML with inline styles and CSS</div>
-				<button
-					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					on:click={() => (maximizeImageHtml = false)}
-				>
-					Close
-				</button>
-			</div>
+<!-- The expanded editor is the same value and the same change handler, so
+     there is no second copy of the state to keep in step. -->
+{#if expanded}
+	<div class="fixed inset-0 z-50 flex flex-col bg-black/60 p-6">
+		<div class="flex items-center justify-between pb-3">
+			<span class="font-mono text-[11px] tracking-[0.08em] text-white">
+				{call.method}
+				{call.path(state)}
+			</span>
+			<button
+				type="button"
+				on:click={() => (expanded = false)}
+				class="font-sans text-[13px] text-white hover:underline">Close</button
+			>
+		</div>
+		<div class="pg-editor min-h-0 flex-1 overflow-hidden rounded-xl">
+			<CodeMirror
+				value={editorValue}
+				extensions={editorExtensions}
+				on:change={(e) => onEditorChange(e.detail)}
+			/>
 		</div>
 	</div>
 {/if}
-
-<!-- Maximized GIF HTML Editor Modal -->
-{#if maximizeGifHtml}
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div
-		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
-		on:click|self={() => (maximizeGifHtml = false)}
-	>
-		<div
-			class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] w-full max-w-3xl h-[600px] flex flex-col"
-		>
-			<!-- Header -->
-			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
-				<div class="flex items-center gap-3">
-					<div
-						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
-					>
-						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-							/></svg
-						>
-					</div>
-					<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">
-						Edit HTML Content
-					</h3>
-				</div>
-				<button
-					class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-					on:click={() => (maximizeGifHtml = false)}
-					title="Close"
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/></svg
-					>
-				</button>
-			</div>
-			<!-- Editor -->
-			<div class="flex-1 min-h-0 p-5">
-				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
-				>
-					<CodeMirror
-						bind:value={gifParams.html}
-						lang={htmlLang()}
-						styles={{
-							'&': {
-								height: '100%',
-								fontSize: '13px',
-								fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-							},
-							'.cm-content': { padding: '12px' },
-							'.cm-line': { padding: '0' },
-							'.cm-gutters': {
-								backgroundColor: '#f9fafb',
-								color: '#9ca3af',
-								borderRight: '1px solid #f3f4f6',
-								minWidth: '40px'
-							},
-							'.cm-scroller': { overflow: 'auto' }
-						}}
-					/>
-				</div>
-			</div>
-			<!-- Footer -->
-			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
-				<div class="text-[10px] text-gray-500">HTML with CSS animations for GIF generation</div>
-				<button
-					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					on:click={() => (maximizeGifHtml = false)}
-				>
-					Close
-				</button>
-			</div>
-		</div>
-	</div>
-{/if}
-
-<!-- Maximized Render Template Variables Editor Modal -->
-{#if maximizeRenderVars}
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div
-		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
-		on:click|self={() => (maximizeRenderVars = false)}
-	>
-		<div
-			class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] w-full max-w-3xl h-[600px] flex flex-col"
-		>
-			<!-- Header -->
-			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
-				<div class="flex items-center gap-3">
-					<div
-						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
-					>
-						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-							/></svg
-						>
-					</div>
-					<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">
-						Edit Variables (JSON)
-					</h3>
-				</div>
-				<button
-					class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-					on:click={() => (maximizeRenderVars = false)}
-					title="Close"
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/></svg
-					>
-				</button>
-			</div>
-			<!-- Editor -->
-			<div class="flex-1 min-h-0 p-5">
-				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
-				>
-					<CodeMirror
-						bind:value={renderTemplateParams.variables}
-						lang={json()}
-						styles={{
-							'&': {
-								height: '100%',
-								fontSize: '13px',
-								fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-							},
-							'.cm-content': { padding: '12px' },
-							'.cm-line': { padding: '0' },
-							'.cm-gutters': {
-								backgroundColor: '#f9fafb',
-								color: '#9ca3af',
-								borderRight: '1px solid #f3f4f6',
-								minWidth: '40px'
-							},
-							'.cm-scroller': { overflow: 'auto' }
-						}}
-					/>
-				</div>
-			</div>
-			<!-- Footer -->
-			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
-				<div class="text-[10px] text-gray-500">
-					Format: <code class="bg-gray-100 px-1 rounded">{'{'}"key": "value"{'}'}</code>
-				</div>
-				<button
-					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					on:click={() => (maximizeRenderVars = false)}
-				>
-					Close
-				</button>
-			</div>
-		</div>
-	</div>
-{/if}
-
-<!-- Maximized Batch Render Variable Sets Editor Modal -->
-{#if maximizeBatchVars}
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div
-		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
-		on:click|self={() => (maximizeBatchVars = false)}
-	>
-		<div
-			class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] w-full max-w-3xl h-[600px] flex flex-col"
-		>
-			<!-- Header -->
-			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
-				<div class="flex items-center gap-3">
-					<div
-						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
-					>
-						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-							/></svg
-						>
-					</div>
-					<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">
-						Edit Variable Sets (JSON)
-					</h3>
-				</div>
-				<button
-					class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-					on:click={() => (maximizeBatchVars = false)}
-					title="Close"
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/></svg
-					>
-				</button>
-			</div>
-			<!-- Editor -->
-			<div class="flex-1 min-h-0 p-5">
-				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
-				>
-					<CodeMirror
-						bind:value={batchRenderParams.variableSets}
-						lang={json()}
-						styles={{
-							'&': {
-								height: '100%',
-								fontSize: '13px',
-								fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-							},
-							'.cm-content': { padding: '12px' },
-							'.cm-line': { padding: '0' },
-							'.cm-gutters': {
-								backgroundColor: '#f9fafb',
-								color: '#9ca3af',
-								borderRight: '1px solid #f3f4f6',
-								minWidth: '40px'
-							},
-							'.cm-scroller': { overflow: 'auto' }
-						}}
-					/>
-				</div>
-			</div>
-			<!-- Footer -->
-			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
-				<div class="text-[10px] text-gray-500">
-					Format: <code class="bg-gray-100 px-1 rounded">[{'{'}"key": "value"{'}'}]</code>. Each object
-					is one variation
-				</div>
-				<button
-					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					on:click={() => (maximizeBatchVars = false)}
-				>
-					Close
-				</button>
-			</div>
-		</div>
-	</div>
-{/if}
-
-<!-- Maximized CSV Column Mappings Editor Modal -->
-{#if maximizeCsvMappings}
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div
-		class="fixed inset-0 z-[99999] bg-black/50 flex items-center justify-center p-4 sm:p-8"
-		on:click|self={() => (maximizeCsvMappings = false)}
-	>
-		<div
-			class="bg-white rounded-2xl border-[3px] border-gray-900 shadow-[8px_8px_0_0_#1f293780] w-full max-w-3xl h-[600px] flex flex-col"
-		>
-			<!-- Header -->
-			<div class="flex items-center justify-between px-5 py-4 border-b-[3px] border-gray-900">
-				<div class="flex items-center gap-3">
-					<div
-						class="w-8 h-8 bg-brand-accent rounded-lg border-[3px] border-gray-900 flex items-center justify-center"
-					>
-						<svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-							/></svg
-						>
-					</div>
-					<h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">
-						Edit Column Mappings (JSON)
-					</h3>
-				</div>
-				<button
-					class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-					on:click={() => (maximizeCsvMappings = false)}
-					title="Close"
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/></svg
-					>
-				</button>
-			</div>
-			<!-- Editor -->
-			<div class="flex-1 min-h-0 p-5">
-				<div
-					class="border-[3px] border-gray-900 rounded-xl overflow-hidden focus-within:shadow-brutal-accent transition-shadow bg-white h-full"
-				>
-					<CodeMirror
-						bind:value={batchRenderCsvParams.mappings}
-						lang={json()}
-						styles={{
-							'&': {
-								height: '100%',
-								fontSize: '13px',
-								fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-							},
-							'.cm-content': { padding: '12px' },
-							'.cm-line': { padding: '0' },
-							'.cm-gutters': {
-								backgroundColor: '#f9fafb',
-								color: '#9ca3af',
-								borderRight: '1px solid #f3f4f6',
-								minWidth: '40px'
-							},
-							'.cm-scroller': { overflow: 'auto' }
-						}}
-					/>
-				</div>
-			</div>
-			<!-- Footer -->
-			<div class="px-5 py-3 border-t-[3px] border-gray-900 flex items-center justify-between">
-				<div class="text-[10px] text-gray-500">
-					Format: <code class="bg-gray-100 px-1 rounded">{'{'}"CSV Column": "templateVar"{'}'}</code
-					>
-				</div>
-				<button
-					class="px-4 py-2 bg-brand-accent text-gray-900 text-xs font-bold rounded-lg border-[3px] border-gray-900 shadow-[3px_3px_0_0_#1f293780] hover:shadow-[1px_1px_0_0_#1f293780] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					on:click={() => (maximizeCsvMappings = false)}
-				>
-					Close
-				</button>
-			</div>
-		</div>
-	</div>
-{/if}
-
-<Toast />
 
 <style>
-	.custom-scrollbar::-webkit-scrollbar {
-		width: 8px;
-		height: 8px;
+	/* CodeMirror sizes itself from its host, and svelte-codemirror-editor puts
+	   its own .codemirror-wrapper in between. That wrapper is height:auto, so
+	   styling only .cm-editor resolves 100% against auto and the pane collapses
+	   to its first line — every editor here has to be told to fill twice. */
+	.pg-editor :global(.codemirror-wrapper),
+	.pg-editor :global(.cm-editor) {
+		height: 100%;
 	}
-	.custom-scrollbar::-webkit-scrollbar-track {
-		background: rgba(0, 0, 0, 0.1);
-		border-radius: 4px;
-	}
-	.custom-scrollbar::-webkit-scrollbar-thumb {
-		background: rgba(255, 255, 255, 0.2);
-		border-radius: 4px;
-	}
-	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-		background: rgba(255, 255, 255, 0.3);
+	.pg-editor :global(.cm-scroller) {
+		overflow: auto;
 	}
 
-	.animate-in {
-		animation: fadeIn 0.3s ease-in-out;
+	/* Two greys the brand palette does not name: the dark lane's hairline and
+	   its dimmest label. Declared once here rather than inlined per element. */
+	.pg-rule {
+		border: 1px solid #2c2f33;
 	}
 
-	@keyframes fadeIn {
-		from {
-			opacity: 0;
-			transform: translateY(10px);
+	.pg-rule-b {
+		border-bottom: 1px solid #2c2f33;
+	}
+
+	.pg-dim {
+		color: #8b95a0;
+	}
+
+	.pg-pulse {
+		animation: pg-pulse 1.1s ease-in-out infinite;
+	}
+
+	@keyframes pg-pulse {
+		0%,
+		100% {
+			opacity: 0.45;
 		}
-		to {
+		50% {
 			opacity: 1;
-			transform: translateY(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		/* Two greys the brand palette does not name: the dark lane's hairline and
+	   its dimmest label. Declared once here rather than inlined per element. */
+		.pg-rule {
+			border: 1px solid #2c2f33;
+		}
+
+		.pg-rule-b {
+			border-bottom: 1px solid #2c2f33;
+		}
+
+		.pg-dim {
+			color: #8b95a0;
+		}
+
+		.pg-pulse {
+			animation: none;
 		}
 	}
 </style>

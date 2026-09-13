@@ -95,3 +95,8 @@ export const RiMagicLine = makeIcon(
 export const RiClosedCaptioningLine = makeIcon(
   "M3 3h18a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm1 2v14h16V5H4Zm3.5 4.5h3v1.5h-3v3h3V16h-3a1.5 1.5 0 0 1-1.5-1.5v-3A1.5 1.5 0 0 1 7.5 9.5Zm6 0h3v1.5h-3v3h3V16h-3a1.5 1.5 0 0 1-1.5-1.5v-3a1.5 1.5 0 0 1 1.5-1.5Z"
 );
+
+/** Say it (Ri Sparkling 2) — the copilot rail item. */
+export const RiSparkling2Line = makeIcon(
+  "M12 1.5l2.06 5.44L19.5 9l-5.44 2.06L12 16.5l-2.06-5.44L4.5 9l5.44-2.06L12 1.5Zm0 4.66L11.1 8.1 9.16 9l1.94.9.9 1.94.9-1.94L14.84 9l-1.94-.9L12 6.16ZM18.5 14l.94 2.56L22 17.5l-2.56.94L18.5 21l-.94-2.56L15 17.5l2.56-.94L18.5 14ZM5 15l.7 1.8L7.5 17.5l-1.8.7L5 20l-.7-1.8L2.5 17.5l1.8-.7L5 15Z"
+);

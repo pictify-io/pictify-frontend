@@ -5,7 +5,7 @@
 	 * and a spacious interactive showcase stage.
 	 */
 	import { fade } from 'svelte/transition';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	const ADA_CERT = 'https://media.pictify.io/template-renders/cj944exs-1785797479873.png';
 
@@ -227,7 +227,7 @@
 
 										<div class="text-[#4ade80] font-bold text-sm mt-4 flex items-center gap-2">
 											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-											Job complete: 500 PDFs delivered.
+											Job complete: 500 PDFs rendered.
 										</div>
 									</div>
 								</div>
@@ -245,7 +245,7 @@
 									</div>
 									<h3 class="text-3xl sm:text-4xl font-black text-white leading-tight mb-4">Always-On <br/><span class="text-[#4ade80]">Automations</span></h3>
 									<p class="text-lg font-medium text-gray-300 leading-relaxed">
-										Trigger document generation instantly from your own backend, Zapier, or n8n. Complete with HMAC signing and per-row bounce tracking.
+										Trigger document generation instantly from your own backend, Zapier, or n8n. Complete with HMAC signing and per-row status tracking.
 									</p>
 								</div>
 
@@ -258,9 +258,9 @@
 									</div>
 									<div class="flex items-center gap-4 bg-gray-800 p-4 rounded-xl border border-gray-700">
 										<div class="w-10 h-10 bg-[#ffc480] rounded-lg flex items-center justify-center border-[2px] border-gray-900 shrink-0">
-											<svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v9a2 2 0 002 2z"/></svg>
+											<svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
 										</div>
-										<span class="text-sm font-bold text-white">Email Delivery & Per-Row Status</span>
+										<span class="text-sm font-bold text-white">Per-Row Status & Hosted Output</span>
 									</div>
 								</div>
 							</div>
@@ -301,11 +301,11 @@
 										<!-- Pipeline Node 3 -->
 										<div class="flex items-center gap-4 md:gap-6 relative">
 											<div class="w-12 h-12 md:w-16 md:h-16 bg-[#4ade80] border-[3px] border-gray-900 rounded-2xl shadow-[4px_4px_0_0_#000] flex items-center justify-center shrink-0 z-10">
-												<svg class="w-6 h-6 md:w-8 md:h-8 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+												<svg class="w-6 h-6 md:w-8 md:h-8 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
 											</div>
 											<div class="flex-1 bg-gray-800 rounded-xl p-3 md:p-4 border border-[#4ade80]">
-												<h4 class="text-white font-black text-base md:text-lg">3. Email Delivery</h4>
-												<p class="text-gray-400 text-[10px] md:text-xs font-mono mt-1 text-[#4ade80] truncate">Sent successfully to inbox</p>
+												<h4 class="text-white font-black text-base md:text-lg">3. Hosted Output</h4>
+												<p class="text-gray-400 text-[10px] md:text-xs font-mono mt-1 text-[#4ade80] truncate">200 OK &mdash; url returned per row</p>
 											</div>
 										</div>
 									</div>
@@ -346,11 +346,11 @@
 
 			<div class="bg-[#4ade80] rounded-[2rem] border-[4px] border-gray-900 p-8 sm:p-10 shadow-[8px_8px_0_0_#1f2937] hover:shadow-[4px_4px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 transition-all text-gray-900">
 				<div class="w-16 h-16 bg-white rounded-2xl border-[3px] border-gray-900 shadow-[4px_4px_0_0_#1f2937] flex items-center justify-center mb-6 transform -rotate-3 text-gray-900">
-					<svg class="w-8 h-8 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+					<svg class="w-8 h-8 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
 				</div>
-				<h4 class="text-2xl font-black text-gray-900 mb-3 leading-tight">Delivery Auditing</h4>
+				<h4 class="text-2xl font-black text-gray-900 mb-3 leading-tight">Run Auditing</h4>
 				<p class="text-base font-bold text-gray-900/90 leading-relaxed">
-					Track every document with per-row delivered/bounced status, webhook events, and one-click re-send.
+					Track every document with per-row render status, webhook events, and one-click re-run.
 				</p>
 			</div>
 		</div>

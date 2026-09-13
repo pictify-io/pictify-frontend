@@ -6,7 +6,7 @@ import {
 	savePersonalization as savePersonalizationAPI,
 	skipPersonalization as skipPersonalizationAPI
 } from '../api/onboarding';
-import { analytics } from '$lib/analytics.js';
+import { analytics } from '$lib/telemetry.js';
 
 /**
  * Onboarding Store - Manages onboarding checklist state

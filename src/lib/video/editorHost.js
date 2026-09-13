@@ -41,7 +41,7 @@ const instances = new Map();
  * @param {number} [options.width] - Composition width (used when project is null).
  * @param {number} [options.height] - Composition height (used when project is null).
  * @param {number} [options.fps]
- * @param {string} [options.backgroundColor] - Backdrop color outside the artboard.
+ * @param {string} [options.backgroundColor] - Backdrop color outside the artboard. Defaults to the Repro Shop canvas greige.
  * @param {Function} [options.onState] - Called with { currentTime, isPlaying, tracks, clips, settings } on every store change.
  * @param {Function} [options.onSelection] - Called with the selected clip array.
  * @param {Function} [options.onError]
@@ -53,7 +53,7 @@ export const mountVideoEditor = async (canvasEl, options = {}) => {
 		width = DEFAULT_SETTINGS.width,
 		height = DEFAULT_SETTINGS.height,
 		fps = DEFAULT_SETTINGS.fps,
-		backgroundColor = '#101014',
+		backgroundColor = '#E2E4DD',
 		onState,
 		onSelection,
 		onError
@@ -123,6 +123,38 @@ export const mountVideoEditor = async (canvasEl, options = {}) => {
 		unsubscribe = core.store.subscribe(push);
 		push(core.store.getState());
 	}
+
+	/*
+	 * Composition size: store → engine.
+	 *
+	 * `new Studio({ width, height })` reads those ONCE. The composition panel
+	 * writes size changes to the project store (aspect presets, the W/H fields,
+	 * swap), so the numbers updated and the artboard kept rendering at whatever
+	 * it was opened with — the preview simply disagreed with the settings.
+	 *
+	 * This is a subscription of its own rather than a branch inside `push`,
+	 * because that block only runs when the caller passed `onState`, and the
+	 * engine has to follow its own document either way.
+	 */
+	let appliedWidth = settings.width;
+	let appliedHeight = settings.height;
+	const syncCompositionSize = (state) => {
+		const w = Math.round(Number(state?.settings?.width) || 0);
+		const h = Math.round(Number(state?.settings?.height) || 0);
+		if (!w || !h) return;
+		if (w === appliedWidth && h === appliedHeight) return;
+		appliedWidth = w;
+		appliedHeight = h;
+		try {
+			// setSize changes the artboard; updateArtboardLayout re-fits it (and
+			// the FIT %) inside the viewport it now has to live in.
+			studio.setSize(w, h);
+			studio.updateArtboardLayout();
+		} catch (error) {
+			if (onError) onError(`Could not resize the canvas: ${error?.message || error}`);
+		}
+	};
+	const unsubscribeSize = core.store.subscribe(syncCompositionSize);
 
 	const selectionEvents = ['selection:created', 'selection:updated', 'selection:cleared'];
 	const selectionHandler = (payload) => {
@@ -197,6 +229,7 @@ export const mountVideoEditor = async (canvasEl, options = {}) => {
 
 		destroy: () => {
 			if (unsubscribe) unsubscribe();
+			unsubscribeSize();
 			selectionEvents.forEach((event) => studio.off?.(event, selectionHandler));
 			try {
 				studio.destroy?.();

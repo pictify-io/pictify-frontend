@@ -402,8 +402,8 @@ export const useCaseDetails = {
 			Perfect for learning platforms, fitness apps, developer communities, and any product with achievement
 			systems. Unlike static badge libraries, Pictify badges are dynamically generated, so each user gets
 			a personalized badge with their name, tier, and achievement date baked in. For whole cohorts, upload
-			a recipient CSV to a Pictify workflow and every badge is bulk-generated and emailed to its recipient
-			automatically.`,
+			a recipient CSV to a Pictify workflow and every badge is bulk-generated in one run, with
+			per-row status.`,
 		useCaseScenarios: [
 			'Learning platforms issuing skill completion badges',
 			'Developer communities awarding contribution badges',
@@ -649,7 +649,7 @@ export const useCaseDetails = {
 			With Pictify's membership card generator, create branded cards featuring member names, IDs, photos,
 			and expiration dates. Generate cards automatically when members join or renew, and include QR codes
 			for easy verification. For bulk onboarding, upload a member CSV to a Pictify workflow and every card
-			is generated and emailed to its member automatically.`,
+			is generated in one run, with per-row status.`,
 		useCaseScenarios: [
 			'Gyms and fitness clubs issuing member cards',
 			'Professional associations providing member credentials',
@@ -777,7 +777,7 @@ export const useCaseDetails = {
 	'barcode-generator': {
 		label: 'Barcodes',
 		seoTitle: 'Barcode Generator API: Bulk Barcodes for Labels & Inventory (Free) | Pictify',
-		ogImage: 'https://media.pictify.io/que8z-1775618085943.png',
+		ogImage: 'https://pictify.io/og/tools/barcode-generator.png',
 		description:
 			'Generate Code 128, EAN-13, UPC-A, and ITF-14 barcodes: free online tool plus a bulk barcode generator API for product labels, inventory, and shipping at scale.',
 		seoKeywords: [

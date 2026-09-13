@@ -1,1056 +1,895 @@
 <script>
-	import { onMount, onDestroy } from 'svelte';
+	/**
+	 * Brand assets — one kit. FE-20 (boards D11 `IVW-0`, D11b `J4W-0`,
+	 * D11a `JBE-0`; notes `JIX-0` decisions, `JJI-0` states).
+	 *
+	 * Replaces the v1 asset grid (tiles by type, categories, a separate
+	 * FeatureGate screen). The grid answered "what files have I uploaded"; this
+	 * page answers the question a buyer actually has, which is "what will my
+	 * customers see" — four rows, a live specimen, and the list of editions
+	 * currently using it.
+	 *
+	 * THE THREE THINGS THIS SCREEN PROMISES, and each is load-bearing:
+	 *
+	 *   REVISIONS, NOT OVERWRITES. Saving makes rev n+1. An approved edition
+	 *   keeps the revision it was approved with, so changing a colour today
+	 *   cannot alter what a customer already received.
+	 *   NOTHING IS SAVED UNTIL YOU CONFIRM. Detection proposes; the draft lives
+	 *   in this component until "Save as rev 1". Closing the page writes nothing.
+	 *   A RATIO, NOT A VERDICT. Every swatch prints its contrast against white
+	 *   as a number the buyer can check, and a failing one never blocks the
+	 *   save — it tells the AI where not to put words.
+	 *
+	 * Locked plan renders the SAME page read-only with one plum "Unlock brand
+	 * kit" in the header, rather than a gate screen: a buyer deciding whether to
+	 * pay should be able to see what they would be buying.
+	 */
+	import { onMount } from 'svelte';
+	import { notify, showToast } from '../../../store/toast.store.js';
+	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
+	import CardPreview from '$lib/components/campaigns/CardPreview.svelte';
+	import BrandSetupDialog from '$lib/components/campaigns/BrandSetupDialog.svelte';
 	import {
-		brandAssets,
-		fetchBrandAssets,
-		uploadAsset,
-		addColor,
-		deleteAsset,
-		deleteAssets
-	} from '../../../store/brand-assets.store';
-	import { toast } from '../../../store/toast.store';
-	import Toast from '$lib/components/Toast.svelte';
-	import { analytics } from '$lib/analytics.js';
-	import { copyToClipboard as sharedCopy, formatRelativeDate } from '$lib/utils/format.js';
-	import Loader from '$lib/components/Loader.svelte';
+		getBrandKit,
+		saveBrandKitRevision,
+		uploadBrandFile,
+		deleteBrandAsset,
+		brandKitError
+	} from '../../../api/brand-kit';
 	import {
-		ASSET_TYPE_LABELS,
-		ASSET_TYPE_ICONS,
-		COLOR_CATEGORIES,
-		getAcceptString
-	} from '../../../api/brand-assets';
-	import { user } from '../../../store/user.store';
-	import { FeatureUpgradePrompt } from '$lib/components/plg';
-	import FeatureGate from '$lib/components/plg/FeatureGate.svelte';
-	import {
-		checkFeatureAccessSync,
-		FEATURES,
-		getFeatureUpgradePrompt
-	} from '../../../store/plg.store';
+		contrastOnWhite,
+		formatRatio,
+		passesAA,
+		darkenToPass,
+		countChanges,
+		specimenHtml,
+		emptyKit,
+		TONE_CHIPS,
+		MAX_TONES,
+		BACKGROUND_ROLE,
+		pinnedApprovedEditions,
+		sameLogo
+	} from '$lib/campaigns/brand-kit.js';
 
-	// Feature gating for Brand Assets
-	$: brandAssetsAccess = checkFeatureAccessSync(FEATURES.BRAND_ASSETS);
-	$: hasBrandAssetsAccess = brandAssetsAccess?.hasAccess ?? false;
-	$: brandAssetsUpgradePrompt = getFeatureUpgradePrompt(FEATURES.BRAND_ASSETS);
+	let loading = true;
+	let loadError = null;
 
-	let isLoading = true;
-	let isUploading = false;
-	let selectedType = null;
-	let selectedAssets = new Set();
-	let showDeleteConfirm = false;
-	let assetToDelete = null;
-	let showColorModal = false;
-	let showUploadModal = false;
-	let uploadType = 'image';
-	let currentPlan = '';
-	let unsubscribeUser = () => {};
+	/** The last saved revision, kept so the foot can count what has changed. */
+	let saved = null;
+	let revision = 0;
+	let savedAt = null;
+	let website = '';
+	let usedBy = [];
+	let locked = false;
 
-	// Mock Data for Locked State
-	const MOCK_ASSETS = [
-		{
-			uid: 'mock-1',
-			type: 'logo',
-			name: 'Primary Logo Dark',
-			url: 'https://via.placeholder.com/150?text=LOGO',
-			createdAt: new Date().toISOString()
-		},
-		{
-			uid: 'mock-2',
-			type: 'color',
-			name: 'Brand Primary',
-			value: '#ff6b6b',
-			isPrimary: true,
-			createdAt: new Date().toISOString()
-		},
-		{
-			uid: 'mock-3',
-			type: 'font',
-			name: 'Inter Bold',
-			metadata: { fontFamily: 'Inter' },
-			createdAt: new Date().toISOString()
-		},
-		{
-			uid: 'mock-4',
-			type: 'color',
-			name: 'Surface Gray',
-			value: '#f3f4f6',
-			createdAt: new Date().toISOString()
-		},
-		{
-			uid: 'mock-5',
-			type: 'icon',
-			name: 'Menu Icon',
-			url: 'https://via.placeholder.com/150?text=ICON',
-			createdAt: new Date().toISOString()
-		},
-		{
-			uid: 'mock-6',
-			type: 'image',
-			name: 'Hero Background',
-			url: 'https://via.placeholder.com/150?text=BG',
-			createdAt: new Date().toISOString()
-		},
-		{
-			uid: 'mock-7',
-			type: 'font',
-			name: 'JetBrains Mono',
-			metadata: { fontFamily: 'JetBrains Mono' },
-			createdAt: new Date().toISOString()
-		},
-		{
-			uid: 'mock-8',
-			type: 'color',
-			name: 'Accent Yellow',
-			value: '#ffc480',
-			createdAt: new Date().toISOString()
-		}
-	];
+	/** The kit being edited. Never written anywhere until Save. */
+	let draft = emptyKit();
+	let saving = false;
 
-	// Color form
-	let colorForm = {
-		name: '',
-		value: '#000000',
-		category: 'primary',
-		description: ''
-	};
+	/** D11a: shown when a team has never saved a kit. */
+	let setupOpen = false;
+	/** D11b: set after a detect, so the rows can show FOUND · n. */
+	let detected = null;
 
-	// Upload form
-	let uploadForm = {
-		name: '',
-		description: '',
-		tags: '',
-		isPrimary: false
-	};
-	let selectedFile = null;
+	let logoInput;
+	let fontInput;
+	let uploadKind = 'mark';
 
-	let fileInput;
+	$: changes = saved ? countChanges(saved, draft) : 0;
+	$: dirty = changes > 0 || (revision === 0 && hasAnything(draft));
+	$: editable = !locked;
 
-	$: assets = $brandAssets.assets;
-	$: counts = $brandAssets.counts;
-	$: limits = $brandAssets.limits;
-	$: pagination = $brandAssets.pagination;
+	/*
+	 * A first run has something to save even though there is no saved revision
+	 * to diff against — `countChanges` would say 0 and the Save button would sit
+	 * disabled over a fully detected kit.
+	 */
+	function hasAnything(kit) {
+		return Boolean(
+			kit?.logos?.length ||
+				kit?.colours?.length ||
+				kit?.fonts?.headings ||
+				kit?.fonts?.body ||
+				kit?.voice?.tones?.length ||
+				kit?.voice?.rule
+		);
+	}
 
-	const ASSET_TYPES = ['logo', 'font', 'color', 'image', 'icon'];
+	onMount(load);
 
-	async function loadAssets(type = null) {
-		isLoading = true;
-		selectedType = type;
+	async function load() {
+		loading = true;
+		loadError = null;
 		try {
-			await fetchBrandAssets({ type });
+			const res = await getBrandKit();
+			revision = res?.revision || 0;
+			savedAt = res?.savedAt || null;
+			website = res?.website || '';
+			usedBy = res?.usedBy || [];
+			locked = res?.locked === true;
+			saved = res?.kit || null;
+			draft = res?.kit ? structuredClone(res.kit) : emptyKit();
+			// The empty state is a state, not a failure: a team with no kit yet
+			// gets the dialog rather than an error or a blank page.
+			setupOpen = revision === 0 && !locked;
+		} catch (err) {
+			loadError = brandKitError(err).message;
 		} finally {
-			isLoading = false;
+			loading = false;
 		}
 	}
 
-	function openUploadModal(type = 'image') {
-		uploadType = type;
-		uploadForm = { name: '', description: '', tags: '', isPrimary: false };
-		selectedFile = null;
-		showUploadModal = true;
+	/* ------------------------------------------------------------ editing */
+
+	function setColour(role, hex) {
+		const next = [...draft.colours];
+		const at = next.findIndex((c) => c.role === role);
+		if (at === -1) next.push({ role, hex });
+		else next[at] = { ...next[at], hex };
+		draft = { ...draft, colours: next };
 	}
 
-	function closeUploadModal() {
-		showUploadModal = false;
-		selectedFile = null;
+	function addRole() {
+		// Named by position rather than prompting: the buyer renames in place,
+		// and a dialog for a label would be three clicks for a word.
+		const n = draft.colours.length + 1;
+		draft = { ...draft, colours: [...draft.colours, { role: `Colour ${n}`, hex: '#000000' }] };
 	}
 
-	function handleFileSelect(event) {
-		const file = event.target.files?.[0];
-		if (file) {
-			selectedFile = file;
-			if (!uploadForm.name) {
-				uploadForm.name = file.name.replace(/\.[^/.]+$/, '');
+	function darken(role) {
+		const current = draft.colours.find((c) => c.role === role)?.hex;
+		const next = darkenToPass(current);
+		if (!next) {
+			showToast('That colour cannot reach 4.5 : 1 without becoming black.', 'default', 4000);
+			return;
+		}
+		setColour(role, next);
+	}
+
+	function toggleTone(tone) {
+		const tones = draft.voice?.tones || [];
+		const has = tones.includes(tone);
+		// Two at most (locked decision). Choosing a third replaces the oldest
+		// rather than refusing, so the chips never feel stuck.
+		const next = has
+			? tones.filter((t) => t !== tone)
+			: [...tones, tone].slice(-MAX_TONES);
+		draft = { ...draft, voice: { ...draft.voice, tones: next } };
+	}
+
+	/**
+	 * The logo the buyer asked to remove, while the typed confirmation is open.
+	 * Null the rest of the time — the confirmation only exists for the one case
+	 * that needs it.
+	 */
+	let removing = null;
+	let typed = '';
+	let removeBusy = false;
+
+	/** No trimming games: it matches exactly or the button stays disabled. */
+	$: removeConfirmed = removing ? typed === `remove ${removing.kind}` : false;
+
+	function requestRemove(logo) {
+		const pinned = pinnedApprovedEditions(saved, usedBy, logo);
+		if (!pinned.length) {
+			// Nothing is holding it: drop it from the draft. Still not destructive
+			// — the kit is not written until Save, so this is undoable with Discard.
+			dropLogo(logo);
+			return;
+		}
+		typed = '';
+		removing = { ...logo, pinned };
+	}
+
+	function dropLogo(logo) {
+		draft = {
+			...draft,
+			logos: draft.logos.filter((l) => !sameLogo(l, logo))
+		};
+	}
+
+	async function confirmRemove() {
+		if (!removeConfirmed || removeBusy) return;
+		removeBusy = true;
+		try {
+			/*
+			 * The server is asked because the asset exists beyond this draft — the
+			 * pinned revisions still reference its bytes, and only the server knows
+			 * whether they can be released. It re-checks the typed confirmation
+			 * too; the client asking is a courtesy, the server refusing is the
+			 * guarantee.
+			 */
+			await deleteBrandAsset(removing.assetUid, typed);
+			dropLogo(removing);
+			removing = null;
+			typed = '';
+			notify.note('REMOVED FROM THE KIT', 'Approved editions keep the revision they were approved with.');
+		} catch (err) {
+			notify.fail('Remove asset', err, { retry: () => confirmRemove() });
+		} finally {
+			removeBusy = false;
+		}
+	}
+
+	async function pickFile(kind) {
+		uploadKind = kind;
+		if (kind === 'font') fontInput?.click();
+		else logoInput?.click();
+	}
+
+	async function onFile(event) {
+		const file = event.target?.files?.[0];
+		event.target.value = '';
+		if (!file) return;
+		try {
+			const asset = await uploadBrandFile(file, uploadKind);
+			if (uploadKind === 'font') {
+				draft = {
+					...draft,
+					fonts: { ...draft.fonts, headings: draft.fonts.headings || asset, body: draft.fonts.body || asset }
+				};
+			} else {
+				const logos = draft.logos.filter((l) => l.kind !== uploadKind);
+				draft = { ...draft, logos: [...logos, { ...asset, kind: uploadKind }] };
 			}
+		} catch (err) {
+			// No retry: the file input is empty again, so there is nothing to
+			// re-send without the visitor picking the file a second time.
+			notify.fail('Upload', err);
 		}
 	}
 
-	async function handleUpload() {
-		if (!selectedFile) {
-			toast.set({ message: 'Please select a file', type: 'error' });
-			return;
-		}
+	/* -------------------------------------------------------------- save */
 
-		isUploading = true;
+	async function save() {
+		if (saving || !editable) return;
+		saving = true;
 		try {
-			const tags = uploadForm.tags
-				? uploadForm.tags
-						.split(',')
-						.map((t) => t.trim())
-						.filter(Boolean)
-				: [];
+			const res = await saveBrandKitRevision(draft, revision);
+			revision = res.revision;
+			savedAt = res.savedAt || new Date().toISOString();
+			saved = structuredClone(draft);
+			usedBy = res.usedBy || usedBy;
+			detected = null;
 
-			await uploadAsset(selectedFile, {
-				type: uploadType,
-				name: uploadForm.name || selectedFile.name,
-				description: uploadForm.description,
-				tags,
-				isPrimary: uploadForm.isPrimary
-			});
-
-			analytics.trackBrandAssetCreated({
-				asset_type: uploadType,
-				asset_count: ($brandAssets.assets || []).length
-			});
-			toast.set({
-				message: `${ASSET_TYPE_LABELS[uploadType]} uploaded successfully!`,
-				type: 'success',
-				duration: 3000
-			});
-			closeUploadModal();
-		} catch (error) {
-			toast.set({ message: error.message || 'Upload failed', type: 'error' });
+		} catch (err) {
+			const e = brandKitError(err);
+			if (e.status === 409) {
+				// Another tab saved first. Reload rather than overwrite: the other
+				// version is somebody's work too.
+				notify.note('SOMEONE ELSE SAVED FIRST', 'Reloading their version so nothing is overwritten.');
+				await load();
+			} else {
+				notify.fail('Save kit', err, { retry: () => save() });
+			}
 		} finally {
-			isUploading = false;
+			saving = false;
 		}
 	}
 
-	function openColorModal() {
-		colorForm = { name: '', value: '#000000', category: 'primary', description: '' };
-		showColorModal = true;
+	function discard() {
+		draft = saved ? structuredClone(saved) : emptyKit();
+		detected = null;
 	}
 
-	function closeColorModal() {
-		showColorModal = false;
+	function onDetected(event) {
+		const result = event.detail;
+		website = result.website || website;
+		detected = result.found || null;
+		draft = result.kit || emptyKit();
+		setupOpen = false;
 	}
 
-	async function handleAddColor() {
-		if (!colorForm.name || !colorForm.value) {
-			toast.set({ message: 'Please fill in color name and value', type: 'error' });
-			return;
-		}
+	/* ------------------------------------------------------------ derived */
 
-		isUploading = true;
-		try {
-			await addColor(colorForm);
-			analytics.trackBrandAssetCreated({
-				asset_type: 'color',
-				asset_count: ($brandAssets.assets || []).length
-			});
-			toast.set({ message: 'Color added successfully!', type: 'success', duration: 3000 });
-			closeColorModal();
-		} catch (error) {
-			toast.set({ message: error.message || 'Failed to add color', type: 'error' });
-		} finally {
-			isUploading = false;
-		}
+	$: specimen = specimenHtml(draft);
+	$: failing = (draft.colours || []).filter(
+		(c) => c.role !== BACKGROUND_ROLE && contrastOnWhite(c.hex) !== null && !passesAA(c.hex)
+	);
+	$: markLogo = (draft.logos || []).find((l) => l.kind === 'mark') || null;
+	$: wordLogo = (draft.logos || []).find((l) => l.kind === 'wordmark') || null;
+
+	/** The foot line. Three different sentences, and each states a fact. */
+	$: footLine = detected
+		? `Found on ${website} · ${detected.logos} logo${detected.logos === 1 ? '' : 's'} · ${detected.colours} colour${detected.colours === 1 ? '' : 's'} · ${detected.fonts} font${detected.fonts === 1 ? '' : 's'} · nothing saved yet`
+		: dirty
+			? `${changes} change${changes === 1 ? '' : 's'} since rev ${revision} · not saved`
+			: revision > 0
+				? `rev ${revision} · saved ${relative(savedAt)} · used by ${usedBy.length} edition${usedBy.length === 1 ? '' : 's'}`
+				: 'Nothing saved yet';
+
+	$: footTone = detected || dirty ? 'current' : 'ready';
+
+	function relative(iso) {
+		if (!iso) return 'just now';
+		// Plain literal: the repo's eslint parser rejects numeric separators.
+		const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+		if (days <= 0) return 'today';
+		if (days === 1) return 'yesterday';
+		return `${days} days ago`;
 	}
-
-	function confirmDelete(asset) {
-		assetToDelete = asset;
-		showDeleteConfirm = true;
-	}
-
-	function closeDeleteConfirm() {
-		showDeleteConfirm = false;
-		assetToDelete = null;
-	}
-
-	async function handleDelete() {
-		if (!assetToDelete) return;
-
-		try {
-			await deleteAsset(assetToDelete.uid);
-			toast.set({ message: 'Asset deleted successfully', type: 'success', duration: 3000 });
-			closeDeleteConfirm();
-		} catch (error) {
-			toast.set({ message: error.message || 'Delete failed', type: 'error' });
-		}
-	}
-
-	function toggleSelectAsset(uid) {
-		if (selectedAssets.has(uid)) {
-			selectedAssets.delete(uid);
-		} else {
-			selectedAssets.add(uid);
-		}
-		selectedAssets = selectedAssets;
-	}
-
-	function selectAll() {
-		if (selectedAssets.size === assets.length) {
-			selectedAssets.clear();
-		} else {
-			selectedAssets = new Set(assets.map((a) => a.uid));
-		}
-		selectedAssets = selectedAssets;
-	}
-
-	async function handleBulkDelete() {
-		if (selectedAssets.size === 0) return;
-
-		try {
-			await deleteAssets(Array.from(selectedAssets));
-			toast.set({
-				message: `${selectedAssets.size} assets deleted`,
-				type: 'success',
-				duration: 3000
-			});
-			selectedAssets.clear();
-			selectedAssets = selectedAssets;
-		} catch (error) {
-			toast.set({ message: error.message || 'Delete failed', type: 'error' });
-		}
-	}
-
-	function copyToClipboard(text) {
-		sharedCopy(text);
-	}
-
-	function formatDate(dateString) {
-		return formatRelativeDate(dateString);
-	}
-
-	onMount(async () => {
-		unsubscribeUser = user.subscribe((u) => {
-			if (u) currentPlan = u.currentPlan;
-		});
-		await loadAssets();
-	});
-
-	onDestroy(() => {
-		unsubscribeUser();
-	});
 </script>
 
-<section class="min-h-full">
-	<div>
-		<!-- Page Header -->
-		<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 sm:mb-12">
-			<div>
-				<div
-					class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest rounded mb-3"
-				>
-					<span class="w-2 h-2 bg-brand-danger rounded-full" />
-					Asset Vault
+<svelte:head><title>Brand assets | Pictify.io</title></svelte:head>
+
+
+<input
+	type="file"
+	accept="image/svg+xml,image/png"
+	class="hidden"
+	bind:this={logoInput}
+	on:change={onFile}
+/>
+<input
+	type="file"
+	accept=".woff,.woff2,.ttf,.otf"
+	class="hidden"
+	bind:this={fontInput}
+	on:change={onFile}
+/>
+
+{#if setupOpen}
+	<BrandSetupDialog
+		{website}
+		on:detected={onDetected}
+		on:blank={() => {
+			draft = emptyKit();
+			setupOpen = false;
+		}}
+		on:upload={() => {
+			setupOpen = false;
+			pickFile('mark');
+		}}
+	/>
+{/if}
+
+<div class="min-h-full w-full px-6 py-8 lg:px-11 lg:py-9">
+	<div class="mx-auto flex max-w-page flex-col">
+		<!-- Header -->
+		<div class="flex items-end justify-between gap-6 border-b border-brand-rule pb-[22px]">
+			<div class="flex flex-col gap-1.5">
+				<div class="flex items-center gap-2.5">
+					<h1
+						class="font-display text-[32px] font-semibold leading-[38px] tracking-[-0.02em] text-brand-ink"
+					>
+						Brand assets
+					</h1>
+					{#if revision > 0}
+						<span
+							class="rounded-btn border border-brand-rule px-2 py-[3px] font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-slate"
+						>
+							{website || 'Kit'} · rev {revision}
+						</span>
+					{/if}
 				</div>
-				<h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-					Brand <span class="text-gray-900">Assets</span>
-				</h1>
+				<p class="font-sans text-[14px] leading-[20px] text-brand-slate">
+					Every design starts from this. Saving makes a new revision; approved editions keep theirs.
+				</p>
 			</div>
 
-			<!-- Stats / Plan -->
-			<div class="flex items-center gap-4 sm:gap-6 md:gap-8">
-				<div class="text-right">
-					<div class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
-						Total Assets
-					</div>
-					<div class="text-lg sm:text-xl font-black text-gray-900 tabular-nums">
-						{hasBrandAssetsAccess ? pagination.total || 0 : 'LOCKED'}
-					</div>
-				</div>
-				<div class="text-right border-l-2 border-gray-200 pl-4 sm:pl-6 md:gap-8">
-					<div class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
-						Current Plan
-					</div>
-					<div class="text-lg sm:text-xl font-black text-gray-900 uppercase">
-						{currentPlan || 'Starter'}
-					</div>
-				</div>
+			<div class="flex flex-shrink-0 gap-2">
+				{#if locked}
+					<!-- The one plum button on a locked page. Same kit, read-only. -->
+					<button
+						type="button"
+						class="flex h-10 items-center gap-2 rounded-btn bg-brand-plum px-4 font-sans text-[14px] font-medium text-white"
+					>
+						Unlock brand kit
+						<span class="block h-[7px] w-[7px] bg-brand-field" aria-hidden="true" />
+					</button>
+				{:else if detected}
+					<button
+						type="button"
+						on:click={() => (setupOpen = true)}
+						class="h-10 rounded-btn border border-brand-rule px-3.5 font-sans text-[14px] text-brand-ink"
+					>
+						Try another website
+					</button>
+					<button
+						type="button"
+						on:click={() => {
+							draft = emptyKit();
+							detected = null;
+						}}
+						class="h-10 rounded-btn border border-brand-rule px-3.5 font-sans text-[14px] text-brand-ink"
+					>
+						Start blank
+					</button>
+				{:else}
+					{#if website}
+						<button
+							type="button"
+							on:click={() => (setupOpen = true)}
+							class="h-10 rounded-btn border border-brand-rule px-3.5 font-sans text-[14px] text-brand-ink"
+						>
+							Re-detect from {website}
+						</button>
+					{/if}
+					<button
+						type="button"
+						class="h-10 rounded-btn border border-brand-rule px-3.5 font-sans text-[14px] text-brand-ink"
+					>
+						Versions
+					</button>
+				{/if}
 			</div>
 		</div>
 
-		<FeatureGate feature={FEATURES.BRAND_ASSETS}>
-			{#if !hasBrandAssetsAccess}
-				<!-- MOCK VIEW (Blurred Backdrop) -->
-				<div class="select-none opacity-50 grayscale transition-all duration-500">
-					<!-- Mock Filters & Actions -->
-					<div class="flex flex-wrap gap-2 mb-6 sm:mb-8 pointer-events-none">
-						<button
-							class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 bg-gray-900 text-white shadow-brutal-md"
-							>All</button
-						>
-						{#each ASSET_TYPES as type}
-							<button
-								class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 bg-white text-gray-600"
-							>
-								{ASSET_TYPE_LABELS[type]}s
-							</button>
-						{/each}
-
-						<div class="flex-grow" />
-
-						<button
-							class="px-4 py-2.5 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md flex items-center gap-2"
-						>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M12 4v16m8-8H4"
-								/></svg
-							>
-							Logo
-						</button>
-					</div>
-
-					<!-- Mock Grid -->
-					<div
-						class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 pointer-events-none"
-					>
-						{#each MOCK_ASSETS as asset}
-							<div
-								class="bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-xl relative"
-							>
-								<div
-									class="relative aspect-square bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] flex items-center justify-center overflow-hidden border-b-[3px] border-gray-900"
-								>
-									{#if asset.type === 'color'}
-										<div class="w-full h-full" style="background-color: {asset.value}" />
-									{:else if asset.type === 'font'}
-										<div class="text-center w-full px-4">
-											<span
-												class="text-5xl text-gray-900 block mb-2"
-												style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
-												>Aa</span
-											>
-										</div>
-									{:else if asset.type === 'logo' || asset.type === 'icon' || asset.type === 'image'}
-										<div
-											class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 font-black text-xs"
-										>
-											IMG
-										</div>
-									{/if}
-
-									<div class="absolute top-3 right-3">
-										<span
-											class="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-white text-gray-900 border-[2px] border-gray-900"
-										>
-											{asset.type}
-										</span>
-									</div>
-								</div>
-								<div class="p-4 bg-white">
-									<h3
-										class="font-black text-gray-900 text-xs uppercase tracking-wide truncate mb-1"
-									>
-										{asset.name}
-									</h3>
-									<div class="flex items-center justify-between">
-										<span class="text-[10px] font-bold text-gray-400 uppercase"
-											>{formatDate(asset.createdAt)}</span
-										>
-									</div>
-								</div>
-							</div>
-						{/each}
-					</div>
-				</div>
-			{:else}
-				<!-- Filter Tabs and Actions -->
-				<div class="flex flex-wrap gap-2 mb-6 sm:mb-8">
-					<button
-						on:click={() => loadAssets(null)}
-						class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all
-				{selectedType === null
-							? 'bg-gray-900 text-white shadow-brutal-md'
-							: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
-					>
-						All
-					</button>
-					{#each ASSET_TYPES as type}
-						<button
-							on:click={() => loadAssets(type)}
-							class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wide border-[2px] border-gray-900 transition-all flex items-center gap-2
-					{selectedType === type
-								? 'bg-gray-900 text-white shadow-brutal-md'
-								: 'bg-white text-gray-600 hover:text-gray-900 hover:shadow-brutal-sm'}"
-						>
-							{ASSET_TYPE_LABELS[type]}s
-							<span
-								class="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px] font-bold ml-1"
-							>
-								{counts[type] || 0}
-							</span>
-						</button>
-					{/each}
-
-					<div class="flex-grow" />
-
-					<button
-						on:click={() => openUploadModal('logo')}
-						class="px-4 py-2.5 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 4v16m8-8H4"
-							/></svg
-						>
-						Logo
-					</button>
-					<button
-						on:click={openColorModal}
-						class="px-4 py-2.5 bg-data-green text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-							/></svg
-						>
-						Color
-					</button>
-					<button
-						on:click={() => openUploadModal('font')}
-						class="px-4 py-2.5 bg-white text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
-							/></svg
-						>
-						Font
-					</button>
-					<button
-						on:click={() => openUploadModal('image')}
-						class="px-4 py-2.5 bg-white text-gray-900 text-xs font-black uppercase tracking-wide rounded-lg border-[2px] border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-							/></svg
-						>
-						Image
-					</button>
-				</div>
-
-				<!-- Bulk Actions (Conditional) -->
-				{#if selectedAssets.size > 0}
-					<div
-						class="bg-brand-danger text-white rounded-xl border-[3px] border-gray-900 p-4 mb-8 flex items-center justify-between shadow-brutal-lg animate-fade-in"
-					>
-						<div class="flex items-center gap-3">
-							<button
-								on:click={selectAll}
-								class="w-6 h-6 rounded-md border-2 border-white bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
-							>
-								{#if selectedAssets.size === assets.length}
-									<svg
-										class="w-4 h-4 text-white"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="3"
-											d="M5 13l4 4L19 7"
-										/></svg
-									>
-								{/if}
-							</button>
-							<span class="font-black uppercase tracking-wide text-sm"
-								>{selectedAssets.size} assets selected</span
-							>
-						</div>
-						<button
-							on:click={handleBulkDelete}
-							class="px-4 py-2 bg-white text-brand-danger rounded-lg border-[2px] border-gray-900 text-xs font-black uppercase tracking-wide hover:shadow-brutal-sm hover:-translate-y-0.5 transition-all flex items-center gap-2"
-						>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-								/></svg
-							>
-							Delete Selected
-						</button>
-					</div>
-				{/if}
-
-				<!-- Content Grid -->
-				<div class="relative min-h-[400px]">
-					{#if isLoading}
-						<div
-							class="absolute inset-0 flex items-center justify-center z-20 bg-brand-bg/80"
-						>
-							<Loader size="16" show={isLoading} />
-						</div>
-					{/if}
-
-					{#if assets.length === 0 && !isLoading}
-						<div
-							class="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border-[3px] border-gray-900 border-dashed shadow-sm"
-						>
-							<div
-								class="w-24 h-24 bg-gray-100 rounded-full border-[3px] border-gray-900 flex items-center justify-center mb-6 shadow-brutal-lg"
-							>
-								<svg
-									class="w-10 h-10 text-gray-400"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+		{#if loading}
+			<p class="pt-7 font-sans text-[13px] text-brand-mute">Loading the kit…</p>
+		{:else if loadError}
+			<p class="pt-7"><StatusSquare tone="blocked" label={loadError} /></p>
+		{:else}
+			<div class="flex items-start gap-10 pt-7">
+				<!-- The kit. Fixed label column, fixed content column. -->
+				<div
+					class="flex w-[752px] flex-shrink-0 flex-col rounded-[8px] border border-brand-rule bg-white {locked
+						? 'opacity-60'
+						: ''}"
+				>
+					<!-- Logo -->
+					<div class="flex items-start gap-4 border-b border-brand-rule px-[22px] py-5">
+						<div class="flex w-[130px] flex-shrink-0 flex-col gap-1.5 pt-1.5">
+							<span class="font-sans text-[13.5px] leading-[18px] text-brand-slate">Logo</span>
+							{#if detected}
+								<span class="flex items-center gap-[5px]">
+									<span
+										class="block h-[7px] w-[7px] border border-brand-ink {detected.logos
+											? 'bg-brand-field'
+											: ''}"
+										aria-hidden="true"
 									/>
-								</svg>
-							</div>
-							<h3 class="text-2xl font-black text-gray-900 uppercase tracking-wide mb-2">
-								{#if selectedType}
-									No {ASSET_TYPE_LABELS[selectedType]}s Found
-								{:else}
-									Asset Vault Empty
-								{/if}
-							</h3>
-							<p class="text-gray-500 font-bold max-w-md text-center mb-8">
-								Upload your brand assets to create a consistent design system across all your
-								templates.
-							</p>
-							<button
-								on:click={() =>
-									selectedType
-										? selectedType === 'color'
-											? openColorModal()
-											: openUploadModal(selectedType)
-										: openUploadModal('logo')}
-								class="px-8 py-4 bg-gray-900 text-white text-sm font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-wider"
-							>
-								Upload First Asset
-							</button>
+									<span class="font-mono text-[10px] uppercase tracking-[0.06em] text-brand-slate">
+										{detected.logos ? `Found · ${detected.logos}` : 'Not found'}
+									</span>
+								</span>
+							{/if}
 						</div>
-					{:else}
-						<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-							{#each assets as asset (asset.uid)}
-								<div
-									class="group bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-xl hover:shadow-brutal-2xl hover:-translate-y-1 transition-all duration-200 relative"
-								>
-									<!-- Selection Checkbox -->
-									<button
-										on:click|stopPropagation={() => toggleSelectAsset(asset.uid)}
-										class="absolute top-3 left-3 z-20 w-6 h-6 rounded bg-white border-[2px] border-gray-900 flex items-center justify-center shadow-sm hover:scale-110 transition-transform
-								{selectedAssets.has(asset.uid) ? 'bg-gray-900' : 'opacity-0 group-hover:opacity-100'}"
-									>
-										{#if selectedAssets.has(asset.uid)}
-											<svg
-												class="w-3.5 h-3.5 text-white"
-												fill="none"
-												stroke="currentColor"
-												viewBox="0 0 24 24"
-												><path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="3"
-													d="M5 13l4 4L19 7"
-												/></svg
-											>
-										{/if}
-									</button>
-
-									<!-- Asset Preview -->
-									<div
-										class="relative aspect-square bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] flex items-center justify-center overflow-hidden border-b-[3px] border-gray-900 group-hover:bg-gray-50 transition-colors"
-									>
-										{#if asset.type === 'color'}
-											<div class="w-full h-full" style="background-color: {asset.value}" />
-											<div
-												class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white px-3 py-1.5 rounded-lg border-[2px] border-gray-900 text-xs font-mono font-black text-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,0.2)]"
-											>
-												{asset.value}
-											</div>
-										{:else if asset.type === 'font'}
-											<div class="text-center w-full px-4">
-												<span
-													class="text-5xl text-gray-900 block mb-2"
-													style="font-family: '{asset.metadata?.fontFamily || asset.name}'">Aa</span
-												>
-												<span
-													class="text-[10px] font-mono font-bold text-gray-400 uppercase truncate block"
-													>{asset.metadata?.fontFamily || asset.name}</span
-												>
-											</div>
-										{:else}
-											<img
-												src={asset.url}
-												alt={asset.name}
-												class="w-full h-full object-contain p-6 drop-shadow-sm group-hover:scale-105 transition-transform duration-300"
-												loading="lazy"
-											/>
-										{/if}
-
-										<!-- Type Badge -->
-										<div class="absolute top-3 right-3">
+						<div class="flex w-[562px] flex-shrink-0 flex-col gap-2.5">
+							<div class="flex gap-2.5">
+								{#each [{ slot: 'mark', logo: markLogo, meta: 'Mark' }, { slot: 'wordmark', logo: wordLogo, meta: 'Wordmark' }] as entry (entry.slot)}
+									{#if entry.logo}
+										<div
+											class="flex min-w-0 flex-1 items-center gap-3 rounded-[6px] border p-3 {entry.slot ===
+											'mark'
+												? 'border-[1.5px] border-brand-ink'
+												: 'border-brand-rule'}"
+										>
 											<span
-												class="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-white text-gray-900 border-[2px] border-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]"
+												class="flex h-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-[6px] bg-brand-subtle {entry.slot ===
+												'mark'
+													? 'w-11'
+													: 'w-[84px]'}"
 											>
-												{asset.type}
+												{#if entry.logo.url}
+													<img
+														src={entry.logo.url}
+														alt=""
+														class="max-h-11 max-w-full object-contain"
+													/>
+												{/if}
 											</span>
-										</div>
-
-										<!-- Hover Overlay -->
-										<div
-											class="absolute inset-0 bg-gray-900/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-										/>
-
-										<!-- Action Buttons (visible on hover) -->
-										<div
-											class="absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0"
-										>
-											<button
-												on:click|stopPropagation={() =>
-													copyToClipboard(asset.type === 'color' ? asset.value : asset.url)}
-												class="w-8 h-8 bg-white rounded-lg border-[2px] border-gray-900 shadow-brutal-sm flex items-center justify-center hover:bg-gray-50 hover:-translate-y-0.5 transition-all"
-												title="Copy"
-											>
-												<svg
-													class="w-4 h-4 text-gray-700"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-													/></svg
+											<span class="flex min-w-0 flex-1 flex-col gap-0.5">
+												<span class="truncate font-sans text-[14px] leading-[18px] text-brand-ink"
+													>{entry.logo.name || `${entry.meta.toLowerCase()}.svg`}</span
 												>
-											</button>
-											<button
-												on:click|stopPropagation={() => confirmDelete(asset)}
-												class="w-8 h-8 bg-brand-danger rounded-lg border-[2px] border-gray-900 shadow-brutal-sm flex items-center justify-center hover:bg-data-red hover:-translate-y-0.5 transition-all"
-												title="Delete"
-											>
-												<svg
-													class="w-4 h-4 text-white"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-													/></svg
-												>
-											</button>
+												<span class="font-mono text-[10px] uppercase text-brand-mute">
+													{entry.meta}{entry.logo.bytes
+														? ` · ${Math.round(entry.logo.bytes / 1024)} KB`
+														: ''}
+												</span>
+											</span>
+											{#if editable}
+												<!-- Stacked, right-aligned: Replace over Remove (JKM-0). -->
+												<span class="flex flex-shrink-0 flex-col items-end gap-1">
+													<button
+														type="button"
+														on:click={() => pickFile(entry.slot)}
+														class="font-sans text-[13px] leading-4 text-brand-royal hover:underline"
+														>Replace</button
+													>
+													<button
+														type="button"
+														on:click={() => requestRemove(entry.logo)}
+														class="font-sans text-[13px] leading-4 text-brand-mute hover:text-brand-ink hover:underline"
+														>Remove</button
+													>
+												</span>
+											{/if}
 										</div>
-									</div>
-
-									<!-- Card Footer -->
-									<div class="p-4 bg-white">
-										<h3
-											class="font-black text-gray-900 text-xs uppercase tracking-wide truncate mb-1"
-											title={asset.name}
+									{:else}
+										<button
+											type="button"
+											disabled={!editable}
+											on:click={() => pickFile(entry.slot)}
+											class="flex h-[68px] min-w-0 flex-1 items-center justify-center rounded-[6px] border border-dashed border-brand-rule font-sans text-[13px] text-brand-mute disabled:opacity-60"
 										>
-											{asset.name}
-										</h3>
-										<div class="flex items-center justify-between">
-											<span class="text-[10px] font-bold text-gray-400 uppercase"
-												>{formatDate(asset.createdAt)}</span
-											>
-											{#if asset.isPrimary}
+											Add a {entry.meta.toLowerCase()}
+										</button>
+									{/if}
+								{/each}
+							</div>
+							<div class="flex items-center justify-between gap-4">
+								<span class="font-sans text-[12.5px] leading-4 text-brand-mute"
+									>SVG or PNG, at least 200 px wide. The mark goes on cards.</span
+								>
+								{#if editable}
+									<button
+										type="button"
+										on:click={() => pickFile('mark')}
+										class="flex-shrink-0 font-sans text-[13px] text-brand-royal hover:underline"
+										>+ Add a logo</button
+									>
+								{/if}
+							</div>
+						</div>
+					</div>
+
+					<!-- Colours -->
+					<div class="flex items-start gap-4 border-b border-brand-rule px-[22px] py-5">
+						<div class="flex w-[130px] flex-shrink-0 flex-col gap-1.5 pt-1.5">
+							<span class="font-sans text-[13.5px] leading-[18px] text-brand-slate">Colours</span>
+							{#if detected}
+								<span class="flex items-center gap-[5px]">
+									<span
+										class="block h-[7px] w-[7px] border border-brand-ink {detected.colours
+											? 'bg-brand-field'
+											: ''}"
+										aria-hidden="true"
+									/>
+									<span class="font-mono text-[10px] uppercase tracking-[0.06em] text-brand-slate">
+										{detected.colours ? `Found · ${detected.colours}` : 'Not found'}
+									</span>
+								</span>
+							{/if}
+						</div>
+						<div class="flex w-[562px] flex-shrink-0 flex-col gap-2.5">
+							<div class="flex gap-2.5">
+								{#each draft.colours as colour (colour.role)}
+									{@const ratio = contrastOnWhite(colour.hex)}
+									{@const background = colour.role === BACKGROUND_ROLE}
+									<div class="flex flex-1 flex-col gap-2">
+										<label class="block cursor-pointer">
+											<span class="sr-only">{colour.role} colour</span>
+											<input
+												type="color"
+												value={colour.hex}
+												disabled={!editable}
+												on:input={(e) => setColour(colour.role, e.currentTarget.value.toUpperCase())}
+												class="block h-14 w-full cursor-pointer appearance-none rounded-[6px] border-0 bg-transparent p-0 disabled:cursor-default"
+												style="background-color:{colour.hex}"
+											/>
+										</label>
+										<div class="flex items-center justify-between gap-2">
+											<span class="flex min-w-0 flex-col gap-px">
+												<span class="truncate font-sans text-[13.5px] leading-[18px] text-brand-ink"
+													>{colour.role}</span
+												>
+												<span class="font-mono text-[11px] leading-[14px] text-brand-mute"
+													>{colour.hex}</span
+												>
+											</span>
+											{#if background}
 												<span
-													class="w-2 h-2 rounded-full bg-brand-danger border border-gray-900"
-													title="Primary Asset"
-												/>
+													class="flex-shrink-0 font-mono text-[10px] uppercase tracking-[0.06em] text-brand-mute"
+													>Background</span
+												>
+											{:else if ratio !== null}
+												<span class="flex flex-shrink-0 items-center gap-[5px]">
+													<span
+														class="block h-[7px] w-[7px] {passesAA(colour.hex)
+															? 'bg-brand-proof'
+															: 'bg-brand-alarm'}"
+														aria-hidden="true"
+													/>
+													<span
+														class="font-mono text-[10px] uppercase tracking-[0.06em] text-brand-slate"
+														>{formatRatio(ratio)}</span
+													>
+												</span>
 											{/if}
 										</div>
 									</div>
+								{/each}
+								{#if editable}
+									<button
+										type="button"
+										on:click={addRole}
+										aria-label="Add a colour role"
+										class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-[6px] border border-dashed border-brand-mute font-sans text-[18px] text-brand-mute"
+										>+</button
+									>
+								{/if}
+							</div>
+
+							<!--
+								One line per failing colour, and it never blocks the save. The
+								sentence says what the consequence actually is — the AI will not
+								set words on it — rather than scolding the buyer for their brand.
+							-->
+							{#each failing as colour (colour.role)}
+								<div
+									class="flex items-center justify-between gap-3 rounded-[6px] bg-brand-subtle px-3 py-[9px]"
+								>
+									<span class="flex min-w-0 items-center gap-2">
+										<span class="block h-[7px] w-[7px] flex-shrink-0 bg-brand-alarm" aria-hidden="true" />
+										<span class="font-sans text-[12.5px] leading-4 text-brand-slate"
+											>{colour.role} is too light for text. It will be used for shapes only.</span
+										>
+									</span>
+									{#if editable}
+										<button
+											type="button"
+											on:click={() => darken(colour.role)}
+											class="flex-shrink-0 font-sans text-[12.5px] text-brand-royal hover:underline"
+											>Darken to pass</button
+										>
+									{/if}
 								</div>
 							{/each}
 						</div>
-					{/if}
-				</div>
-			{/if}
-		</FeatureGate>
-	</div>
-</section>
+					</div>
 
-<!-- Modals share the same design language -->
-{#if showUploadModal}
-	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-	<div
-		class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
-		on:click={closeUploadModal}
-		role="dialog"
-		aria-modal="true"
-		aria-labelledby="upload-modal-title"
-	>
-		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-		<div
-			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-brutal-3xl max-w-md w-full overflow-hidden"
-			on:click|stopPropagation
-		>
-			<div class="bg-gray-900 p-4 flex items-center justify-between">
-				<h2
-					id="upload-modal-title"
-					class="text-lg font-black text-white uppercase tracking-widest flex items-center gap-3"
-				>
-					<span class="text-brand-accent">Upload</span>
-					{ASSET_TYPE_LABELS[uploadType]}
-				</h2>
-				<button on:click={closeUploadModal} aria-label="Close upload modal" class="text-gray-400 hover:text-white">
-					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/></svg
-					>
-				</button>
-			</div>
-
-			<div class="p-6 space-y-5">
-				<!-- File Drop Zone -->
-				<label class="block group cursor-pointer">
-					<input
-						type="file"
-						accept={getAcceptString(uploadType)}
-						class="hidden"
-						bind:this={fileInput}
-						on:change={handleFileSelect}
-					/>
-					<div
-						class="w-full py-10 border-[3px] border-dashed rounded-xl transition-all relative overflow-hidden
-							{selectedFile
-							? 'border-data-green bg-data-green/10'
-							: 'border-gray-300 group-hover:border-gray-900 group-hover:bg-gray-50'}"
-					>
-						<div class="text-center relative z-10">
-							{#if selectedFile}
-								<div
-									class="w-12 h-12 bg-data-green rounded-full border-[3px] border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-sm"
-								>
-									<svg
-										class="w-6 h-6 text-gray-900"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M5 13l4 4L19 7"
-										/></svg
-									>
-								</div>
-								<p class="font-black text-gray-900 text-sm uppercase tracking-wide">
-									{selectedFile.name}
-								</p>
-								<p class="text-xs font-bold text-gray-500 mt-1 uppercase">Click to replace</p>
-							{:else}
-								<div
-									class="w-12 h-12 bg-white rounded-full border-[3px] border-gray-900 flex items-center justify-center mx-auto mb-3 shadow-[3px_3px_0_0_rgba(0,0,0,0.1)] group-hover:shadow-[4px_4px_0_0_rgba(0,0,0,0.2)] group-hover:-translate-y-0.5 transition-all"
-								>
-									<svg
-										class="w-6 h-6 text-gray-900"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-										/></svg
-									>
-								</div>
-								<p class="font-black text-gray-900 text-sm uppercase tracking-wide">
-									Drop file or click
-								</p>
-								<p class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-wider">
-									{#if uploadType === 'font'}
-										TTF, OTF, WOFF, WOFF2, EOT (Max 5MB)
-									{:else}
-										PNG, JPG, SVG (Max 10MB)
-									{/if}
-								</p>
+					<!-- Fonts -->
+					<div class="flex items-start gap-4 border-b border-brand-rule px-[22px] py-5">
+						<div class="flex w-[130px] flex-shrink-0 flex-col gap-1.5 pt-1.5">
+							<span class="font-sans text-[13.5px] leading-[18px] text-brand-slate">Fonts</span>
+							{#if detected}
+								<span class="flex items-center gap-[5px]">
+									<span
+										class="block h-[7px] w-[7px] border border-brand-ink {detected.fonts
+											? 'bg-brand-field'
+											: ''}"
+										aria-hidden="true"
+									/>
+									<span class="font-mono text-[10px] uppercase tracking-[0.06em] text-brand-slate">
+										{detected.fonts ? `Found · ${detected.fonts}` : 'Not found'}
+									</span>
+								</span>
 							{/if}
 						</div>
-					</div>
-				</label>
-
-				<!-- Inputs -->
-				<div class="space-y-4">
-					<div>
-						<label
-							for="upload-name"
-							class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-1"
-							>Asset Name</label
-						>
-						<input
-							id="upload-name"
-							type="text"
-							bind:value={uploadForm.name}
-							placeholder="e.g., Dark Logo Variant"
-							class="w-full px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-						/>
-					</div>
-
-					<div class="grid grid-cols-2 gap-4">
-						<div>
-							<label
-								for="upload-tags"
-								class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-1"
-								>Tags</label
-							>
-							<input
-								id="upload-tags"
-								type="text"
-								bind:value={uploadForm.tags}
-								placeholder="logo, dark, brand"
-								class="w-full px-4 py-3 bg-white border-[3px] border-gray-900 rounded-xl text-sm font-bold focus:outline-none focus:shadow-brutal-accent transition-all"
-							/>
-						</div>
-						<div class="flex items-end">
-							<label
-								class="flex items-center gap-3 cursor-pointer w-full p-3 bg-white border-[3px] border-gray-900 rounded-xl hover:bg-gray-50 transition-colors"
-							>
-								<input
-									type="checkbox"
-									bind:checked={uploadForm.isPrimary}
-									class="w-5 h-5 rounded border-[2px] border-gray-900 text-gray-900 focus:ring-0 checked:bg-gray-900"
-								/>
-								<span class="text-xs font-black text-gray-900 uppercase tracking-wide"
-									>Primary Asset</span
+						<div class="flex w-[562px] flex-shrink-0 flex-col gap-2.5">
+							<div class="flex gap-2.5">
+								{#each [{ slot: 'headings', label: 'headings' }, { slot: 'body', label: 'body' }] as entry (entry.slot)}
+									{@const font = draft.fonts?.[entry.slot]}
+									<div
+										class="flex min-w-0 flex-1 items-center gap-3 rounded-[6px] border border-brand-rule p-3"
+									>
+										<span
+											class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[6px] bg-brand-subtle font-sans text-[22px] leading-7 text-brand-ink {entry.slot ===
+											'headings'
+												? 'font-bold'
+												: ''}">Aa</span
+										>
+										<span class="flex min-w-0 flex-1 flex-col gap-0.5">
+											<span class="truncate font-sans text-[14px] leading-[18px] text-brand-ink">
+												{font?.family || 'Not set'} · {entry.label}
+											</span>
+											<span class="font-mono text-[11px] uppercase leading-[14px] text-brand-mute">
+												{#if !font}
+													Pick a font
+												{:else if font.source === 'upload'}
+													Uploaded · embedded
+												{:else if font.available === false}
+													<!-- JJI-0: detected but not on Google. Says so rather than
+													     silently substituting Inter behind the buyer's back. -->
+													Not available · upload the file or pick a match
+												{:else}
+													Google · {(font.weights || []).join(' ') || '400'}
+												{/if}
+											</span>
+										</span>
+										{#if editable}
+											<button
+												type="button"
+												on:click={() => pickFile('font')}
+												class="flex-shrink-0 font-sans text-[13px] text-brand-royal hover:underline"
+												>Change</button
+											>
+										{/if}
+									</div>
+								{/each}
+							</div>
+							<div class="flex items-center justify-between gap-4">
+								<span class="font-sans text-[12.5px] leading-4 text-brand-mute"
+									>Uploaded fonts are embedded in every card, so it looks the same in every inbox.</span
 								>
-							</label>
-						</div>
-					</div>
-				</div>
-
-				<!-- Actions -->
-				<div class="flex gap-3 pt-2">
-					<button
-						on:click={closeUploadModal}
-						class="flex-1 px-4 py-3 bg-white border-[3px] border-gray-900 text-gray-900 rounded-xl font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						Cancel
-					</button>
-					<button
-						on:click={handleUpload}
-						disabled={!selectedFile || isUploading}
-						class="flex-[2] px-4 py-3 bg-brand-danger text-white rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-					>
-						{#if isUploading}
-							Uploading...
-						{:else}
-							Upload Asset
-						{/if}
-					</button>
-				</div>
-			</div>
-		</div>
-	</div>
-{/if}
-
-<!-- Color Modal uses similar styling -->
-{#if showColorModal}
-	<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-	<div
-		class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
-		on:click={closeColorModal}
-		role="dialog"
-		aria-modal="true"
-	>
-		<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-		<div
-			class="bg-brand-bg rounded-2xl border-[3px] border-gray-900 shadow-brutal-3xl max-w-md w-full overflow-hidden"
-			on:click|stopPropagation
-		>
-			<div class="bg-gray-900 p-4 flex items-center justify-between">
-				<h2 class="text-lg font-black text-white uppercase tracking-widest flex items-center gap-3">
-					<span class="text-data-green">New</span> Color
-				</h2>
-				<button on:click={closeColorModal} aria-label="Close color modal" class="text-gray-400 hover:text-white">
-					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-						><path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/></svg
-					>
-				</button>
-			</div>
-
-			<div class="p-6 space-y-6">
-				<!-- Color Picker -->
-				<div class="flex gap-4">
-					<div
-						class="w-24 h-24 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg"
-						style="background-color: {colorForm.value}"
-					/>
-					<div class="flex-1 space-y-4">
-						<div>
-							<label
-								for="color-hex"
-								class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-1"
-								>Hex Code</label
-							>
-							<div class="flex gap-2">
-								<div
-									class="relative w-10 h-10 overflow-hidden rounded-lg border-[3px] border-gray-900"
-								>
-									<input
-										type="color"
-										bind:value={colorForm.value}
-										class="absolute -top-2 -left-2 w-16 h-16 cursor-pointer"
-									/>
-								</div>
-								<input
-									id="color-hex"
-									type="text"
-									bind:value={colorForm.value}
-									class="flex-1 px-3 py-2 bg-white border-[3px] border-gray-900 rounded-lg font-mono font-bold uppercase focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480]"
-								/>
+								{#if editable}
+									<button
+										type="button"
+										on:click={() => pickFile('font')}
+										class="flex-shrink-0 font-sans text-[13px] text-brand-royal hover:underline"
+										>Upload a font</button
+									>
+								{/if}
 							</div>
 						</div>
-						<div>
-							<label
-								for="color-name"
-								class="block text-xs font-black text-gray-900 uppercase tracking-wide mb-1"
-								>Name</label
-							>
+					</div>
+
+					<!-- Voice -->
+					<div class="flex items-start gap-4 px-[22px] py-5">
+						<div class="w-[130px] flex-shrink-0 pt-1.5">
+							<span class="font-sans text-[13.5px] leading-[18px] text-brand-slate">Voice</span>
+						</div>
+						<div class="flex w-[562px] flex-shrink-0 flex-col gap-2.5">
+							<div class="flex flex-wrap gap-1.5">
+								{#each TONE_CHIPS as tone (tone)}
+									{@const on = (draft.voice?.tones || []).includes(tone)}
+									<button
+										type="button"
+										disabled={!editable}
+										on:click={() => toggleTone(tone)}
+										aria-pressed={on}
+										class="rounded-full px-[11px] py-1.5 font-sans text-[13px] leading-4 {on
+											? 'border-[1.5px] border-brand-ink text-brand-ink'
+											: 'border border-brand-rule text-brand-slate'}">{tone}</button
+									>
+								{/each}
+							</div>
 							<input
-								id="color-name"
 								type="text"
-								bind:value={colorForm.name}
-								placeholder="e.g. Brand Blue"
-								class="w-full px-3 py-2 bg-white border-[3px] border-gray-900 rounded-lg font-bold focus:outline-none focus:shadow-[3px_3px_0_0_#ffc480]"
+								disabled={!editable}
+								bind:value={draft.voice.rule}
+								placeholder="One rule in your own words"
+								class="h-[38px] rounded-btn border border-brand-rule px-3 font-sans text-[14px] leading-[18px] text-brand-ink outline-none focus:border-brand-ink"
 							/>
+							<span class="font-sans text-[12.5px] leading-4 text-brand-mute"
+								>Shapes the AI’s wording for static text. Your numbers are never rewritten.</span
+							>
 						</div>
 					</div>
 				</div>
 
-				<!-- Actions -->
-				<div class="flex gap-3">
-					<button
-						on:click={closeColorModal}
-						class="flex-1 px-4 py-3 bg-white border-[3px] border-gray-900 text-gray-900 rounded-xl font-black uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						Cancel
-					</button>
-					<button
-						on:click={handleAddColor}
-						disabled={!colorForm.name || isUploading}
-						class="flex-[2] px-4 py-3 bg-data-green text-gray-900 rounded-xl font-black uppercase tracking-wide border-[3px] border-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
-					>
-						Add Color
-					</button>
+				<!-- Specimen + who is using this -->
+				<div class="flex w-[340px] flex-shrink-0 flex-col gap-6">
+					<div class="flex flex-col gap-2.5">
+						<p class="font-mono text-[11px] uppercase tracking-[0.06em] text-brand-mute">
+							How it looks · sample data
+						</p>
+						<!--
+							The standard card, re-rendered from the kit — not a swatch board.
+							The promise on this screen is "here is what your customers get",
+							and only the real layout can keep it.
+						-->
+						<CardPreview html={specimen} width={1200} height={800} displayWidth={340} />
+						<p class="font-sans text-[12.5px] leading-4 text-brand-slate">
+							Updates as you edit. Real designs pick which colours and fonts they use.
+						</p>
+					</div>
+
+					<div class="flex flex-col">
+						<div class="border-b border-brand-ink pb-2.5">
+							<p class="font-mono text-[11px] uppercase tracking-[0.06em] text-brand-mute">Used by</p>
+						</div>
+						{#each usedBy as use (use.editionUid)}
+							<div class="flex items-center justify-between gap-3 border-b border-brand-rule py-[11px]">
+								<span class="flex min-w-0 flex-col gap-px">
+									<span class="truncate font-sans text-[14px] leading-[18px] text-brand-ink"
+										>{use.name}</span
+									>
+									<span class="font-sans text-[12px] leading-4 text-brand-slate"
+										>design rev {use.designRevision} · {use.state}</span
+									>
+								</span>
+								<span class="flex-shrink-0 font-mono text-[11px] leading-[14px] text-brand-slate"
+									>brand rev {use.brandRevision}</span
+								>
+							</div>
+						{:else}
+							<p class="py-[11px] font-sans text-[12.5px] text-brand-mute">
+								No editions are using this kit yet.
+							</p>
+						{/each}
+						{#if usedBy.length}
+							<p class="pt-2.5 font-sans text-[12.5px] leading-4 text-brand-mute">
+								Saving makes brand rev {revision + 1}. Drafts pick it up next time they open; approved
+								editions keep the revision they were approved with.
+							</p>
+						{/if}
+					</div>
 				</div>
+			</div>
+
+			<!-- Foot -->
+			<div
+				class="mt-7 flex items-center justify-between gap-6 border-t border-brand-rule pt-5"
+			>
+				<StatusSquare tone={footTone} label={footLine} />
+				{#if editable}
+					<div class="flex flex-shrink-0 gap-2">
+						<button
+							type="button"
+							on:click={discard}
+							disabled={!dirty || saving}
+							class="h-10 rounded-btn border border-brand-rule px-3.5 font-sans text-[14px] text-brand-ink disabled:opacity-40"
+							>Discard</button
+						>
+						<button
+							type="button"
+							on:click={save}
+							disabled={!dirty || saving}
+							class="flex h-10 items-center gap-2 rounded-btn bg-brand-plum px-4 font-sans text-[14px] font-medium text-white disabled:opacity-40"
+						>
+							{saving ? 'Saving…' : `Save as rev ${revision + 1}`}
+							<span class="block h-[7px] w-[7px] bg-brand-field" aria-hidden="true" />
+						</button>
+					</div>
+				{/if}
+			</div>
+		{/if}
+	</div>
+</div>
+
+<!--
+	Removing a logo an approved edition is pinned to. The D10 typed-confirmation
+	pattern (board `DLG-0`), reused rather than re-invented so the gesture that
+	means "I understand this is not an undo" is the same everywhere.
+	
+	NAMES THE EDITIONS, because "used by 2 editions" is not enough to decide
+	with — the buyer needs to know WHICH, and that those editions keep what they
+	were approved with either way.
+-->
+{#if removing}
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center bg-brand-ink/40 px-5"
+		role="dialog"
+		aria-modal="true"
+		aria-label="Remove logo"
+	>
+		<div class="w-full max-w-[520px] rounded-md border-2 border-brand-ink bg-white p-6">
+			<h2 class="font-display text-[19px] font-bold text-brand-ink">
+				Remove the {removing.kind}
+			</h2>
+			<p class="mt-2.5 font-sans text-[14px] text-brand-slate">
+				This takes it out of the kit from the next revision onward. Editions already approved keep
+				the revision they were approved with, so nothing a customer has received changes.
+			</p>
+
+			<p class="mt-4 font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-mute">
+				Approved editions pinned to it
+			</p>
+			<ul class="mt-1.5 border-t border-brand-rule">
+				{#each removing.pinned as use (use.editionUid)}
+					<li class="flex items-center justify-between gap-3 border-b border-brand-rule py-2">
+						<span class="truncate font-sans text-[13.5px] text-brand-ink">{use.name}</span>
+						<span class="flex-shrink-0 font-mono text-[11px] text-brand-slate"
+							>brand rev {use.brandRevision}</span
+						>
+					</li>
+				{/each}
+			</ul>
+
+			<label class="mt-5 block">
+				<span class="font-sans text-[13px] text-brand-slate"
+					>Type <span class="font-mono text-brand-ink">remove {removing.kind}</span> to confirm</span
+				>
+				<input
+					bind:value={typed}
+					autocomplete="off"
+					class="mt-1.5 h-11 w-full rounded-btn border border-brand-rule px-3 font-mono text-[13.5px] text-brand-ink"
+				/>
+			</label>
+
+			<div class="mt-5 flex items-center justify-end gap-3">
+				<button
+					type="button"
+					on:click={() => {
+						removing = null;
+						typed = '';
+					}}
+					class="flex h-11 items-center rounded-btn border border-brand-rule px-4 font-sans text-[13.5px] text-brand-slate"
+					>Cancel</button
+				>
+				<button
+					type="button"
+					on:click={confirmRemove}
+					disabled={!removeConfirmed || removeBusy}
+					class="flex h-11 items-center rounded-btn px-4 font-sans text-[13.5px] {removeConfirmed
+						? 'bg-brand-alarm text-white'
+						: 'cursor-not-allowed bg-brand-subtle text-brand-mute'}"
+					>{removeBusy ? 'Removing…' : 'Remove from the kit'}</button
+				>
 			</div>
 		</div>
 	</div>
 {/if}
-
-<!-- Toast -->
-<Toast />

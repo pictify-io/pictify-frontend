@@ -13,6 +13,23 @@ const createImagePublic = async ({ html, width, height, selector, url, fileExten
 	return response;
 };
 
+/**
+ * What the guest has left today, from the server. TS-B1/TS-B3.
+ *
+ * The meter must not be the browser's own tally — counting downloads in
+ * localStorage is exactly what made the old "5 free today" a decoration. A
+ * peek, so reading the number does not spend one.
+ */
+const getGuestRenderQuota = async () => {
+	try {
+		return await backend.get('/image/public/quota');
+	} catch {
+		// A meter that cannot reach the server shows nothing rather than zero:
+		// telling someone they are out when we do not know is worse than silence.
+		return null;
+	}
+};
+
 const createGifPublic = async ({ html, width, height, duration }) => {
 	const response = await backend.post('/gif/public', {
 		html,
@@ -24,7 +41,7 @@ const createGifPublic = async ({ html, width, height, duration }) => {
 };
 
 const createOgImage = async ({ template, heading, description, logo, apiKey }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		'/image/og-image',
 		{
@@ -39,7 +56,7 @@ const createOgImage = async ({ template, heading, description, logo, apiKey }) =
 };
 
 const createImage = async ({ html, width, height, selector, url, fileExtension, apiKey }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		'/image',
 		{
@@ -56,7 +73,7 @@ const createImage = async ({ html, width, height, selector, url, fileExtension, 
 };
 
 const createGif = async ({ html, width, height, framesPerSecond, selector, apiKey }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		'/gif',
 		{
@@ -72,7 +89,7 @@ const createGif = async ({ html, width, height, framesPerSecond, selector, apiKe
 };
 
 const createAgentScreenshot = async ({ prompt, apiKey }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		'/image/agent-screenshot',
 		{
@@ -92,7 +109,7 @@ const createCanvasImage = async ({
 	fileExtension,
 	apiKey
 }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		'/image/canvas',
 		{
@@ -109,7 +126,7 @@ const createCanvasImage = async ({
 };
 
 const captureGif = async ({ url, width, height, frameDurationSeconds, quality, apiKey }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		'/gif/capture',
 		{
@@ -125,7 +142,7 @@ const captureGif = async ({ url, width, height, frameDurationSeconds, quality, a
 };
 
 const renderTemplate = async ({ templateUid, variables, outputFormat, apiKey }) => {
-	const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+	const headers = apiKey ? { Authorization: `Bearer ${apiKey}`, 'X-Pictify-Client': 'dashboard' } : {};
 	const response = await backend.post(
 		`/templates/${templateUid}/render`,
 		{
@@ -145,7 +162,8 @@ const getOgImageTemplates = async (apiKey) => {
 
 const checkApiHealth = async () => {
 	try {
-		await backend.get('/healthcheck');
+		// The render pipeline's health route — there is no bare /healthcheck.
+		await backend.get('/image/health');
 		return true;
 	} catch (error) {
 		return false;
@@ -246,6 +264,7 @@ const createAgentScreenshotStream = async (prompt, onMessage, apiKey) => {
 export {
 	createGifPublic,
 	createImagePublic,
+	getGuestRenderQuota,
 	createOgImage,
 	getOgImageTemplates,
 	checkApiHealth,

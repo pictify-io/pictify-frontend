@@ -40,12 +40,8 @@ export async function getBillingDashboard({ refresh = false } = {}) {
  * @returns {Promise<Object|null>} Subscription data or null
  */
 export async function getSubscription() {
-	try {
-		const response = await backend.get('/api/billing/subscription');
-		return response;
-	} catch (error) {
-		return null;
-	}
+	const response = await backend.get('/api/billing/subscription');
+	return response;
 }
 
 /**

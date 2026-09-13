@@ -139,8 +139,8 @@ export default function CaptionsPanel() {
         )}
 
         {error && (
-          <div className="mt-3 rounded border border-brand-danger/40 bg-brand-danger/10 p-2">
-            <p className="text-[11px] leading-snug text-brand-danger">{error}</p>
+          <div className="mt-3 rounded border border-brand-alarm/40 bg-brand-alarm/10 p-2">
+            <p className="text-[11px] leading-snug text-brand-alarm">{error}</p>
           </div>
         )}
 

@@ -1,124 +1,222 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
+	/**
+	 * /pricing — "Pay by the render".
+	 *
+	 * Every number on this page comes from src/config/plan-features.js. Nothing
+	 * is typed twice: the cards, the "what a month buys" tiles and the
+	 * comparison table all read the same config, so the page cannot drift from
+	 * what the product actually enforces.
+	 *
+	 * Free is a strip under the three paid cards rather than a fourth card —
+	 * the paid tiers keep the stage, and Free is still the first column of the
+	 * comparison table.
+	 *
+	 * No Enterprise surface (owner decision 2026-08-22), and no retired
+	 * features: experiments, dynamic links, storage connectors and white-label
+	 * are gone from the table even though their keys still exist for
+	 * grandfathered accounts.
+	 */
+	import { HERO_CLUSTER, BASELINE_RUN } from '$lib/components/landing/hero-clusters.js';
+	import Nav from '$lib/components/landing/Nav.svelte';
+	import Footer from '$lib/components/landing/Footer.svelte';
+	import PixelCluster from '$lib/components/landing/PixelCluster.svelte';
 	import { getProducts } from '../../api/product';
 	import { onMount, onDestroy } from 'svelte';
 	import { user } from '../../store/user.store';
 	import { goto } from '$app/navigation';
-	import { analytics } from '$lib/analytics.js';
-	import { fade, fly } from 'svelte/transition';
+	import { analytics } from '$lib/telemetry.js';
 	import {
 		PLANS,
 		PLAN_DISPLAY_NAMES,
 		PLAN_PRICING,
-		PLAN_ORDER,
 		FEATURES,
 		PLAN_FEATURES,
-		FEATURE_METADATA,
-		FEATURE_CATEGORIES,
 		formatLimit,
-		OVERAGE_PRICING,
-		formatOverageRate
+		formatOverageRate,
+		normalizePlan
 	} from '../../config/plan-features.js';
 
 	let plans = [];
-	let selectedPlanIndex = 0;
-	let didManuallySelect = false;
-	let requestsNeeded = 1500;
-	let maxRequests = 0;
-	let minRequests = 0;
-	let recommendedPlanIndex = 0;
-	let selectedPlan = null;
-	let sliderIndex = 0;
 	let showAnnual = true;
+	let isLoggedIn = false;
+	let unsubscribe = () => {};
 
 	const numberFormatter = new Intl.NumberFormat('en-US');
+
+	/*
+	 * The head, from the same source as the table. /pricing shipped with no
+	 * <title>, no description and no canonical — search had nothing to show for
+	 * the page that closes the sale.
+	 *
+	 * The free tier's render count is read, not typed: a description promising
+	 * a number the table contradicts is worse than no description. PDF output
+	 * is deliberately absent from the sentence — it is false on the free plan.
+	 */
+	const freeRenders = PLAN_FEATURES[PLANS.STARTER][FEATURES.RENDERS];
+	const metaTitle = 'Pricing: Pay by the Render, Free Tier Included | Pictify';
+	const metaDescription = `Three plans, one render pool. Start free with ${numberFormatter.format(
+		freeRenders
+	)} renders a month, then pay by the render. Overage never surprises you.`;
+	const canonical = 'https://pictify.io/pricing';
 	const popularPlanNames = ['Pro'];
 
-	// Feature comparison data for the table
-	const featureComparisonRows = [
-		// Core Features
+	const CARD_PLANS = [PLANS.BASIC, PLANS.STANDARD, PLANS.BUSINESS];
+	const TABLE_PLANS = [PLANS.STARTER, PLANS.BASIC, PLANS.STANDARD, PLANS.BUSINESS];
+
+	/**
+	 * The plan the signed-in visitor is already on, so their card can say so.
+	 * `currentPlan` is what the user store carries (see store/user.store.js);
+	 * normalizePlan maps the API's names onto the config's ids, the same way
+	 * /dashboard/upgrade does.
+	 */
+	$: currentPlan = $user?.currentPlan ? normalizePlan($user.currentPlan) : null;
+
+	const feature = (plan, key) => PLAN_FEATURES[plan]?.[key];
+	const renders = (plan) => feature(plan, FEATURES.RENDERS);
+
+	/**
+	 * Prices as a map, not a helper. A helper that reads `showAnnual` from scope
+	 * is invisible to the compiler, so the template would keep the first price
+	 * it rendered while the "/mo" suffix flipped — the toggle would look broken
+	 * in exactly the way that is hard to notice.
+	 */
+	$: price = Object.fromEntries(
+		TABLE_PLANS.map((plan) => [plan, PLAN_PRICING[plan]?.[showAnnual ? 'annual' : 'monthly']])
+	);
+
+	/** One line per card, describing the tier in renders rather than adjectives. */
+	const CARD_BLURB = {
+		[PLANS.BASIC]: 'One workflow in production.',
+		[PLANS.STANDARD]: 'Several workflows, no template cap.',
+		[PLANS.BUSINESS]: 'Rendering inside your product.'
+	};
+
+	/**
+	 * Card bullets. Each one is derived from config so a limit change lands here
+	 * too; the leading line names the tier below it, Dub-style.
+	 */
+	$: CARD_BULLETS = {
+		[PLANS.BASIC]: [
+			'PDF output',
+			`Batch render from CSV (${feature(PLANS.BASIC, FEATURES.BATCH_ITEMS_PER_REQUEST)} rows)`,
+			`${formatLimit(
+				feature(PLANS.BASIC, FEATURES.TEMPLATES_SAVED)
+			)} templates · ${numberFormatter.format(
+				feature(PLANS.BASIC, FEATURES.AI_CREDITS)
+			)} AI credits`,
+			'Webhooks & brand assets',
+			`${feature(PLANS.BASIC, FEATURES.TEAM_SEATS)} seats`
+		],
+		[PLANS.STANDARD]: [
+			'Unlimited templates',
+			`${numberFormatter.format(
+				feature(PLANS.STANDARD, FEATURES.AI_CREDITS)
+			)} AI credits · video renders`,
+			`${feature(PLANS.STANDARD, FEATURES.TEAM_SEATS)} seats`,
+			`Batches up to ${numberFormatter.format(
+				feature(PLANS.STANDARD, FEATURES.BATCH_ITEMS_PER_REQUEST)
+			)} rows`,
+			'Monthly spending cap on overage'
+		],
+		[PLANS.BUSINESS]: [
+			`${numberFormatter.format(feature(PLANS.BUSINESS, FEATURES.AI_CREDITS))} AI credits`,
+			`${feature(PLANS.BUSINESS, FEATURES.TEAM_SEATS)} seats`,
+			'Dedicated render queue',
+			`Batches up to ${numberFormatter.format(
+				feature(PLANS.BUSINESS, FEATURES.BATCH_ITEMS_PER_REQUEST)
+			)} rows`,
+			'Audit logs'
+		]
+	};
+
+	const PREVIOUS_TIER = {
+		[PLANS.BASIC]: 'FREE',
+		[PLANS.STANDARD]: 'BASIC',
+		[PLANS.BUSINESS]: 'PRO'
+	};
+
+	/**
+	 * What a month of renders buys. Deliberately static marketing copy — these
+	 * make volumes concrete and are not derived from anything.
+	 */
+	const VOLUME_TILES = [
 		{
-			category: 'Core Features',
-			features: [
-				{ label: 'Monthly Renders', feature: FEATURES.RENDERS, unit: '/mo' },
-				{
-					label: 'API Access',
-					feature: FEATURES.API_ACCESS,
-					description: 'Full REST API access'
-				}
+			label: 'BASIC · 1,000',
+			title: 'One cohort of certificates',
+			body: '1,000 attendees, one CSV, one afternoon. Or 30 OG images a day for a blog.',
+			tint: 'bg-brand-powder'
+		},
+		{
+			label: 'PRO · 10,000',
+			title: 'Every invoice, every order',
+			body: '~330 PDFs a day from a webhook, with room for social cards on top.',
+			tint: 'bg-brand-field'
+		},
+		{
+			label: 'BUSINESS · 40,000',
+			title: 'A feature in your product',
+			body: 'Personalised images for every user, under half a cent each after the pool.',
+			tint: 'bg-brand-rose'
+		}
+	];
+
+	/**
+	 * Comparison rows. Every row reads a FEATURES key or is marked `all` for
+	 * things every plan gets; nothing here is hand-typed per plan.
+	 */
+	const COMPARISON = [
+		{
+			group: 'RENDERS',
+			rows: [
+				{ label: 'Renders per month', kind: 'number', key: FEATURES.RENDERS },
+				{ label: 'Overage per render', kind: 'overage' },
+				{ label: 'PNG · JPG · WebP · GIF', kind: 'all' },
+				{ label: 'PDF output', kind: 'bool', key: FEATURES.PDF_OUTPUT },
+				{ label: 'Video renders', kind: 'all' }
 			]
 		},
-		// Output Formats
 		{
-			category: 'Output Formats',
-			features: [
-				{ label: 'PNG, JPG & GIF', feature: null, allPlans: true },
-				{ label: 'PDF Export', feature: FEATURES.PDF_OUTPUT },
+			group: 'BUILD & AUTOMATE',
+			rows: [
+				{ label: 'Saved templates', kind: 'limit', key: FEATURES.TEMPLATES_SAVED },
+				{ label: 'Batch render from CSV / Sheets', kind: 'bool', key: FEATURES.BATCH_RENDER },
+				{ label: 'Rows per batch request', kind: 'number', key: FEATURES.BATCH_ITEMS_PER_REQUEST },
+				{ label: 'Webhooks', kind: 'bool', key: FEATURES.WEBHOOKS },
 				{
-					label: 'Video Templates (MP4 & GIF)',
-					feature: null,
-					allPlans: true,
-					description: 'Video studio + AI generation'
-				}
-			]
-		},
-		// Templates & Assets
-		{
-			category: 'Templates & Assets',
-			features: [
-				{ label: 'Saved Templates', feature: FEATURES.TEMPLATES_SAVED },
-				{ label: 'Brand Assets', feature: FEATURES.BRAND_ASSETS }
-			]
-		},
-		// Automation
-		{
-			category: 'Automation',
-			features: [
-				{
-					label: 'Workflow runs (CSV & webhook)',
-					feature: null,
-					allPlans: true,
-					description: 'CSV or webhook in, documents out, email delivery'
+					label: 'AI credits / month (copilot, captions, AI video)',
+					kind: 'number',
+					key: FEATURES.AI_CREDITS
 				},
-				{ label: 'Batch Rendering', feature: FEATURES.BATCH_RENDER },
-				{ label: 'Items per Batch', feature: FEATURES.BATCH_ITEMS_PER_REQUEST },
-				{ label: 'Webhooks', feature: FEATURES.WEBHOOKS }
+				{ label: 'API access · MCP server · SDKs', kind: 'all' }
 			]
 		},
-		// AI Features
 		{
-			category: 'AI Features',
-			features: [
-				{
-					label: 'AI Credits',
-					feature: FEATURES.AI_CREDITS,
-					unit: '/mo',
-					description: 'Copilot (templates & video), AI video generation & captions'
-				}
-			]
-		},
-		// Team & Enterprise
-		{
-			category: 'Team & Enterprise',
-			features: [
-				{ label: 'Team Seats', feature: FEATURES.TEAM_SEATS },
-				{
-					label: 'Storage Connectors',
-					feature: FEATURES.STORAGE_CONNECTORS,
-					description: 'S3, GCS, Cloudinary'
-				},
-				{ label: 'SSO/SAML', feature: FEATURES.SSO_SAML },
-				{ label: 'Audit Logs', feature: FEATURES.AUDIT_LOGS },
-				{ label: 'White Label', feature: FEATURES.WHITE_LABEL }
+			group: 'TEAM',
+			rows: [
+				{ label: 'Seats', kind: 'number', key: FEATURES.TEAM_SEATS },
+				{ label: 'Brand assets library', kind: 'bool', key: FEATURES.BRAND_ASSETS },
+				{ label: 'Audit logs', kind: 'bool', key: FEATURES.AUDIT_LOGS }
 			]
 		}
 	];
 
-	// Plans to show as pricing cards (paid only - Free is in comparison table)
-	const pricingCardPlans = [PLANS.BASIC, PLANS.STANDARD, PLANS.BUSINESS];
-	// Plans to show in the feature comparison table (includes Free)
-	const comparisonPlans = [PLANS.STARTER, PLANS.BASIC, PLANS.STANDARD, PLANS.BUSINESS];
+	/** Renders one comparison cell from config; returns a string or a boolean. */
+	function cell(row, plan) {
+		if (row.kind === 'all') return true;
+		if (row.kind === 'overage') {
+			const rate = formatOverageRate(plan);
+			return rate || '—';
+		}
+		const value = feature(plan, row.key);
+		if (row.kind === 'bool') return value === true;
+		if (row.kind === 'limit') return formatLimit(value);
+		if (row.kind === 'number') {
+			if (value === null) return 'Unlimited';
+			if (!value) return '—';
+			return numberFormatter.format(value);
+		}
+		return '—';
+	}
 
 	const FAQs = [
 		{
@@ -172,77 +270,6 @@
 			isOpened: false
 		}
 	];
-
-	let isLoggedIn = false;
-	let unsubscribe = () => {};
-
-	onMount(async () => {
-		analytics.trackPricingViewed({ source: 'public_pricing' });
-
-		const response = await getProducts();
-		plans = (response?.data ?? [])
-			.filter((plan) => plan && typeof plan.request_per_month === 'number')
-			.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
-
-		if (plans.length) {
-			const defaultPlanIndex = plans.findIndex((plan) => plan.request_per_month >= requestsNeeded);
-			selectedPlanIndex = defaultPlanIndex >= 0 ? defaultPlanIndex : plans.length - 1;
-			requestsNeeded = plans[selectedPlanIndex].request_per_month;
-			sliderIndex = selectedPlanIndex;
-		}
-
-		unsubscribe = user.subscribe((u) => {
-			isLoggedIn = !!u.email;
-		});
-	});
-
-	onDestroy(() => {
-		isLoggedIn = false;
-		unsubscribe();
-	});
-
-	const sliderStep = 50;
-
-	const ensureNumber = (value) => {
-		if (typeof value === 'number') return value;
-		const numeric = Number(value ?? 0);
-		return Number.isNaN(numeric) ? null : numeric;
-	};
-
-	const clampRequests = (value) => {
-		if (!plans.length) return ensureNumber(value) ?? 0;
-		const numeric = ensureNumber(value);
-		if (numeric === null) return minRequests || 0;
-		const min = minRequests || 0;
-		const max = maxRequests || numeric;
-		if (numeric < min) return min;
-		if (numeric > max) return max;
-		return numeric;
-	};
-
-	const formatRequests = (value) => {
-		const numeric = ensureNumber(value);
-		if (numeric === null) return '-';
-		if (numeric >= 1_000_000) {
-			return `${(numeric / 1_000_000).toFixed(numeric % 1_000_000 === 0 ? 0 : 1)}M requests/mo`;
-		}
-		if (numeric >= 1_000) {
-			return `${(numeric / 1_000).toFixed(numeric % 1_000 === 0 ? 0 : 1)}K requests/mo`;
-		}
-		return `${numberFormatter.format(numeric)} requests/mo`;
-	};
-
-	const formatRequestsShort = (value) => {
-		const numeric = ensureNumber(value);
-		if (numeric === null) return '-';
-		if (numeric >= 1_000_000) {
-			return `${(numeric / 1_000_000).toFixed(numeric % 1_000_000 === 0 ? 0 : 1)}M`;
-		}
-		if (numeric >= 1_000) {
-			return `${(numeric / 1_000).toFixed(numeric % 1_000 === 0 ? 0 : 1)}K`;
-		}
-		return numberFormatter.format(numeric);
-	};
 
 	const selectPlanHandler = (planName) => {
 		// Map internal plan IDs to API product names (API returns "Pro", config uses "standard")
@@ -299,716 +326,563 @@
 		}
 	};
 
-	const handleRequestsChange = (value) => {
-		const numeric = clampRequests(value);
-		didManuallySelect = false;
-		requestsNeeded = numeric;
-	};
-
-	const handlePlanClick = (index) => {
-		didManuallySelect = true;
-		selectedPlanIndex = index;
-		sliderIndex = index;
-		const plan = plans[index];
-		if (plan?.request_per_month) {
-			requestsNeeded = plan.request_per_month;
-		}
-	};
-
-	const purchasePlan = (event, index) => {
-		event?.stopPropagation?.();
-		const plan = plans[index];
-		selectPlanHandler(plan?.name);
-	};
-
-	const handleRowKeyDown = (event, index) => {
-		if (event.key === 'Enter' || event.key === ' ') {
-			event.preventDefault();
-			handlePlanClick(index);
-		}
-	};
-
-	const clampSliderIndex = (value) => {
-		if (!plans.length) return 0;
-		const numeric = Math.round(Number(value ?? 0));
-		if (Number.isNaN(numeric)) return 0;
-		if (numeric < 0) return 0;
-		if (numeric >= plans.length) return plans.length - 1;
-		return numeric;
-	};
-
-	const handleSliderChange = (value) => {
-		const index = clampSliderIndex(value);
-		sliderIndex = index;
-		didManuallySelect = false;
-		selectedPlanIndex = index;
-		const plan = plans[index];
-		if (plan?.request_per_month) {
-			requestsNeeded = plan.request_per_month;
-		}
-	};
-
-	const resetToRecommendation = () => {
-		didManuallySelect = false;
-		const plan = plans[recommendedPlanIndex];
-		if (plan?.request_per_month) {
-			requestsNeeded = plan.request_per_month;
-		}
-		sliderIndex = recommendedPlanIndex;
-	};
-
-	// Format feature value for display in comparison table
-	function formatFeatureValue(planId, feature, unit = '') {
-		if (!feature) return null;
-		const value = PLAN_FEATURES[planId]?.[feature];
-		if (value === null) return 'Unlimited';
-		if (value === true) return true;
-		if (value === false) return false;
-		if (typeof value === 'number') {
-			return formatLimit(value) + unit;
-		}
-		return value;
+	/** Free's CTA goes to signup, not checkout. */
+	function startOnFree(location) {
+		analytics.track('pricing_plan_click', {
+			plan: 'free',
+			billing_interval: showAnnual ? 'annual' : 'monthly',
+			cta_location: location
+		});
+		goto('/signup?redirect=/dashboard');
 	}
 
-	// Get price for a plan (pass isAnnual for Svelte reactivity)
-	function getPlanPrice(planId, isAnnual = false) {
-		const pricing = PLAN_PRICING[planId];
-		if (!pricing) return 'Custom';
-		const price = isAnnual ? pricing.annual : pricing.monthly;
-		if (price === null) return 'Custom';
-		if (price === 0) return 'Free';
-		return `$${price}`;
+	function choosePlan(planId, location) {
+		analytics.track('pricing_plan_click', {
+			plan: PLAN_DISPLAY_NAMES[planId],
+			billing_interval: showAnnual ? 'annual' : 'monthly',
+			cta_location: location
+		});
+		selectPlanHandler(planId);
 	}
 
-	$: maxRequests = plans.length ? Math.max(...plans.map((plan) => plan.request_per_month ?? 0)) : 0;
+	onMount(async () => {
+		analytics.trackPricingViewed({ source: 'public_pricing' });
+		const response = await getProducts();
+		plans = (response?.data ?? [])
+			.filter((plan) => plan && typeof plan.request_per_month === 'number')
+			.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+		unsubscribe = user.subscribe((u) => {
+			isLoggedIn = !!u.email;
+		});
+	});
 
-	$: minRequests = plans.length ? Math.min(...plans.map((plan) => plan.request_per_month ?? 0)) : 0;
-
-	$: requestsNeeded = clampRequests(requestsNeeded);
-
-	$: recommendedPlanIndex = plans.length
-		? plans.findIndex((plan) => plan.request_per_month >= requestsNeeded)
-		: 0;
-
-	$: recommendedPlanIndex =
-		recommendedPlanIndex === -1 && plans.length ? plans.length - 1 : recommendedPlanIndex;
-
-	$: if (plans.length && !didManuallySelect && recommendedPlanIndex !== selectedPlanIndex) {
-		selectedPlanIndex = recommendedPlanIndex;
-	}
-
-	$: selectedPlan = plans[selectedPlanIndex] ?? null;
-
-	$: if (plans.length) {
-		const clamped = clampSliderIndex(sliderIndex);
-		if (clamped !== sliderIndex) {
-			sliderIndex = clamped;
-		}
-	}
-
-	$: if (plans.length && selectedPlanIndex !== clampSliderIndex(sliderIndex)) {
-		sliderIndex = clampSliderIndex(selectedPlanIndex);
-	}
+	onDestroy(() => {
+		isLoggedIn = false;
+		unsubscribe();
+	});
 </script>
 
 <svelte:head>
-	<meta property="og:image" content="https://media.pictify.io/cmnij-1775406943351.png" />
-	<meta name="twitter:image" content="https://media.pictify.io/cmnij-1775406943351.png" />
+	<title>{metaTitle}</title>
+	<meta name="description" content={metaDescription} />
+	<link rel="canonical" href={canonical} />
+
+	<!-- Open Graph -->
+	<meta property="og:title" content={metaTitle} />
+	<meta property="og:description" content={metaDescription} />
+	<meta property="og:url" content={canonical} />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Pictify" />
+	<meta property="og:image" content="https://pictify.io/og/v2/pricing.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+
+	<!-- Twitter Card -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content={metaTitle} />
+	<meta name="twitter:description" content={metaDescription} />
+	<meta name="twitter:image" content="https://pictify.io/og/v2/pricing.png" />
 </svelte:head>
 
-<section class="bg-brand-bg min-h-screen overflow-x-hidden">
+<div class="landing-v2 flex min-h-screen w-full flex-col bg-brand-canvas">
 	<Nav />
-	<main class="relative z-10">
-		<div class="relative py-24 lg:py-32">
-			<!-- Background Grid for Density -->
+
+	<!-- ── Hero ──────────────────────────────────────────────────────── -->
+	<section class="relative w-full overflow-hidden bg-brand-field">
+		<PixelCluster
+			cells={HERO_CLUSTER}
+			cell={22}
+			origin="e"
+			delay={320}
+			cycle={3}
+			class="right-0 top-6 hidden lg:block"
+		/>
+		<PixelCluster
+			cells={BASELINE_RUN}
+			cell={14}
+			origin="w"
+			delay={520}
+			class="-bottom-3 left-[34%] hidden lg:block"
+		/>
+		<div
+			class="relative mx-auto flex w-full max-w-page flex-col gap-3 px-5 py-12 lg:px-10 lg:py-[72px]"
+		>
+			<p class="font-mono text-[11px] tracking-[0.06em] text-brand-royal">
+				PRICING <span class="text-brand-mute">·</span>
+				<span class="text-brand-ink">BY THE RENDER</span>
+			</p>
+			<h1
+				class="font-display text-[40px] font-extrabold leading-[1.02] tracking-[-0.02em] text-brand-ink lg:text-[56px] lg:leading-[60px]"
+			>
+				Pay by the render.
+			</h1>
+			<p
+				class="max-w-[620px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
+			>
+				One render is one image, PDF, GIF or video. Same price whether it comes from the API, a CSV
+				row or a webhook. Start on Free, no card.
+			</p>
+			<p class="mt-1 font-mono text-[11px] tracking-[0.06em] text-brand-ink">
+				FREE FOREVER TIER · CANCEL ANYTIME · ANNUAL SAVES 20%
+			</p>
+		</div>
+	</section>
+
+	<main class="w-full">
+		<!-- ── Toggle ────────────────────────────────────────────────── -->
+		<div
+			class="mx-auto flex w-full max-w-page flex-col gap-4 px-5 pt-10 lg:flex-row lg:items-center lg:justify-between lg:px-10"
+		>
+			<p class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">
+				THREE PLANS · ONE RENDER POOL · OVERAGE NEVER SURPRISES YOU
+			</p>
+
 			<div
-				class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
-			/>
-
-			<div class="relative mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-6 md:px-10">
-				<!-- Hero Content -->
-				<div
-					class="flex flex-col items-center text-center gap-8 max-w-4xl mx-auto relative z-10 pt-12"
+				class="flex w-max items-center gap-1 rounded-full border border-brand-ink bg-brand-paper p-1"
+				role="group"
+				aria-label="Billing interval"
+			>
+				<button
+					type="button"
+					aria-pressed={!showAnnual}
+					on:click={() => (showAnnual = false)}
+					class="rounded-full px-3.5 py-1.5 font-mono text-[11px] tracking-[0.06em] transition-colors {showAnnual
+						? 'text-brand-slate hover:text-brand-ink'
+						: 'bg-brand-ink text-white'}"
 				>
-					<!-- Pill Badge -->
+					MONTHLY
+				</button>
+				<button
+					type="button"
+					aria-pressed={showAnnual}
+					on:click={() => (showAnnual = true)}
+					class="flex items-center gap-2 rounded-full px-3.5 py-1.5 font-mono text-[11px] tracking-[0.06em] transition-colors {showAnnual
+						? 'bg-brand-ink text-white'
+						: 'text-brand-slate hover:text-brand-ink'}"
+				>
+					ANNUAL
+					<span class="bg-brand-field px-1.5 py-0.5 text-[10px] text-brand-ink">−20%</span>
+				</button>
+			</div>
+		</div>
+
+		<!-- ── Paid cards ────────────────────────────────────────────── -->
+		<div class="mx-auto w-full max-w-page px-5 pt-5 lg:px-10">
+			<div class="grid grid-cols-1 gap-6 md:grid-cols-2 min-[1200px]:grid-cols-3">
+				{#each CARD_PLANS as planId (planId)}
+					{@const isPopular = popularPlanNames.includes(PLAN_DISPLAY_NAMES[planId])}
+					{@const isCurrent = currentPlan === planId}
 					<div
-						class="inline-flex items-center gap-2 px-5 py-2 bg-white rounded-full border-[3px] border-gray-900 shadow-brutal-lg mb-4 transform -rotate-1 hover:rotate-0 transition-transform"
+						class="flex flex-col overflow-hidden rounded-card border-[1.5px] border-brand-ink {isPopular
+							? 'bg-brand-ink shadow-[6px_6px_0_0_#FF48B0] md:order-first min-[1200px]:order-none'
+							: 'bg-brand-paper'}"
 					>
-						<span class="w-2.5 h-2.5 bg-brand-danger rounded-full animate-pulse" />
-						<span class="text-xs font-black text-gray-900 uppercase tracking-widest"
-							>No Hidden Fees</span
-						>
-					</div>
+						<div class="flex flex-col gap-3.5 px-6 pb-5 pt-6">
+							<div class="flex items-center justify-between">
+								<h2
+									class="font-display text-[21px] font-bold leading-[26px] tracking-[-0.015em] {isPopular
+										? 'text-white'
+										: 'text-brand-ink'}"
+								>
+									{PLAN_DISPLAY_NAMES[planId]}
+								</h2>
+								{#if isCurrent}
+									<span
+										class="border border-brand-proof bg-brand-proof/10 px-2 py-0.5 font-mono text-[10px] tracking-[0.06em] {isPopular
+											? 'text-white'
+											: 'text-brand-ink'}"
+									>
+										CURRENT PLAN
+									</span>
+								{:else if isPopular}
+									<span
+										class="bg-brand-field px-2 py-0.5 font-mono text-[10px] tracking-[0.06em] text-brand-ink"
+									>
+										MOST TEAMS
+									</span>
+								{/if}
+							</div>
 
-					<h1
-						class="text-4xl md:text-5xl 2xl:text-7xl font-black text-gray-900 tracking-[-0.03em] leading-tight mb-6"
-					>
-						Simple, transparent <br />
-						<span class="relative inline-block text-brand-danger mt-1">
-							Pricing
-							<svg
-								class="absolute w-[105%] h-6 -bottom-2 -left-[2.5%] text-gray-900 opacity-100"
-								viewBox="0 0 100 10"
-								preserveAspectRatio="none"
+							<div class="flex flex-col gap-0.5">
+								<p
+									class="font-display text-[44px] font-bold leading-[46px] tracking-[-0.02em] lg:text-[50px] lg:leading-[52px] {isPopular
+										? 'text-white'
+										: 'text-brand-ink'}"
+								>
+									{numberFormatter.format(renders(planId))}
+								</p>
+								<p class="font-mono text-xs tracking-[0.06em] text-brand-mute">RENDERS / MONTH</p>
+							</div>
+
+							<div class="flex items-baseline gap-1.5">
+								<span
+									class="font-sans text-2xl font-semibold leading-[30px] {isPopular
+										? 'text-white'
+										: 'text-brand-ink'}"
+								>
+									${price[planId]}
+								</span>
+								<span class="font-sans text-sm leading-[18px] text-brand-mute">
+									{showAnnual ? '/mo billed annually' : '/mo'}
+								</span>
+							</div>
+
+							<p
+								class="font-sans text-sm leading-[21px] {isPopular
+									? 'text-brand-press-text'
+									: 'text-brand-slate'}"
 							>
-								<path d="M0 5 Q 50 15 100 5" stroke="currentColor" stroke-width="4" fill="none" />
-							</svg>
-						</span>
-					</h1>
+								{CARD_BLURB[planId]}
+								{formatOverageRate(planId)} a render past the pool.
+							</p>
 
-					<p
-						class="text-lg md:text-2xl text-gray-700 font-bold max-w-3xl leading-relaxed tracking-tight"
-					>
-						Stop overpaying for renders. Get full API access, <br class="hidden md:block" />
-						high-performance infrastructure, and
-						<span class="relative inline-block px-2 mx-1">
-							<span
-								class="absolute inset-0 bg-data-green/30 -skew-y-2 rounded-lg border-2 border-transparent"
-							/>
-							<span class="relative text-gray-900">scale as you grow.</span>
-						</span>
-					</p>
-
-					<!-- Chunky Billing Toggle -->
-					<div
-						class="mt-10 relative inline-flex p-2 bg-white rounded-xl border-[3px] border-gray-900 shadow-brutal-xl"
-					>
-						<div class="absolute -top-4 -right-4 z-20">
-							<span
-								class="px-3 py-1.5 bg-brand-danger text-white text-[11px] font-black uppercase tracking-widest rounded border-[2px] border-gray-900 shadow-brutal-sm rotate-12 block transform origin-bottom-left animate-bounce [animation-duration:3s]"
-							>
-								Save 20%
-							</span>
+							{#if isCurrent}
+								<span
+									class="flex items-center justify-center rounded-lg border-[1.5px] border-brand-proof p-3 font-sans text-[15px] font-semibold {isPopular
+										? 'text-white'
+										: 'text-brand-ink'}"
+								>
+									You're on this
+								</span>
+							{:else}
+								<button
+									type="button"
+									on:click={() => choosePlan(planId, 'card')}
+									class="flex items-center justify-center rounded-lg p-3 font-sans text-[15px] font-semibold transition-opacity hover:opacity-90 {isPopular
+										? 'bg-brand-field text-brand-ink'
+										: 'border-[1.5px] border-brand-ink text-brand-ink'}"
+								>
+									Choose {PLAN_DISPLAY_NAMES[planId]}
+								</button>
+							{/if}
 						</div>
-
-						<button
-							class="relative z-10 px-10 lg:px-8 py-4 lg:py-3 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {!showAnnual
-								? 'bg-brand-accent text-gray-900 shadow-sm border-2 border-gray-900'
-								: 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}"
-							on:click={() => (showAnnual = false)}
-						>
-							Monthly
-						</button>
-						<button
-							class="relative z-10 px-10 lg:px-8 py-4 lg:py-3 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200 {showAnnual
-								? 'bg-brand-accent text-gray-900 shadow-sm border-2 border-gray-900'
-								: 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}"
-							on:click={() => (showAnnual = true)}
-						>
-							Annual
-						</button>
-					</div>
-
-					<!-- Trust/Social Proof -->
-					<div class="mt-8 flex items-center gap-2 text-sm font-bold text-gray-500">
-						<svg class="w-5 h-5 text-gray-900" fill="currentColor" viewBox="0 0 20 20"
-							><path
-								fill-rule="evenodd"
-								d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-								clip-rule="evenodd"
-							/></svg
-						>
-						<span>Cancel anytime. No credit card required for free tier.</span>
-					</div>
-				</div>
-
-				<!-- Free Tier Note -->
-				<div class="text-center relative z-10">
-					<p class="text-base font-bold text-gray-500">
-						Just exploring? Start with our <button
-							on:click={() => selectPlanHandler(PLANS.STARTER)}
-							class="text-brand-danger underline underline-offset-4 decoration-2 hover:text-[#e55a5a] transition-colors font-black"
-							>Free plan: 50 renders/mo</button
-						>. No credit card needed.
-					</p>
-				</div>
-
-				<!-- Plan Cards Grid -->
-				<div
-					class="grid grid-cols-1 md:grid-cols-3 gap-8 xl:gap-10 items-stretch justify-center relative z-10 max-w-5xl mx-auto"
-				>
-					{#each pricingCardPlans as planId (planId + '-' + showAnnual)}
-						{@const isPopular = popularPlanNames.includes(PLAN_DISPLAY_NAMES[planId])}
-						{@const price = getPlanPrice(planId, showAnnual)}
-						{@const renders = PLAN_FEATURES[planId]?.[FEATURES.RENDERS]}
 
 						<div
-							class="relative flex flex-col p-6 h-full bg-white rounded-2xl border-[3px] border-gray-900 transition-all duration-300
-							{isPopular
-								? 'shadow-brutal-3xl lg:-mt-6 lg:mb-6 z-20 scale-[1.02] bg-brand-bg'
-								: 'shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-1'}"
+							class="flex flex-col gap-2 border-t px-6 pb-6 pt-[18px] {isPopular
+								? 'border-white/15'
+								: 'border-brand-rule'}"
 						>
-							{#if isPopular}
-								<div
-									class="absolute -top-5 left-1/2 -translate-x-1/2 px-4 py-2 bg-brand-accent text-gray-900 text-xs font-black uppercase tracking-widest rounded-lg border-[3px] border-gray-900 shadow-brutal-md whitespace-nowrap z-30"
-								>
-									Most Popular
-								</div>
-							{/if}
-
-							<div class="mb-6 border-b-[3px] border-gray-100 pb-6 relative">
-								<!-- Card Decoration -->
-								<div class="absolute -top-2 -right-2 w-8 h-8 opacity-10 bg-gray-900 rounded-full" />
-
-								<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight">
-									{PLAN_DISPLAY_NAMES[planId]}
-								</h3>
-								<p class="text-sm font-bold text-gray-500 mt-2 min-h-[40px] leading-snug">
-									{#if planId === PLANS.BASIC}
-										All features, lower volume. Great for solo devs & small projects.
-									{:else if planId === PLANS.STANDARD}
-										For teams & startups scaling documents, images & video.
-									{:else if planId === PLANS.BUSINESS}
-										Unlimited scale, enterprise security & dedicated support.
-									{:else}
-										Flexible plan for your needs.
-									{/if}
-								</p>
-							</div>
-
-							<div class="mb-8">
-								<div class="flex items-baseline gap-2">
-									{#if showAnnual && PLAN_PRICING[planId]?.monthly > 0}
-										<span class="text-2xl font-bold text-gray-400 line-through"
-											>${PLAN_PRICING[planId].monthly}</span
-										>
-									{/if}
-									<span class="text-5xl font-black text-gray-900 tracking-tighter">{price}</span>
-									{#if price !== 'Free' && price !== 'Custom'}
-										<span class="text-gray-500 font-bold text-lg">/mo</span>
-									{/if}
-								</div>
-								{#if showAnnual && PLAN_PRICING[planId]?.monthly > 0}
-									{@const monthlyCost = PLAN_PRICING[planId].monthly}
-									{@const annualCost = PLAN_PRICING[planId].annual}
-									{@const yearlySavings = (monthlyCost - annualCost) * 12}
-									<div
-										class="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-brand-success/10 text-brand-success text-xs font-bold rounded-md border border-brand-success/30"
-									>
-										<svg
-											class="w-3.5 h-3.5"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-											stroke-width="2.5"
-										>
-											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-										</svg>
-										Save ${yearlySavings}/year
-									</div>
-								{/if}
-							</div>
-
-							<ul class="space-y-4 flex-1 mb-8">
-								<!-- Render Limit (Highlighted) -->
-								<li
-									class="flex items-start gap-3 text-sm font-bold text-gray-900 bg-gray-50 p-3 rounded-lg border-2 border-gray-200 border-dashed"
-								>
-									<div
-										class="w-6 h-6 rounded bg-[#c6e0ff] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
-									>
-										<svg
-											class="w-3.5 h-3.5 text-gray-900"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-											stroke-width="4"
-										>
-											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-										</svg>
-									</div>
-									<div class="flex flex-col mt-0.5">
-										<span><strong>{formatLimit(renders)}</strong> renders/mo</span>
-										{#if OVERAGE_PRICING[planId]?.eligible}
-											<span class="text-xs text-gray-500 font-normal"
-												>then {formatOverageRate(planId)}/render</span
-											>
-										{/if}
-									</div>
-								</li>
-
-								<!-- AI credits (separate pool: copilot, AI generation, captions) -->
-								{#if PLAN_FEATURES[planId]?.[FEATURES.AI_CREDITS]}
-									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
-										<div
-											class="w-6 h-6 rounded bg-[#c6e0ff] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
-										>
-											<svg
-												class="w-3.5 h-3.5 text-gray-900"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-												stroke-width="4"
-											>
-												<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-											</svg>
-										</div>
-										<div class="flex flex-col mt-0.5">
-											<span
-												><strong>{formatLimit(PLAN_FEATURES[planId][FEATURES.AI_CREDITS])}</strong> AI
-												credits/mo</span
-											>
-											<span class="text-xs text-gray-500 font-normal"
-												>Copilot (templates & video), AI video generation & captions</span
-											>
-										</div>
-									</li>
-								{/if}
-
-								<!-- Specific Features with Icons -->
-								{#if PLAN_FEATURES[planId]?.[FEATURES.BATCH_RENDER]}
-									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
-										<div
-											class="w-6 h-6 rounded bg-[#a2ffc1] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
-										>
-											<svg
-												class="w-3.5 h-3.5 text-gray-900"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-												stroke-width="3"
-											>
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-												/>
-											</svg>
-										</div>
-										<span class="mt-0.5">Batch processing</span>
-									</li>
-								{/if}
-								{#if PLAN_FEATURES[planId]?.[FEATURES.TEAM_SEATS] !== 1}
-									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
-										<div
-											class="w-6 h-6 rounded bg-[#e5e7eb] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
-										>
-											<svg
-												class="w-3.5 h-3.5 text-gray-900"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-												stroke-width="3"
-											>
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-												/>
-											</svg>
-										</div>
-										<span class="mt-0.5"
-											>{formatLimit(PLAN_FEATURES[planId]?.[FEATURES.TEAM_SEATS])} team seats</span
-										>
-									</li>
-								{/if}
-								{#if PLAN_FEATURES[planId]?.[FEATURES.STORAGE_CONNECTORS]}
-									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
-										<div
-											class="w-6 h-6 rounded bg-[#c6e0ff] border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
-										>
-											<svg
-												class="w-3.5 h-3.5 text-gray-900"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-												stroke-width="3"
-											>
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
-												/>
-											</svg>
-										</div>
-										<span class="mt-0.5">Cloud storage</span>
-									</li>
-								{/if}
-								{#if PLAN_FEATURES[planId]?.[FEATURES.SSO_SAML]}
-									<li class="flex items-start gap-3 text-sm font-bold text-gray-800 px-3">
-										<div
-											class="w-6 h-6 rounded bg-brand-danger/20 border-2 border-gray-900 flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0_0_#1f2937]"
-										>
-											<svg
-												class="w-3.5 h-3.5 text-gray-900"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-												stroke-width="3"
-											>
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-												/>
-											</svg>
-										</div>
-										<span class="mt-0.5">SSO & Security</span>
-									</li>
-								{/if}
-							</ul>
-
-							<button
-								class="w-full py-4 lg:py-3 px-6 rounded-xl font-black text-sm uppercase tracking-widest border-[3px] border-gray-900 transition-all
-								{isPopular
-									? 'bg-brand-accent text-gray-900 shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm'
-									: 'bg-white text-gray-900 hover:bg-gray-50 shadow-brutal-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-sm'}"
-								on:click={() => selectPlanHandler(planId)}
+							<p
+								class="pb-1 font-mono text-[11px] leading-5 tracking-[0.06em] {isPopular
+									? 'text-white'
+									: 'text-brand-ink'}"
 							>
-								Get Started
-							</button>
+								EVERYTHING IN {PREVIOUS_TIER[planId]}, PLUS
+							</p>
+							{#each CARD_BULLETS[planId] as bullet (bullet)}
+								<div class="flex gap-2">
+									<span
+										class="mt-[7px] h-1.5 w-1.5 flex-shrink-0 bg-brand-proof"
+										aria-hidden="true"
+									/>
+									<span
+										class="font-sans text-sm leading-5 {isPopular
+											? 'text-brand-press-text'
+											: 'text-brand-slate'}"
+									>
+										{bullet}
+									</span>
+								</div>
+							{/each}
 						</div>
-					{/each}
-				</div>
-
-				<!-- Feature Comparison Table -->
-				<div class="flex flex-col gap-10 mt-16 max-w-6xl mx-auto w-full relative z-10">
-					<!-- Table Decoration -->
-					<div
-						class="absolute -top-10 -left-10 w-24 h-24 bg-[#a2ffc1] rounded-full blur-[60px] opacity-50 pointer-events-none"
-					/>
-
-					<div class="text-center">
-						<h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">
-							Compare Features
-						</h2>
-						<p class="text-xl text-gray-700 font-bold max-w-2xl mx-auto">
-							Detailed breakdown of everything included.
-						</p>
 					</div>
+				{/each}
+			</div>
+		</div>
 
-					<div
-						class="overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-white shadow-brutal-2xl"
+		<!-- ── Free strip ────────────────────────────────────────────── -->
+		<div class="mx-auto w-full max-w-page px-5 pt-6 lg:px-10">
+			<div
+				class="flex flex-col gap-4 rounded-card border-[1.5px] border-brand-ink bg-brand-paper px-6 py-5 lg:flex-row lg:items-center lg:gap-8"
+			>
+				<div class="flex items-baseline gap-3 lg:w-[220px] lg:flex-shrink-0">
+					<h2
+						class="font-display text-[21px] font-bold leading-[26px] tracking-[-0.015em] text-brand-ink"
 					>
-						<div class="overflow-x-auto">
-							<table class="w-full min-w-[1000px] border-collapse">
-								<thead>
-									<tr>
-										<th
-											class="text-left p-6 font-black text-gray-900 w-64 bg-gray-50 border-b-[3px] border-r-[3px] border-gray-900 sticky left-0 z-10"
-										>
-											Feature
-										</th>
-										{#each comparisonPlans as planId (planId + '-' + showAnnual)}
-											{@const isPopular = popularPlanNames.includes(PLAN_DISPLAY_NAMES[planId])}
-											<th
-												class="p-6 text-center border-b-[3px] border-r-[3px] last:border-r-0 border-gray-900 {isPopular
-													? 'bg-brand-accent/10'
-													: 'bg-white'}"
-											>
-												<span class="font-black text-lg text-gray-900 block uppercase tracking-wide"
-													>{PLAN_DISPLAY_NAMES[planId]}</span
-												>
-												<span class="text-sm font-bold text-gray-500 mt-1 block">
-													{getPlanPrice(planId, showAnnual)}/mo
-													{#if showAnnual && PLAN_PRICING[planId]?.monthly > 0}
-														<span class="text-brand-success text-xs block">billed annually</span>
-													{/if}
-												</span>
-											</th>
-										{/each}
-									</tr>
-								</thead>
-								<tbody>
-									{#each featureComparisonRows as section}
-										<tr>
-											<td
-												colspan={comparisonPlans.length + 1}
-												class="p-4 bg-gray-900 text-white font-black text-sm uppercase tracking-widest border-b-[3px] border-gray-900"
-											>
-												{section.category}
-											</td>
-										</tr>
-										{#each section.features as row, rowIndex}
-											<tr class="hover:bg-gray-50 transition-colors">
-												<td
-													class="p-5 text-gray-900 border-b border-r-[3px] last:border-b-0 border-gray-900 bg-white sticky left-0 z-10"
-												>
-													<div class="flex flex-col">
-														<span class="font-bold text-base">{row.label}</span>
-														{#if row.description}
-															<span class="text-xs text-gray-500 font-bold mt-1"
-																>{row.description}</span
-															>
-														{/if}
-													</div>
-												</td>
-												{#each comparisonPlans as planId (planId + '-' + showAnnual)}
-													{@const isPopular = popularPlanNames.includes(PLAN_DISPLAY_NAMES[planId])}
-													{@const value = row.allPlans
-														? true
-														: formatFeatureValue(planId, row.feature, row.unit || '')}
-													<td
-														class="p-5 text-center border-b border-r-[3px] last:border-r-0 last:border-b-0 border-gray-900 {isPopular
-															? 'bg-brand-accent/5'
-															: ''}"
-													>
-														{#if value === true}
-															<div
-																class="w-8 h-8 rounded-lg bg-[#a2ffc1] border-2 border-gray-900 flex items-center justify-center mx-auto shadow-brutal-sm"
-															>
-																<svg
-																	class="w-5 h-5 text-gray-900"
-																	fill="none"
-																	viewBox="0 0 24 24"
-																	stroke="currentColor"
-																	stroke-width="3"
-																>
-																	<path
-																		stroke-linecap="round"
-																		stroke-linejoin="round"
-																		d="M5 13l4 4L19 7"
-																	/>
-																</svg>
-															</div>
-														{:else if value === false}
-															<div
-																class="w-8 h-8 rounded-lg bg-gray-100 border-2 border-gray-300 flex items-center justify-center mx-auto opacity-50"
-															>
-																<svg
-																	class="w-5 h-5 text-gray-500"
-																	fill="none"
-																	viewBox="0 0 24 24"
-																	stroke="currentColor"
-																	stroke-width="3"
-																>
-																	<path
-																		stroke-linecap="round"
-																		stroke-linejoin="round"
-																		d="M6 18L18 6M6 6l12 12"
-																	/>
-																</svg>
-															</div>
-														{:else}
-															<span class="font-black text-gray-900 text-lg">{value}</span>
-														{/if}
-													</td>
-												{/each}
-											</tr>
-										{/each}
-									{/each}
-								</tbody>
-							</table>
-						</div>
-					</div>
+						Free
+					</h2>
+					<p class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">
+						$0 · FOREVER · NO CARD
+					</p>
 				</div>
 
-				<!-- Enterprise CTA -->
-				<div
-					class="max-w-4xl mx-auto w-full relative overflow-hidden rounded-2xl border-[3px] border-gray-900 bg-brand-bg p-10 md:p-16 shadow-brutal-2xl text-center z-10"
-				>
-					<!-- Geometric Decorations -->
-					<div
-						class="absolute -top-10 -right-10 w-32 h-32 border-[4px] border-gray-900 rounded-full opacity-10"
-					/>
-					<div class="absolute -bottom-10 -left-10 w-32 h-32 bg-gray-900 rounded-full opacity-5" />
+				<div class="flex flex-1 flex-col gap-1">
+					<p class="font-sans text-[15px] leading-[22px] text-brand-ink">
+						{numberFormatter.format(renders(PLANS.STARTER))} renders a month · full API · PNG / JPG /
+						WebP / GIF · {formatLimit(feature(PLANS.STARTER, FEATURES.TEMPLATES_SAVED))} templates ·
+						{feature(PLANS.STARTER, FEATURES.AI_CREDITS)} AI credits
+					</p>
+					<p class="font-sans text-sm leading-5 text-brand-slate">
+						Enough to try the API and the free tools properly. Nothing expires.
+					</p>
+				</div>
 
-					<div class="relative z-10 flex flex-col items-center gap-6">
-						<h3 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tight">
-							Enterprise Needs?
-						</h3>
-						<p class="text-xl text-gray-700 font-bold max-w-2xl mx-auto">
-							For companies requiring custom SLAs, dedicated infrastructure, and priority support.
-						</p>
-						<a
-							href="mailto:support@pictify.io"
-							class="inline-flex items-center gap-3 mt-4 px-8 lg:px-6 py-5 lg:py-3.5 bg-gray-900 text-white font-black rounded-xl border-[3px] border-gray-900 shadow-brutal-accent hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-brutal-accent-sm hover:bg-gray-800 transition-all text-lg lg:text-base uppercase tracking-widest"
+				{#if isLoggedIn && (!currentPlan || currentPlan === PLANS.STARTER)}
+					<span
+						class="flex flex-shrink-0 items-center justify-center rounded-lg border-[1.5px] border-brand-proof px-5 py-2.5 font-mono text-[11px] tracking-[0.06em] text-brand-ink"
+					>
+						YOU'RE ON THIS
+					</span>
+				{:else}
+					<button
+						type="button"
+						on:click={() => startOnFree('free_strip')}
+						class="flex flex-shrink-0 items-center justify-center rounded-lg border-[1.5px] border-brand-ink px-5 py-2.5 font-sans text-[15px] font-semibold text-brand-ink transition-colors hover:bg-brand-subtle"
+					>
+						Start on Free
+					</button>
+				{/if}
+			</div>
+		</div>
+
+		<!-- ── What a month buys ─────────────────────────────────────── -->
+		<div class="mx-auto w-full max-w-page px-5 pt-12 lg:px-10">
+			<p class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">
+				WHAT A MONTH OF RENDERS ACTUALLY BUYS
+			</p>
+			<div class="mt-4 grid grid-cols-1 gap-6 md:grid-cols-3">
+				{#each VOLUME_TILES as tile (tile.label)}
+					<div class="flex flex-col gap-2 border border-brand-ink {tile.tint} px-5 py-4">
+						<p class="font-mono text-[10px] tracking-[0.06em] text-brand-ink/70">{tile.label}</p>
+						<p
+							class="font-display text-[19px] font-bold leading-6 tracking-[-0.015em] text-brand-ink"
 						>
-							<span>Contact Sales</span>
-							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2.5"
-									d="M14 5l7 7m0 0l-7 7m7-7H3"
-								/></svg
-							>
-						</a>
-					</div>
-				</div>
-
-				<!-- FAQ Section -->
-				<div class="flex flex-col gap-12 mt-8 max-w-5xl mx-auto w-full relative z-10">
-					<div class="text-center max-w-2xl mx-auto">
-						<h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">
-							Common Questions
-						</h2>
-						<p class="text-xl text-gray-700 font-bold">
-							Everything you need to know about plans and billing.
+							{tile.title}
 						</p>
+						<p class="font-sans text-sm leading-5 text-brand-ink/80">{tile.body}</p>
 					</div>
+				{/each}
+			</div>
+		</div>
 
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-						{#each FAQs as faq}
-							<div
-								class="group flex flex-col bg-white rounded-xl border-[3px] border-gray-900 shadow-[5px_5px_0_0_#1f2937] cursor-pointer transition-all hover:-translate-y-1 hover:shadow-brutal-2xl"
-								role="button"
-								tabindex="0"
-								aria-expanded={faq.isOpened}
-								on:click={() => (faq.isOpened = !faq.isOpened)}
-								on:keydown={(e) => {
-									if (e.key === 'Enter' || e.key === ' ') {
-										e.preventDefault();
-										faq.isOpened = !faq.isOpened;
-									}
-								}}
-							>
-								<div class="flex items-start justify-between gap-4 p-6">
-									<h3 class="text-lg font-black text-gray-900 leading-tight pr-4">
-										{faq.question}
-									</h3>
-									<div
-										class="w-10 h-10 rounded-lg bg-gray-50 border-[2px] border-gray-900 flex items-center justify-center flex-shrink-0 transition-all duration-300 shadow-brutal-sm {faq.isOpened
-											? 'rotate-180 bg-brand-accent'
-											: 'group-hover:translate-x-[1px] group-hover:translate-y-[1px]'}"
+		<!-- ── Compare plans ─────────────────────────────────────────── -->
+		<section class="mx-auto w-full max-w-page px-5 pt-16 lg:px-10">
+			<div class="flex items-baseline gap-3 border-t-2 border-brand-ink pt-8">
+				<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">01</span>
+				<h2
+					class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink lg:text-[32px] lg:leading-[42px]"
+				>
+					Compare plans
+				</h2>
+			</div>
+
+			<!-- Scrolls inside itself; the page never scrolls sideways. -->
+			<div class="mt-6 overflow-x-auto rounded-card border-[1.5px] border-brand-ink bg-brand-paper">
+				<div class="min-w-[860px]">
+					<!-- Sticky header: the buy action travels with the reader. -->
+					<div
+						class="sticky top-[88px] z-10 grid grid-cols-[360px_repeat(4,1fr)] gap-6 border-b border-brand-ink bg-brand-paper px-6 py-4"
+					>
+						<div class="flex flex-col justify-end gap-1">
+							<p class="font-mono text-[10px] tracking-[0.06em] text-brand-mute">
+								STICKS UNDER THE NAV
+							</p>
+							<p class="font-sans text-sm text-brand-slate">
+								{showAnnual ? 'Annual pricing shown' : 'Monthly pricing shown'}
+							</p>
+						</div>
+
+						{#each TABLE_PLANS as planId (planId)}
+							{@const isPopular = popularPlanNames.includes(PLAN_DISPLAY_NAMES[planId])}
+							<div class="flex flex-col items-center gap-2 text-center">
+								{#if isPopular}
+									<span
+										class="bg-brand-field px-2 py-0.5 font-mono text-[10px] tracking-[0.06em] text-brand-ink"
 									>
-										<svg
-											class="w-5 h-5 text-gray-900"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-											stroke-width="3"
-										>
-											<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-										</svg>
-									</div>
-								</div>
-								{#if faq.isOpened}
-									<div class="px-6 pb-6 pt-0">
-										<div class="h-[2px] w-full bg-gray-100 mb-4" />
-										<p class="text-base text-gray-700 font-bold leading-relaxed">
-											{@html faq.answer}
-										</p>
-									</div>
+										MOST TEAMS
+									</span>
+								{/if}
+								<p class="font-sans text-[15px] font-semibold text-brand-ink">
+									{PLAN_DISPLAY_NAMES[planId]}
+									<span class="font-mono text-[11px] font-normal text-brand-mute">
+										{planId === PLANS.STARTER ? '$0' : `$${price[planId]} / mo`}
+									</span>
+								</p>
+								{#if planId === PLANS.STARTER}
+									<button
+										type="button"
+										on:click={() => startOnFree('table_header')}
+										class="w-full rounded border-[1.5px] border-brand-ink px-3 py-1.5 font-sans text-sm font-semibold text-brand-ink transition-colors hover:bg-brand-subtle"
+									>
+										Start on Free
+									</button>
+								{:else}
+									<button
+										type="button"
+										on:click={() => choosePlan(planId, 'table_header')}
+										class="w-full rounded px-3 py-1.5 font-sans text-sm font-semibold transition-opacity hover:opacity-90 {isPopular
+											? 'bg-brand-ink text-white shadow-[2px_2px_0_0_#FF48B0]'
+											: 'border-[1.5px] border-brand-ink text-brand-ink'}"
+									>
+										Choose {PLAN_DISPLAY_NAMES[planId]}
+									</button>
 								{/if}
 							</div>
 						{/each}
 					</div>
+
+					{#each COMPARISON as group (group.group)}
+						<p
+							class="border-b border-brand-rule bg-brand-subtle px-6 py-2 font-mono text-[10px] tracking-[0.06em] text-brand-blue"
+						>
+							{group.group}
+						</p>
+						{#each group.rows as row (row.label)}
+							<div
+								class="grid grid-cols-[360px_repeat(4,1fr)] items-center gap-6 border-b border-brand-rule px-6 py-3 last:border-b-0"
+							>
+								<p class="font-sans text-sm text-brand-ink">{row.label}</p>
+								{#each TABLE_PLANS as planId (planId)}
+									{@const value = cell(row, planId)}
+									<div class="flex items-center justify-center text-center">
+										{#if value === true}
+											<span class="h-2.5 w-2.5 bg-brand-proof" aria-label="Included" role="img" />
+										{:else if value === false}
+											<span
+												class="h-2.5 w-2.5 border border-brand-rule"
+												aria-label="Not included"
+												role="img"
+											/>
+										{:else}
+											<span class="font-sans text-sm text-brand-slate">{value}</span>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						{/each}
+					{/each}
 				</div>
 			</div>
-		</div>
+		</section>
+
+		<!-- ── Campaign pilot ────────────────────────────────────────── -->
+		<!--
+			Deliberately NOT a fourth plan card and deliberately not on the toggle.
+			The pilot is quoted per engagement and has no checkout, so putting a
+			price on this page — or a Buy button — would be the one thing the
+			product cannot honour. It sits after the comparison table because a
+			reader who got that far has already decided this page is about renders
+			per month, and this is a different shape of thing entirely.
+		-->
+		<section class="mx-auto w-full max-w-page px-5 pt-16 lg:px-10">
+			<div class="border-t-2 border-brand-ink pt-8">
+				<div class="flex items-baseline gap-3">
+					<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">02</span>
+					<h2
+						class="font-display text-[26px] font-extrabold tracking-[-0.03em] text-brand-ink lg:text-h2"
+					>
+						Campaign pilot
+					</h2>
+				</div>
+
+				<div class="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-14">
+					<div>
+						<p class="max-w-[620px] font-sans text-[15.5px] leading-[25px] text-brand-slate">
+							Customer value updates — a card per customer, made from a spreadsheet your team
+							already keeps — are not sold by the render. A pilot is one campaign for one month,
+							quoted per engagement after a conversation about what you want to send.
+						</p>
+						<p class="mt-4 max-w-[620px] font-sans text-[15.5px] leading-[25px] text-brand-slate">
+							There is no checkout for it and no card on file. You ask for access, we reply, and the
+							pilot is set up with you.
+						</p>
+						<a
+							href="/campaigns/customer-value-updates"
+							class="mt-6 inline-flex h-11 items-center gap-2.5 bg-brand-ink px-5 font-sans text-[14.5px] font-semibold text-white"
+						>
+							How campaigns work
+							<span class="block h-2.5 w-2.5 bg-brand-field" aria-hidden="true" />
+						</a>
+					</div>
+
+					<dl class="border-t border-brand-rule">
+						{#each [['Scope', '1 campaign · 1 month'], ['Format', 'Email card or one-page PDF'], ['Customers', 'Up to 250 per send'], ['Sending', 'From your own email tool'], ['Price', 'Quoted per pilot']] as [label, value] (label)}
+							<div
+								class="flex items-baseline justify-between gap-5 border-b border-brand-rule py-2.5"
+							>
+								<dt class="flex-shrink-0 font-sans text-[13.5px] text-brand-slate">{label}</dt>
+								<dd class="text-right font-sans text-[13.5px] font-semibold text-brand-ink">
+									{value}
+								</dd>
+							</div>
+						{/each}
+					</dl>
+				</div>
+			</div>
+		</section>
+
+		<!-- ── FAQ ───────────────────────────────────────────────────── -->
+		<section class="mx-auto w-full max-w-page px-5 pt-16 lg:px-10">
+			<div class="max-w-[760px]">
+				<div class="flex items-baseline gap-3 border-t-2 border-brand-ink pt-8">
+					<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">03</span>
+					<h2
+						class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink lg:text-[32px] lg:leading-[42px]"
+					>
+						Questions people ask before they pay
+					</h2>
+				</div>
+
+				<div class="mt-6 flex flex-col gap-3">
+					{#each FAQs as faq (faq.question)}
+						<details class="group border border-brand-ink bg-brand-paper">
+							<summary
+								class="flex cursor-pointer items-center justify-between gap-4 p-4 font-sans text-[15px] font-medium text-brand-ink"
+							>
+								<span>{faq.question}</span>
+								<span
+									class="font-mono text-lg text-brand-mute transition-transform group-open:rotate-45"
+									aria-hidden="true">+</span
+								>
+							</summary>
+							<p
+								class="border-t border-brand-rule p-4 font-sans text-[15px] leading-[23px] text-brand-slate"
+							>
+								{@html faq.answer}
+							</p>
+						</details>
+					{/each}
+				</div>
+			</div>
+		</section>
 	</main>
 
-	<Footer />
-</section>
+	<!-- ── Closing band ──────────────────────────────────────────────── -->
+	<section class="mt-20 w-full bg-brand-press-deep px-5 py-14 lg:px-10 lg:py-20">
+		<div
+			class="mx-auto flex w-full max-w-page flex-col gap-8 lg:flex-row lg:items-end lg:justify-between"
+		>
+			<div class="flex flex-col gap-3.5 lg:max-w-[640px]">
+				<p class="font-mono text-xs tracking-[0.06em] text-brand-field">NO TRIAL CLOCK</p>
+				<!-- Marketing copy, not a section heading: kept as a <p>. -->
+				<p
+					class="font-display text-[34px] font-bold leading-[1.08] tracking-[-0.02em] text-white lg:text-[44px] lg:leading-[50px]"
+				>
+					Start on Free. Nothing to cancel.
+				</p>
+				<p class="font-sans text-base leading-[25px] text-brand-press-text">
+					{numberFormatter.format(renders(PLANS.STARTER))} renders a month, the full API, no card. Upgrade
+					the month you actually need more.
+				</p>
+			</div>
 
-<style>
-	@keyframes float {
-		0%,
-		100% {
-			transform: translateY(0px) rotate(-6deg);
-		}
-		50% {
-			transform: translateY(-10px) rotate(-3deg);
-		}
-	}
-	@keyframes float-reverse {
-		0%,
-		100% {
-			transform: translateY(0px) rotate(6deg);
-		}
-		50% {
-			transform: translateY(-10px) rotate(3deg);
-		}
-	}
-</style>
+			<div class="flex flex-col items-start gap-2.5 lg:items-end">
+				<button
+					type="button"
+					on:click={() => startOnFree('closing_band')}
+					class="rounded-lg bg-brand-field px-7 py-4 font-sans text-base font-semibold text-brand-ink shadow-[3px_3px_0_0_#FF48B0] transition-opacity hover:opacity-90"
+				>
+					Start rendering free
+				</button>
+				<a
+					href="/docs"
+					class="font-mono text-[11px] tracking-[0.06em] text-brand-press-text hover:text-white"
+				>
+					OR READ THE DOCS FIRST →
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<Footer />
+</div>

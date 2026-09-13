@@ -16,7 +16,11 @@ export async function GET() {
 	if (sanityEnabled()) {
 		try {
 			const docs = await sanityQuery(
-				'*[_type == "post" && !(_id in path("drafts.**"))]{ "slug": slug.current, "createdAt": publishedAt }'
+				// lastmod is _updatedAt, not publishedAt. These are living reference
+				// guides: a post rewritten last week but first published in 2024 was
+				// telling crawlers it had not changed in two years, which is the
+				// opposite of the signal the blog trades on.
+				'*[_type == "post" && !(_id in path("drafts.**"))]{ "slug": slug.current, "lastmod": coalesce(_updatedAt, publishedAt) }'
 			);
 			if (docs?.length) links = docs;
 		} catch (e) {
@@ -38,8 +42,9 @@ export async function GET() {
 			(link) => `  <url>
     <loc>${baseUrl}/blogs/${xmlEscape(link.slug)}</loc>
     <lastmod>${
-			link.createdAt
-				? new Date(link.createdAt).toISOString().slice(0, 10)
+			// `lastmod` from the CMS path, `createdAt` from the legacy one.
+			link.lastmod || link.createdAt
+				? new Date(link.lastmod || link.createdAt).toISOString().slice(0, 10)
 				: new Date().toISOString().slice(0, 10)
 		}</lastmod>
     <changefreq>weekly</changefreq>

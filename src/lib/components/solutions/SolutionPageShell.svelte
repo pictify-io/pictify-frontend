@@ -13,14 +13,14 @@
 	 */
 	import ToolPageShell from '$lib/components/tools/scaffold/ToolPageShell.svelte';
 	import ToolBreadcrumb from '$lib/components/tools/scaffold/ToolBreadcrumb.svelte';
-	import ToolSeoHead from '$lib/components/tools/scaffold/ToolSeoHead.svelte';
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
 	import ToolFaq from '$lib/components/tools/scaffold/ToolFaq.svelte';
 
 	// SEO — passed through to ToolSeoHead
 	export let title = '';
 	export let description = '';
 	export let canonical = '';
-	export let ogImage = 'https://media.pictify.io/k2oq1-1776144080510.png';
+	export let ogImage = 'https://pictify.io/og/v2/solutions.png';
 	export let ogImageAlt = '';
 	export let ogImageWidth = 1200;
 	export let ogImageHeight = 630;

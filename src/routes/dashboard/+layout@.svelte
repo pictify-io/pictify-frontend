@@ -1,76 +1,48 @@
 <script>
+	import Wordmark from '$lib/components/landing/Wordmark.svelte';
 	import '../../app.css';
-	import Nav from '$lib/components/dashboard/Nav.svelte';
-	import SideNav from '$lib/components/dashboard/SideNav.svelte';
+	import RailV2 from '$lib/components/dashboard/v2/RailV2.svelte';
 	import CommandPalette from '$lib/components/dashboard/CommandPalette.svelte';
-	import VerifyEmailBanner from '$lib/components/dashboard/VerifyEmailBanner.svelte';
+	import Toast from '$lib/components/Toast.svelte';
+	import { notify } from '../../store/toast.store';
 	import PLGProvider from '$lib/components/plg/PLGProvider.svelte';
-	import UsageBanner from '$lib/components/plg/UsageBanner.svelte';
 	import ProactiveUpgradeModal from '$lib/components/plg/ProactiveUpgradeModal.svelte';
 	import { getUser } from '../../store/user.store';
 	import { initOnboarding } from '../../store/onboarding.store';
 
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-
 	import { page } from '$app/stores';
 
 	let user = null;
 	let isUserLoaded = false;
-	let isSidebarOpen = false; // Default to closed on mobile
-	let windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1024;
+	let railOpen = false;
 
-	function toggleSidebar() {
-		// Only toggle on mobile screens
-		if (windowWidth < 1024) {
-			isSidebarOpen = !isSidebarOpen;
-		}
-	}
-
-	function closeSidebar() {
-		if (windowWidth < 1024) {
-			isSidebarOpen = false;
-		}
-	}
-
-	// Close sidebar on route change (mobile only)
-	$: if ($page.url.pathname && windowWidth < 1024) {
-		closeSidebar();
-	}
-
-	// Handle window resize
-	function handleResize() {
-		windowWidth = window.innerWidth;
-		// Auto-adjust sidebar state based on screen size
-		if (windowWidth >= 1024) {
-			isSidebarOpen = true; // Always visible on desktop
-		} else {
-			isSidebarOpen = false; // Hidden by default on mobile/tablet
-		}
-	}
+	// Close the mobile rail on navigation.
+	$: if ($page.url.pathname) railOpen = false;
 
 	onMount(async () => {
-		user = await getUser();
+		try {
+			user = await getUser();
+		} catch (err) {
+			/*
+			 * A 401 comes back as null (the store translates it) and falls into
+			 * the redirect below. Anything else here is the server being
+			 * unreachable, NOT a signed-out visitor — bouncing them to /login
+			 * would be a lie, and leaving the promise to reject leaves the
+			 * dashboard as an empty shell with a rail and no page. So: say it,
+			 * and render the chrome.
+			 */
+			notify.fail('Load dashboard', err, { retry: () => window.location.reload() });
+			isUserLoaded = true;
+			return;
+		}
 		if (!user || !user?.email) {
 			goto('/login');
 			return;
 		}
-
-		// Initialize onboarding checklist (before marking loaded, so wizard state is ready)
 		await initOnboarding();
-
-		// Mark user as loaded so child components can safely make API calls
 		isUserLoaded = true;
-
-		// Home page now exists at /dashboard — no redirect needed
-
-		// Add resize listener
-		window.addEventListener('resize', handleResize);
-		handleResize(); // Initial check
-
-		return () => {
-			window.removeEventListener('resize', handleResize);
-		};
 	});
 </script>
 
@@ -79,71 +51,74 @@
 </svelte:head>
 
 <PLGProvider>
-	<div class="h-screen flex flex-col overflow-hidden bg-brand-bg">
-		<Nav on:toggleSidebar={toggleSidebar} />
-		{#if user?.isEmailVerified === false}
-			<VerifyEmailBanner email={user?.email} />
-		{/if}
-		{#if isUserLoaded}
-			<UsageBanner />
-		{/if}
-		<div class="flex w-full flex-grow overflow-hidden relative">
-			<!-- Backdrop for mobile/tablet -->
-			{#if isSidebarOpen && windowWidth < 1024}
+	<div class="flex h-screen flex-col overflow-hidden bg-brand-paper">
+		<!-- Email verification lives in the rail (VerifyEmailCard), not a banner. -->
+
+		<!-- Mobile top bar: the rail is desktop furniture; small screens get the
+		     mark and a toggle. -->
+		<header
+			class="flex h-14 flex-shrink-0 items-center justify-between border-b border-brand-rule px-4 lg:hidden"
+		>
+			<a href="/dashboard" class="flex items-center" aria-label="Pictify home">
+				<Wordmark responsive={false} />
+			</a>
+			<button
+				type="button"
+				on:click={() => (railOpen = !railOpen)}
+				class="flex h-9 w-9 flex-col items-center justify-center gap-[3px] rounded-btn border border-brand-rule"
+				aria-label="Toggle navigation"
+				aria-expanded={railOpen}
+			>
+				<span class="block h-0.5 w-4 bg-brand-ink" />
+				<span class="block h-0.5 w-4 bg-brand-ink" />
+				<span class="block h-0.5 w-4 bg-brand-ink" />
+			</button>
+		</header>
+
+		<div class="relative flex w-full flex-grow overflow-hidden">
+			{#if railOpen}
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div
-					class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-					on:click={closeSidebar}
-					on:keydown={(e) => e.key === 'Escape' && closeSidebar()}
+					class="fixed inset-0 z-40 bg-black/50 lg:hidden"
+					on:click={() => (railOpen = false)}
+					on:keydown={(e) => e.key === 'Escape' && (railOpen = false)}
 					role="button"
 					tabindex="0"
-					aria-label="Close sidebar"
+					aria-label="Close navigation"
 				/>
 			{/if}
 
-			<!-- Sidebar -->
 			<div
-				class="
-				fixed inset-y-0 left-0 z-50 bg-brand-bg transition-transform duration-300 ease-in-out
-				lg:relative lg:z-0 lg:h-full lg:overflow-hidden
-				w-64 min-w-[16rem]
-				{isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-				lg:translate-x-0
-			"
+				class="fixed inset-y-0 left-0 z-50 transition-transform duration-200 ease-in-out lg:relative lg:z-0 lg:translate-x-0
+				{railOpen ? 'translate-x-0' : '-translate-x-full'}"
 			>
-				<SideNav />
+				<RailV2 />
 			</div>
 
-			<!-- Main content -->
-			<div
-				class="flex-grow h-full overflow-y-auto overflow-x-hidden min-w-0 bg-brand-bg relative"
+			<main
+				class="min-w-0 flex-grow overflow-y-auto overflow-x-hidden"
 				style="scrollbar-gutter: stable;"
 			>
-				<!-- Background Grid -->
-				<div
-					class="absolute inset-0 opacity-5 pointer-events-none"
-					style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"
-				/>
-				<div class="w-full max-w-7xl mx-auto p-6 h-full relative z-10">
-					{#if isUserLoaded}
-						<slot />
-					{:else}
-						<div class="flex items-center justify-center h-full">
-							<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
-						</div>
-					{/if}
-				</div>
-			</div>
+				{#if isUserLoaded}
+					<slot />
+				{:else}
+					<div class="flex h-full items-center justify-center">
+						<span class="block h-3 w-3 animate-pulse bg-brand-field" aria-label="Loading" />
+					</div>
+				{/if}
+			</main>
 		</div>
-
-		<!-- Getting Started Guide is now rendered inline on the dashboard page -->
 	</div>
 
-	<!-- Proactive Upgrade Modal (shows once at 75%) -->
 	{#if isUserLoaded}
 		<ProactiveUpgradeModal />
 	{/if}
 
-	<!-- Command Palette (Cmd+K) -->
 	<CommandPalette />
+
+	<!--
+		ONE mount for the whole dashboard. It used to be imported per page, so
+		six surfaces called showToast with nothing in their tree to render it.
+	-->
+	<Toast />
 </PLGProvider>

@@ -273,22 +273,6 @@ export function getCurlExample(apiKey) {
 
 // Quick action definitions (id → action metadata)
 const ACTIONS = {
-	run_workflow: {
-		id: 'run_workflow',
-		label: 'Run Workflow',
-		desc: 'Render at scale from a CSV or webhook',
-		href: '/dashboard/workflows/new',
-		icon: 'batch',
-		color: '#ff6b6b'
-	},
-	view_workflows: {
-		id: 'view_workflows',
-		label: 'Workflows',
-		desc: 'Monitor your workflow runs & outputs',
-		href: '/dashboard/workflows',
-		icon: 'lightning',
-		color: '#a78bfa'
-	},
 	api_playground: {
 		id: 'api_playground',
 		label: 'API Playground',
@@ -323,23 +307,23 @@ const ACTIONS = {
 	}
 };
 
-const DEFAULT_ACTIONS = ['create_template', 'create_video', 'run_workflow', 'view_workflows'];
+const DEFAULT_ACTIONS = ['create_template', 'create_video'];
 
 // Which quick actions to show per use case (ordered by relevance)
 export const QUICK_ACTION_PRESETS = {
-	'social-media': ['create_template', 'run_workflow', 'view_workflows', 'api_playground'],
-	'email-marketing': ['create_template', 'run_workflow', 'view_workflows', 'api_playground'],
-	'e-commerce': ['create_template', 'run_workflow', 'view_workflows', 'api_playground'],
-	'dashboard-reporting': ['api_playground', 'api_keys', 'run_workflow', 'create_template'],
-	certificates: ['create_template', 'run_workflow', 'api_playground', 'api_keys'],
-	'personalized-images': ['api_playground', 'api_keys', 'run_workflow', 'create_template'],
-	'content-marketing': ['create_template', 'run_workflow', 'view_workflows', 'api_playground'],
+	'social-media': ['create_template', 'api_playground'],
+	'email-marketing': ['create_template', 'api_playground'],
+	'e-commerce': ['create_template', 'api_playground'],
+	'dashboard-reporting': ['api_playground', 'api_keys', 'create_template'],
+	certificates: ['create_template', 'api_playground', 'api_keys'],
+	'personalized-images': ['api_playground', 'api_keys', 'create_template'],
+	'content-marketing': ['create_template', 'api_playground'],
 	// Engineer-centric intents
-	'ai-agent': ['api_keys', 'api_playground', 'create_template', 'run_workflow'],
-	'api-integration': ['api_keys', 'api_playground', 'create_template', 'run_workflow'],
-	'no-code': ['create_template', 'run_workflow', 'view_workflows', 'api_keys'],
-	'template-builder': ['create_template', 'run_workflow', 'view_workflows', 'api_playground'],
-	exploring: ['create_template', 'api_playground', 'run_workflow', 'api_keys']
+	'ai-agent': ['api_keys', 'api_playground', 'create_template'],
+	'api-integration': ['api_keys', 'api_playground', 'create_template'],
+	'no-code': ['create_template', 'api_keys'],
+	'template-builder': ['create_template', 'api_playground'],
+	exploring: ['create_template', 'api_playground', 'api_keys']
 };
 
 // Personalized hero copy per use case / intent
@@ -453,8 +437,7 @@ export const PRIMARY_CTA = {
 	'email-marketing': { label: 'Create Email Banner', href: '/dashboard/template/create' },
 	'e-commerce': { label: 'Create Product Visual', href: '/dashboard/template/create' },
 	'dashboard-reporting': { label: 'Create Report Visual', href: '/dashboard/template/create' },
-	// The certificate wedge is a batch job now: the win is a delivered run, not a saved template.
-	certificates: { label: 'Start a run', href: '/dashboard/workflows/new' },
+	certificates: { label: 'Create a template', href: '/dashboard/template/create' },
 	'personalized-images': { label: 'Try API Playground', href: '/dashboard/api-playground' },
 	'content-marketing': { label: 'Create Blog Image', href: '/dashboard/template/create' },
 	// Engineer-centric intents

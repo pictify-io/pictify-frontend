@@ -45,10 +45,16 @@ export const TIMELINE_OFFSET_X_SMALL = 64;
 export const TIMELINE_OFFSET_X_LARGE = 96;
 
 // Timeline item selection styling
-export const TIMELINE_SELECTED_BORDER_COLOR = "rgba(24, 163, 222, 0.5)";
-export const TIMELINE_UNSELECTED_BORDER_COLOR = "rgba(255, 255, 255, 0.05)";
-export const TIMELINE_BORDER_WIDTH = 2;
-export const TIMELINE_ITEM_BORDER_RADIUS = 4;
+// Repro Shop: pink is the selection colour everywhere in v2, and it is the
+// only thing on the track allowed to use it.
+export const TIMELINE_SELECTED_BORDER_COLOR = "#FF48B0";
+// A hairline of ink, not a white glow: the track is light now, so the border
+// has to darken the edge rather than lighten it.
+export const TIMELINE_UNSELECTED_BORDER_COLOR = "rgba(0, 0, 0, 0.55)";
+export const TIMELINE_BORDER_WIDTH = 1;
+/** Selection reads as a weight change, not just a hue change. */
+export const TIMELINE_SELECTED_BORDER_WIDTH = 1.5;
+export const TIMELINE_ITEM_BORDER_RADIUS = 6;
 
 export const TIMELINE_ZOOM_LEVELS: ITimelineScaleState[] = [
   { index: 0, unit: 1, zoom: 0.25, segments: 5 },

@@ -1,0 +1,298 @@
+{
+  "route": "/tools/html-to-webp",
+  "title": "HTML to WEBP: Free Online Converter & API | Pictify",
+  "canonical": "https://pictify.io/tools/html-to-webp",
+  "metas": {
+    "author": "Pictify.io",
+    "description": "Convert HTML to WEBP images instantly. Paste your code, preview live, and export. Free online tool with built-in editor and API access.",
+    "keywords": "convert image from HTML, HTML to WEBP, WEBP converter, online image generator, web design tool, WebP image creator, Pictify.io",
+    "og:description": "Paste HTML + CSS and get a high-quality WEBP in one click. Free online converter with a live code editor and API access for developers.",
+    "og:image": "https://media.pictify.io/gre6p-1775406841745.png",
+    "og:locale": "en_US",
+    "og:site_name": "Pictify.io",
+    "og:title": "HTML to WEBP: Free Online Converter & API | Pictify",
+    "og:type": "website",
+    "og:url": "https://pictify.io/tools/html-to-webp",
+    "robots": "index, follow, max-image-preview:large",
+    "twitter:card": "summary_large_image",
+    "twitter:description": "Convert HTML to WEBP images instantly. Paste your code, preview live, and export. Free online tool with built-in editor and API access.",
+    "twitter:image": "https://media.pictify.io/gre6p-1775406841745.png",
+    "twitter:site": "@pictify_io",
+    "twitter:title": "HTML to WEBP: Free Online Converter & API | Pictify"
+  },
+  "jsonLd": [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/",
+          "name": "Home",
+          "position": 1
+        },
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/tools",
+          "name": "Tools",
+          "position": 2
+        },
+        {
+          "@type": "ListItem",
+          "name": "HTML to WEBP",
+          "position": 3
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "description": "API-first image, document, and video generation. Every row of a spreadsheet or webhook becomes a rendered, personalized certificate, badge, report, or video.",
+      "logo": "https://pictify.io/logo.png",
+      "name": "Pictify",
+      "sameAs": [
+        "https://github.com/pictify-io"
+      ],
+      "url": "https://pictify.io"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "applicationCategory": "DesignApplication",
+      "description": "Convert HTML to high-quality WebP instantly. Create optimized images for websites, social media, and email marketing.",
+      "featureList": [
+        "Instant HTML to WebP conversion",
+        "Optimized for web graphics, combining the best of JPG and PNG",
+        "Web-friendly output",
+        "No watermark on free accounts"
+      ],
+      "mainEntity": [
+        {
+          "@type": "HowTo",
+          "description": "Step-by-step guide to convert HTML to WebP images",
+          "name": "How to Convert HTML to WebP",
+          "step": [
+            {
+              "@type": "HowToStep",
+              "text": "Input your HTML code in the editor",
+              "url": "https://pictify.io/tools/html-to-webp#input"
+            },
+            {
+              "@type": "HowToStep",
+              "text": "Preview your HTML design",
+              "url": "https://pictify.io/tools/html-to-webp#preview"
+            },
+            {
+              "@type": "HowToStep",
+              "text": "Generate your WebP image",
+              "url": "https://pictify.io/tools/html-to-webp#generate"
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Paste your HTML and CSS code into Pictify's free online editor, see a live preview, then click \"Capture\" to download a high-quality WebP file. No file upload or signup needed. You can also use the Pictify API to convert HTML to WebP programmatically."
+              },
+              "name": "How do I convert HTML to WebP?"
+            },
+            {
+              "@type": "Question",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Send a POST request to the Pictify API with your HTML code, width, and height. The API returns a CDN-hosted WebP URL. Supports custom CSS, Google Fonts, and dynamic variables. Free tier includes 100 renders per month."
+              },
+              "name": "Can I convert HTML to WebP with an API?"
+            },
+            {
+              "@type": "Question",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, the online converter is completely free with no signup required. You get 5 free generations per day as a guest, and unlimited generations when you create a free account."
+              },
+              "name": "Is this HTML to WebP converter free?"
+            },
+            {
+              "@type": "Question",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "WebP is best for web graphics, combining the best of JPG and PNG. Common use cases include social media cards, Open Graph images, email headers, certificates, and automated report generation."
+              },
+              "name": "What is WebP best for?"
+            }
+          ]
+        }
+      ],
+      "name": "HTML to WebP Converter",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "operatingSystem": "Web",
+      "url": "https://pictify.io/tools/html-to-webp"
+    }
+  ],
+  "outline": [
+    {
+      "tag": "h1",
+      "text": "HTML TO WebP"
+    },
+    {
+      "tag": "h2",
+      "text": "Key Features"
+    },
+    {
+      "tag": "h2",
+      "text": "Automate with the API"
+    },
+    {
+      "tag": "h2",
+      "text": "HTML to Image: Choosing the Right Format"
+    },
+    {
+      "tag": "h2",
+      "text": "Try Other Formats"
+    },
+    {
+      "tag": "h3",
+      "text": "JPG"
+    },
+    {
+      "tag": "h3",
+      "text": "PNG"
+    },
+    {
+      "tag": "h3",
+      "text": "HTML to Image"
+    },
+    {
+      "tag": "h2",
+      "text": "Need social previews?"
+    },
+    {
+      "tag": "h3",
+      "text": "WordPress"
+    },
+    {
+      "tag": "h3",
+      "text": "Notion"
+    },
+    {
+      "tag": "h3",
+      "text": "Shopify"
+    },
+    {
+      "tag": "h2",
+      "text": "How to Convert"
+    },
+    {
+      "tag": "h3",
+      "text": "Input Code"
+    },
+    {
+      "tag": "h3",
+      "text": "Preview"
+    },
+    {
+      "tag": "h3",
+      "text": "Convert"
+    },
+    {
+      "tag": "h2",
+      "text": "Best Practices for WebP Conversion"
+    },
+    {
+      "tag": "h2",
+      "text": "FAQ"
+    },
+    {
+      "tag": "h2",
+      "text": "Best Practices"
+    },
+    {
+      "tag": "h2",
+      "text": "Fast, Free, Optimized."
+    },
+    {
+      "tag": "h2",
+      "text": "Why Choose This Tool?"
+    },
+    {
+      "tag": "h3",
+      "text": "Optimized for web graphics, combining the best of JPG and PNG"
+    },
+    {
+      "tag": "h3",
+      "text": "Key Advantages"
+    },
+    {
+      "tag": "h3",
+      "text": "Considerations"
+    },
+    {
+      "tag": "h2",
+      "text": "WebP vs Others"
+    },
+    {
+      "tag": "h2",
+      "text": "Real-World Use Cases"
+    },
+    {
+      "tag": "h3",
+      "text": "Social Media"
+    },
+    {
+      "tag": "h3",
+      "text": "Email Campaigns"
+    },
+    {
+      "tag": "h3",
+      "text": "Website Mockups"
+    },
+    {
+      "tag": "h3",
+      "text": "Documentation"
+    },
+    {
+      "tag": "h2",
+      "text": "Technical Specs"
+    },
+    {
+      "tag": "h3",
+      "text": "Conversion Process"
+    },
+    {
+      "tag": "h3",
+      "text": "Image Quality"
+    },
+    {
+      "tag": "h3",
+      "text": "Supported Features"
+    },
+    {
+      "tag": "h3",
+      "text": "Performance"
+    },
+    {
+      "tag": "h2",
+      "text": "Product"
+    },
+    {
+      "tag": "h2",
+      "text": "Developers"
+    },
+    {
+      "tag": "h2",
+      "text": "Integrations"
+    },
+    {
+      "tag": "h2",
+      "text": "Company"
+    }
+  ]
+}

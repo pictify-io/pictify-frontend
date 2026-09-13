@@ -1,14 +1,14 @@
 <script>
 	import { fade, fly, scale } from 'svelte/transition';
 
-	// State for the delivery (Block 3) interactions — spreadsheet rows whose
+	// State for the per-row render (Block 3) interactions — spreadsheet rows whose
 	// certificate renders are REAL Pictify outputs (demo template 6E3AHG9PYB)
 	let activeRecipient = 0;
 	const recipients = [
 		{
 			row: 1,
 			name: 'Ada Lovelace',
-			email: 'ada@acme.com',
+			file: 'ada-certificate.pdf',
 			course: 'Advanced Analytics Bootcamp',
 			cert: 'https://media.pictify.io/template-renders/cj944exs-1785797479873.png',
 			color: 'bg-brand-accent'
@@ -16,7 +16,7 @@
 		{
 			row: 2,
 			name: 'Tom Okafor',
-			email: 'tom@northwind.io',
+			file: 'tom-certificate.pdf',
 			course: 'Cloud Architecture 101',
 			cert: 'https://media.pictify.io/template-renders/dqk5p2xy-1785800750071.png',
 			color: 'bg-data-violet'
@@ -24,7 +24,7 @@
 		{
 			row: 3,
 			name: 'Mei-Ling Chen',
-			email: 'mei@brightpath.co',
+			file: 'mei-certificate.pdf',
 			course: 'Leadership Essentials',
 			cert: 'https://media.pictify.io/template-renders/6atuz9pd-1785800751255.png',
 			color: 'bg-brand-danger'
@@ -364,20 +364,20 @@
 				</div>
 			</div>
 
-			<!-- Block 3: Email Personalization (Spans 12 cols, Split) -->
+			<!-- Block 3: Per-Row Personalization (Spans 12 cols, Split) -->
 			<div class="xl:col-span-12 bg-[#FFFDF8] rounded-[2.5rem] border-[3px] border-gray-900 shadow-[10px_10px_0_0_#1f2937] hover:shadow-[6px_6px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 transition-all duration-300 relative overflow-hidden group">
 				<div class="grid lg:grid-cols-12 h-full">
 					<!-- Interactive Selector (Left Side, 5 columns) -->
 					<div class="lg:col-span-5 p-8 md:p-10 lg:p-12 flex flex-col justify-center relative z-20 bg-white border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-gray-900 order-1">
 						<div class="flex items-center gap-4 mb-8">
 							<div class="w-14 h-14 bg-[#4ade80] border-[3px] border-gray-900 rounded-2xl flex items-center justify-center shadow-[4px_4px_0_0_#1f2937] transform -rotate-3 transition-transform group-hover:rotate-0">
-								<svg class="w-7 h-7 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v9a2 2 0 002 2z"/></svg>
+								<svg class="w-7 h-7 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
 							</div>
-							<h3 class="text-3xl md:text-4xl font-black text-gray-900 leading-tight">Delivered by Email</h3>
+							<h3 class="text-3xl md:text-4xl font-black text-gray-900 leading-tight">One Per Row</h3>
 						</div>
 
 						<p class="text-lg text-gray-700 font-medium mb-10 max-w-sm">
-							Every CSV row or webhook event renders a personalized document and lands in each recipient's inbox automatically.
+							Every CSV row or webhook event renders its own personalized document, hosted and ready the moment the run finishes.
 						</p>
 
 						<div class="flex flex-col gap-4">
@@ -399,11 +399,11 @@
 									<div class="flex-1 min-w-0">
 										<div class="text-base font-black leading-tight truncate">{recipient.name}</div>
 										<div class="text-xs font-bold {activeRecipient === i ? 'text-gray-300' : 'text-gray-500'} mt-1 truncate">
-											{recipient.email}
+											{recipient.course}
 										</div>
 									</div>
 									{#if activeRecipient === i}
-										<span class="absolute -right-3 -top-3 px-3 py-1 rounded-xl border-[3px] border-gray-900 bg-[#4ade80] text-gray-900 text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#fff] rotate-6">Delivered</span>
+										<span class="absolute -right-3 -top-3 px-3 py-1 rounded-xl border-[3px] border-gray-900 bg-[#4ade80] text-gray-900 text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0_0_#fff] rotate-6">Rendered</span>
 									{/if}
 								</button>
 							{/each}
@@ -435,19 +435,19 @@
 								{#key activeRecipient}
 									<pre class="font-mono text-[10px] md:text-[11px] text-gray-900 font-bold overflow-hidden whitespace-pre-wrap" in:fade={{ duration: 200 }}>
 {`{
+  "row": ${recipients[activeRecipient].row},
   "name": "${recipients[activeRecipient].name}",
-  "course": "${recipients[activeRecipient].course.length > 16 ? recipients[activeRecipient].course.slice(0, 15) + '…' : recipients[activeRecipient].course}",
-  "email": "${recipients[activeRecipient].email}"
+  "course": "${recipients[activeRecipient].course.length > 16 ? recipients[activeRecipient].course.slice(0, 15) + '…' : recipients[activeRecipient].course}"
 }`}
 									</pre>
 								{/key}
 							</div>
 
-							<!-- Output: the recipient's inbox -->
+							<!-- Output: the rendered document for this row -->
 							<div class="w-full bg-white rounded-2xl border-[3px] border-gray-900 shadow-[12px_12px_0_0_#1f2937] overflow-hidden transition-transform duration-500 hover:-translate-y-2 relative z-10">
 								{#key activeRecipient}
 								<div in:fade={{ duration: 300, delay: 100 }}>
-									<!-- inbox chrome -->
+									<!-- output chrome -->
 									<div class="h-10 bg-gray-100 border-b-[3px] border-gray-900 flex items-center px-4 justify-between">
 										<div class="flex flex-1 gap-2 h-full items-center">
 											<div class="w-3 h-3 rounded-full bg-[#ff6b6b] border-[2px] border-gray-900"></div>
@@ -455,26 +455,26 @@
 											<div class="w-3 h-3 rounded-full bg-[#4ade80] border-[2px] border-gray-900"></div>
 										</div>
 										<div class="text-[10px] font-black font-mono uppercase tracking-widest text-gray-500 truncate max-w-[200px]">
-											inbox · {recipients[activeRecipient].email}
+											output · {recipients[activeRecipient].file}
 										</div>
 									</div>
 
-									<!-- email header -->
+									<!-- output header -->
 									<div class="px-6 pt-5 pb-4 border-b-[3px] border-gray-100">
 										<div class="flex items-center justify-between gap-2 mb-2">
 											<p class="text-[12px] font-black text-gray-900 uppercase tracking-widest truncate">
-												Acme Academy <span class="text-gray-400">via Pictify</span>
+												Row {recipients[activeRecipient].row} of 240 <span class="text-gray-400">· Acme Academy</span>
 											</p>
 										</div>
 										<p class="text-lg font-black text-gray-900 leading-tight">
-											Your certificate is ready, {recipients[activeRecipient].name.split(' ')[0]} 🎓
+											{recipients[activeRecipient].name.split(' ')[0]}'s certificate is ready 🎓
 										</p>
 									</div>
 
-									<!-- email body -->
+									<!-- output body -->
 									<div class="px-6 py-5 bg-[#FFFDF8]">
 										<p class="text-[13px] font-bold text-gray-700 mb-4 leading-relaxed">
-											Congratulations on completing <span class="text-gray-900 bg-[#ffc480]/30 px-1 rounded">{recipients[activeRecipient].course}</span>! Your personalized certificate is attached below.
+											Rendered from one template against <span class="text-gray-900 bg-[#ffc480]/30 px-1 rounded">{recipients[activeRecipient].course}</span>, hosted at its own URL.
 										</p>
 										<div class="relative group/img">
 											<img

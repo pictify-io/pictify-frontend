@@ -1,743 +1,474 @@
 <script>
+	/**
+	 * The press room. One layout, three swappable slots driven by observed
+	 * facts — never by time or hand-waving:
+	 *
+	 *   S0  no template or no render yet   → setup ledger + starters + empty line
+	 *   S1  renders, but none external     → key/invite strip + connect row
+	 *   S2+ an external caller has printed → fills-from line + daybook + nudge
+	 *
+	 * Every promo module retires itself the moment the server observes the
+	 * behavior it exists to cause. Dismissal is the escape hatch.
+	 */
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { user } from '../../store/user.store';
-	import { plgStatus, PLAN_DISPLAY_NAMES } from '../../store/plg.store';
-	import { cdnStore, initCdnAnalytics } from '../../store/cdn.store';
-	import { teamStore, currentTeam } from '../../store/team.store';
-	import {
-		onboardingStore,
-		showOnboarding,
-		showWelcomeWizard,
-		initOnboarding,
-		completeStepAction,
-		dismissOnboardingAction,
-		toggleOnboardingCollapse,
-		personalization
-	} from '../../store/onboarding.store';
-	import { fetchAuditLogs } from '../../api/audit';
-	import { getWorkflowStats, listWorkflowRuns } from '../../api/workflow';
-	import RecentRuns from '$lib/components/dashboard/RecentRuns.svelte';
-	import { getTemplates } from '../../api/template';
-	import SnippetThumbnail from '$lib/components/editor/html/SnippetThumbnail.svelte';
-	import { getApiToken, createApiToken } from '../../api/user';
-	import { analytics } from '$lib/analytics.js';
-	import {
-		getQuickActions,
-		getWelcomeMessage,
-		getEmptyStateMessage,
-		getPrimaryCTA,
-		STARTER_TEMPLATES
-	} from '../../config/personalization.js';
-	import { evaluateNudges, getDismissedNudges, dismissNudge } from '$lib/utils/nudge-engine.js';
-	import NudgeBanner from '$lib/components/dashboard/NudgeBanner.svelte';
-	import GettingStartedGuide from '$lib/components/onboarding/GettingStartedGuide.svelte';
-	import WelcomeWizard from '$lib/components/onboarding/WelcomeWizard.svelte';
-	import Skeleton from '$lib/components/dashboard/Skeleton.svelte';
 	import { browser } from '$app/environment';
-	import posthog from 'posthog-js';
+	import { analytics } from '$lib/telemetry.js';
 
-	let isLoading = true;
-	let guideDismissed = false;
-	// Experiment: dashboard-checklist-value-first (SEQUENCED — flag dormant, defaults to control).
-	let checklistVariant = 'control';
-	let recentLogs = [];
-	let recentTemplates = [];
+	import Composer from '$lib/components/dashboard/v2/Composer.svelte';
+	import SetupStrip from '$lib/components/dashboard/v2/SetupStrip.svelte';
+	import NextStepCard from '$lib/components/dashboard/v2/NextStepCard.svelte';
+	import ProofSheet from '$lib/components/dashboard/v2/ProofSheet.svelte';
+	import JustPrinted from '$lib/components/dashboard/v2/JustPrinted.svelte';
+	import DaybookChart from '$lib/components/dashboard/v2/DaybookChart.svelte';
+	import UpgradeNudge from '$lib/components/dashboard/v2/UpgradeNudge.svelte';
+	import GeneratingStep from '$lib/components/onboarding/v2/GeneratingStep.svelte';
+
+	import { getTemplates } from '../../api/template.js';
+	import { getImages, getGifs, getPdfs } from '../../api/media.js';
+	import { checkApiHealth } from '../../api/image.js';
+	import { getOnboardingV2Status, generateFromPrompt } from '../../api/onboarding-v2.js';
+	import { usageWidget, plgStatus } from '../../store/plg.store';
+	import { activeApiToken, getAPITokenAction, createAPITokenAction } from '../../store/user.store';
+	import { currentTeam, teamMembers, createInvitationAction } from '../../store/team.store';
+	import { personalization } from '../../store/onboarding.store';
+	import { PUBLIC_DOCS_URL } from '$env/static/public';
+
+	const DAY_MS = 86_400_000;
+	const HIDE_SETUP_KEY = 'pictify_home_hide_setup';
+	const HIDE_INVITE_KEY = 'pictify_home_hide_invite';
+
+	let loaded = false;
+	let templates = [];
 	let totalTemplates = 0;
-	let workflowStats = { totalRuns: 0, documentsRendered: 0, documentsDelivered: 0 };
-	let recentRuns = [];
+	let renders = [];
+	let rendersTruncated = false;
+	let hasStoredRender = false;
+	let external = { received: false, via: null };
+	let apiUp = null;
+	let setupHidden = browser ? localStorage.getItem(HIDE_SETUP_KEY) === '1' : false;
+	let inviteHidden = browser ? localStorage.getItem(HIDE_INVITE_KEY) === '1' : false;
 
-	// Last 14 days for the compact sparkline. dailyStats is oldest-first.
-	$: sparkStats = ($cdnStore.dailyStats || []).slice(-14);
-	$: sparkMax = sparkStats.reduce((max, d) => Math.max(max, d.hits || 0), 0);
-	// The sparkline shows shape; this gives it a magnitude.
-	$: spark14Total = sparkStats.reduce((sum, d) => sum + (d.hits || 0), 0);
-	// Prior 14-day window, for a like-for-like trend. Null when there isn't a
-	// full previous window to compare against, so we never show a fake +100%.
-	$: prev14Stats = ($cdnStore.dailyStats || []).slice(-28, -14);
-	$: prev14Total = prev14Stats.reduce((sum, d) => sum + (d.hits || 0), 0);
-	$: trendPct =
-		prev14Stats.length > 0 && prev14Total > 0
-			? Math.round(((spark14Total - prev14Total) / prev14Total) * 100)
-			: null;
+	// The onboarding answer to "How will this template fill?". Silence renders
+	// as 'api' — the key/curl card is account facts, the least ad-like default.
+	// 'dashboard' (the explicit "just me" answer) renders no card at all.
+	const MODE_MAP = {
+		api: 'api',
+		both: 'api',
+		mcp: 'mcp',
+		automation: 'automation',
+		csv: 'csv',
+		dashboard: 'dashboard',
+		editor: 'dashboard'
+	};
+	$: declaredMode = MODE_MAP[$personalization?.integrationMode] || 'api';
 
-	let nudges = [];
-	let userApiKey = '';
+	const FILL_LABELS = { api: 'YOUR CODE', mcp: 'AN AGENT', automation: 'AN AUTOMATION', csv: 'A SPREADSHEET' };
+	$: otherFills = Object.keys(FILL_LABELS)
+		.filter((m) => m !== declaredMode)
+		.map((m) => FILL_LABELS[m])
+		.join(' · ');
 
-	// Filtered daily stats based on time range
-	$: planName = PLAN_DISPLAY_NAMES[$plgStatus.plan] || 'Starter';
-	$: teamName = $currentTeam?.name || 'My Workspace';
-	$: memberCount = $teamStore?.members?.length || 1;
+	// ---- facts → stage -------------------------------------------------------
+	// Usage counts as proof of printing: onboarding renders bill quota without
+	// persisting to media, so an empty media list alone doesn't mean "never
+	// rendered".
+	$: hasTemplate = totalTemplates > 0;
+	$: hasRender = hasStoredRender || ($usageWidget?.current ?? 0) > 0;
+	$: stage = !hasTemplate || !hasRender ? 's0' : external.received ? 's2' : 's1';
 
-	// Personalization
-	$: useCase = $personalization?.useCase;
-	$: isPersonalized = !!useCase;
-	$: welcomeMsg = useCase ? getWelcomeMessage(useCase) : null;
-	$: quickActions = getQuickActions(useCase);
-	$: emptyMsg = useCase ? getEmptyStateMessage(useCase) : null;
-	$: integrationMode = $personalization?.integrationMode;
-	$: primaryCTA = getPrimaryCTA(useCase, integrationMode);
-	$: isNewUser = isPersonalized && totalTemplates < 2;
-	$: starterTemplateIds = useCase ? STARTER_TEMPLATES[useCase] || [] : [];
+	$: quotaPct = $usageWidget?.percentage ?? 0;
+	$: apiKey = $activeApiToken?.token || '';
 
-	// Getting Started Guide
-	$: guideHasApiKey = ($onboardingStore.steps || []).some(
-		(s) => s.id === 'get_api_key' && s.completed
-	);
-	$: guideHasTemplates = totalTemplates > 0;
-	$: guideHasImages = ($onboardingStore.steps || []).some(
-		(s) => s.id === 'first_image' && s.completed
-	);
-	$: guideIntent = $personalization?.useCase || null;
-	$: showGuide = !guideDismissed && totalTemplates < 3;
-
-	function handleDismissGuide() {
-		guideDismissed = true;
-		if (browser) {
-			localStorage.setItem('pictify_guide_dismissed', 'true');
-		}
-	}
-
-
-	function formatBytes(bytes) {
-		if (bytes === 0) return '0 B';
-		const k = 1024;
-		const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-		const i = Math.floor(Math.log(bytes) / Math.log(k));
-		return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-	}
-
-	function formatNumber(num) {
-		if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-		if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-		return num.toString();
-	}
-
-	function timeAgo(dateStr) {
-		const date = new Date(dateStr);
-		const now = new Date();
-		const seconds = Math.floor((now - date) / 1000);
-		if (seconds < 60) return 'just now';
-		const minutes = Math.floor(seconds / 60);
-		if (minutes < 60) return `${minutes}m ago`;
-		const hours = Math.floor(minutes / 60);
-		if (hours < 24) return `${hours}h ago`;
-		const days = Math.floor(hours / 24);
-		if (days < 7) return `${days}d ago`;
-		return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-	}
-
-	function getCategoryIcon(category) {
-		const icons = {
-			image:
-				'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z',
-			gif: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z',
-			pdf: 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z',
-			template:
-				'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z',
-			auth: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
-			api: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4',
-			batch:
-				'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10',
-			webhook: 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101',
-			connector: 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101'
-		};
-		return icons[category] || icons.image;
-	}
-
-	function getCategoryColor(category) {
-		const colors = {
-			image: 'bg-blue-100 text-blue-700 border-blue-700',
-			gif: 'bg-green-100 text-green-700 border-green-700',
-			pdf: 'bg-red-100 text-red-700 border-red-700',
-			template: 'bg-purple-100 text-purple-700 border-purple-700',
-			auth: 'bg-yellow-100 text-yellow-700 border-yellow-700',
-			api: 'bg-indigo-100 text-indigo-700 border-indigo-700',
-			batch: 'bg-orange-100 text-orange-700 border-orange-700'
-		};
-		return colors[category] || 'bg-gray-100 text-gray-700 border-gray-700';
-	}
-
-	function getStatusDot(status) {
-		if (status === 'success') return 'bg-data-green';
-		if (status === 'failure') return 'bg-brand-danger';
-		return 'bg-brand-accent';
-	}
-
-	function handleDismissNudge(id) {
-		dismissNudge(id);
-		nudges = nudges.filter((n) => n.id !== id);
-	}
+	// ---- data ----------------------------------------------------------------
+	const tagged = (list, format) => (list || []).map((r) => ({ ...r, format }));
 
 	onMount(async () => {
-		analytics.page('Dashboard Home');
-		// Fire the canonical dashboard_page_viewed event on the main dashboard route.
-		// Previously only dashboard SUB-pages called this, so the funnel showed ~0%
-		// dashboard reach for signups — a measurement gap, not real behaviour.
-		analytics.trackDashboardPage({ page_name: 'dashboard_home' });
-
-		// Resolve the dashboard-checklist-value-first experiment variant once flags load.
-		const resolveChecklistVariant = () => {
-			try {
-				checklistVariant = posthog.getFeatureFlag?.('dashboard-checklist-value-first') || 'control';
-			} catch {
-				checklistVariant = 'control';
-			}
-		};
-		if (typeof posthog.onFeatureFlags === 'function') {
-			posthog.onFeatureFlags(resolveChecklistVariant);
-		} else {
-			resolveChecklistVariant();
-		}
-
-		// Check if Getting Started Guide was previously dismissed
+		// A starter picked on the Templates page (or anywhere else) lands in
+		// the composer here.
 		if (browser) {
-			guideDismissed = localStorage.getItem('pictify_guide_dismissed') === 'true';
-		}
-
-		try {
-			// Fetch data in parallel
-			const [cdnData, logsData, templatesData, apiTokenData, wfStats, runsData] = await Promise.all([
-				initCdnAnalytics(),
-				fetchAuditLogs({ limit: 8 }).catch(() => ({ logs: [] })),
-				getTemplates({ page: 1, limit: 6, sort: 'newest' }).catch(() => null),
-				getApiToken().catch(() => null),
-				getWorkflowStats(),
-				listWorkflowRuns().catch(() => ({ runs: [] }))
-			]);
-			workflowStats = wfStats;
-			recentRuns = (runsData?.runs || []).slice(0, 6);
-
-			// Extract API key for getting started guide, auto-create if none exists
-			if (apiTokenData?.apiTokens?.length) {
-				userApiKey = apiTokenData.apiTokens[0].token || '';
-			} else {
-				try {
-					const created = await createApiToken();
-					userApiKey = created?.token || '';
-				} catch {
-					// Non-critical — user can create later
-				}
+			const seed = sessionStorage.getItem('pictify_seed_prompt');
+			if (seed) {
+				prompt = seed;
+				sessionStorage.removeItem('pictify_seed_prompt');
 			}
-
-			recentLogs = logsData?.logs || [];
-			recentTemplates = templatesData?.templates || [];
-			totalTemplates = templatesData?.pagination?.total || recentTemplates.length;
-
-			// Evaluate nudges
-			const onb = $onboardingStore;
-			const completedStepIds = (onb.steps || []).filter((s) => s.completed).map((s) => s.id);
-			nudges = evaluateNudges(
-				{
-					templateCount: totalTemplates,
-					integrationMode: onb.personalization?.integrationMode || null,
-					hasApiKey: completedStepIds.includes('get_api_key'),
-					hasBulkRendered: false
-				},
-				getDismissedNudges()
-			);
-		} catch (error) {
-		} finally {
-			isLoading = false;
 		}
 
+		const [templatesData, imagesData, gifsData, pdfsData, status, health] = await Promise.all([
+			// Each read carries its own failure: one dead endpoint empties its
+			// own strip instead of blanking the whole dashboard.
+			getTemplates({ page: 1, limit: 4, sort: 'newest' }).catch(() => null),
+			getImages({ limit: 100 }),
+			getGifs({ limit: 30 }),
+			getPdfs({ limit: 30 }),
+			getOnboardingV2Status().catch(() => null),
+			checkApiHealth().catch(() => null)
+		]);
+
+		templates = templatesData?.templates || [];
+		totalTemplates = templatesData?.pagination?.total ?? templates.length;
+
+		const all = [
+			...tagged(imagesData?.images, 'PNG'),
+			...tagged(gifsData?.gifs, 'GIF'),
+			...tagged(pdfsData?.pdfs, 'PDF')
+		]
+			.filter((r) => r.createdAt)
+			.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+		renders = all;
+		rendersTruncated = Boolean(
+			imagesData?.pagination?.hasMore || gifsData?.pagination?.hasMore || pdfsData?.pagination?.hasMore
+		);
+		hasStoredRender =
+			all.length > 0 ||
+			(imagesData?.pagination?.total ?? 0) + (gifsData?.pagination?.total ?? 0) + (pdfsData?.pagination?.total ?? 0) > 0;
+
+		if (status) external = { received: Boolean(status.received), via: status.firstExternalRenderVia || null };
+		apiUp = health ? true : false;
+
+		// The key chip and curl snippet need a real key; make one if the account
+		// has none (parity with the old home).
+		try {
+			const existing = await getAPITokenAction();
+			if (!existing?.apiTokens?.length) await createAPITokenAction();
+		} catch {
+			// Snippet falls back to a placeholder — not worth blocking the page.
+		}
+
+		loaded = true;
+		analytics.track('home_v2_viewed', { stage });
 	});
+
+	// ---- derived slices ------------------------------------------------------
+	$: justPrinted = renders.slice(0, 8);
+	$: windowStart = Date.now() - 14 * DAY_MS;
+	$: window14 = renders.filter((r) => new Date(r.createdAt).getTime() >= windowStart);
+	$: prior14 = renders.filter((r) => {
+		const t = new Date(r.createdAt).getTime();
+		return t < windowStart && t >= Date.now() - 28 * DAY_MS;
+	});
+	// A truncated fetch can't make honest claims about the window or the trend.
+	$: trendPct =
+		!rendersTruncated && prior14.length > 0
+			? Math.round(((window14.length - prior14.length) / prior14.length) * 100)
+			: null;
+	$: showChart = stage === 's2' && window14.length > 0 && !rendersTruncated;
+
+	$: fillChips = (() => {
+		const via = (external.via || '').toLowerCase();
+		return [
+			{ label: 'YOUR CODE', on: via.includes('api') || via.includes('code') },
+			{ label: 'ZAPIER', on: via.includes('zapier') },
+			{ label: 'CSV', on: via.includes('csv') || via.includes('batch') },
+			{ label: 'MCP', on: via.includes('mcp') || via.includes('agent') }
+		];
+	})();
+
+	function hideSetup() {
+		setupHidden = true;
+		if (browser) localStorage.setItem(HIDE_SETUP_KEY, '1');
+		analytics.track('home_setup_hidden', { stage });
+	}
+
+	function hideInvite() {
+		inviteHidden = true;
+		if (browser) localStorage.setItem(HIDE_INVITE_KEY, '1');
+		analytics.track('home_invite_hidden');
+	}
+
+	// The invite ask fires once, at the moment it's earned: first external
+	// render landed, still a team of one.
+	$: showInviteCard = stage === 's2' && !inviteHidden && ($teamMembers?.length || 1) <= 1;
+
+	// ---- invite --------------------------------------------------------------
+	let inviteBusy = false;
+	let inviteResult = '';
+
+	async function handleInvite(event) {
+		if (!$currentTeam?.uid) {
+			inviteResult = 'No team to invite into yet.';
+			return;
+		}
+		inviteBusy = true;
+		inviteResult = '';
+		try {
+			await createInvitationAction($currentTeam.uid, event.detail.email);
+			inviteResult = `Invite sent to ${event.detail.email}.`;
+			analytics.track('home_invite_sent');
+		} catch (e) {
+			inviteResult = e?.message || 'Could not send that invite.';
+		} finally {
+			inviteBusy = false;
+		}
+	}
+
+	// ---- the press run -------------------------------------------------------
+	let view = 'home';
+	let prompt = '';
+	let generateError = '';
+	let lines = [];
+	let variables = [];
+	let genStage = 0;
+	let agentStages = {};
+	let abortGeneration;
+	let timers = [];
+
+	function clearTimers() {
+		timers.forEach(clearTimeout);
+		timers = [];
+	}
+	onDestroy(() => {
+		clearTimers();
+		abortGeneration?.abort();
+	});
+
+	async function runGeneration(event) {
+		prompt = event.detail.prompt;
+		generateError = '';
+		analytics.track('home_generate_started', { length: prompt.length, stage });
+
+		clearTimers();
+		abortGeneration?.abort();
+		abortGeneration = new AbortController();
+
+		view = 'generating';
+		genStage = 0;
+		lines = [];
+		variables = [];
+		agentStages = {};
+
+		let buffered = '';
+
+		await generateFromPrompt({
+			prompt,
+			signal: abortGeneration.signal,
+			onStage: (s) => {
+				const at = agentStages[s.id]?.at ?? Date.now();
+				const tookMs = s.status === 'done' ? Date.now() - at : agentStages[s.id]?.tookMs;
+				agentStages = { ...agentStages, [s.id]: { ...s, at, tookMs } };
+			},
+			onToken: (text) => {
+				buffered += text;
+				const parts = buffered.split('\n');
+				buffered = parts.pop() ?? '';
+				const visible = parts.filter((l) => !/^\s*```/.test(l));
+				if (visible.length) lines = [...lines, ...visible];
+			},
+			onTemplate: (payload) => {
+				if (buffered.trim() && !/^\s*```/.test(buffered)) lines = [...lines, buffered];
+				genStage = 1;
+				(payload.variables || []).forEach((v, i) => {
+					timers.push(setTimeout(() => (variables = [...variables, v]), 360 * (i + 1)));
+				});
+				const settle = 360 * (payload.variables?.length || 0) + 400;
+				timers.push(
+					setTimeout(() => {
+						analytics.track('home_generate_completed');
+						goto(`/template-workspace/html/${payload.templateUid}`);
+					}, settle)
+				);
+			},
+			onError: (err) => {
+				generateError = err?.message || 'Could not write that template.';
+				analytics.track('home_generate_failed');
+				view = 'home';
+			}
+		});
+	}
 </script>
 
 <svelte:head>
-	<title>Dashboard - Pictify.io</title>
+	<title>Home | Pictify.io</title>
 </svelte:head>
 
-<section class="min-h-full pb-12 relative z-0">
-	<!-- Background Pattern -->
-	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none -z-10"
-	/>
-
-	<!-- Welcome Header & Primary Action -->
-	<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 sm:mb-12 pt-4">
-		<div>
-			<div
-				class="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-accent border-[3px] border-black shadow-brutal-lg rounded-full transform -rotate-1 mb-6"
-			>
-				<span class="w-2 h-2 bg-data-green rounded-full border border-black" />
-				<span class="text-xs font-black text-black uppercase tracking-widest">Command Center</span>
-			</div>
-			{#if welcomeMsg && totalTemplates === 0}
-				<h1
-					class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black text-black tracking-tighter leading-[0.95]"
-				>
-					{welcomeMsg.title}
-				</h1>
-				<p class="text-base sm:text-lg font-bold text-gray-500 mt-3 max-w-lg">
-					{welcomeMsg.subtitle}
-				</p>
-			{:else}
-				<h1
-					class="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black text-black tracking-tighter leading-[0.95]"
-				>
-					Welcome back.
-				</h1>
-			{/if}
-		</div>
-
-		<div class="flex items-center gap-4">
-			<a
-				href={primaryCTA?.href || '/dashboard/workflows/new'}
-				class="group flex items-center gap-3 bg-brand-danger border-[3px] border-black shadow-brutal-xl rounded-2xl px-6 py-3 md:px-8 md:py-4 hover:shadow-brutal-sm hover:translate-x-[4px] hover:translate-y-[4px] transform hover:rotate-1 transition-all duration-200"
-			>
-				<span class="text-white font-black text-lg uppercase tracking-wide"
-					>{primaryCTA?.label || 'Start a run'}</span
-				>
-				<div
-					class="w-8 h-8 md:w-10 md:h-10 bg-white rounded-xl border-[3px] border-black flex items-center justify-center group-hover:rotate-12 transition-transform shadow-brutal-sm"
-				>
-					<svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						{#if integrationMode === 'api'}
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="3"
-								d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-							/>
-						{:else}
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="3"
-								d="M12 4v16m8-8H4"
-							/>
-						{/if}
-					</svg>
-				</div>
-			</a>
-		</div>
+{#if view === 'generating'}
+	<div class="min-h-full w-full bg-brand-paper">
+		<GeneratingStep
+			{prompt}
+			{lines}
+			{variables}
+			stage={genStage}
+			{agentStages}
+			on:edit={() => {
+				clearTimers();
+				abortGeneration?.abort();
+				view = 'home';
+			}}
+		/>
 	</div>
+{:else}
+	<div class="relative min-h-full w-full overflow-hidden px-6 py-8 lg:px-11 lg:py-9">
+		<!-- Edge cluster: the app sharing the landing's cut-by-the-page-edge
+		     decoration language. -->
+		<div class="absolute -right-[26px] top-[60px] hidden flex-col lg:flex" aria-hidden="true">
+			<div class="flex">
+				<span class="block h-[26px] w-[26px]"></span>
+				<span class="block h-[26px] w-[26px] bg-brand-powder"></span>
+				<span class="block h-[26px] w-[26px] bg-brand-blue"></span>
+			</div>
+			<div class="flex">
+				<span class="block h-[26px] w-[26px] bg-brand-sky"></span>
+				<span class="block h-[26px] w-[26px] bg-brand-ink"></span>
+				<span class="block h-[26px] w-[26px] bg-brand-powder"></span>
+			</div>
+		</div>
 
-	<!-- Getting Started Guide (new users only) -->
-	{#if showGuide && !isLoading}
-		<div class="mb-10">
-			<GettingStartedGuide
-				hasApiKey={guideHasApiKey}
-				hasTemplates={guideHasTemplates}
-				hasImages={guideHasImages}
-				intent={guideIntent}
-				apiKey={userApiKey}
-				variant={checklistVariant}
-				on:dismiss={handleDismissGuide}
-			/>
-		</div>
-	{/if}
+		<div class="mx-auto flex max-w-page flex-col gap-6">
+			<div class="flex items-center justify-between">
+				<span class="flex items-center gap-2">
+					<span
+						class="block h-[9px] w-[9px] {apiUp === false ? 'bg-[#B0483A]' : 'bg-brand-proof'} {apiUp === null
+							? 'animate-pulse opacity-50'
+							: ''}"
+						aria-hidden="true"
+					></span>
+					<span class="font-mono text-[11px] uppercase tracking-[0.1em] text-brand-mute">
+						{apiUp === null ? 'Checking…' : apiUp ? 'API up' : 'API down'}
+					</span>
+				</span>
+				<a
+					href={PUBLIC_DOCS_URL || 'https://docs.pictify.io'}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="rounded-btn border-[1.5px] border-brand-rule px-3.5 py-2 font-sans text-[13px] font-semibold text-brand-slate hover:border-brand-ink hover:text-brand-ink"
+				>
+					Docs
+				</a>
+			</div>
 
-	{#if isLoading}
-		<!-- Skeleton: 3 stat cards + chart placeholder + 4 template cards -->
-		<div class="mb-12">
-			<Skeleton class="h-4 w-40 mb-6" />
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-				{#each Array(3) as _}
-					<Skeleton class="h-32 rounded-2xl border-[3px] border-gray-200" />
-				{/each}
+			<div class="flex flex-col gap-4">
+				<h1 class="font-display text-[34px] font-extrabold tracking-[-0.03em] text-brand-ink lg:text-[38px]">
+					What do you need to make?
+				</h1>
+				<Composer bind:prompt busy={view === 'generating'} on:generate={runGeneration} />
+				{#if generateError}
+					<p role="alert" class="flex items-start gap-2.5 rounded-btn bg-brand-rose px-4 py-3 font-sans text-[15px] leading-[21px] text-brand-ink">
+						<span class="mt-1.5 block h-2 w-2 flex-shrink-0 bg-brand-ink" aria-hidden="true"></span>
+						{generateError} Your description is still in the ticket — adjust it and try again.
+					</p>
+				{/if}
 			</div>
-		</div>
-		<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 mb-12">
-			<div class="lg:col-span-8">
-				<Skeleton class="h-[400px] rounded-2xl border-[3px] border-gray-200" />
-			</div>
-			<div class="lg:col-span-4">
-				<Skeleton class="h-[400px] rounded-2xl border-[3px] border-gray-200" />
-			</div>
-			<div class="lg:col-span-8">
-				<Skeleton class="h-4 w-40 mb-6" />
-				<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-					{#each Array(4) as _}
-						<Skeleton class="h-52 rounded-2xl border-[3px] border-gray-200" />
-					{/each}
-				</div>
-			</div>
-			<div class="lg:col-span-4">
-				<Skeleton class="h-52 rounded-2xl border-[3px] border-gray-200" />
-			</div>
-		</div>
-	{:else}
-		<!-- Recommended For You (new personalized users only) -->
-		{#if isNewUser && starterTemplateIds.length > 0}
-			<div class="mb-12">
-				<div class="flex items-center gap-3 mb-6">
-					<h2
-						class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3"
-					>
-						<span class="w-3 h-3 bg-brand-accent rounded-full border-[2px] border-black" />
-						Recommended For You
-					</h2>
-				</div>
-				<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-					{#each starterTemplateIds.slice(0, 3) as templateId}
+
+			{#if loaded}
+				{#if stage === 's0' && !setupHidden}
+					<SetupStrip variant="s0" {apiKey} {hasTemplate} on:hide={hideSetup} />
+				{/if}
+
+				{#if stage === 's1'}
+					{#if declaredMode !== 'dashboard' && !setupHidden}
+						<NextStepCard
+							variant={declaredMode}
+							{apiKey}
+							templateName={templates[0]?.name || ''}
+							variables={templates[0]?.variables || []}
+						/>
+					{/if}
+					<div class="flex items-center justify-between px-0.5">
+						<span class="font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute">
+							Also works with — {declaredMode === 'dashboard' ? Object.values(FILL_LABELS).join(' · ') : otherFills}
+						</span>
 						<a
-							href="/template-workspace/html/create?engine=html"
-							class="group bg-white rounded-2xl border-[3px] border-black shadow-brutal-lg overflow-hidden hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+							href="/dashboard/integrations"
+							class="font-sans text-[12.5px] font-semibold text-brand-slate underline underline-offset-[3px]"
 						>
-							<!-- Template Preview -->
-							<div
-								class="aspect-[4/3] bg-[radial-gradient(circle_at_30%_30%,#f8f8f8,#e8e8e8)] overflow-hidden relative"
-							>
-								<div class="w-full h-full flex items-center justify-center">
-									<div
-										class="w-14 h-14 bg-brand-accent/20 rounded-xl border-[2px] border-brand-accent flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-transform"
-									>
-										<svg
-											class="w-7 h-7 text-brand-accent"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"
-											/>
-										</svg>
-									</div>
-								</div>
-							</div>
-							<!-- Label -->
-							<div class="px-4 py-3 border-t-[3px] border-black">
-								<span class="text-sm font-black text-black capitalize"
-									>{templateId.replace(/-/g, ' ')}</span
-								>
-								<span class="block text-xs font-bold text-gray-500 mt-0.5">Try this template</span>
-							</div>
+							Set up another way
 						</a>
-					{/each}
-				</div>
-			</div>
-		{/if}
-
-		<!-- Nudge Banners -->
-		{#if nudges.length > 0}
-			<div class="flex flex-col gap-3 mb-8">
-				{#each nudges as nudge (nudge.id)}
-					<NudgeBanner
-						message={nudge.message}
-						cta={nudge.cta}
-						href={nudge.href}
-						on:dismiss={() => handleDismissNudge(nudge.id)}
-					/>
-				{/each}
-			</div>
-		{/if}
-
-		<!-- 1. Pulse Metrics (Top Full-Width) -->
-		<!-- Performance Command Center -->
-		<div class="mb-12">
-			<div class="flex items-center gap-3 mb-6">
-				<h2
-					class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3"
-				>
-					<span class="w-3 h-3 bg-brand-danger rounded-full border-[2px] border-black" />
-					Performance Analytics
-				</h2>
-			</div>
-
-			<!-- Analytics Layout: top row aggregated metrics, then chart + quick actions -->
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-				<!-- Aggregated Metric: Views -->
-				<div
-					class="bg-brand-accent rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 flex flex-col justify-center relative overflow-hidden group"
-				>
-					<!-- Geometric background shape -->
-					<div
-						class="absolute -right-12 -top-12 w-40 h-40 bg-white/20 rounded-full blur-2xl group-hover:translate-x-4 group-hover:translate-y-4 transition-transform duration-700"
-					/>
-					<div class="relative z-10">
-						<div
-							class="text-[10px] md:text-xs font-black text-black/70 uppercase tracking-widest mb-2"
-						>
-							Total Views
-						</div>
-						<div
-							class="text-4xl md:text-5xl lg:text-6xl font-black text-black tracking-tighter leading-none"
-						>
-							{formatNumber($cdnStore.totalHits)}
-						</div>
 					</div>
-				</div>
+				{/if}
 
-				<!-- Aggregated Metric: Templates -->
-				<div
-					class="bg-indigo-300 rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 flex flex-col justify-center relative overflow-hidden group"
-				>
-					<!-- Geometric background shape -->
-					<div
-						class="absolute -right-6 -bottom-6 w-32 h-32 bg-black/5 transform rotate-12 group-hover:rotate-45 transition-transform duration-700"
-					/>
-					<div class="relative z-10">
-						<div
-							class="text-[10px] md:text-xs font-black text-black/70 uppercase tracking-widest mb-2"
-						>
-							Total Templates
-						</div>
-						<div
-							class="text-4xl md:text-5xl lg:text-6xl font-black text-black tracking-tighter leading-none"
-						>
-							{totalTemplates}
-						</div>
-					</div>
-				</div>
-
-				<!-- Aggregated Metric: Assets -->
-				<div
-					class="bg-data-green rounded-2xl border-[3px] border-black shadow-brutal-2xl p-6 flex flex-col justify-center relative overflow-hidden group"
-				>
-					<!-- Geometric background shape -->
-					<div
-						class="absolute -left-10 -bottom-10 w-36 h-36 bg-white/30 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700"
-					/>
-					<div class="relative z-10">
-						<div
-							class="text-[10px] md:text-xs font-black text-black/70 uppercase tracking-widest mb-2"
-						>
-							Workflow Runs
-						</div>
-						<div
-							class="text-4xl md:text-5xl lg:text-6xl font-black text-black tracking-tighter leading-none"
-						>
-							{formatNumber(workflowStats.totalRuns)}
-						</div>
-						<div class="text-[10px] font-bold text-black/50 mt-2 uppercase tracking-wider">
-							{formatNumber(workflowStats.documentsDelivered)} delivered
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Main Split -->
-		<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 mb-12 items-start">
-			<!-- ROW 1: Chart + Quick Actions -->
-			<!-- Render activity — compact. The full chart, referrers and countries
-				 live at /dashboard/analytics; duplicating them here buried the run
-				 loop under the old image-API product. -->
-			<div class="lg:col-span-8 flex flex-col lg:self-stretch">
-				<!-- Heading sits OUTSIDE the card, matching Quick Actions and Recent
-					 runs, so all three section titles share one baseline. -->
-				<div class="flex items-center justify-between mb-6 gap-4 min-h-[38px]">
-					<h2
-						class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3"
-					>
-						<span class="w-3 h-3 bg-data-blue rounded-sm border-[2px] border-black rotate-45" />
-						Render activity
-					</h2>
-					<a
-						href="/dashboard/analytics"
-						class="inline-flex items-center gap-2 bg-white text-black px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest border-[3px] border-black shadow-brutal-sm hover:shadow-brutal-md hover:-translate-y-0.5 transition-all focus-brutal"
-					>
-						View analytics
-						<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-						</svg>
-					</a>
-				</div>
-
-				<div
-					class="bg-white rounded-2xl border-[3px] border-black shadow-brutal-md p-5 md:p-6 flex-1 flex items-center"
-				>
-					<div class="flex items-center gap-6 lg:gap-8 w-full">
-						<div class="shrink-0 flex flex-col gap-5">
-							<div>
-								<div
-									class="text-3xl font-black text-black tracking-tighter leading-none tabular-nums"
-								>
-									{formatNumber($cdnStore.totalHits)}
-								</div>
-								<div class="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1.5">
-									Views all time
-								</div>
-							</div>
-
-							<div class="pt-5 border-t-[3px] border-black">
-								<div class="flex items-baseline gap-2">
-									<span
-										class="text-3xl font-black text-black tracking-tighter leading-none tabular-nums"
-									>
-										{formatNumber(spark14Total)}
+				{#if stage === 's2'}
+					<div class="flex items-center justify-between border-y border-brand-rule py-2.5">
+						<div class="flex flex-wrap items-center gap-2">
+							<span class="font-mono text-[10px] uppercase tracking-[0.1em] text-brand-mute">Fills from</span>
+							{#each fillChips as chip (chip.label)}
+								{#if chip.on}
+									<span class="rounded-[3px] bg-brand-canvas px-[9px] py-[3px] font-mono text-[10px] tracking-[0.06em] text-brand-ink">
+										{chip.label} ✓
 									</span>
-									{#if trendPct !== null}
-										<span
-											class="px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-full border-[2px] border-black tabular-nums {trendPct >=
-											0
-												? 'bg-data-green text-black'
-												: 'bg-brand-danger/20 text-black'}"
-										>
-											{trendPct >= 0 ? '+' : ''}{trendPct}%
-										</span>
-									{/if}
-								</div>
-								<div class="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1.5">
-									Last 14 days
-								</div>
-							</div>
+								{:else}
+									<span class="rounded-[3px] border border-brand-rule px-[9px] py-[3px] font-mono text-[10px] tracking-[0.06em] text-brand-slate">
+										+ {chip.label}
+									</span>
+								{/if}
+							{/each}
 						</div>
-
-						<!-- Sparkline: last 14 days of delivery, drawn from the same
-							 dailyStats the analytics page uses. -->
-						{#if sparkStats.length > 1}
-							<div class="flex-1 flex items-end gap-[3px] h-14 lg:h-20" aria-hidden="true">
-								{#each sparkStats as day}
-									<div
-										class="flex-1 bg-data-blue border-[1.5px] border-black rounded-sm min-h-[3px] transition-all duration-200"
-										style="height: {sparkMax > 0 ? Math.max(6, (day.hits / sparkMax) * 100) : 6}%"
-										title="{day.date}: {day.hits} views"
-									/>
-								{/each}
-							</div>
-							<div class="shrink-0 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-								14d
-							</div>
-						{:else}
-							<p class="flex-1 text-xs font-bold text-gray-500">
-								No render traffic yet. Assets you render through a template or the API show up here.
-							</p>
-						{/if}
-					</div>
-				</div>
-			</div>
-			<div class="lg:col-span-4 flex flex-col lg:self-stretch">
-				<!-- Quick Actions — Feature Discovery (personalized order) -->
-				<div class="flex flex-col flex-1">
-					<div class="flex items-center justify-between mb-6 min-h-[38px]">
-						<h2
-							class="text-sm md:text-base font-black text-black uppercase tracking-widest flex items-center gap-3"
+						<a
+							href="/dashboard/integrations"
+							class="font-sans text-[12.5px] font-semibold text-brand-slate underline underline-offset-[3px]"
 						>
-							<span class="w-3 h-3 bg-data-violet rounded-sm border-[2px] border-black" />
-							Quick Actions
-						</h2>
+							Callers
+						</a>
 					</div>
 
-					<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-3">
-						{#each quickActions as action}
-							<a
-								href={action.href}
-								class="group bg-white rounded-xl border-[3px] border-black shadow-brutal-md p-3 hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex flex-col items-center text-center"
-							>
-								<div
-									class="w-9 h-9 rounded-lg border-[2px] flex items-center justify-center mb-2 group-hover:scale-110 group-hover:-rotate-3 transition-transform"
-									style="background-color: {action.color}15; border-color: {action.color}"
-								>
-									<svg
-										class="w-5 h-5"
-										style="color: {action.color}"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
+					{#if showChart}
+						<DaybookChart renders={window14} total={window14.length} {trendPct} />
+					{/if}
+
+					{#if showInviteCard}
+						<div class="relative flex flex-col justify-between gap-3 overflow-hidden rounded-[10px] bg-brand-canvas px-[22px] py-4 sm:flex-row sm:items-center">
+							<div class="flex flex-col gap-0.5">
+								<div class="flex items-center gap-3">
+									<span class="font-mono text-[10px] uppercase tracking-[0.12em] text-[#6B6B68]">
+										Bring your team
+									</span>
+									<button
+										type="button"
+										on:click={hideInvite}
+										class="font-mono text-[10px] text-brand-mute hover:text-brand-ink"
 									>
-										{#if action.icon === 'batch'}
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-											/>
-										{:else if action.icon === 'link'}
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-											/>
-										{:else if action.icon === 'chart'}
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-											/>
-										{:else if action.icon === 'shield'}
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-											/>
-										{:else if action.icon === 'clock'}
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-											/>
-										{:else if action.icon === 'lightning'}
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M13 10V3L4 14h7v7l9-11h-7z"
-											/>
-										{:else if action.icon === 'code'}
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-											/>
-										{:else if action.icon === 'key'}
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-											/>
-										{:else if action.icon === 'video'}
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2.5"
-											d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-										/>
-									{:else if action.icon === 'plus'}
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M12 4v16m8-8H4"
-											/>
-										{:else}
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="M13 10V3L4 14h7v7l9-11h-7z"
-											/>
-										{/if}
-									</svg>
+										HIDE ✕
+									</button>
 								</div>
-								<span class="text-xs font-black text-black uppercase tracking-wider"
-									>{action.label}</span
+								<span class="font-sans text-[13px] text-brand-slate">
+									Templates are shared. Everyone gets their own key, renders share one quota.
+								</span>
+								{#if inviteResult}
+									<span class="font-mono text-[10.5px] text-brand-slate">{inviteResult}</span>
+								{/if}
+							</div>
+							<form class="flex flex-shrink-0 items-center gap-2" on:submit|preventDefault={(e) => handleInvite({ detail: { email: e.target.email.value } })}>
+								<input
+									name="email"
+									type="email"
+									placeholder="teammate@yours.com"
+									class="w-[200px] rounded-btn border-[1.5px] border-brand-rule bg-white px-3 py-2 font-mono text-[11px] text-brand-ink outline-none placeholder:text-brand-mute focus:border-brand-ink"
+								/>
+								<button
+									type="submit"
+									disabled={inviteBusy}
+									class="rounded-btn bg-brand-ink px-4 py-2 font-sans text-xs font-bold text-white disabled:opacity-30"
 								>
-								<span
-									class="text-[10px] font-bold text-gray-500 mt-1 leading-tight hidden sm:block lg:hidden xl:block"
-									>{action.desc}</span
-								>
-							</a>
+									{inviteBusy ? 'Inviting…' : 'Invite'}
+								</button>
+							</form>
+						</div>
+					{/if}
+				{/if}
+
+				<ProofSheet
+					starters={stage === 's0'}
+					{templates}
+					on:use={(e) => {
+						prompt = e.detail.seed;
+						analytics.track('home_starter_seeded');
+					}}
+				/>
+
+				{#if stage === 's2' && quotaPct >= 80}
+					<UpgradeNudge percentage={quotaPct} resetDate={$plgStatus?.resetDate ?? null} />
+				{/if}
+
+				<JustPrinted renders={justPrinted} empty={stage === 's0' && justPrinted.length === 0} />
+			{:else}
+				<div class="flex flex-col gap-4" aria-hidden="true">
+					<div class="h-[88px] animate-pulse rounded-[10px] bg-brand-canvas"></div>
+					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+						{#each Array(4) as _}
+							<div class="h-[220px] animate-pulse rounded-[10px] bg-brand-canvas"></div>
 						{/each}
 					</div>
 				</div>
-			</div>
-
-			<!-- ROW 2: Continue Working (full width — the "Top Performing
-				 Templates" panel was removed 2026-08) -->
-			<!-- Recent runs — the page's primary content. "Did my documents go out?"
-				 is the question this product answers; nothing rendered it before. -->
-			<!-- Recent runs — the page's primary content. "Did my documents go out?"
-				 is the question this product answers; nothing rendered it before. -->
-			<div class="lg:col-span-12 flex flex-col">
-				<RecentRuns runs={recentRuns} />
-			</div>
+			{/if}
 		</div>
-	{/if}
-</section>
-
-<!-- Intent Wizard (full-screen overlay for new users) -->
-{#if $showWelcomeWizard}
-	<WelcomeWizard />
+	</div>
 {/if}

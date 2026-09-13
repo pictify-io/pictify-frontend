@@ -9,7 +9,6 @@
 	import { css } from '@codemirror/lang-css';
 	import { javascript } from '@codemirror/lang-javascript';
 	import { EditorView } from '@codemirror/view';
-	import Toast from '$lib/components/Toast.svelte';
 	import OgImageTemplate from '$lib/components/tools/OgImageTemplate.svelte';
 
 	const dispatch = createEventDispatcher();
@@ -723,7 +722,6 @@
 	</div>
 </div>
 
-<Toast />
 
 <style>
 	:global(.color-picker-dialog),

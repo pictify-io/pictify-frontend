@@ -8,7 +8,6 @@
 	} from '../../../store/user.store';
 	import { onMount } from 'svelte';
 	import CopyIcon from '$lib/assets/dashboard/Copy Icons.png';
-	import Toast from '$lib/components/Toast.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 	import { plgStatus, usageWidget, initPLG } from '../../../store/plg.store';
 	import { copyToClipboard } from '$lib/utils/format.js';
@@ -437,4 +436,3 @@
 	{/if}
 </section>
 
-<Toast />

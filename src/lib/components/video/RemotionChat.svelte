@@ -81,14 +81,14 @@
 	});
 </script>
 
-<div class="flex h-full min-h-0 flex-col bg-gray-950">
+<div class="flex h-full min-h-0 flex-col bg-brand-paper">
 	<div bind:this={listEl} class="ov-scroll min-h-0 flex-1 overflow-y-auto px-3 py-3">
 		{#if !messages.length}
 			<div class="pt-2">
-				<p class="text-[11px] font-bold leading-snug text-gray-300">
+				<p class="text-[11px] font-bold leading-snug text-brand-slate">
 					Describe a change and the scene is rewritten for you.
 				</p>
-				<p class="mt-1 text-[11px] leading-snug text-gray-500">
+				<p class="mt-1 text-[11px] leading-snug text-brand-mute">
 					Every edit has to compile before it is applied, so a request that would
 					break the video is refused instead.
 				</p>
@@ -99,7 +99,7 @@
 								type="button"
 								on:click={() => send(suggestion)}
 								disabled={busy}
-								class="rounded border border-gray-800 bg-gray-900 px-2 py-1.5 text-left text-[11px] text-gray-300 transition-colors hover:border-brand-accent/60 hover:text-white disabled:opacity-50"
+								class="rounded border border-brand-rule bg-brand-subtle px-2 py-1.5 text-left text-[11px] text-brand-slate transition-colors hover:border-brand-ink hover:text-white disabled:opacity-50"
 							>
 								{suggestion}
 							</button>
@@ -113,7 +113,7 @@
 			{#if message.role === 'user'}
 				<div class="mb-2 flex justify-end">
 					<p
-						class="max-w-[85%] rounded-lg rounded-br-sm border-[2px] border-black bg-brand-accent px-2 py-1.5 text-[11px] font-bold leading-snug text-black"
+						class="max-w-[85%] rounded-lg rounded-br-sm border border-brand-rule bg-brand-field px-2 py-1.5 text-[11px] font-bold leading-snug text-black"
 					>
 						{message.text}
 					</p>
@@ -121,8 +121,8 @@
 			{:else}
 				<div class="mb-3">
 					<p
-						class="max-w-[90%] rounded-lg rounded-bl-sm border border-gray-800 bg-gray-900 px-2 py-1.5 text-[11px] leading-snug
-							{message.status === 'error' ? 'text-brand-danger' : 'text-gray-300'}"
+						class="max-w-[90%] rounded-lg rounded-bl-sm border border-brand-rule bg-brand-subtle px-2 py-1.5 text-[11px] leading-snug
+							{message.status === 'error' ? 'text-brand-alarm' : 'text-brand-slate'}"
 					>
 						{message.text}
 					</p>
@@ -130,9 +130,9 @@
 					{#if message.errors?.length}
 						<!-- The compiler's own words. "It failed" tells you nothing you can
 						     act on; the actual error usually tells you what to ask for next. -->
-						<div class="mt-1 rounded border border-brand-danger/40 bg-brand-danger/10 p-1.5">
+						<div class="mt-1 rounded border border-brand-alarm/40 bg-brand-alarm/10 p-1.5">
 							{#each message.errors as error (error)}
-								<p class="font-mono text-[10px] leading-snug text-brand-danger">{error}</p>
+								<p class="font-mono text-[10px] leading-snug text-brand-alarm">{error}</p>
 							{/each}
 						</div>
 					{/if}
@@ -142,7 +142,7 @@
 							type="button"
 							on:click={() => dispatch('revert')}
 							title="Put the composition back the way it was before this edit"
-							class="mt-1.5 rounded border-[2px] border-black bg-gray-800 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-gray-100 transition-colors hover:bg-gray-700"
+							class="mt-1.5 rounded border border-brand-rule bg-brand-subtle px-2 py-1 text-[10px] font-mono uppercase tracking-[0.08em] text-brand-ink transition-colors hover:bg-brand-rule"
 						>
 							Undo this edit
 						</button>
@@ -152,8 +152,8 @@
 		{/each}
 
 		{#if busy}
-			<div class="flex items-center gap-2 px-1 py-1 text-[11px] text-gray-400">
-				<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-accent"></span>
+			<div class="flex items-center gap-2 px-1 py-1 text-[11px] text-brand-slate">
+				<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-field"></span>
 				<!--
 					The live stage, not a fixed label. An edit takes eight to fifteen
 					seconds and "working…" for all of them tells the user nothing about
@@ -166,7 +166,7 @@
 
 	<form
 		on:submit|preventDefault={() => send()}
-		class="shrink-0 border-t-[3px] border-black bg-gray-900 p-2"
+		class="shrink-0 border-t border-brand-rule bg-brand-subtle p-2"
 	>
 		<textarea
 			bind:value={draft}
@@ -175,14 +175,14 @@
 			rows="2"
 			placeholder="Make the intro shorter…"
 			aria-label="Describe a change for AI to make"
-			class="w-full resize-none rounded border border-gray-700 bg-gray-950 px-2 py-1.5 text-[11px] leading-snug text-gray-100 outline-none transition-colors placeholder:text-gray-500 focus:border-brand-accent disabled:opacity-60"
+			class="w-full resize-none rounded border border-brand-rule bg-brand-paper px-2 py-1.5 text-[11px] leading-snug text-brand-ink outline-none transition-colors placeholder:text-brand-mute focus:border-brand-ink disabled:opacity-60"
 		></textarea>
 		<div class="mt-1.5 flex items-center justify-between">
-			<span class="text-[10px] text-gray-600">Enter to send</span>
+			<span class="text-[10px] text-brand-mute">Enter to send</span>
 			<button
 				type="submit"
 				disabled={busy || !draft.trim()}
-				class="rounded border-[2px] border-black bg-brand-accent px-3 py-1 text-[10px] font-black uppercase tracking-widest text-black transition-all hover:-translate-y-px disabled:translate-y-0 disabled:opacity-40"
+				class="rounded border border-brand-rule bg-brand-field px-3 py-1 text-[10px] font-mono uppercase tracking-[0.08em] text-black transition-all hover:-translate-y-px disabled:translate-y-0 disabled:opacity-40"
 			>
 				{busy ? 'Editing…' : 'Send'}
 			</button>

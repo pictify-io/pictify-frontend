@@ -1,18 +1,32 @@
 <script>
-	import ToolPageShell from '$lib/components/tools/scaffold/ToolPageShell.svelte';
-	import ToolBreadcrumb from '$lib/components/tools/scaffold/ToolBreadcrumb.svelte';
-	import ToolSeoHead from '$lib/components/tools/scaffold/ToolSeoHead.svelte';
-	import ToolSuccessBanner from '$lib/components/tools/scaffold/ToolSuccessBanner.svelte';
-	import ToolFaq from '$lib/components/tools/scaffold/ToolFaq.svelte';
-	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
-	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
+	/**
+	 * /tools/tweet-screenshot — the v2 tool page, column mode.
+	 *
+	 * The head, the FAQ and the prose keep their live wording; only the frame,
+	 * the toolbar and the result surface are new. ToolSeoHead stays:
+	 * they own the frozen schema and heading.
+	 */
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
+	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
+	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
+	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
+	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
+	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
+	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
+	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
+	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
+	import Lead from '$lib/components/tools/v2/longform/Lead.svelte';
+	import Prose from '$lib/components/tools/v2/longform/Prose.svelte';
+	import ProseGroup from '$lib/components/tools/v2/longform/ProseGroup.svelte';
+	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
 	import { onMount } from 'svelte';
 	import { user } from '../../../store/user.store';
 	import { toast } from '../../../store/toast.store';
-	import { generationLimits } from '../../../store/generationLimits.store';
+	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import backend from '../../../service/backend';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { buildTweetHtml, DEFAULT_TWEET } from '$lib/components/tools/TweetScreenshot.js';
 
 	$: isUserLoggedIn = !!$user?.email;
@@ -98,10 +112,7 @@ res = requests.post(
 print(res.json()['image']['url'])`;
 
 	function escapeHtml(s) {
-		return String(s)
-			.replace(/&/g, '&amp;')
-			.replace(/</g, '&lt;')
-			.replace(/>/g, '&gt;');
+		return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 	}
 
 	/**
@@ -151,7 +162,10 @@ print(res.json()['image']['url'])`;
 		{ re: /"(?:[^"\\]|\\.)*"/gs, cls: 'string' },
 		{ re: /'(?:[^'\\]|\\.)*'/gs, cls: 'string' },
 		{ re: /`(?:[^`\\]|\\.)*`/gs, cls: 'string' },
-		{ re: /\b(?:import|from|const|let|var|await|async|return|if|else|function|new|true|false|null|undefined)\b/g, cls: 'keyword' },
+		{
+			re: /\b(?:import|from|const|let|var|await|async|return|if|else|function|new|true|false|null|undefined)\b/g,
+			cls: 'keyword'
+		},
 		{ re: /\b(?:fetch|JSON|console|stringify|parse)\b/g, cls: 'function' },
 		{ re: /\b[A-Za-z_$][\w$]*(?=\s*\()/g, cls: 'function' },
 		{ re: /\b\d+(?:\.\d+)?\b/g, cls: 'number' },
@@ -163,7 +177,10 @@ print(res.json()['image']['url'])`;
 		{ re: /#[^\n]*/g, cls: 'comment' },
 		{ re: /f?"(?:[^"\\]|\\.)*"/gs, cls: 'string' },
 		{ re: /f?'(?:[^'\\]|\\.)*'/gs, cls: 'string' },
-		{ re: /\b(?:import|from|as|def|return|if|else|elif|for|while|in|is|not|and|or|True|False|None|print)\b/g, cls: 'keyword' },
+		{
+			re: /\b(?:import|from|as|def|return|if|else|elif|for|while|in|is|not|and|or|True|False|None|print)\b/g,
+			cls: 'keyword'
+		},
 		{ re: /\b(?:requests|os|json)\b/g, cls: 'function' },
 		{ re: /\.[a-zA-Z_][\w]*(?=\s*\()/g, cls: 'function' },
 		{ re: /\b\d+(?:\.\d+)?\b/g, cls: 'number' },
@@ -172,8 +189,18 @@ print(res.json()['image']['url'])`;
 
 	$: codeExamples = [
 		{ id: 'curl', label: 'cURL', fileName: 'terminal', code: highlight(apiSnippetCurl, curlRules) },
-		{ id: 'node', label: 'Node.js', fileName: 'tweet-screenshot.js', code: highlight(apiSnippetNode, jsRules) },
-		{ id: 'python', label: 'Python', fileName: 'tweet_screenshot.py', code: highlight(apiSnippetPython, pyRules) }
+		{
+			id: 'node',
+			label: 'Node.js',
+			fileName: 'tweet-screenshot.js',
+			code: highlight(apiSnippetNode, jsRules)
+		},
+		{
+			id: 'python',
+			label: 'Python',
+			fileName: 'tweet_screenshot.py',
+			code: highlight(apiSnippetPython, pyRules)
+		}
 	];
 	let selectedSnippet = 'curl';
 	$: activeSnippet = codeExamples.find((c) => c.id === selectedSnippet) || codeExamples[0];
@@ -198,7 +225,8 @@ print(res.json()['image']['url'])`;
 	}
 
 	function messageForReason(reason, fallback) {
-		if (reason === 'not_found') return 'Tweet not found or private. Fill the fields below manually.';
+		if (reason === 'not_found')
+			return 'Tweet not found or private. Fill the fields below manually.';
 		if (reason === 'rate_limited') return 'Twitter is rate-limiting us. Fill the fields manually.';
 		if (reason === 'upstream' || reason === 'shape_error')
 			return "Couldn't reach Twitter. Fill the fields manually.";
@@ -302,7 +330,9 @@ print(res.json()['image']['url'])`;
 		return {
 			...t,
 			author: { ...t.author, avatar_url: avatar },
-			media: (t?.media || []).map((m, i) => (media[i] ? { ...m, url: media[i] } : null)).filter(Boolean)
+			media: (t?.media || [])
+				.map((m, i) => (media[i] ? { ...m, url: media[i] } : null))
+				.filter(Boolean)
 		};
 	}
 
@@ -356,7 +386,7 @@ print(res.json()['image']['url'])`;
 		},
 		{
 			q: 'Where does the tweet data come from?',
-			a: 'We fetch public tweet metadata via Twitter\'s public syndication endpoint, the same one Twitter itself uses to power embeds. No Twitter API key needed on your end. If the data is unavailable (deleted, private, or rate-limited), the tool falls back to manual entry so you can still produce the screenshot.'
+			a: "We fetch public tweet metadata via Twitter's public syndication endpoint, the same one Twitter itself uses to power embeds. No Twitter API key needed on your end. If the data is unavailable (deleted, private, or rate-limited), the tool falls back to manual entry so you can still produce the screenshot."
 		},
 		{
 			q: 'Is there a watermark on downloads?',
@@ -424,6 +454,12 @@ print(res.json()['image']['url'])`;
 	onMount(() => {
 		analytics.trackToolOpened?.({ tool_name: 'tweet_screenshot' });
 	});
+
+	const TOOL_NAME = 'tweet_screenshot';
+	const TOOL_PATH = '/tools/tweet-screenshot';
+
+	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+
 </script>
 
 <ToolSeoHead
@@ -451,438 +487,380 @@ print(res.json()['image']['url'])`;
 	{howToMeta}
 />
 
-<ToolPageShell>
-		<ToolBreadcrumb label="Tweet Screenshot" marginClass="mb-8" />
+<ToolPageShell
+	toolName={TOOL_NAME}
+	toolPath={TOOL_PATH}
+	breadcrumb="TWEET SCREENSHOT"
+	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · NO TWITTER API KEY"
+	loggedIn={isUserLoggedIn}
+	hasResult={!!generatedImageUrl}
+	longform="column"
+>
+	<HeroTitle slot="h1">Tweet Screenshot Generator</HeroTitle>
 
-		<!-- Hero -->
-		<header class="text-center mb-10">
-			<h1 class="text-4xl md:text-6xl font-black text-gray-900 leading-[1.05] tracking-tight">
-				Tweet Screenshot Generator
-			</h1>
-			<p class="mt-4 text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-				Paste any tweet URL. Auto-fills in a click. Tweak anything. Download as PNG, or automate with one API call.
-			</p>
-		</header>
+	<HeroSub slot="hero-sub">
+		Paste any tweet URL. Auto-fills in a click. Tweak anything. Download as PNG, or automate with
+		one API call.
+	</HeroSub>
 
-		<!-- URL fetch row -->
-		<div id="paste-url" class="scroll-mt-20"></div>
-		<div class="max-w-3xl mx-auto mb-6">
-			<div class="flex gap-2">
-				<input
-					type="url"
-					placeholder="https://twitter.com/jack/status/20"
-					bind:value={urlInput}
-					on:keydown={(e) => e.key === 'Enter' && handleFetchClick()}
-					class="flex-1 px-4 py-3 text-base bg-white border-[3px] border-gray-900 rounded-lg shadow-brutal-lg focus:outline-none focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-brutal-md transition-all"
+	<div slot="tool">
+		<ToolCard>
+			<div class="flex w-full flex-col lg:flex-row lg:items-stretch">
+				<!-- Controls pane: URL + tweet fields -->
+				<div
+					class="flex w-full min-w-0 flex-col gap-5 overflow-y-auto bg-brand-paper p-5 lg:w-[420px] lg:flex-shrink-0 lg:border-r-[1.5px] lg:border-brand-ink lg:p-6"
+				>
+					<div id="paste-url" class="scroll-mt-20" />
+					<!-- Fetch from URL -->
+					<div class="flex flex-col gap-2">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">TWEET URL</span>
+						<div class="flex gap-2">
+							<input
+								type="url"
+								placeholder="https://twitter.com/jack/status/20"
+								bind:value={urlInput}
+								on:keydown={(e) => e.key === 'Enter' && handleFetchClick()}
+								class="h-11 min-w-0 flex-1 rounded-lg border-[1.5px] border-brand-ink bg-white px-3 font-mono text-sm text-brand-ink placeholder-brand-mute focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
+							<button
+								on:click={handleFetchClick}
+								disabled={status === 'fetching'}
+								class="h-11 flex-shrink-0 rounded-lg border-[1.5px] border-brand-ink bg-brand-paper px-4 font-sans text-sm font-semibold text-brand-ink transition-colors hover:bg-brand-field disabled:cursor-not-allowed disabled:opacity-60"
+							>
+								{status === 'fetching' ? 'Fetching…' : 'Fetch'}
+							</button>
+						</div>
+						{#if fetchError}
+							<p class="text-sm font-bold text-brand-alarm">{fetchError}</p>
+						{/if}
+						{#if fetchNotice}
+							<div
+								class="flex items-start gap-2 rounded-lg border border-brand-blue bg-brand-powder p-3 text-sm font-semibold text-brand-slate"
+							>
+								<span class="font-semibold text-brand-blue">ℹ</span>
+								<span>{fetchNotice}</span>
+							</div>
+						{/if}
+						{#if status === 'confirm-overwrite'}
+							<div
+								class="flex items-center gap-3 rounded-lg border border-brand-field bg-brand-field/30 p-3"
+							>
+								<span class="text-sm font-bold text-brand-ink"
+									>Refetching will replace your edits.</span
+								>
+								<button
+									on:click={confirmOverwrite}
+									class="rounded border border-brand-ink bg-brand-ink px-3 py-1.5 text-sm font-bold text-white"
+									>Refetch</button
+								>
+								<button
+									on:click={cancelOverwrite}
+									class="rounded border border-brand-ink bg-brand-paper px-3 py-1.5 text-sm font-bold text-brand-ink"
+									>Cancel</button
+								>
+							</div>
+						{/if}
+					</div>
+
+					<!-- Tweet fields -->
+					<div class="flex flex-col gap-4">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">TWEET FIELDS</span
+						>
+						<div>
+							<label class="mb-1 block text-sm font-bold text-brand-slate">Display name</label>
+							<input
+								type="text"
+								value={tweet.author.name}
+								on:input={(e) => updateAuthor('name', e.target.value)}
+								class="w-full rounded-md border border-brand-ink bg-white px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
+						</div>
+						<div>
+							<label class="mb-1 block text-sm font-bold text-brand-slate">Handle (without @)</label
+							>
+							<input
+								type="text"
+								value={tweet.author.handle}
+								on:input={(e) => updateAuthor('handle', e.target.value.replace(/^@/, ''))}
+								class="w-full rounded-md border border-brand-ink bg-white px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
+						</div>
+						<div>
+							<label class="mb-1 block text-sm font-bold text-brand-slate">Avatar URL</label>
+							<input
+								type="url"
+								value={tweet.author.avatar_url || ''}
+								on:input={(e) => updateAuthor('avatar_url', e.target.value || null)}
+								placeholder="https://pbs.twimg.com/..."
+								class="w-full rounded-md border border-brand-ink bg-white px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
+						</div>
+						<div class="flex flex-wrap gap-4">
+							<label class="flex items-center gap-2 text-sm font-bold text-brand-slate">
+								<input
+									type="checkbox"
+									checked={tweet.author.is_verified_blue}
+									on:change={(e) => updateAuthor('is_verified_blue', e.target.checked)}
+									class="h-5 w-5 accent-brand-ink"
+								/>
+								Verified (blue)
+							</label>
+							<label class="flex items-center gap-2 text-sm font-bold text-brand-slate">
+								<input
+									type="checkbox"
+									checked={tweet.author.is_verified}
+									on:change={(e) => updateAuthor('is_verified', e.target.checked)}
+									class="h-5 w-5 accent-brand-ink"
+								/>
+								Verified (legacy)
+							</label>
+						</div>
+						<div>
+							<label class="mb-1 block text-sm font-bold text-brand-slate">Tweet body</label>
+							<textarea
+								value={tweet.body}
+								on:input={(e) => updateTweetField('body', e.target.value)}
+								rows="4"
+								class="w-full resize-none rounded-md border border-brand-ink bg-white px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
+						</div>
+						<div>
+							<label class="mb-1 block text-sm font-bold text-brand-slate"
+								>Date (ISO 8601 or blank)</label
+							>
+							<input
+								type="text"
+								value={tweet.created_at || ''}
+								on:input={(e) => updateTweetField('created_at', e.target.value || null)}
+								placeholder="2026-04-14T10:00:00.000Z"
+								class="w-full rounded-md border border-brand-ink bg-white px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+							/>
+						</div>
+						<div class="grid grid-cols-3 gap-3">
+							<div>
+								<label class="mb-1 block text-xs font-bold text-brand-slate">Replies</label>
+								<input
+									type="number"
+									min="0"
+									value={tweet.metrics.replies ?? ''}
+									on:input={(e) => updateMetric('replies', e.target.value)}
+									class="w-full rounded-md border border-brand-ink bg-white px-2 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+								/>
+							</div>
+							<div>
+								<label class="mb-1 block text-xs font-bold text-brand-slate">Retweets</label>
+								<input
+									type="number"
+									min="0"
+									value={tweet.metrics.retweets ?? ''}
+									on:input={(e) => updateMetric('retweets', e.target.value)}
+									class="w-full rounded-md border border-brand-ink bg-white px-2 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+								/>
+							</div>
+							<div>
+								<label class="mb-1 block text-xs font-bold text-brand-slate">Likes</label>
+								<input
+									type="number"
+									min="0"
+									value={tweet.metrics.likes ?? ''}
+									on:input={(e) => updateMetric('likes', e.target.value)}
+									class="w-full rounded-md border border-brand-ink bg-white px-2 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-royal"
+								/>
+							</div>
+						</div>
+						{#if generationError}
+							<p class="text-sm font-bold text-brand-alarm">{generationError}</p>
+						{/if}
+					</div>
+				</div>
+
+				<!-- Preview pane -->
+				<div
+					class="flex min-h-[360px] min-w-0 flex-1 flex-col gap-2 border-t-[1.5px] border-brand-ink bg-brand-subtle p-4 lg:min-h-0 lg:border-t-0"
+				>
+					<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">LIVE PREVIEW</span>
+					<div class="flex flex-1 items-start justify-center overflow-auto p-2 sm:p-4">
+						<div
+							class="max-w-full overflow-hidden rounded-xl border border-brand-rule bg-brand-paper shadow-md"
+						>
+							<!-- Rendered tweet card; same HTML that will be POSTed to /image/public on Download -->
+							<iframe
+								bind:this={previewIframe}
+								on:load={resizePreview}
+								title="Tweet preview"
+								srcdoc={previewHtml}
+								scrolling="no"
+								style="width:{CARD_WIDTH}px;max-width:100%;height:{previewHeight}px;border:0;display:block;overflow:hidden"
+								sandbox="allow-same-origin"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<svelte:fragment slot="toolbar-left">
+				<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">TWEET URL → PNG</span>
+			</svelte:fragment>
+
+			<svelte:fragment slot="toolbar-right">
+				<QuotaMeter
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
 				/>
-				<button
-					on:click={handleFetchClick}
-					disabled={status === 'fetching'}
-					class="px-6 py-3 bg-brand-accent text-gray-900 font-black border-[3px] border-gray-900 rounded-lg shadow-brutal-lg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-brutal-md active:translate-x-[2px] active:translate-y-[2px] active:shadow-brutal-sm disabled:opacity-60 disabled:cursor-not-allowed transition-all"
-				>
-					{status === 'fetching' ? 'Fetching…' : 'Fetch'}
-				</button>
-			</div>
-			{#if fetchError}
-				<p class="mt-2 text-sm font-bold text-red-600">{fetchError}</p>
-			{/if}
-			{#if fetchNotice}
-				<div class="mt-3 p-3 bg-blue-50 border-[3px] border-blue-400 rounded-lg text-sm font-semibold text-gray-800 flex items-start gap-2">
-					<span class="text-blue-600 font-black">ℹ</span>
-					<span>{fetchNotice}</span>
-				</div>
-			{/if}
-			{#if status === 'confirm-overwrite'}
-				<div class="mt-3 p-3 bg-amber-50 border-[3px] border-amber-400 rounded-lg flex items-center gap-3">
-					<span class="text-sm font-bold text-gray-900">Refetching will replace your edits.</span>
-					<button
-						on:click={confirmOverwrite}
-						class="px-3 py-1.5 bg-gray-900 text-white text-sm font-bold rounded border-2 border-gray-900"
-					>Refetch</button>
-					<button
-						on:click={cancelOverwrite}
-						class="px-3 py-1.5 bg-white text-gray-900 text-sm font-bold rounded border-2 border-gray-900"
-					>Cancel</button>
-				</div>
-			{/if}
-		</div>
+				<GenerateButton
+					label="Download PNG"
+					loading={isGenerating}
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+					on:generate={handleGenerate}
+				/>
+			</svelte:fragment>
+		</ToolCard>
+	</div>
 
-		<GenerationLimitBanner toolName="tweet_screenshot" />
-
-		<!-- Preview on top, fields below (stacked vertically; preview is full-width so tall cards don't clip) -->
-		<div class="flex flex-col-reverse gap-6 mb-10 max-w-3xl mx-auto">
-			<!-- Fields -->
-			<div class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl p-6">
-				<h2 class="text-xl font-black mb-4 text-gray-900">Tweet fields</h2>
-				<div class="space-y-4">
-					<div>
-						<label class="block text-sm font-bold text-gray-700 mb-1">Display name</label>
-						<input
-							type="text"
-							value={tweet.author.name}
-							on:input={(e) => updateAuthor('name', e.target.value)}
-							class="w-full px-3 py-2 bg-white border-2 border-gray-900 rounded-md font-semibold"
-						/>
-					</div>
-					<div>
-						<label class="block text-sm font-bold text-gray-700 mb-1">Handle (without @)</label>
-						<input
-							type="text"
-							value={tweet.author.handle}
-							on:input={(e) => updateAuthor('handle', e.target.value.replace(/^@/, ''))}
-							class="w-full px-3 py-2 bg-white border-2 border-gray-900 rounded-md font-semibold"
-						/>
-					</div>
-					<div>
-						<label class="block text-sm font-bold text-gray-700 mb-1">Avatar URL</label>
-						<input
-							type="url"
-							value={tweet.author.avatar_url || ''}
-							on:input={(e) => updateAuthor('avatar_url', e.target.value || null)}
-							placeholder="https://pbs.twimg.com/..."
-							class="w-full px-3 py-2 bg-white border-2 border-gray-900 rounded-md font-semibold"
-						/>
-					</div>
-					<div class="flex gap-4">
-						<label class="flex items-center gap-2 font-bold text-sm text-gray-700">
-							<input
-								type="checkbox"
-								checked={tweet.author.is_verified_blue}
-								on:change={(e) => updateAuthor('is_verified_blue', e.target.checked)}
-								class="w-5 h-5"
-							/>
-							Verified (blue)
-						</label>
-						<label class="flex items-center gap-2 font-bold text-sm text-gray-700">
-							<input
-								type="checkbox"
-								checked={tweet.author.is_verified}
-								on:change={(e) => updateAuthor('is_verified', e.target.checked)}
-								class="w-5 h-5"
-							/>
-							Verified (legacy)
-						</label>
-					</div>
-					<div>
-						<label class="block text-sm font-bold text-gray-700 mb-1">Tweet body</label>
-						<textarea
-							value={tweet.body}
-							on:input={(e) => updateTweetField('body', e.target.value)}
-							rows="4"
-							class="w-full px-3 py-2 bg-white border-2 border-gray-900 rounded-md font-semibold resize-none"
-						/>
-					</div>
-					<div>
-						<label class="block text-sm font-bold text-gray-700 mb-1">Date (ISO 8601 or blank)</label>
-						<input
-							type="text"
-							value={tweet.created_at || ''}
-							on:input={(e) => updateTweetField('created_at', e.target.value || null)}
-							placeholder="2026-04-14T10:00:00.000Z"
-							class="w-full px-3 py-2 bg-white border-2 border-gray-900 rounded-md font-semibold"
-						/>
-					</div>
-					<div class="grid grid-cols-3 gap-3">
-						<div>
-							<label class="block text-xs font-bold text-gray-700 mb-1">Replies</label>
-							<input
-								type="number"
-								min="0"
-								value={tweet.metrics.replies ?? ''}
-								on:input={(e) => updateMetric('replies', e.target.value)}
-								class="w-full px-2 py-2 bg-white border-2 border-gray-900 rounded-md font-semibold"
-							/>
-						</div>
-						<div>
-							<label class="block text-xs font-bold text-gray-700 mb-1">Retweets</label>
-							<input
-								type="number"
-								min="0"
-								value={tweet.metrics.retweets ?? ''}
-								on:input={(e) => updateMetric('retweets', e.target.value)}
-								class="w-full px-2 py-2 bg-white border-2 border-gray-900 rounded-md font-semibold"
-							/>
-						</div>
-						<div>
-							<label class="block text-xs font-bold text-gray-700 mb-1">Likes</label>
-							<input
-								type="number"
-								min="0"
-								value={tweet.metrics.likes ?? ''}
-								on:input={(e) => updateMetric('likes', e.target.value)}
-								class="w-full px-2 py-2 bg-white border-2 border-gray-900 rounded-md font-semibold"
-							/>
-						</div>
-					</div>
-				</div>
-
-				<button
-					on:click={handleGenerate}
-					disabled={isGenerating}
-					class="w-full mt-6 px-6 py-3 bg-gray-900 text-white font-black rounded-lg border-[3px] border-gray-900 shadow-brutal-accent hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_0_#ffc480] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
-				>
-					{isGenerating ? 'Generating…' : 'Download PNG'}
-				</button>
-				{#if generationError}
-					<p class="mt-2 text-sm font-bold text-red-600">{generationError}</p>
-				{/if}
-			</div>
-
-			<!-- Live preview -->
-			<div class="bg-gradient-to-br from-gray-50 to-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-xl p-6">
-				<h2 class="text-xl font-black mb-4 text-gray-900">Live preview</h2>
-				<div class="flex items-start justify-center">
-					<div class="rounded-xl overflow-hidden border-2 border-gray-300 shadow-md bg-white max-w-full">
-						<!-- Rendered tweet card; same HTML that will be POSTed to /image/public on Download -->
-						<iframe
-							bind:this={previewIframe}
-							on:load={resizePreview}
-							title="Tweet preview"
-							srcdoc={previewHtml}
-							scrolling="no"
-							style="width:{CARD_WIDTH}px;max-width:100%;height:{previewHeight}px;border:0;display:block;overflow:hidden"
-							sandbox="allow-same-origin"
-						/>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Success banner — shown only after a successful generation. -->
+	<div slot="result">
 		{#if generatedImageUrl}
-			<ToolSuccessBanner
+			<ResultCard
 				imageUrl={generatedImageUrl}
-				imageAlt="Generated tweet screenshot"
-				heading="Success! Here is your tweet screenshot"
-				downloadFileName="tweet-screenshot.png"
-				toolName="tweet_screenshot"
+				formatLabel="PNG"
+				fileExtension="png"
+				loggedIn={isUserLoggedIn}
+				toolName={TOOL_NAME}
+				toolPath={TOOL_PATH}
+				html={previewHtml}
 			/>
 		{/if}
+	</div>
 
-		<!-- Automate with the API — always visible so devs see the programmatic path even without generating first -->
-		<section id="api" class="mt-20 scroll-mt-20">
-			<div class="text-center mb-12">
-				<div
-					class="inline-block bg-white border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform rotate-1 rounded-lg"
-				>
-					<span class="font-black uppercase tracking-widest text-sm">For Developers</span>
-				</div>
-				<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-					Automate with the <span class="text-brand-danger">API</span>
-				</h2>
-				<p class="text-lg md:text-xl font-bold text-gray-700 mt-4 max-w-3xl mx-auto">
-					Generate tweet screenshots programmatically. Same HTML as the live preview, rendered at any scale via a single POST.
-				</p>
-			</div>
+	<AutomateSection
+		slot="automate"
+		title="Automate with the"
+		titleHighlight="API"
+		toolName={TOOL_NAME}
+		description="Generate tweet screenshots programmatically. Same HTML as the live preview, rendered at any scale via a single POST."
+		{codeExamples}
+	/>
 
-			<!-- Language tabs -->
-			<div class="mb-6">
-				<div class="flex flex-wrap gap-2">
-					{#each codeExamples as snippet}
-						<button
-							on:click={() => (selectedSnippet = snippet.id)}
-							class="px-4 py-2 text-sm font-black border-[3px] transition-all rounded-lg uppercase tracking-wider
-								{selectedSnippet === snippet.id
-									? 'border-gray-900 bg-gray-900 text-white shadow-[3px_3px_0_0_#ffc480]'
-									: 'border-gray-900 bg-white text-gray-600 hover:bg-gray-50'}"
-						>
-							{snippet.label}
-						</button>
-					{/each}
-				</div>
-			</div>
-
-			<!-- Code Snippet -->
-			<div class="bg-[#282c34] rounded-2xl border-[3px] border-gray-900 shadow-brutal-2xl overflow-hidden">
-				<div class="bg-[#21252b] px-4 py-3 border-b-[3px] border-gray-900 flex items-center justify-between">
-					<div class="flex items-center gap-2">
-						<div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56]"></div>
-						<div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]"></div>
-						<div class="w-3.5 h-3.5 rounded-full bg-[#27c93f]"></div>
-					</div>
-					<span class="text-xs text-gray-500 font-mono font-bold uppercase tracking-wider">
-						{activeSnippet?.fileName || ''}
-					</span>
-				</div>
-				<div class="p-6 overflow-x-auto">
-					<pre class="text-sm font-mono leading-relaxed whitespace-pre text-gray-300"><code>{@html activeSnippet.code}</code></pre>
-				</div>
-			</div>
-
-			<!-- CTA -->
-			<div class="text-center mt-12">
-				<div class="flex flex-wrap justify-center gap-4">
-					<a
-						href="/signup"
-						class="px-8 py-4 bg-gray-900 text-white font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						Get API Key
-					</a>
-					<a
-						href="https://docs.pictify.io"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="px-8 py-4 bg-white text-gray-900 font-black border-[3px] border-gray-900 rounded-xl uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-					>
-						Read API Docs
-					</a>
-				</div>
-			</div>
-		</section>
-
-		<!-- SEO content — grounded prose that gives Google context for the keyword cluster.
-		     Targets: twitter screenshot, tweet screenshot, screenshot on twitter, tweet to image,
-		     screenshot twitter post, tweet image generator, print tweet, tweet screenshot maker. -->
-		<section class="mt-20 max-w-4xl mx-auto px-2">
-			<div class="prose prose-lg prose-neutral max-w-none">
-				<h2 class="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter mb-6">
-					The fastest way to <span class="text-brand-danger">screenshot a tweet</span>
-				</h2>
-				<p class="text-lg text-gray-700 leading-relaxed mb-5">
-					A clean tweet screenshot does a lot of work in content. Newsletters quote tweets. LinkedIn
-					posts lead with them. Podcast thumbnails reference them. Decks drop them onto slides.
-					The problem: the built-in phone or browser screenshot always looks wrong: wrong crop,
-					wrong dark/light mode, UI chrome bleeding in, verified badge missing, weird resolution.
-					This tool fixes that in one paste.
-				</p>
-				<p class="text-lg text-gray-700 leading-relaxed mb-8">
+	<svelte:fragment slot="longform">
+		<LongformSection index="01" id="about" first title="The fastest way to screenshot a tweet">
+			<Lead>
+				A clean tweet screenshot does a lot of work in content. Newsletters quote tweets. LinkedIn
+				posts lead with them. Podcast thumbnails reference them. Decks drop them onto slides. The
+				problem: the built-in phone or browser screenshot always looks wrong: wrong crop, wrong
+				dark/light mode, UI chrome bleeding in, verified badge missing, weird resolution. This tool
+				fixes that in one paste.
+			</Lead>
+			<Prose>
+				<p>
 					Paste any public tweet URL from twitter.com or x.com. We fetch the tweet body, author,
 					avatar, verified badge, media, and engagement metrics through Twitter's own public
 					syndication endpoint; no Twitter API key required on your side. Every field is editable,
 					so you can tweak the name, rewrite the body for a mockup, adjust metric counts, or swap
-					the avatar. Click download and you get a crisp PNG at 600&nbsp;×&nbsp;auto, perfect for any
-					social graphic, blog embed, or presentation slide.
+					the avatar. Click download and you get a crisp PNG at 600 × auto, perfect for any social
+					graphic, blog embed, or presentation slide.
 				</p>
+			</Prose>
 
-				<h3 class="text-2xl font-black text-gray-900 mt-10 mb-4">Who uses a tweet screenshot generator?</h3>
-				<ul class="text-lg text-gray-700 leading-relaxed space-y-3 mb-8 list-disc pl-6 marker:text-brand-danger">
-					<li>
-						<strong>Newsletter writers and creators</strong> who quote tweets in Substack,
-						Beehiiv, or ConvertKit and want a consistent look instead of iOS screenshots of
-						different phone sizes.
-					</li>
-					<li>
-						<strong>Marketing teams</strong> turning customer praise into social proof (testimonial
-						tweets, product launch reactions, founder announcements) formatted for LinkedIn,
-						Instagram, and ads.
-					</li>
-					<li>
-						<strong>Podcast and YouTube creators</strong> who reference a tweet on screen or in a
-						thumbnail and need a clean, non-branded capture that doesn't scream "phone photo."
-					</li>
-					<li>
-						<strong>Writers and journalists</strong> embedding tweets in articles where the
-						official Twitter embed is blocked, rate-limited, or too heavy for AMP.
-					</li>
-					<li>
-						<strong>Developers and product teams</strong> generating tweet images programmatically
-						for content pipelines, CMS integrations, or automated lifecycle emails. See the
-						<a href="#api" class="text-brand-danger underline">API section</a> above.
-					</li>
-				</ul>
+			<ProseGroup
+				items={[
+					{
+						heading: 'Who uses a tweet screenshot generator?',
+						bullets: [
+							{
+								html: '<strong>Newsletter writers and creators</strong> who quote tweets in Substack, Beehiiv, or ConvertKit and want a consistent look instead of iOS screenshots of different phone sizes.'
+							},
+							{
+								html: '<strong>Marketing teams</strong> turning customer praise into social proof (testimonial tweets, product launch reactions, founder announcements) formatted for LinkedIn, Instagram, and ads.'
+							},
+							{
+								html: '<strong>Podcast and YouTube creators</strong> who reference a tweet on screen or in a thumbnail and need a clean, non-branded capture that doesn\'t scream "phone photo."'
+							},
+							{
+								html: '<strong>Writers and journalists</strong> embedding tweets in articles where the official Twitter embed is blocked, rate-limited, or too heavy for AMP.'
+							},
+							{
+								html: '<strong>Developers and product teams</strong> generating tweet images programmatically for content pipelines, CMS integrations, or automated lifecycle emails. See the API section above.'
+							}
+						]
+					},
+					{
+						heading: 'How to screenshot a tweet in three steps',
+						bullets: [
+							{
+								html: '<strong>Paste the tweet URL.</strong> Copy the link from any tweet on twitter.com or x.com and paste it above. We accept links from mobile, desktop, and shared X ?s=20 variants.'
+							},
+							{
+								html: '<strong>Edit any field.</strong> Display name, handle, verified badge (blue or legacy), body text, media, date, replies, retweets, likes. Every surface is editable. Great for typo fixes, hypothetical tweets, or stress testing a design.'
+							},
+							{
+								html: '<strong>Download the PNG</strong> or copy the API call and automate it from your backend. Both paths produce the exact same image: what you preview is what you ship.'
+							}
+						]
+					}
+				]}
+			/>
 
-				<h3 class="text-2xl font-black text-gray-900 mt-10 mb-4">How to screenshot a tweet in three steps</h3>
-				<ol class="text-lg text-gray-700 leading-relaxed space-y-3 mb-8 list-decimal pl-6 marker:text-brand-danger marker:font-black">
-					<li>
-						<strong>Paste the tweet URL.</strong> Copy the link from any tweet on
-						<code class="bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">twitter.com</code>
-						or
-						<code class="bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">x.com</code>
-						and paste it above. We accept links from mobile, desktop, and shared X
-						<code class="bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">?s=20</code>
-						variants.
-					</li>
-					<li>
-						<strong>Edit any field.</strong> Display name, handle, verified badge (blue or
-						legacy), body text, media, date, replies, retweets, likes. Every surface is editable.
-						Great for typo fixes, hypothetical tweets, or stress-testing a draft before posting.
-					</li>
-					<li>
-						<strong>Download the PNG</strong> or copy the API call and automate it from your
-						backend. Both paths produce the exact same image: what you preview is what you ship.
-					</li>
-				</ol>
+			<ProseGroup items={[{ heading: 'Why this beats screenshots of your screen' }]} />
+			<ProseGroup
+				columns={2}
+				headingTag="h4"
+				items={[
+					{
+						heading: 'Pixel-perfect, every time',
+						body: 'Rendered server-side with consistent typography and spacing. No viewport differences, no device pixel ratio weirdness, no status-bar notch cropping.'
+					},
+					{
+						heading: "Works when the embed doesn't",
+						body: 'Tweet got deleted or the account went private? Paste what you remember, fill the fields manually, and produce a usable screenshot without relying on the live tweet.'
+					},
+					{
+						heading: 'No Twitter API key',
+						body: 'Other tools require you to spin up a Twitter developer account and manage tokens. We use the public syndication endpoint: zero setup, zero monthly cost.'
+					},
+					{
+						heading: 'Scales to a million',
+						body: 'Need tweet images for every author, every post, every campaign? The same tool ships a REST API: POST a payload, get a CDN-backed PNG.'
+					}
+				]}
+			/>
 
-				<h3 class="text-2xl font-black text-gray-900 mt-10 mb-4">Why this beats screenshots of your screen</h3>
-				<div class="grid md:grid-cols-2 gap-5 mb-8">
-					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
-						<h4 class="font-black text-gray-900 mb-2">Pixel-perfect, every time</h4>
-						<p class="text-gray-700">
-							Rendered server-side with consistent typography and spacing. No viewport
-							differences, no device pixel ratio weirdness, no status-bar notch cropping.
-						</p>
-					</div>
-					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
-						<h4 class="font-black text-gray-900 mb-2">Works when the embed doesn't</h4>
-						<p class="text-gray-700">
-							Tweet got deleted or the account went private? Paste what you remember, fill the
-							fields manually, and produce a usable screenshot without relying on the live tweet.
-						</p>
-					</div>
-					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
-						<h4 class="font-black text-gray-900 mb-2">No Twitter API key</h4>
-						<p class="text-gray-700">
-							Other tools require you to spin up a Twitter developer account and manage
-							tokens. We use the public syndication endpoint: zero setup, zero monthly cost.
-						</p>
-					</div>
-					<div class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5">
-						<h4 class="font-black text-gray-900 mb-2">Scales to a million</h4>
-						<p class="text-gray-700">
-							Need tweet images for every author, every post, every campaign? The same tool
-							ships a REST API: POST a payload, get a CDN-backed PNG.
-						</p>
-					</div>
-				</div>
-
-				<h3 class="text-2xl font-black text-gray-900 mt-10 mb-4">What's captured in the tweet image</h3>
-				<p class="text-lg text-gray-700 leading-relaxed mb-4">
-					The rendered image matches Twitter's native tweet card layout:
+			<ProseGroup
+				items={[
+					{
+						heading: "What's captured in the tweet image",
+						body: "The rendered image matches Twitter's native tweet card layout:",
+						bullets: [
+							'Profile picture (auto-fetched from pbs.twimg.com)',
+							'Display name + @handle with verified badge (blue checkmark or legacy gold)',
+							'Tweet body with clickable URLs, mentions, and hashtags styled in Twitter blue',
+							'Attached photos: up to four, in the same grid layout Twitter uses',
+							'Post timestamp in the Twitter time format',
+							'Engagement metrics: replies, retweets, and likes (formatted with K/M suffixes)',
+							'The X logo in the top-right corner, so the screenshot reads as a tweet at a glance'
+						]
+					},
+					{
+						heading: 'Tweet to image, programmatically',
+						body: "Everything this tool does, the Pictify API does via a single HTTP call. Generate tweet screenshots as part of a daily newsletter build, a CMS publish hook, or a scheduled social campaign. The API snippet above is the exact call we'd make ourselves. Copy it, swap in your key, and you're shipping."
+					}
+				]}
+			/>
+			<Prose>
+				<p>
+					Common automated workflows: "every new reply to our product account becomes a social
+					post", "founder tweets auto-generate LinkedIn graphics", "newsletter archive page renders
+					every quoted tweet as a PNG for faster load and better SEO".
 				</p>
-				<ul class="text-lg text-gray-700 leading-relaxed space-y-2 mb-8 list-disc pl-6 marker:text-brand-danger">
-					<li>Profile picture (auto-fetched from <code class="bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">pbs.twimg.com</code>)</li>
-					<li>Display name + @handle with verified badge (blue checkmark or legacy gold)</li>
-					<li>Tweet body with clickable URLs, mentions, and hashtags styled in Twitter blue</li>
-					<li>Attached photos: up to four, in the same grid layout Twitter uses</li>
-					<li>Post timestamp in the Twitter time format</li>
-					<li>Engagement metrics: replies, retweets, and likes (formatted with K/M suffixes)</li>
-					<li>The X logo in the top-right corner, so the screenshot reads as a tweet at a glance</li>
-				</ul>
+			</Prose>
+		</LongformSection>
 
-				<h3 class="text-2xl font-black text-gray-900 mt-10 mb-4">Tweet to image, programmatically</h3>
-				<p class="text-lg text-gray-700 leading-relaxed mb-4">
-					Everything this tool does, the <a href="https://docs.pictify.io" target="_blank" rel="noopener" class="text-brand-danger underline">Pictify API</a>
-					does via a single HTTP call. Generate tweet screenshots as part of a daily newsletter
-					build, a CMS publish hook, or a scheduled social campaign. The API snippet
-					<a href="#api" class="text-brand-danger underline">above</a> is the exact call we'd make
-					ourselves. Copy it, swap in your key, and you're shipping.
-				</p>
-				<p class="text-lg text-gray-700 leading-relaxed">
-					Common automated workflows: <em>"every new reply to our product account becomes a social
-					post"</em>, <em>"founder tweets auto-generate LinkedIn graphics"</em>, <em>"newsletter
-					archive page renders every quoted tweet as a PNG for faster load and better SEO"</em>.
-				</p>
-			</div>
-		</section>
+		<LongformSection index="02" id="faq" title="Frequently asked questions">
+			<FaqList {faqs} />
+		</LongformSection>
+	</svelte:fragment>
 
-		<ToolFaq {faqs} />
-
-		<div class="mt-20">
-			<RelatedTools tools={['certificate', 'markdown', 'code']} />
-		</div>
 </ToolPageShell>
-
-<style>
-	/* Syntax tokens for the Automate-with-the-API snippet block.
-	   Palette: One Dark. Global so they style the {@html} output. */
-	:global(.tok-cmd)      { color: #e06c75; font-weight: 700; }
-	:global(.tok-flag)     { color: #d19a66; font-weight: 600; }
-	:global(.tok-keyword)  { color: #c678dd; font-weight: 600; }
-	:global(.tok-function) { color: #61afef; }
-	:global(.tok-string)   { color: #98c379; }
-	:global(.tok-number)   { color: #d19a66; }
-	:global(.tok-url)      { color: #56b6c2; text-decoration: underline; text-underline-offset: 3px; }
-	:global(.tok-variable) { color: #e5c07b; }
-	:global(.tok-comment)  { color: #7f848e; font-style: italic; }
-	:global(.tok-punct)    { color: #abb2bf; }
-</style>

@@ -5,9 +5,8 @@
 	 * Keeping the two decoupled means this component is pure markup and the schema
 	 * always stays in the document <head> where crawlers expect it.
 	 *
-	 * Markup mirrors what certificate-generator and tweet-screenshot emit today.
-	 *
-	 * See plan: docs/plans/2026-04-15-002-refactor-tool-scaffold-plan.md
+	 * v2 styling: the heading text is frozen (these pages rank), the chrome is
+	 * the reading column's — hairline rules, no boxes stacked on boxes.
 	 */
 
 	/** @type {Array<{q: string, a: string}>} */
@@ -15,16 +14,26 @@
 	export let heading = 'Frequently asked questions';
 </script>
 
-<section class="mt-16">
-	<h2 class="text-3xl md:text-4xl font-black text-gray-900 text-center mb-8">{heading}</h2>
-	<div class="max-w-3xl mx-auto space-y-4">
+<section class="flex flex-col gap-5">
+	<h2 class="font-display text-[28px] font-bold leading-9 tracking-[-0.02em] text-brand-ink">
+		{heading}
+	</h2>
+	<div class="flex flex-col gap-3">
 		{#each faqs as faq}
-			<details class="bg-white border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-5 group">
-				<summary class="font-black text-lg cursor-pointer flex justify-between items-center">
+			<details class="group border border-brand-ink bg-brand-paper">
+				<summary
+					class="flex cursor-pointer items-center justify-between gap-4 p-4 font-sans text-[15px] font-medium text-brand-ink"
+				>
 					<span>{faq.q}</span>
-					<span class="text-2xl group-open:rotate-45 transition-transform">+</span>
+					<span class="font-mono text-lg text-brand-mute transition-transform group-open:rotate-45"
+						>+</span
+					>
 				</summary>
-				<p class="mt-3 text-gray-700 leading-relaxed">{faq.a}</p>
+				<p
+					class="border-t border-brand-rule p-4 font-sans text-[15px] leading-[23px] text-brand-slate"
+				>
+					{faq.a}
+				</p>
 			</details>
 		{/each}
 	</div>

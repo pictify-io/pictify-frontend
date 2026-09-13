@@ -3,7 +3,6 @@
 	import { user, activeApiToken, getAPITokenAction } from '../../../../store/user.store';
 	import { toast } from '../../../../store/toast.store';
 	import { createAgentScreenshotStream } from '../../../../api/image';
-	import Toast from '$lib/components/Toast.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 	import EmailVerificationRequired from '$lib/components/dashboard/EmailVerificationRequired.svelte';
 	import { slide } from 'svelte/transition';
@@ -424,4 +423,3 @@
 	</div>
 {/if}
 
-<Toast />

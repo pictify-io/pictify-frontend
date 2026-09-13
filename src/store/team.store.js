@@ -16,7 +16,7 @@ import {
 	acceptInvitation as acceptAPI,
 	declineInvitation as declineAPI
 } from '../api/teams';
-import { analytics } from '$lib/analytics.js';
+import { analytics } from '$lib/telemetry.js';
 import { initOnboarding } from './onboarding.store';
 import { resetPLG } from './plg.store';
 

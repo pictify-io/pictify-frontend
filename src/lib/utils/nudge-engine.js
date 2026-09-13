@@ -13,14 +13,6 @@ const NUDGES = [
 		message: 'Get your API key to start generating images programmatically.',
 		cta: 'Get API Key',
 		href: '/dashboard/api-token'
-	},
-	{
-		id: 'suggest-workflow',
-		priority: 2,
-		condition: (ctx) => ctx.templateCount >= 1 && !ctx.hasBulkRendered,
-		message: 'Generate images at scale — run a workflow from a CSV or webhook.',
-		cta: 'Run a Workflow',
-		href: '/dashboard/workflows/new'
 	}
 ];
 

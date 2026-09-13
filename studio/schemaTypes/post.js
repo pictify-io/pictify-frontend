@@ -70,6 +70,14 @@ export default defineType({
 			validation: (rule) => rule.required().max(170)
 		}),
 		defineField({
+			name: 'tldr',
+			title: 'TL;DR',
+			type: 'text',
+			rows: 4,
+			description:
+				'Optional. Renders as the summary card above the body. First line is the claim; any "- " lines below it become the at-a-glance list. Leave empty and a leading "> **TL;DR**" blockquote in the body is used instead.'
+		}),
+		defineField({
 			name: 'content',
 			title: 'Body (markdown)',
 			type: 'markdown',
@@ -114,6 +122,14 @@ export default defineType({
 			name: 'readingTime',
 			title: 'Reading time (minutes)',
 			type: 'number'
+		}),
+		defineField({
+			name: 'updatedNote',
+			title: 'What changed (last update)',
+			type: 'string',
+			description:
+				'Optional. One clause, e.g. "refreshed pricing and added the Node SDK example". Shown beside the UPDATED date. Leave empty and the strip is hidden — an update note is never invented.',
+			validation: (rule) => rule.max(120)
 		}),
 		defineField({
 			name: 'publishedAt',

@@ -13,7 +13,21 @@ const API_VERSION = 'v2024-01-01';
 
 export const sanityEnabled = () => !!env.PUBLIC_SANITY_PROJECT_ID;
 
-export async function sanityQuery(query, params = {}, fetchFn = fetch) {
+/**
+ * `fetchFn` defaults to the PLATFORM fetch, not a caller-supplied one.
+ *
+ * Passing SvelteKit's request-scoped `fetch` here is actively wrong twice over.
+ * In a universal load it simulates CORS, so a response the browser could not
+ * read fails the load on the server too — which is how every dev session
+ * outside the project's CORS allowlist ended up silently serving the legacy
+ * Mongo blog. In a server load it decorates the request with the visitor's own
+ * headers, which Sanity's CDN answers with a 403, and which would send a
+ * reader's cookies to a third party if it did not.
+ *
+ * This is a public, cacheable GET to someone else's CDN. It wants a plain
+ * fetch and nothing else.
+ */
+export async function sanityQuery(query, params = {}, fetchFn = globalThis.fetch) {
 	const projectId = env.PUBLIC_SANITY_PROJECT_ID;
 	const dataset = env.PUBLIC_SANITY_DATASET || 'production';
 	if (!projectId) return null;
@@ -58,6 +72,11 @@ export function toLegacyBlog(doc) {
 		image: doc.heroImage || null,
 		readingTime: doc.readingTime || estimateReadingTime(doc.content),
 		isFeatured: !!doc.featured,
+		// Optional editorial fields. Absent is meaningful: the post page hides
+		// the UPDATED strip rather than inventing a note, and falls back to a
+		// leading "> **TL;DR**" blockquote for the summary card.
+		tldr: doc.tldr || null,
+		updatedNote: doc.updatedNote || null,
 		createdAt: doc.publishedAt,
 		date: doc.publishedAt,
 		updatedAt: doc._updatedAt
@@ -67,7 +86,8 @@ export function toLegacyBlog(doc) {
 /** Shared fields for both list and single-post views. */
 const POST_FIELDS = `
 	title, seoTitle, "slug": slug.current, legacySlugs, description,
-	tags, author, type, heroImage, readingTime, featured, publishedAt, _updatedAt
+	tags, author, type, heroImage, readingTime, featured, publishedAt, _updatedAt,
+	tldr, updatedNote
 `;
 
 /** List views don't render body content — skip fetching every post's full markdown. */
@@ -77,7 +97,7 @@ const LIST_PROJECTION = `{ ${POST_FIELDS} }`;
 const POST_PROJECTION = `{ ${POST_FIELDS}, content }`;
 
 /** One post by clean slug OR legacy slug. Returns { blog, matchedLegacy }. */
-export async function getSanityPost(slug, fetchFn = fetch) {
+export async function getSanityPost(slug, fetchFn = globalThis.fetch) {
 	const doc = await sanityQuery(
 		`*[_type == "post" && !(_id in path("drafts.**")) && (slug.current == $slug || $slug in legacySlugs)][0] ${POST_PROJECTION}`,
 		{ slug },
@@ -89,11 +109,40 @@ export async function getSanityPost(slug, fetchFn = fetch) {
 	return { blog: toLegacyBlog(doc), matchedLegacy: doc.slug !== slug };
 }
 
-/** All published posts, newest first. List view — no body content. */
-export async function getSanityPosts(fetchFn = fetch) {
+/**
+ * All published posts, newest first.
+ *
+ * Ordered by `coalesce(publishedAt, _updatedAt)`: one post in the dataset has a
+ * null publishedAt, and GROQ sorts null FIRST on a desc order — so the single
+ * post with missing metadata was pinned to the top of the blog. Falling back to
+ * the document's own update time puts it where it belongs without needing the
+ * data fixed first.
+ */
+export async function getSanityPosts(fetchFn = globalThis.fetch) {
 	const docs = await sanityQuery(
-		`*[_type == "post" && !(_id in path("drafts.**"))] | order(publishedAt desc) ${LIST_PROJECTION}`,
+		`*[_type == "post" && !(_id in path("drafts.**"))] | order(coalesce(publishedAt, _updatedAt) desc) ${LIST_PROJECTION}`,
 		{},
+		fetchFn
+	);
+	return (docs || []).map(toLegacyBlog);
+}
+
+/**
+ * Posts to read next: shared tags first, then simply recent.
+ *
+ * Replaces getRecommendedBlogs, which hit the legacy Mongo API — the last
+ * thing tying /blogs to the pre-CMS backend. Scored in GROQ rather than
+ * fetched-then-sorted so one query does it.
+ *
+ * `count(tags[@ in $tags])` is the overlap; posts with none still qualify, so a
+ * post with unique tags gets neighbours instead of an empty strip.
+ */
+export async function getSanityRelated(slug, tags = [], limit = 3, fetchFn = globalThis.fetch) {
+	const docs = await sanityQuery(
+		`*[_type == "post" && !(_id in path("drafts.**")) && slug.current != $slug]
+			| order(count(tags[@ in $tags]) desc, coalesce(publishedAt, _updatedAt) desc)
+			[0...$limit] ${LIST_PROJECTION}`,
+		{ slug, tags: tags || [], limit },
 		fetchFn
 	);
 	return (docs || []).map(toLegacyBlog);

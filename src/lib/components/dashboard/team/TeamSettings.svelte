@@ -18,9 +18,8 @@
 		revokeInvitationAction,
 		resendInvitationAction
 	} from '../../../../store/team.store';
-	import { toast } from '../../../../store/toast.store';
+	import { notify } from '../../../../store/toast.store';
 	import { formatRelativeDate } from '$lib/utils/format.js';
-	import EmailSendingCard from './EmailSendingCard.svelte';
 
 	let loading = true;
 	let saving = false;
@@ -79,7 +78,7 @@
 
 		try {
 			await updateTeamAction($currentTeam.uid, { name: teamName.trim() });
-			toast.set({ message: 'Team settings updated', type: 'success' });
+			notify.done('SETTINGS SAVED', 'The team name and defaults are updated.');
 		} catch (err) {
 			error = err.message;
 		} finally {
@@ -101,7 +100,7 @@
 
 		try {
 			await createInvitationAction($currentTeam.uid, inviteEmail.trim());
-			toast.set({ message: 'Invitation sent successfully', type: 'success' });
+			notify.done('INVITE SENT', `${inviteEmail} has 7 days to accept.`);
 			inviteEmail = '';
 		} catch (err) {
 			inviteError = err.message;
@@ -123,9 +122,8 @@
 
 		try {
 			await removeMemberAction($currentTeam.uid, member.uid);
-			toast.set({ message: 'Member removed successfully', type: 'success' });
 		} catch (err) {
-			toast.set({ message: err.message, type: 'error' });
+			notify.fail('Remove member', err, { retry: () => handleRemoveMember(member) });
 		} finally {
 			removingMemberId = null;
 		}
@@ -140,9 +138,8 @@
 
 		try {
 			await revokeInvitationAction($currentTeam.uid, invitation.uid);
-			toast.set({ message: 'Invitation revoked', type: 'success' });
 		} catch (err) {
-			toast.set({ message: err.message, type: 'error' });
+			notify.fail('Revoke invite', err, { retry: () => handleRevokeInvitation(invitation) });
 		} finally {
 			revokingInvitationId = null;
 		}
@@ -150,14 +147,14 @@
 
 	async function copyInviteLink(invitation) {
 		if (!invitation.inviteUrl) {
-			toast.set({ message: 'Invite link not available', type: 'error' });
+			notify.fail('Copy invite link', { data: { message: 'That invite has no link yet.' } });
 			return;
 		}
 		try {
 			await navigator.clipboard.writeText(invitation.inviteUrl);
-			toast.set({ message: 'Invite link copied to clipboard', type: 'success' });
+			notify.done('LINK COPIED', 'The invite link is on your clipboard.');
 		} catch (err) {
-			toast.set({ message: 'Failed to copy link', type: 'error' });
+			notify.fail('Copy invite link', err);
 		}
 	}
 
@@ -182,7 +179,7 @@
 
 		try {
 			await resendInvitationAction($currentTeam.uid, invitation.uid);
-			toast.set({ message: 'Invitation email resent', type: 'success' });
+			notify.done('INVITE SENT AGAIN', `${invitation.email} has 7 more days.`);
 			// Start 2-minute cooldown on success
 			startResendCooldown(invitation.uid, 120);
 		} catch (err) {
@@ -191,7 +188,7 @@
 			if (retryMatch) {
 				startResendCooldown(invitation.uid, parseInt(retryMatch[1]));
 			}
-			toast.set({ message: err.message, type: 'error' });
+			notify.fail('Resend invite', err, { retry: () => handleResendInvitation(invitation) });
 		} finally {
 			resendingInvitationId = null;
 		}
@@ -440,8 +437,6 @@
 						</div>
 					</div>
 				{/if}
-				<!-- Email sending domain (workflow delivery) -->
-				<EmailSendingCard />
 			</div>
 
 			<!-- Right Column: Actions -->

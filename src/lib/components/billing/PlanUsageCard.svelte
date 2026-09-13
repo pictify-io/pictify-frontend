@@ -21,7 +21,19 @@
 	const fmt = (n) => (typeof n === 'number' ? n.toLocaleString('en-US') : '–');
 
 	onMount(async () => {
-		const details = await getPlanDetails();
+		/*
+		 * A page-load read, so a failure stays here rather than raising a
+		 * toast (TO-01: the toast is for actions the visitor clicked). What it
+		 * must not do is throw past `loading = false` and leave the card
+		 * spinning forever, which is what happened when the API wrapper
+		 * stopped returning null.
+		 */
+		let details = null;
+		try {
+			details = await getPlanDetails();
+		} catch {
+			details = null;
+		}
 		if (details) {
 			const used =
 				typeof details.usage === 'number'

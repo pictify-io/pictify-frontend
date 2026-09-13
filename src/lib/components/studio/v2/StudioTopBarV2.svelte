@@ -1,0 +1,195 @@
+<script>
+	/**
+	 * Studio top bar (boards `FM8-0` campaign, `JL2-0` template).
+	 *
+	 * Carries the one fact every other surface in campaigns also names: the
+	 * REVISION. Setup, Review and the proof caption all say "rev n", and they
+	 * have to agree, so the number is displayed from server state and never
+	 * incremented locally in anticipation of a save.
+	 *
+	 * ONE BAR, TWO CONTEXTS (PS-1). `context` changes the breadcrumb and which
+	 * actions sit on the right; everything else is shared, because a second top
+	 * bar would be two places to fix the save state.
+	 *
+	 *   campaign — primary "Use this design", which hands the design to an
+	 *              edition. Unchanged.
+	 *   template — secondary "Use it" (opens the USE IT rail) and primary
+	 *              "Render", which makes the real file.
+	 *
+	 * BUTTON METRICS CORRECTED TO THE BOARDS. This was built with
+	 * `rounded-btn` (4px) and `h-9` (36px); both FM8-0 and JL2-0 specify 6px
+	 * and 34px with a 600-weight label. Two independently drawn boards agreeing
+	 * makes the code the outlier, so it is fixed rather than preserved — the
+	 * campaign bar shifts by 2px and gains the weight it was always meant to
+	 * have.
+	 */
+	import StatusSquare from '$lib/components/campaigns/StatusSquare.svelte';
+	import { saveState as saveStateOf } from './save-states.js';
+
+	export let designName = 'Untitled design';
+	export let breadcrumb = null;
+	export let revision = 1;
+	/** 'saved' | 'saving' | 'unsaved' | 'offline' | 'conflict' | 'ai' */
+	export let saveState = 'saved';
+	export let format = 'PNG';
+	export let width = 1200;
+	export let height = 800;
+	/**
+	 * Opens the Versions panel. The revision label IS the affordance — there is
+	 * no second button — because the number is what a buyer is looking at when
+	 * the question "what changed?" occurs to them.
+	 */
+	export let onRevisionClick = null;
+	export let versionsOpen = false;
+
+	export let canUndo = false;
+	export let canRedo = false;
+	/** 'campaign' | 'template'. Decides the breadcrumb and the right cluster. */
+	export let context = 'campaign';
+	/** Campaign context only. Null on the standalone route. */
+	export let onUseThisDesign = null;
+	export let useDisabled = false;
+	/** Template context: makes the real file through the production path. */
+	export let onRender = null;
+	export let renderDisabled = false;
+	/** Template context: focuses the USE IT rail tab. */
+	export let onUseIt = null;
+	export let onBack = null;
+	export let onUndo = null;
+	export let onRedo = null;
+	export let onPreview = null;
+
+	$: state = saveStateOf(saveState);
+</script>
+
+<header
+	class="flex flex-wrap items-center gap-4 border-b border-brand-rule bg-brand-paper px-4 py-3"
+>
+	<button
+		type="button"
+		on:click={onBack}
+		class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-btn border border-brand-rule text-brand-slate"
+		aria-label="Back">‹</button
+	>
+
+	<div class="flex min-w-0 flex-1 flex-wrap items-center gap-2.5">
+		{#if breadcrumb}
+			<span class="truncate font-sans text-[13.5px] text-brand-mute">{breadcrumb}</span>
+			<span class="font-sans text-[13.5px] text-brand-mute" aria-hidden="true">/</span>
+		{/if}
+		<span class="truncate font-sans text-[16px] font-bold text-brand-ink">{designName}</span>
+		<span class="flex flex-shrink-0 items-center gap-2">
+			<StatusSquare tone={state.tone} label={state.label} />
+			{#if onRevisionClick}
+				<button
+					type="button"
+					on:click={onRevisionClick}
+					aria-expanded={versionsOpen}
+					class="rounded-btn font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-mute underline-offset-2 hover:text-brand-ink hover:underline"
+					>· Rev {revision}</button
+				>
+			{:else}
+				<span class="font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-mute"
+					>· Rev {revision}</span
+				>
+			{/if}
+		</span>
+	</div>
+
+	<div class="flex flex-shrink-0 items-center gap-3">
+		<span class="flex items-center gap-0.5 rounded-[6px] border border-brand-rule p-0.5">
+			<button
+				type="button"
+				on:click={onUndo}
+				disabled={!canUndo}
+				class="flex h-7 w-[30px] items-center justify-center text-brand-ink disabled:text-brand-mute"
+				aria-label="Undo"
+			>
+				<!-- Curved arrows, stroked: the ↶/↷ glyphs vary by font and sit off-baseline. -->
+				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+					<path d="M6 4.5 3 7.5l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+					<path d="M3.5 7.5H10a3 3 0 0 1 0 6H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+				</svg>
+			</button>
+			<button
+				type="button"
+				on:click={onRedo}
+				disabled={!canRedo}
+				class="flex h-7 w-[30px] items-center justify-center text-brand-ink disabled:text-brand-mute"
+				aria-label="Redo"
+			>
+				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+					<path d="m10 4.5 3 3-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+					<path d="M12.5 7.5H6a3 3 0 0 0 0 6h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+				</svg>
+			</button>
+		</span>
+
+		<span
+			class="flex h-[34px] items-center rounded-[6px] border border-brand-rule px-3 font-mono text-[11.5px] text-brand-slate"
+			>{format} · {width} × {height}</span
+		>
+
+		{#if context === 'campaign'}
+			<button
+				type="button"
+				on:click={onPreview}
+				class="flex h-[34px] items-center rounded-[6px] border border-brand-rule px-3.5 font-sans text-[13.5px] text-brand-slate"
+				>Preview</button
+			>
+		{/if}
+
+		{#if context === 'template' && onUseIt}
+			<!-- Secondary. The USE IT tab is reachable on its own too; this is a
+			     shortcut to it, not the only way in. -->
+			<button
+				type="button"
+				on:click={onUseIt}
+				class="flex h-[34px] items-center rounded-[6px] border border-brand-rule px-3.5 font-sans text-[13.5px] text-brand-ink"
+				>Use it</button
+			>
+		{/if}
+
+		{#if context === 'template' && onRender}
+			<!--
+				The one plum primary in template context. "Render" rather than
+				"Preview" because it makes the REAL file through the production
+				path — the same bytes the API returns — and calling that a preview
+				would undersell the only button that proves the template works.
+			-->
+			<button
+				type="button"
+				on:click={onRender}
+				disabled={renderDisabled}
+				class="flex h-[34px] items-center gap-2 rounded-[6px] px-4 font-sans text-[13.5px] font-semibold {renderDisabled
+					? 'cursor-not-allowed bg-brand-subtle text-brand-mute'
+					: 'bg-brand-plum text-white'}"
+			>
+				Render
+				<span
+					class="block h-[7px] w-[7px] {renderDisabled ? 'bg-brand-rule' : 'bg-brand-field'}"
+					aria-hidden="true"
+				/>
+			</button>
+		{/if}
+
+		{#if context === 'campaign' && onUseThisDesign}
+			<!-- The one plum primary on this screen. Disabled shows a rule square
+			     rather than opacity, so "cannot yet" is legible rather than faint. -->
+			<button
+				type="button"
+				on:click={onUseThisDesign}
+				disabled={useDisabled}
+				class="flex h-[34px] items-center gap-2 rounded-[6px] px-4 font-sans text-[13.5px] font-semibold {useDisabled
+					? 'cursor-not-allowed bg-brand-subtle text-brand-mute'
+					: 'bg-brand-plum text-white'}"
+			>
+				Use this design
+				<span
+					class="block h-[7px] w-[7px] {useDisabled ? 'bg-brand-rule' : 'bg-brand-field'}"
+					aria-hidden="true"
+				/>
+			</button>
+		{/if}
+	</div>
+</header>

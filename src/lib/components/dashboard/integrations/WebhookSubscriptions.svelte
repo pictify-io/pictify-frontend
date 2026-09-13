@@ -11,7 +11,7 @@
 	} from '../../../../api/integrations';
 	import Loader from '$lib/components/Loader.svelte';
 	import FeatureGate from '$lib/components/plg/FeatureGate.svelte';
-	import { toast } from '../../../../store/toast.store';
+	import { notify } from '../../../../store/toast.store';
 	import { FEATURES, checkFeatureAccessSync } from '../../../../store/plg.store';
 	import { openUpgradeModal } from '../../../../store/upgrade-modal.store';
 
@@ -84,7 +84,7 @@
 			await deleteWebhookSubscription(uid);
 			subscriptions = subscriptions.filter((s) => s.uid !== uid);
 		} catch (err) {
-			toast.set({ message: 'Failed to delete webhook', type: 'error', duration: 3000 });
+			notify.fail('Delete webhook', err, { retry: () => handleDelete(uid) });
 		}
 	}
 
@@ -93,7 +93,7 @@
 			const response = await pauseWebhookSubscription(uid);
 			subscriptions = subscriptions.map((s) => (s.uid === uid ? { ...s, status: 'paused' } : s));
 		} catch (err) {
-			toast.set({ message: 'Failed to pause webhook', type: 'error', duration: 3000 });
+			notify.fail('Pause webhook', err, { retry: () => handlePause(uid) });
 		}
 	}
 
@@ -102,7 +102,7 @@
 			const response = await resumeWebhookSubscription(uid);
 			subscriptions = subscriptions.map((s) => (s.uid === uid ? { ...s, status: 'active' } : s));
 		} catch (err) {
-			toast.set({ message: 'Failed to resume webhook', type: 'error', duration: 3000 });
+			notify.fail('Resume webhook', err, { retry: () => handleResume(uid) });
 		}
 	}
 

@@ -8,7 +8,7 @@
 	import { getApiToken, createApiToken } from '../../api/user';
 	import { createImage } from '../../api/image.js';
 	import { getLastRender, clearLastRender } from '$lib/lastRender.js';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	let apiKey = '';
 	let apiKeyLoading = true;

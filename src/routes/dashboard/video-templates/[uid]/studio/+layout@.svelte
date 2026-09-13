@@ -1,7 +1,7 @@
 <script>
 	/**
 	 * Full-screen layout reset for the video studio: escapes the dashboard
-	 * shell (Nav + SideNav + max-w container) so the studio owns the whole
+	 * shell (Nav + rail + max-w container) so the studio owns the whole
 	 * viewport. Replicates the dashboard layout's auth guard — redirect to
 	 * /login unless a user session exists — without the rest of its chrome.
 	 *

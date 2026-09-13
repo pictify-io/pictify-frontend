@@ -14,6 +14,22 @@ export default defineConfig({
 		jsx: 'automatic'
 	},
 	resolve: {
+		/*
+		 * One React, always.
+		 *
+		 * @pixi/layout ships its own react 19.2.8 under its node_modules while the
+		 * app is on 18.3.1. Two copies means two hook dispatchers, and whichever
+		 * one a module resolves against depends on load order — so mounting the
+		 * Pixi engine and then the Remotion player got "Invalid hook call"
+		 * warnings and, when the dispatcher came back null, a throw at the first
+		 * `React.useRef` in PlayerView. That surfaced as a white rectangle where
+		 * the video should be, and only on some navigation orders, which is the
+		 * worst kind of bug to chase.
+		 *
+		 * Deduping is the structural fix; the error boundary in playerHost.js is
+		 * the belt to this pair of braces.
+		 */
+		dedupe: ['react', 'react-dom'],
 		alias: {
 			'@imgly/background-removal': resolve(projectRoot, 'src/lib/shims/backgroundRemovalStub.js')
 		}
@@ -52,6 +68,20 @@ export default defineConfig({
 			'@openvideo/engine-pixi',
 			'codemirror',
 			'@codemirror/lang-html',
+			// The playground's VARIABLES pane and its JSON linter.
+			'@codemirror/lang-json',
+			// The campaign studio's visual stage loads these from inside
+			// attachStage, so Vite meets them mid-gesture on a cold cache — the
+			// same 504 wall described above, on the first ever open of a design.
+			'moveable',
+			'selecto',
+			// Reached only through the lazily-loaded studio route, so Vite meets
+			// them mid-navigation and each discovery triggers "optimized
+			// dependencies changed. reloading", which 504s everything in flight.
+			'dompurify',
+			'posthog-js',
+			'@paper-design/shaders',
+			'@codemirror/lint',
 			'@codemirror/lang-css',
 			'@codemirror/lang-javascript',
 			'@codemirror/state',

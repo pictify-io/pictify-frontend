@@ -1,0 +1,134 @@
+{
+  "route": "/tools/linkedin-banner-generator",
+  "title": "Free LinkedIn Banner Generator | Create Professional Profile Banners | Pictify",
+  "canonical": "https://pictify.io/tools/linkedin-banner-generator",
+  "metas": {
+    "description": "Create stunning LinkedIn banners in seconds. Choose from 20+ professional templates designed for developers, designers, marketers, and more. Perfect 1584x396 dimensions guaranteed.",
+    "keywords": "linkedin banner generator, linkedin cover photo, linkedin background, profile banner, linkedin header, linkedin banner maker",
+    "og:description": "Create professional LinkedIn banners in seconds. 20+ templates for developers, designers, marketers, and more.",
+    "og:image": "https://pictify.io/og/tools/linkedin-banner-generator.png",
+    "og:image:alt": "Pictify LinkedIn banner generator: free, 1584×396",
+    "og:image:height": "630",
+    "og:image:width": "1200",
+    "og:site_name": "Pictify",
+    "og:title": "Free LinkedIn Banner Generator | Pictify",
+    "og:type": "website",
+    "og:url": "https://pictify.io/tools/linkedin-banner-generator",
+    "twitter:card": "summary_large_image",
+    "twitter:description": "Create professional LinkedIn banners in seconds. 20+ templates. Free, no watermark.",
+    "twitter:image": "https://pictify.io/og/tools/linkedin-banner-generator.png",
+    "twitter:title": "Free LinkedIn Banner Generator | Pictify"
+  },
+  "jsonLd": [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/",
+          "name": "Home",
+          "position": 1
+        },
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/tools",
+          "name": "Tools",
+          "position": 2
+        },
+        {
+          "@type": "ListItem",
+          "name": "LinkedIn Banner Generator",
+          "position": 3
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "description": "API-first image, document, and video generation. Every row of a spreadsheet or webhook becomes a rendered, personalized certificate, badge, report, or video.",
+      "logo": "https://pictify.io/logo.png",
+      "name": "Pictify",
+      "sameAs": [
+        "https://github.com/pictify-io"
+      ],
+      "url": "https://pictify.io"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "applicationCategory": [
+        "DesignApplication",
+        "BusinessApplication"
+      ],
+      "creator": {
+        "@type": "Organization",
+        "name": "Pictify.io",
+        "url": "https://pictify.io"
+      },
+      "description": "Create professional LinkedIn banners in seconds: 20+ templates at the correct 1584×396 dimensions, free with API access.",
+      "name": "Pictify LinkedIn Banner Generator",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "operatingSystem": "Web",
+      "url": "https://pictify.io/tools/linkedin-banner-generator"
+    }
+  ],
+  "outline": [
+    {
+      "tag": "h1",
+      "text": "LINKEDIN BANNER GENERATOR"
+    },
+    {
+      "tag": "h2",
+      "text": "Automate with the API"
+    },
+    {
+      "tag": "h2",
+      "text": "How to Add Your Banner to LinkedIn"
+    },
+    {
+      "tag": "h3",
+      "text": "Create Your Banner"
+    },
+    {
+      "tag": "h3",
+      "text": "Go to LinkedIn"
+    },
+    {
+      "tag": "h3",
+      "text": "Upload & Save"
+    },
+    {
+      "tag": "h2",
+      "text": "LinkedIn Banner Size Guide"
+    },
+    {
+      "tag": "h3",
+      "text": "✓ Recommended Dimensions"
+    },
+    {
+      "tag": "h3",
+      "text": "! Important Notes"
+    },
+    {
+      "tag": "h2",
+      "text": "Product"
+    },
+    {
+      "tag": "h2",
+      "text": "Developers"
+    },
+    {
+      "tag": "h2",
+      "text": "Integrations"
+    },
+    {
+      "tag": "h2",
+      "text": "Company"
+    }
+  ]
+}

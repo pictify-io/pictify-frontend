@@ -1,6 +1,6 @@
 <script>
 	import SignUpButton from './SignUpButton.svelte';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 </script>
 
 <section class="w-full py-16 md:py-24 bg-brand-bg overflow-hidden relative z-0">
@@ -32,7 +32,7 @@
 				</h2>
 
 				<p class="text-lg md:text-xl text-gray-700 max-w-lg mb-10 font-medium leading-relaxed">
-					Sign up, pick a template, add your data. Get pixel-perfect documents rendered and delivered in minutes.
+					Sign up, pick a template, add your data. Get pixel-perfect documents rendered in minutes.
 				</p>
 
 				<div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">

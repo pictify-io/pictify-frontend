@@ -1,6 +1,16 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
+	/**
+	 * /alternatives — the shelf of comparisons.
+	 *
+	 * Data is Sanity-first (see +page.js); comparisons.js is the fallback. The
+	 * headings are the live ones and stay byte-identical: the H1, "Why Teams
+	 * Switch to Pictify", "Explore Alternatives", "Also See", "Ready to
+	 * Switch?", and one "{Competitor} Alternative" per card.
+	 */
+	import { HERO_CLUSTER } from '$lib/components/landing/hero-clusters.js';
+	import Nav from '$lib/components/landing/Nav.svelte';
+	import Footer from '$lib/components/landing/Footer.svelte';
+	import PixelCluster from '$lib/components/landing/PixelCluster.svelte';
 	import { brandIcons } from '$lib/config/brandIcons.js';
 
 	export let data;
@@ -10,6 +20,30 @@
 	const description =
 		'Looking for an alternative to Cloudinary, Puppeteer, or other image tools? See how Pictify compares and why teams are switching.';
 	const canonical = 'https://pictify.io/alternatives';
+
+	/** The four reasons keep their live headings; only the chrome is new. */
+	const REASONS = [
+		{
+			title: 'Faster Setup',
+			body: 'Generate images in minutes, not days',
+			tint: 'bg-brand-powder'
+		},
+		{
+			title: 'Better Pricing',
+			body: 'Pay by the render, with a free tier',
+			tint: 'bg-brand-field'
+		},
+		{
+			title: 'Full HTML Control',
+			body: 'Real HTML and CSS, not a constrained canvas',
+			tint: 'bg-brand-rose'
+		},
+		{
+			title: 'No Infrastructure',
+			body: 'No browsers to run or keep alive',
+			tint: 'bg-brand-subtle'
+		}
+	];
 </script>
 
 <svelte:head>
@@ -27,7 +61,7 @@
 	<meta property="og:url" content={canonical} />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="Pictify" />
-	<meta property="og:image" content="https://pictify.io/og/alternatives/index.png" />
+	<meta property="og:image" content="https://pictify.io/og/v2/alternatives.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
 	<meta property="og:image:alt" content="Pictify alternatives: 34 tools compared" />
@@ -36,286 +70,171 @@
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={description} />
-	<meta name="twitter:image" content="https://pictify.io/og/alternatives/index.png" />
+	<meta name="twitter:image" content="https://pictify.io/og/v2/alternatives.png" />
 	<meta name="twitter:image:alt" content="Pictify alternatives: 34 tools compared" />
 </svelte:head>
 
-<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
+<div class="landing-v2 flex min-h-screen w-full flex-col bg-brand-canvas">
 	<Nav />
 
-	<!-- Background Elements -->
-	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
-	/>
-	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-data-green/10 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
+	<!-- ── Hero ──────────────────────────────────────────────────────── -->
+	<section class="relative w-full overflow-hidden bg-brand-field">
+		<PixelCluster
+			cells={HERO_CLUSTER}
+			cell={22}
+			origin="e"
+			delay={320}
+			cycle={3}
+			class="right-0 top-6 hidden lg:block"
+		/>
+		<div
+			class="relative mx-auto flex w-full max-w-page flex-col gap-3 px-5 py-12 lg:px-10 lg:py-16"
+		>
+			<p class="font-mono text-[11px] tracking-[0.06em] text-brand-royal">
+				ALTERNATIVES <span class="text-brand-mute">·</span>
+				<span class="text-brand-ink">{alternatives.length} COMPARED</span>
+			</p>
 
-	<main
-		class="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-20 md:pb-32 relative z-10"
-	>
-		<!-- Breadcrumb -->
-		<nav class="mb-8">
-			<ol class="flex items-center gap-2 text-sm font-bold">
-				<li><a href="/" class="text-gray-500 hover:text-gray-900">Home</a></li>
-				<li class="text-gray-400">/</li>
-				<li class="text-gray-900">Alternatives</li>
-			</ol>
-		</nav>
-
-		<!-- Hero Section -->
-		<div class="relative flex flex-col items-center justify-center text-center mb-16 pt-4 sm:pt-8">
-			<!-- Badge -->
-			<div
-				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-6"
-			>
-				<div
-					class="px-6 py-2 bg-data-green border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-brutal-lg rounded-lg"
-				>
-					Switch to Better
-				</div>
-			</div>
-
-			<!-- Title -->
 			<h1
-				class="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6"
+				class="max-w-[16ch] font-display text-[40px] font-extrabold leading-[1.02] tracking-[-0.02em] text-brand-ink lg:text-[56px] lg:leading-[60px]"
 			>
 				Pictify as Your
-				<span class="block text-data-green">Alternative</span>
+				<span>Alternative</span>
 			</h1>
 
-			<!-- Description: BLUF answer block — self-contained, entity-rich, extraction-friendly. -->
-			<p class="text-lg sm:text-xl text-gray-600 font-bold leading-relaxed max-w-2xl">
+			<p
+				class="max-w-[680px] font-sans text-base leading-[25px] text-[#2A2C1E] lg:text-lg lg:leading-[27px]"
+			>
 				Pictify is a programmatic media generation platform: HTML-native templates render images
-				(PNG, JPG, WebP), multi-page PDFs, GIFs, and personalized video from your data, then
-				workflow runs email each document to its recipient with per-row delivered/bounced status.
-				We call that loop <span class="text-gray-900">Render-to-Recipient</span>. Below are honest
-				side-by-side comparisons with Bannerbear, htmlcsstoimage, Placid, Certifier, Canva Bulk
-				Create, and 30+ other tools, including where each of them still wins.
+				(PNG, JPG, WebP), multi-page PDFs, GIFs, and personalized video from your data, from an API
+				call, a CSV row or a webhook — each render coming back as a CDN link your own system can
+				fetch. Below are honest side-by-side comparisons with Bannerbear, htmlcsstoimage, Placid,
+				Certifier, Canva Bulk Create, and {alternatives.length - 5}+ other tools, including where
+				each of them still wins.
 			</p>
 		</div>
+	</section>
 
-		<!-- Why Teams Switch Section -->
-		<section class="mb-16">
-			<div class="bg-white border-[3px] border-gray-900 rounded-2xl p-8 shadow-brutal-xl">
-				<h2 class="text-2xl font-black text-gray-900 mb-6 text-center">
+	<main class="w-full">
+		<!-- ── Why teams switch ──────────────────────────────────────── -->
+		<section class="mx-auto w-full max-w-page px-5 pt-14 lg:px-10">
+			<div class="flex items-baseline gap-3 border-t-2 border-brand-ink pt-8">
+				<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">01</span>
+				<h2
+					class="font-display text-[26px] font-bold leading-8 tracking-[-0.02em] text-brand-ink lg:text-[32px] lg:leading-[42px]"
+				>
 					Why Teams Switch to Pictify
 				</h2>
-				<div class="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
-					<div class="text-center">
-						<div
-							class="w-12 h-12 bg-data-green border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
-						>
-							<svg
-								class="w-6 h-6 text-gray-900"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M13 10V3L4 14h7v7l9-11h-7z"
-								/>
-							</svg>
-						</div>
-						<h3 class="font-black text-gray-900 mb-1">Faster Setup</h3>
-						<p class="text-sm text-gray-600 font-medium">Generate images in minutes, not days</p>
+			</div>
+
+			<div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 min-[1200px]:grid-cols-4">
+				{#each REASONS as reason (reason.title)}
+					<div class="flex flex-col gap-2 border border-brand-ink {reason.tint} px-5 py-4">
+						<span class="h-2.5 w-2.5 bg-brand-ink" aria-hidden="true" />
+						<h3 class="font-sans text-base font-semibold leading-5 text-brand-ink">
+							{reason.title}
+						</h3>
+						<p class="font-sans text-sm leading-5 text-brand-ink/80">{reason.body}</p>
 					</div>
-					<div class="text-center">
-						<div
-							class="w-12 h-12 bg-brand-accent border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
-						>
-							<svg
-								class="w-6 h-6 text-gray-900"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-								/>
-							</svg>
-						</div>
-						<h3 class="font-black text-gray-900 mb-1">Better Pricing</h3>
-						<p class="text-sm text-gray-600 font-medium">Simple, affordable per-image pricing</p>
-					</div>
-					<div class="text-center">
-						<div
-							class="w-12 h-12 bg-brand-danger border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
-						>
-							<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-								/>
-							</svg>
-						</div>
-						<h3 class="font-black text-gray-900 mb-1">Full HTML Control</h3>
-						<p class="text-sm text-gray-600 font-medium">Use any HTML/CSS for unlimited designs</p>
-					</div>
-					<div class="text-center">
-						<div
-							class="w-12 h-12 bg-gray-900 border-[2px] border-gray-900 rounded-xl mx-auto mb-3 flex items-center justify-center"
-						>
-							<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-								/>
-							</svg>
-						</div>
-						<h3 class="font-black text-gray-900 mb-1">No Infrastructure</h3>
-						<p class="text-sm text-gray-600 font-medium">We handle browsers, scaling, and CDN</p>
-					</div>
-				</div>
+				{/each}
 			</div>
 		</section>
 
-		<!-- Alternatives Grid -->
-		<section class="mb-16">
-			<h2 class="text-2xl font-black text-gray-900 mb-8 text-center uppercase tracking-tight">
-				Explore Alternatives
-			</h2>
-			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-				{#each alternatives as alt}
+		<!-- ── The shelf ─────────────────────────────────────────────── -->
+		<section class="mx-auto w-full max-w-page px-5 pt-14 lg:px-10">
+			<div class="flex items-baseline gap-3 border-t-2 border-brand-ink pt-8">
+				<span class="font-mono text-xs tracking-[0.06em] text-brand-blue">02</span>
+				<h2
+					class="font-display text-[26px] font-bold leading-8 tracking-[-0.02em] text-brand-ink lg:text-[32px] lg:leading-[42px]"
+				>
+					Explore Alternatives
+				</h2>
+			</div>
+
+			<div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 min-[1200px]:grid-cols-4">
+				{#each alternatives as alt (alt.slug)}
 					{@const icon = brandIcons[alt.slug] || brandIcons.default}
 					<a
-						href="/alternatives/{alt.slug}"
-						class="group relative bg-white border-[3px] border-gray-900 rounded-2xl p-1 shadow-brutal-2xl hover:shadow-brutal-lg hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 overflow-hidden"
+						href={`/alternatives/${alt.slug}`}
+						class="group flex flex-col gap-2 rounded-card border-[1.5px] border-brand-ink bg-brand-paper p-5 transition-[transform,box-shadow] duration-150 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[4px_4px_0_0_#000000] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-royal motion-reduce:transition-none"
 					>
-						<div class="p-6 h-full flex flex-col relative z-10 bg-white rounded-xl">
-							<!-- VS Header -->
-							<div class="flex items-center justify-between mb-8">
-								<!-- Competitor Icon -->
-								<div
-									class="w-14 h-14 bg-gray-50 border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-brutal-md group-hover:scale-110 transition-transform"
-									style="color: {icon.color || '#1f2937'}"
+						<span class="flex items-center gap-2">
+							{#if icon.type === 'url'}
+								<img loading="lazy" src={icon.url} alt="" aria-hidden="true" class="h-4 w-4" />
+							{:else if icon.type === 'text'}
+								<span class="font-mono text-[10px] leading-none" style="color: {icon.color}"
+									>{icon.text}</span
 								>
-									{#if icon.type === 'url'}
-										<img loading="lazy" src={icon.url} alt={alt.competitor} class="w-8 h-8" />
-									{:else if icon.type === 'text'}
-										<span class="text-lg font-black" style="color: {icon.color}">{icon.text}</span>
-									{:else if icon.type === 'svg'}
-										<svg class="w-8 h-8" fill="currentColor" viewBox={icon.viewBox}>
-											<path d={icon.path} />
-										</svg>
-									{:else}
-										<span class="text-xl font-black text-gray-900">{alt.competitor.charAt(0)}</span>
-									{/if}
-								</div>
+							{:else}
+								<span class="h-2.5 w-2.5 border border-brand-ink" aria-hidden="true" />
+							{/if}
+							<span class="font-mono text-[10px] tracking-[0.06em] text-brand-mute">PICTIFY VS</span
+							>
+						</span>
 
-								<div class="flex flex-col items-center gap-1">
-									<div class="w-1.5 h-1.5 rounded-full bg-gray-300" />
-									<div class="text-xs font-black text-data-green uppercase tracking-widest">
-										ALT
-									</div>
-									<div class="w-1.5 h-1.5 rounded-full bg-gray-300" />
-								</div>
+						<h3
+							class="font-display text-[19px] font-bold leading-6 tracking-[-0.015em] text-brand-ink group-hover:underline"
+						>
+							{alt.competitor} Alternative
+						</h3>
 
-								<!-- Pictify Icon -->
-								<div
-									class="w-14 h-14 bg-gray-900 border-[3px] border-gray-900 rounded-xl flex items-center justify-center shadow-[3px_3px_0_0_#ffc480]"
-								>
-									<svg
-										class="w-8 h-8 text-white"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="3"
-											d="M13 10V3L4 14h7v7l9-11h-7z"
-										/>
-									</svg>
-								</div>
-							</div>
-
-							<div class="mb-4">
-								<h3
-									class="text-2xl font-black text-gray-900 mb-2 group-hover:text-data-green transition-colors leading-tight"
-								>
-									{alt.competitor} <br />Alternative
-								</h3>
-								<div class="h-1 w-12 bg-data-green mb-4" />
-								<p class="text-gray-500 font-medium leading-relaxed line-clamp-3">
-									{alt.metaDescription}
-								</p>
-							</div>
-
-							<div class="mt-auto pt-4 border-t-2 border-dashed border-gray-100">
-								<span
-									class="text-sm font-bold text-gray-900 uppercase tracking-wide flex items-center gap-2 group-hover:gap-3 transition-all"
-								>
-									Compare Now
-									<svg
-										class="w-4 h-4 text-data-green"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="3"
-											d="M17 8l4 4m0 0l-4 4m4-4H3"
-										/>
-									</svg>
-								</span>
-							</div>
-						</div>
+						{#if alt.comparison?.competitorDescription}
+							<p class="font-sans text-sm leading-5 text-brand-slate">
+								{alt.comparison.competitorDescription}
+							</p>
+						{/if}
 					</a>
 				{/each}
 			</div>
 		</section>
 
-		<!-- Also See Section -->
-		<section class="mb-16">
-			<div class="text-center mb-8">
-				<h2 class="text-xl font-black text-gray-400 uppercase tracking-wide">Also See</h2>
-			</div>
-			<div class="flex flex-wrap justify-center gap-4">
+		<!-- ── Also see ──────────────────────────────────────────────── -->
+		<section class="mx-auto w-full max-w-page px-5 pt-14 lg:px-10">
+			<h2 class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">Also See</h2>
+			<div class="mt-4 flex flex-wrap gap-3">
 				<a
 					href="/pricing"
-					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="rounded-lg border-[1.5px] border-brand-ink px-5 py-2.5 font-sans text-[15px] font-semibold text-brand-ink transition-colors hover:bg-brand-subtle"
 				>
 					Pricing
 				</a>
 				<a
 					href="/tools"
-					class="px-6 py-3 bg-white border-[3px] border-gray-900 rounded-xl font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+					class="rounded-lg border-[1.5px] border-brand-ink px-5 py-2.5 font-sans text-[15px] font-semibold text-brand-ink transition-colors hover:bg-brand-subtle"
 				>
 					Free Tools
 				</a>
 			</div>
 		</section>
+	</main>
 
-		<!-- Bottom CTA -->
-		<section
-			class="bg-gray-900 border-[4px] border-gray-900 rounded-2xl p-8 md:p-12 text-center shadow-[8px_8px_0_0_#4ade80]"
+	<!-- ── Closing band ──────────────────────────────────────────────── -->
+	<section class="mt-16 w-full bg-brand-press-deep px-5 py-14 lg:px-10 lg:py-20">
+		<div
+			class="mx-auto flex w-full max-w-page flex-col gap-8 lg:flex-row lg:items-end lg:justify-between"
 		>
-			<h2 class="text-3xl md:text-4xl font-black text-white mb-4">Ready to Switch?</h2>
-			<p class="text-gray-400 font-bold mb-8 max-w-xl mx-auto">
-				Start generating images in minutes. Free tier available, no credit card required.
-			</p>
+			<div class="flex flex-col gap-3.5 lg:max-w-[640px]">
+				<p class="font-mono text-xs tracking-[0.06em] text-brand-field">
+					SAME HTML IN. BETTER THINGS OUT.
+				</p>
+				<h2
+					class="font-display text-[32px] font-bold leading-[1.08] tracking-[-0.02em] text-white lg:text-[44px] lg:leading-[50px]"
+				>
+					Ready to Switch?
+				</h2>
+				<p class="font-sans text-base leading-[25px] text-brand-press-text">
+					Start generating images in minutes. Free tier available, no credit card required.
+				</p>
+			</div>
+
 			<a
 				href="/signup"
-				class="inline-block px-8 py-4 bg-data-green text-gray-900 border-[3px] border-white font-black uppercase tracking-wide shadow-[4px_4px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
+				class="w-max rounded-lg bg-brand-field px-7 py-4 font-sans text-base font-semibold text-brand-ink shadow-[3px_3px_0_0_#FF48B0] transition-opacity hover:opacity-90"
 			>
 				Get Started Free
 			</a>
-		</section>
-	</main>
+		</div>
+	</section>
 
 	<Footer />
-</section>
+</div>

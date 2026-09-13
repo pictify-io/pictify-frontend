@@ -1,31 +1,43 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
-	import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
-	import NextSteps from '$lib/components/tools/NextSteps.svelte';
-	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
-	import HtmlTemplateEditor from '$lib/components/tools/HtmlTemplateEditor.svelte';
+	/**
+	 * /tools/[usecase] — the v2 tool page, column mode.
+	 *
+	 * Nine use cases share this route. Three of them (markdown, table, barcode)
+	 * ship their own self-contained editor; the rest render the template
+	 * workbench, which is the only branch with a toolbar action here. SEO copy
+	 * is frozen.
+	 */
+	import Nav from '$lib/components/landing/Nav.svelte';
+	import Footer from '$lib/components/landing/Footer.svelte';
+	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
+	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
+	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
+	import ToolEditor from '$lib/components/tools/ToolEditor.svelte';
 	import MarkdownEditor from '$lib/components/tools/MarkdownEditor.svelte';
 	import TableEditor from '$lib/components/tools/TableEditor.svelte';
 	import BarcodeEditor from '$lib/components/tools/BarcodeEditor.svelte';
-	import TemplateGallery from '$lib/components/tools/TemplateGallery.svelte';
+	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
+	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
+	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
+	import Lead from '$lib/components/tools/v2/longform/Lead.svelte';
+	import Prose from '$lib/components/tools/v2/longform/Prose.svelte';
+	import ProseGroup from '$lib/components/tools/v2/longform/ProseGroup.svelte';
+	import StepCards from '$lib/components/tools/v2/longform/StepCards.svelte';
+	import CheckList from '$lib/components/tools/v2/longform/CheckList.svelte';
+	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
 	import { page } from '$app/stores';
 	import {
 		useCases,
 		useCaseDetails,
 		formats,
 		popularSizes,
-		baseFormatUrl,
-		sizeUrl,
 		parseSize
 	} from '$lib/pseo/config.js';
 	import { getHtmlTemplatesForUseCase } from '$lib/pseo/useCaseHtmlTemplates.js';
-	import { onMount } from 'svelte';
 	import { user } from '../../../store/user.store';
-	import { toast } from '../../../store/toast.store';
-	import { generationLimits } from '../../../store/generationLimits.store';
-	import { createImagePublic } from '../../../api/image.js';
-	import { downloadFile } from '$lib/utils/download.js';
+	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 
 	// User login state
 	let isUserLoggedIn = false;
@@ -46,65 +58,44 @@
 	$: canonical = validCase ? `https://pictify.io/tools/${useCaseId}` : 'https://pictify.io/tools';
 
 	// Generation state
-	let isGenerating = false;
-	let generatedImageUrl = '';
-	let generationError = '';
-	let editorRef;
 
 	// Quick generate from the edited HTML template.
 	// Uses the public HTML endpoint (no auth required, rate limited) — the same
 	// render engine as the authenticated /image API.
-	async function handleQuickGenerate() {
-		const sel = editorRef?.getSelected?.() ||
-			(toolTemplates[0] && {
-				html: toolTemplates[0].html,
-				width: toolTemplates[0].width,
-				height: toolTemplates[0].height
-			});
-		if (!sel?.html) {
-			toast.set({ message: 'No template available', type: 'error', duration: 2000 });
-			return;
-		}
-
-		// Track generation in global limits store
-		generationLimits.increment();
-		isGenerating = true;
-		generationError = '';
-		generatedImageUrl = '';
-
-		try {
-			const { image } = await createImagePublic({
-				html: sel.html,
-				width: sel.width,
-				height: sel.height,
-				fileExtension: 'png'
-			});
-
-			if (image?.url) {
-				generatedImageUrl = image.url;
-				generatedDims = { width: sel.width, height: sel.height };
-				toast.set({ message: 'Image generated successfully!', type: 'success', duration: 2000 });
-			} else {
-				throw new Error('No image URL in response');
-			}
-		} catch (e) {
-			// Handle rate limit error
-			if (e.message?.includes('rate') || e.status === 429) {
-				generationError = 'Too many requests. Please wait a moment and try again.';
-			} else {
-				generationError = e.message || 'Failed to generate image';
-			}
-			toast.set({ message: generationError, type: 'error', duration: 3000 });
-		} finally {
-			isGenerating = false;
-		}
-	}
-
 	// HTML starter templates for this use case (empty for the code-editor tools)
+	/**
+	 * Which "From a …" block each of these tools opens with, from the §9b matrix.
+	 * Anything not listed is a card with two or three fields, which is the
+	 * shape the membership and portfolio tools want.
+	 */
+	const SOURCE_KIND = {
+		'social-proof-card': 'social-proof',
+		'email-header': 'email-header',
+		badge: 'badge',
+		leaderboard: 'table',
+		'membership-card': 'card',
+		'portfolio-card': 'card'
+	};
+	/** A leaderboard is rows before it is prose. */
+	const INPUTS_FIRST = new Set(['leaderboard']);
+
+	/*
+	 * These template sets already carry names and descriptions, so nothing is
+	 * derived. They do NOT carry `template-*` ids, so the tokeniser finds no
+	 * variables in them — Inputs says so honestly, and a visitor can promote any
+	 * text to a variable with "Show a variable here". Giving them ids is a
+	 * content pass, not a code one.
+	 */
+	$: editorTemplates = toolTemplates.map((t) => ({
+		key: t.id,
+		name: t.name,
+		category: null,
+		html: t.html
+	}));
+
 	$: toolTemplates = validCase ? getHtmlTemplatesForUseCase(useCaseId) : [];
 	$: templateWidth = toolTemplates[0]?.width || 1200;
 	$: templateHeight = toolTemplates[0]?.height || 630;
-	let generatedDims = { width: 1200, height: 630 };
 
 	// Escape HTML for code display
 	function escapeHtml(source) {
@@ -128,6 +119,24 @@
 
 	$: renderedApiCode = highlightCurl(apiSnippet);
 
+	/**
+	 * The hand-rolled dark window is gone; AutomateSection takes the same
+	 * snippet in the shape every other tool page uses.
+	 */
+	$: codeExamples = [{ id: 'curl', label: 'cURL', fileName: 'render.sh', code: renderedApiCode }];
+	$: plainExamples = { curl: apiSnippet };
+
+	/** The deep dive, as sub-points of section 01 rather than its own band. */
+	$: deepDive = [
+		...(config?.longDescription
+			? [{ heading: 'The Context', bodyHtml: config.longDescription.replace(/\n/g, '<br/>') }]
+			: []),
+		...(config?.useCaseScenarios?.length
+			? [{ heading: 'Who uses this?', bullets: config.useCaseScenarios }]
+			: [])
+	];
+
+	/** Same hrefs and anchor text the pill list carried. */
 	$: formatOptions =
 		config && config.recommendedFormats && config.recommendedFormats.length
 			? config.recommendedFormats
@@ -136,8 +145,6 @@
 		config && config.recommendedSizes && config.recommendedSizes.length
 			? config.recommendedSizes
 			: popularSizes;
-	$: primarySizeFormat =
-		(formatOptions && formatOptions.length && String(formatOptions[0]).toLowerCase()) || 'jpg';
 
 	// Structured data for SEO
 	$: structuredData = validCase
@@ -165,21 +172,6 @@
 		: null;
 
 	// FAQ structured data for SEO
-	$: faqSchema =
-		validCase && config.faqs && config.faqs.length > 0
-			? {
-					'@context': 'https://schema.org',
-					'@type': 'FAQPage',
-					mainEntity: config.faqs.map((faq) => ({
-						'@type': 'Question',
-						name: faq.q,
-						acceptedAnswer: {
-							'@type': 'Answer',
-							text: faq.a
-						}
-					}))
-			  }
-			: null;
 
 	// API example snippet
 	$: apiSnippet = `curl -X POST https://api.pictify.io/image \\
@@ -192,731 +184,194 @@
     "fileExtension": "${formatOptions[0] || 'png'}"
   }'`;
 
+	const TOOL_NAME = 'usecase_tool';
+
+	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+
+	/*
+	 * No list here any more: the foot is derived from the registry off the
+	 * page's own path (HB-04, board note "SELECTION RULE · NO HAND-PICKED
+	 * LISTS"), which is also what keeps a new tool from needing an edit on
+	 * every route that should now mention it.
+	 */
 </script>
 
-<svelte:head>
-	<title>{title}</title>
-	<meta name="description" content={description} />
-	<link rel="canonical" href={canonical} />
-	<meta name="robots" content="index, follow, max-image-preview:large" />
-	<meta
-		name="keywords"
-		content="{config?.seoKeywords?.join(', ') ||
-			config?.label ||
-			'HTML to Image'}, image generator, automation, Pictify, API"
-	/>
+<ToolSeoHead
+	{title}
+	{description}
+	{canonical}
+	robots="index, follow, max-image-preview:large"
+	keywords="{config?.seoKeywords?.join(', ') ||
+		config?.label ||
+		'HTML to Image'}, image generator, automation, Pictify, API"
+	ogTitle={title}
+	ogDescription={description}
+	ogImage={config?.ogImage || `https://pictify.io/og/tools/${useCaseId}.png`}
+	twitterTitle={title}
+	twitterDescription={description}
+	twitterImage={config?.ogImage || `https://pictify.io/og/tools/${useCaseId}.png`}
+	webApplicationSchema={structuredData}
+	faqs={validCase ? config.faqs : null}
+	breadcrumbLabel={config?.label || 'Tool'}
+/>
 
-	<!-- Open Graph -->
-	<meta property="og:title" content={title} />
-	<meta property="og:description" content={description} />
-	<meta property="og:url" content={canonical} />
-	<meta property="og:type" content="website" />
-	<meta
-		property="og:image"
-		content={config?.ogImage || 'https://media.pictify.io/qyl7z-1775406830860.png'}
-	/>
-
-	<!-- Twitter Card -->
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content={title} />
-	<meta name="twitter:description" content={description} />
-	<meta
-		name="twitter:image"
-		content={config?.ogImage || 'https://media.pictify.io/qyl7z-1775406830860.png'}
-	/>
-
-	{#if structuredData}
-		{@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
-	{/if}
-	{#if faqSchema}
-		{@html `<script type="application/ld+json">${JSON.stringify(faqSchema)}</script>`}
-	{/if}
-	{@html `<script type="application/ld+json">${JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'BreadcrumbList',
-		itemListElement: [
-			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
-			{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
-			{ '@type': 'ListItem', position: 3, name: config?.label || 'Tool' }
-		]
-	})}</script>`}
-</svelte:head>
-
-<section class="w-full min-h-screen bg-brand-bg relative overflow-hidden font-['Manrope']">
-	<Nav />
-
-	<!-- Background Elements -->
-	<div
-		class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"
-	/>
-	<div
-		class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-accent/10 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
-	<div
-		class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-danger/5 rounded-full blur-[80px] -z-10 pointer-events-none"
-	/>
-
-	<main
-		class="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 md:pt-20 md:pb-32 relative z-10"
+{#if validCase}
+	<ToolPageShell
+		toolName={TOOL_NAME}
+		toolPath={`/tools/${useCaseId}`}
+		breadcrumb={config.label.toUpperCase()}
+		facts="FREE · 5 RENDERS A DAY · NO SIGNUP · RENDER BY API"
+		loggedIn={isUserLoggedIn}
+		longform="column"
 	>
-		{#if validCase}
-			<!-- Breadcrumb -->
-			<nav class="mb-12 flex justify-center">
-				<ol
-					class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
-				>
-					<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
-					<li class="text-gray-300">/</li>
-					<li>
-						<a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a>
-					</li>
-					<li class="text-gray-300">/</li>
-					<li class="text-gray-900">{config.label}</li>
-				</ol>
-			</nav>
+		<HeroTitle slot="h1">
+			Generate
+			<span>{config.label}</span>
+		</HeroTitle>
 
-			<!-- Hero Section -->
-			<div
-				class="relative flex flex-col items-center justify-center text-center mb-16 pt-4 sm:pt-8"
-			>
-				<!-- Badge -->
-				<div
-					class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-6"
-				>
-					<div
-						class="px-6 py-2 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black text-sm uppercase tracking-widest shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg"
-					>
-						★ Workflow
+		<HeroSub slot="hero-sub">
+			{config.description}
+			<span class="text-brand-slate">
+				Design once, render variants via API, the infrastructure layer for programmatic media.
+			</span>
+		</HeroSub>
+
+		<div slot="tool">
+			<!--
+				The three self-contained editors carry their own generate button and
+				result, so their card's toolbar shows the quota ladder only — one
+				primary action per surface, and it is already inside the editor.
+			-->
+			{#if useCaseId === 'markdown' || useCaseId === 'table' || useCaseId === 'barcode-generator'}
+				<ToolCard>
+					<div class="p-5 lg:p-7">
+						{#if useCaseId === 'markdown'}
+							<MarkdownEditor {isUserLoggedIn} />
+						{:else if useCaseId === 'table'}
+							<TableEditor {isUserLoggedIn} />
+						{:else}
+							<BarcodeEditor />
+						{/if}
 					</div>
-				</div>
 
-				<!-- Main Title -->
-				<h1
-					class="relative z-10 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-tight mb-6"
-				>
-					Generate
-					<br class="hidden sm:block" />
-					<span class="relative inline-block text-brand-danger px-2">
-						{config.label}
-					</span>
-				</h1>
+					<svelte:fragment slot="toolbar-left">
+						<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">
+							{config.label.toUpperCase()}
+						</span>
+					</svelte:fragment>
 
-				<!-- Description -->
-				<div class="max-w-2xl mx-auto px-2">
-					<p class="text-lg sm:text-xl text-gray-600 font-bold leading-relaxed mb-8">
-						{config.description}
-						<span class="inline-block w-full h-px bg-gray-200 my-4" />
-						Design once, render variants via API, the infrastructure layer for programmatic media.
-					</p>
-				</div>
-			</div>
-
-			<!-- Generation Limit Banner -->
-			<GenerationLimitBanner toolName="usecase_tool" />
-
-			{#if useCaseId === 'markdown'}
-				<!-- Markdown Editor (self-contained: editor, preview, generate, result) -->
-				<MarkdownEditor {isUserLoggedIn} />
-			{:else if useCaseId === 'table'}
-				<!-- Table Editor (self-contained: CSV/HTML input, preview, generate, result) -->
-				<TableEditor {isUserLoggedIn} />
-			{:else if useCaseId === 'barcode-generator'}
-				<!-- Barcode Editor (self-contained: input, preview, generate, result, API examples) -->
-				<BarcodeEditor />
+					<svelte:fragment slot="toolbar-right">
+						<QuotaMeter
+							remaining={guestRemaining}
+							loggedIn={isUserLoggedIn}
+							toolName={TOOL_NAME}
+							toolPath={`/tools/${useCaseId}`}
+						/>
+					</svelte:fragment>
+				</ToolCard>
+			{:else if toolTemplates.length}
+				<!--
+					TS-8. Six of the pSEO tools — social proof, email header, badge,
+					membership and portfolio cards, leaderboard — share this branch, so
+					they move onto the embed in one change rather than six.
+				-->
+				<!--
+					`toolName` is the use-case id, NOT the page's shared `usecase_tool`.
+					The editor keys its local draft on that name, so one name for nine
+					tools meant the badge page restored whatever you last made on the
+					social proof page — a testimonial card under a gallery of badges.
+				-->
+				<ToolEditor
+					templates={editorTemplates}
+					width={templateWidth}
+					height={templateHeight}
+					sourceKind={SOURCE_KIND[useCaseId] || 'card'}
+					toolName={useCaseId}
+					downloadName={useCaseId}
+					defaultTab={INPUTS_FIRST.has(useCaseId) ? 'inputs' : 'say'}
+				/>
 			{:else}
-				<!-- Template Workbench (full-width window card) -->
-				<div class="max-w-screen-2xl mx-auto px-4 mb-20">
+				<ToolCard>
 					<div
-						class="bg-white border-[3px] border-gray-900 shadow-brutal-2xl rounded-2xl overflow-hidden relative group"
+						class="flex h-[315px] w-full items-center justify-center border border-brand-ink bg-brand-subtle"
 					>
-						<!-- Window Header -->
-						<div
-							class="bg-gray-50 border-b-[3px] border-gray-900 p-4 flex items-center justify-between"
-						>
-							<div class="flex items-center gap-2">
-								<div class="w-3.5 h-3.5 rounded-full bg-brand-danger border-2 border-gray-900" />
-								<div class="w-3.5 h-3.5 rounded-full bg-brand-accent border-2 border-gray-900" />
-								<div class="w-3.5 h-3.5 rounded-full bg-data-green border-2 border-gray-900" />
-							</div>
-							<div
-								class="font-mono text-xs font-bold text-gray-500 uppercase flex items-center gap-2"
-							>
-								<span
-									class="px-2 py-0.5 bg-data-green/20 border border-data-green rounded text-gray-700"
-									>Interactive Editor</span
-								>
-							</div>
-						</div>
-
-						<!-- Template workbench body -->
-						<div
-							class="p-4 sm:p-6 lg:p-8 bg-gray-100 flex flex-col relative min-h-[400px]"
-						>
-							<div
-								class="absolute inset-0 opacity-10"
-								style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
-							/>
-
-							<div class="relative z-10 flex flex-col items-center gap-8 w-full">
-								<!-- HTML template editor: live preview + editable source -->
-								{#if toolTemplates.length}
-									<HtmlTemplateEditor bind:this={editorRef} templates={toolTemplates} />
-								{:else}
-									<div
-										class="w-full h-[315px] flex items-center justify-center bg-gray-50 border-[3px] border-gray-900 shadow-brutal-xl"
-									>
-										<p class="font-bold text-gray-400">Preview not available</p>
-									</div>
-								{/if}
-
-								<!-- Action Bar -->
-								<div class="flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg">
-									<a
-										href="/signup"
-										class="flex-1 py-4 bg-data-green text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 rounded-xl"
-									>
-										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-											/></svg
-										>
-										Automate This Template (Free)
-									</a>
-									<button
-										type="button"
-										on:click={handleQuickGenerate}
-										disabled={isGenerating}
-										class="flex-1 py-4 bg-white text-gray-900 border-[3px] border-gray-900 font-black text-lg uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
-									>
-										{#if isGenerating}
-											<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"
-												><circle
-													class="opacity-25"
-													cx="12"
-													cy="12"
-													r="10"
-													stroke="currentColor"
-													stroke-width="4"
-												/><path
-													class="opacity-75"
-													fill="currentColor"
-													d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-												/></svg
-											>
-											Working...
-										{:else}
-											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-												><path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M13 10V3L4 14h7v7l9-11h-7z"
-												/></svg
-											>
-											Generate Image
-										{/if}
-									</button>
-								</div>
-							</div>
-						</div>
+						<p class="font-bold text-brand-mute">Preview not available</p>
 					</div>
-				</div>
+				</ToolCard>
+			{/if}
+		</div>
 
-				<!-- Generated Result + NextSteps -->
-				{#if generatedImageUrl}
-					<div class="max-w-4xl mx-auto px-4 mb-20 animate-fade-in-up">
-						<div
-							class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
-						>
-							<div
-								class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl"
-							/>
 
-							<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
-								Success! Here is your image
-							</h3>
+		<!--
+			The API block moves out of the reading column into the automate slot,
+			where every other tool route carries it. Its heading is the component's
+			"Automate with the API" — one word longer than the hand-rolled h2 it
+			replaces.
+		-->
+		<AutomateSection
+			slot="automate"
+			toolName={TOOL_NAME}
+			description="Trigger this workflow programmatically. Personalized images, generated instantly at scale."
+			{codeExamples}
+			{plainExamples}
+		/>
 
-							<div
-								class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
-							>
-								<img
-									loading="lazy"
-									src={generatedImageUrl}
-									alt="Generated result"
-									class="max-w-full h-auto max-h-[400px]"
-								/>
-							</div>
-
-							<div class="flex flex-wrap justify-center gap-4">
-								<button
-									on:click={() =>
-										downloadFile(generatedImageUrl, 'pictify-result.png', {
-											tool_name: useCaseId.replace(/-/g, '_')
-										})}
-									class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
-								>
-									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-										/></svg
-									>
-									Download PNG
-								</button>
-							</div>
-						</div>
-
-						<div class="mt-12">
-							<NextSteps
-								heading="Now Automate It"
-								description="You've proved it works. Now integrate this into your app."
-								curlSnippet={apiSnippet}
-								generatedUrl={generatedImageUrl}
-								generatedWidth={generatedDims.width}
-								generatedHeight={generatedDims.height}
-								generatedFormat="png"
-								toolName={config?.label || useCaseId}
-							/>
-						</div>
-					</div>
-				{:else if generationError}
-					<div class="max-w-3xl mx-auto px-4 mb-12">
-						<div
-							class="bg-red-50 border-[3px] border-red-500 rounded-2xl p-6 flex items-center gap-4"
-						>
-							<div
-								class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center border-2 border-red-500 text-red-500"
-							>
-								!
-							</div>
-							<div>
-								<h4 class="font-black text-red-900 uppercase">Generation Failed</h4>
-								<p class="text-red-700 font-medium">{generationError}</p>
-							</div>
-							<button
-								on:click={handleQuickGenerate}
-								class="ml-auto underline font-bold text-red-900">Retry</button
-							>
-						</div>
-					</div>
+		<svelte:fragment slot="longform">
+			<LongformSection index="01" id="overview" first title="Why teams choose this workflow">
+				{#if config.overview?.length}
+					<Lead>{config.overview[0]}</Lead>
+					{#if config.overview.length > 1}
+						<Prose>
+							{#each config.overview.slice(1) as paragraph}
+								<p>{paragraph}</p>
+							{/each}
+						</Prose>
+					{/if}
 				{/if}
-			{/if}
 
-			<!-- Why Teams Choose This Section (Three Pillars Style) -->
-			<section class="py-20 relative">
-				<div class="text-center mb-16 px-4">
-					<div
-						class="inline-block bg-white border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform rotate-1 rounded-lg"
-					>
-						<span class="font-black uppercase tracking-widest text-sm">Overview</span>
-					</div>
-					<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-						Why teams <span class="text-brand-danger">choose</span> this workflow
-					</h2>
-				</div>
+				{#if deepDive.length}
+					<ProseGroup items={deepDive} />
+				{/if}
+			</LongformSection>
 
-				<div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-6">
-					{#each config.overview as paragraph, i}
-						<div
-							class="bg-white border-[3px] border-gray-900 p-8 rounded-2xl shadow-brutal-2xl hover:shadow-brutal-3xl hover:-translate-y-1 transition-all relative overflow-hidden group"
-						>
-							<div
-								class="absolute top-0 right-0 w-32 h-32 bg-brand-accent/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"
-							/>
-							<div
-								class="w-12 h-12 bg-brand-accent border-[3px] border-gray-900 rounded-xl flex items-center justify-center text-xl font-black mb-6 shadow-brutal-md relative z-10"
-							>
-								{i + 1}
-							</div>
-							<p class="text-gray-700 font-bold leading-relaxed text-lg relative z-10">
-								{paragraph}
-							</p>
-						</div>
-					{/each}
-				</div>
-			</section>
+			<LongformSection index="02" id="problems-solved" title="Problems Solved">
+				<CheckList items={config.painPoints} />
+			</LongformSection>
 
-			<!-- Deep Dive & Scenarios Section -->
-			{#if config.longDescription || (config.useCaseScenarios && config.useCaseScenarios.length)}
-				<section
-					class="py-20 px-4 bg-white border-y-[3px] border-gray-900 relative overflow-hidden"
-				>
-					<!-- Background Pattern -->
-					<div
-						class="absolute inset-0 opacity-40 mix-blend-multiply"
-						style="background-image: radial-gradient(#e5e7eb 2px, transparent 2px); background-size: 32px 32px;"
-					/>
+			<LongformSection index="03" id="workflow" title="Step-by-step workflow">
+				<StepCards
+					steps={config.workflow.map((step) => ({ title: step.title, body: step.detail }))}
+					jumpTo="/signup"
+					jumpLabel="Start Creating Now →"
+				/>
+			</LongformSection>
 
-					<div class="max-w-6xl mx-auto grid lg:grid-cols-12 gap-12 relative z-10">
-						<!-- Long Description Column -->
-						{#if config.longDescription}
-							<div
-								class={config.useCaseScenarios && config.useCaseScenarios.length
-									? 'lg:col-span-7'
-									: 'lg:col-span-12'}
-							>
-								<div
-									class="bg-brand-bg border-[3px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-brutal-3xl h-full"
-								>
-									<span
-										class="inline-block px-4 py-1.5 bg-brand-danger text-white border-2 border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-brutal-sm mb-6"
-										>Deep Dive</span
-									>
-
-									<h3
-										class="text-2xl md:text-3xl font-black text-gray-900 mb-6 leading-tight uppercase tracking-tight"
-									>
-										The Context
-									</h3>
-
-									<div class="prose prose-lg prose-gray font-medium text-gray-700 leading-loose">
-										{@html config.longDescription.replace(/\n/g, '<br/>')}
-									</div>
-								</div>
-							</div>
-						{/if}
-
-						<!-- Use Case Scenarios Column -->
-						{#if config.useCaseScenarios && config.useCaseScenarios.length}
-							<div class={config.longDescription ? 'lg:col-span-5' : 'lg:col-span-12'}>
-								<div
-									class="bg-data-green border-[3px] border-gray-900 rounded-2xl p-8 md:p-12 shadow-brutal-3xl h-full relative overflow-hidden"
-								>
-									<!-- Decorative Circle -->
-									<div
-										class="absolute -bottom-8 -right-8 w-40 h-40 bg-white/20 rounded-full blur-xl pointer-events-none"
-									/>
-
-									<span
-										class="inline-block px-4 py-1.5 bg-white text-gray-900 border-2 border-gray-900 rounded-full text-xs font-black uppercase tracking-widest shadow-brutal-sm mb-6"
-										>Perfect For</span
-									>
-
-									<h3
-										class="text-2xl md:text-3xl font-black text-gray-900 mb-8 leading-tight uppercase tracking-tight"
-									>
-										Who uses this?
-									</h3>
-
-									<ul class="space-y-4">
-										{#each config.useCaseScenarios as scenario}
-											<li
-												class="flex items-start gap-4 p-4 bg-white/90 border-[3px] border-gray-900 rounded-xl shadow-brutal-lg hover:-translate-y-1 hover:shadow-brutal-xl transition-all"
-											>
-												<div
-													class="flex-shrink-0 w-6 h-6 rounded-full bg-brand-accent border-2 border-gray-900 flex items-center justify-center mt-1"
-												>
-													<svg
-														class="w-3.5 h-3.5 text-gray-900"
-														fill="none"
-														viewBox="0 0 24 24"
-														stroke="currentColor"
-													>
-														<path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="4"
-															d="M5 13l4 4L19 7"
-														/>
-													</svg>
-												</div>
-												<span class="text-gray-900 font-bold leading-snug">{scenario}</span>
-											</li>
-										{/each}
-									</ul>
-								</div>
-							</div>
-						{/if}
-					</div>
-				</section>
-			{/if}
-
-			<SectionSeparator icon="bolt" />
-
-			<!-- Pain Points Section -->
-			<section class="py-20 bg-brand-bg">
-				<div class="max-w-5xl mx-auto px-6">
-					<div class="text-center mb-16">
-						<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-							Problems <span
-								class="bg-brand-danger text-white px-2 transform -skew-x-6 inline-block"
-								>Solved</span
-							>
-						</h2>
-					</div>
-
-					<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-						{#each config.painPoints as point}
-							<div
-								class="bg-white border-[3px] border-gray-900 p-6 rounded-2xl shadow-[5px_5px_0_0_#1f2937] hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-sm transition-all"
-							>
-								<div class="flex items-start gap-4">
-									<span class="text-brand-danger text-2xl font-black">✗</span>
-									<p class="text-gray-800 font-bold">{point}</p>
-								</div>
-							</div>
-						{/each}
-					</div>
-				</div>
-			</section>
-
-			<!-- Step by Step Section -->
-			<section class="py-20">
-				<div class="text-center mb-16 px-4">
-					<h2 class="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-						Step-by-step <span class="text-data-green">workflow</span>
-					</h2>
-				</div>
-
-				<div class="max-w-4xl mx-auto px-6 space-y-8">
-					{#each config.workflow as step, i}
-						<div
-							class="bg-white border-[3px] border-gray-900 rounded-2xl shadow-brutal-2xl overflow-hidden hover:-translate-y-1 transition-all group"
-						>
-							<div class="flex flex-col md:flex-row items-stretch">
-								<div
-									class="bg-gray-900 text-white px-8 py-6 flex items-center justify-center border-b-[3px] md:border-b-0 md:border-r-[3px] border-gray-900 min-w-[100px]"
-								>
-									<span class="font-black text-4xl text-data-green">{i + 1}</span>
-								</div>
-								<div class="p-8 flex-1 group-hover:bg-gray-50 transition-colors">
-									<h3 class="font-black text-2xl text-gray-900 uppercase tracking-wide mb-3">
-										{step.title}
-									</h3>
-									<p class="text-gray-600 font-medium text-lg">{step.detail}</p>
-								</div>
-							</div>
-						</div>
-					{/each}
-				</div>
-
-				<div class="text-center mt-16 px-4">
-					<a
-						href="/signup"
-						class="px-10 py-5 bg-brand-danger text-white border-[3px] border-gray-900 font-black text-xl uppercase tracking-widest shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all inline-flex items-center gap-3 rounded-2xl"
-					>
-						Start Creating Now
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-							><path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M17 8l4 4m0 0l-4 4m4-4H3"
-							/></svg
-						>
-					</a>
-				</div>
-			</section>
-
-			<SectionSeparator icon="hash" />
-
-			<!-- API Section (Dark Mac Window) -->
-			<section class="py-20 px-4">
-				<div class="max-w-6xl mx-auto">
-					<div
-						class="rounded-2xl border-[3px] border-gray-900 bg-white shadow-brutal-3xl overflow-hidden"
-					>
-						<div class="grid gap-10 lg:grid-cols-[1fr,1.2fr] p-8 md:p-16 items-center">
-							<!-- Left: Pitch -->
-							<div class="flex flex-col gap-8">
-								<div>
-									<span
-										class="px-4 py-2 bg-brand-accent border-2 border-gray-900 rounded-lg text-xs font-black uppercase tracking-widest shadow-brutal-sm"
-										>Developer Friendly</span
-									>
-									<h2 class="mt-6 text-3xl md:text-5xl font-black text-gray-900 leading-[1.1]">
-										Automate with <span class="text-brand-danger">API</span>
-									</h2>
-									<p class="mt-6 text-xl text-gray-600 font-medium leading-relaxed">
-										Trigger this workflow programmatically. Personalized images, generated instantly
-										at scale.
-									</p>
-								</div>
-
-								<div class="flex flex-col gap-3">
-									<div class="flex flex-wrap gap-4">
-										<a
-											href="/signup"
-											class="px-6 py-3 bg-gray-900 text-white font-bold border-[3px] border-gray-900 rounded-xl hover:bg-brand-danger hover:text-gray-900 transition-colors"
-										>
-											Get API Key
-										</a>
-										<a
-											href="https://docs.pictify.io"
-											target="_blank"
-											class="px-6 py-3 bg-white text-gray-900 font-bold border-[3px] border-gray-900 rounded-xl hover:bg-gray-50 transition-colors"
-										>
-											Read Docs
-										</a>
-									</div>
-									<a
-										href="/signup"
-										class="w-fit text-sm font-black text-gray-900 underline decoration-4 decoration-brand-accent underline-offset-4 hover:text-brand-danger transition-colors"
-									>
-										Generate in bulk with Workflows →
-									</a>
-								</div>
-							</div>
-
-							<!-- Right: Code Window -->
-							<div class="relative group">
-								<div
-									class="absolute -inset-4 bg-gradient-to-r from-brand-danger to-brand-accent rounded-2xl opacity-20 blur-xl group-hover:opacity-30 transition-opacity"
-								/>
-								<div
-									class="relative rounded-2xl border-[3px] border-gray-900 bg-[#1e1e1e] shadow-brutal-2xl overflow-hidden"
-								>
-									<div
-										class="bg-[#2d2d2d] px-4 py-3 border-b-2 border-gray-800 flex items-center gap-2"
-									>
-										<div class="w-3 h-3 rounded-full bg-[#ff5f56]" />
-										<div class="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-										<div class="w-3 h-3 rounded-full bg-[#27c93f]" />
-									</div>
-									<div class="p-6 overflow-x-auto custom-scrollbar">
-										<pre class="font-mono text-sm leading-relaxed text-gray-300"><code
-												>{@html renderedApiCode}</code
-											></pre>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-
-			<!-- FAQs Section -->
-			<section class="py-20 px-4">
-				<div class="max-w-4xl mx-auto">
-					<div class="text-center mb-16">
-						<h2
-							class="text-3xl md:text-4xl font-black uppercase tracking-tighter inline-block relative"
-						>
-							<span class="relative z-10">Frequently Asked Questions</span>
-							<span
-								class="absolute bottom-1 left-0 w-full h-3 bg-brand-accent -z-0 transform -rotate-1"
-							/>
-						</h2>
-					</div>
-
-					<div class="space-y-4">
-						{#each config.faqs as faq}
-							<details
-								class="group bg-white rounded-2xl border-[3px] border-gray-900 shadow-brutal-lg overflow-hidden transition-all duration-200 open:shadow-brutal-2xl open:-translate-y-1"
-							>
-								<summary
-									class="flex items-center justify-between p-6 cursor-pointer list-none bg-white hover:bg-gray-50 transition-colors"
-								>
-									<span class="font-black text-lg text-gray-900 pr-8">{faq.q}</span>
-									<span
-										class="transform transition-transform duration-200 group-open:rotate-180 bg-gray-100 text-gray-900 w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-900 flex-shrink-0"
-									>
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="3"
-												d="M19 9l-7 7-7-7"
-											/></svg
-										>
-									</span>
-								</summary>
-								<div class="p-6 pt-0 text-gray-700 font-medium leading-relaxed">
-									{faq.a}
-								</div>
-							</details>
-						{/each}
-					</div>
-				</div>
-			</section>
-
-			<!-- Related Workflows -->
-			<section class="py-20 px-4 border-t-[3px] border-gray-900 bg-white">
-				<div class="max-w-6xl mx-auto">
-					<h3 class="text-2xl font-black uppercase tracking-widest text-gray-400 mb-8">
-						Related Workflows
-					</h3>
-					<div class="flex flex-wrap gap-4">
-						{#each config.related as relatedId}
-							<a
-								href={`/tools/${relatedId}`}
-								class="px-6 py-3 bg-brand-bg border-[3px] border-gray-900 font-bold text-gray-900 shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-data-green transition-all rounded-xl"
-							>
-								{useCaseDetails[relatedId]?.label || relatedId}
-							</a>
-						{/each}
-						<a
-							href="/tools"
-							class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold shadow-[4px_4px_0_0_rgba(0,0,0,0.3)] hover:shadow-[2px_2px_0_0_rgba(0,0,0,0.3)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
-						>
-							View All Tools →
-						</a>
-					</div>
-				</div>
-			</section>
-		{:else}
-			<!-- Not Found State -->
+			<LongformSection index="04" id="faq" title="Frequently Asked Questions">
+				<FaqList faqs={config.faqs} />
+			</LongformSection>
+		</svelte:fragment>
+	</ToolPageShell>
+{:else}
+	<div class="landing-v2 flex min-h-screen w-full flex-col bg-brand-canvas">
+		<Nav />
+		<main class="flex flex-1 items-center justify-center px-5 py-24">
 			<div
 				class="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-8 px-4"
 			>
 				<div
-					class="w-24 h-24 bg-brand-danger rounded-full border-[4px] border-gray-900 flex items-center justify-center text-5xl font-black text-white shadow-brutal-2xl"
+					class="flex h-24 w-24 items-center justify-center rounded-full border border-brand-ink bg-brand-pink text-4xl font-semibold text-white"
 				>
 					?
 				</div>
-				<h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-gray-900">
-					Workflow not found
-				</h1>
+				<HeroTitle>Workflow not found</HeroTitle>
 				<a
 					href="/tools"
-					class="px-8 py-4 bg-brand-accent border-[3px] border-gray-900 text-gray-900 font-black uppercase tracking-wider shadow-brutal-xl hover:shadow-brutal-md hover:translate-x-[3px] hover:translate-y-[3px] transition-all rounded-xl"
+					class="px-8 py-4 bg-brand-field border border-brand-ink text-brand-ink font-semibold tracking-wider transition-all rounded-xl"
 				>
 					Explore All Tools
 				</a>
 			</div>
-		{/if}
-	</main>
-
-	<Footer />
-</section>
-
-<style>
-	:global(.token-command) {
-		color: #ff79c6;
-		font-weight: 700;
-	}
-
-	:global(.token-flag) {
-		color: #8be9fd;
-		font-weight: 600;
-	}
-
-	:global(.token-url) {
-		color: #f1fa8c;
-		text-decoration: underline;
-		text-underline-offset: 4px;
-	}
-
-	:global(.token-string) {
-		color: #50fa7b;
-	}
-
-	.custom-scrollbar::-webkit-scrollbar {
-		height: 8px;
-	}
-	.custom-scrollbar::-webkit-scrollbar-track {
-		background: #2d2d2d;
-	}
-	.custom-scrollbar::-webkit-scrollbar-thumb {
-		background: #4b5563;
-		border-radius: 4px;
-	}
-	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-		background: #6b7280;
-	}
-</style>
+		</main>
+		<Footer />
+	</div>
+{/if}

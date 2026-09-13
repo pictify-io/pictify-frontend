@@ -1,0 +1,19 @@
+<svg width="190" height="195" viewBox="0 0 190 195" xmlns="http://www.w3.org/2000/svg">
+  <rect width="190" height="195" fill="#FFD3E8" />
+  <rect x="44" y="30" width="124" height="92" transform="rotate(8 106 76)" fill="#FFFFFF" stroke="#000000" stroke-width="2" />
+  <rect x="36" y="40" width="124" height="92" transform="rotate(4 98 86)" fill="#FFFFFF" stroke="#000000" stroke-width="2" />
+  <rect x="30" y="54" width="124" height="92" fill="#000000" />
+  <rect x="26" y="50" width="124" height="92" fill="#FFFFFF" stroke="#000000" stroke-width="2" />
+  <rect x="34" y="58" width="108" height="76" fill="none" stroke="#0078BF" stroke-width="2" />
+  <rect x="56" y="70" width="64" height="7" fill="#000000" />
+  <rect x="44" y="86" width="88" height="3" fill="#8A8A85" />
+  <rect x="52" y="93" width="72" height="3" fill="#8A8A85" />
+  <rect x="44" y="110" width="40" height="3" fill="#000000" />
+  <rect x="44" y="117" width="28" height="3" fill="#8A8A85" />
+  <path d="M118 140 L110 172 L120 164 L128 172 Z" fill="#0078BF" stroke="#000000" stroke-width="2" stroke-linejoin="round" />
+  <path d="M130 140 L138 172 L128 164 L120 172 Z" fill="#0078BF" stroke="#000000" stroke-width="2" stroke-linejoin="round" />
+  <circle cx="126" cy="128" r="20" fill="#000000" />
+  <circle cx="122" cy="124" r="20" fill="#FF48B0" stroke="#000000" stroke-width="2" />
+  <circle cx="122" cy="124" r="13" fill="#D8F34A" stroke="#000000" stroke-width="2" />
+  <path d="M122 116 l2.5 5 5.5 .8 -4 3.9 1 5.5 -5 -2.6 -5 2.6 1 -5.5 -4 -3.9 5.5 -.8z" fill="#000000" />
+</svg>

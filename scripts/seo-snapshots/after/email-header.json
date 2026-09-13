@@ -1,0 +1,167 @@
+{
+  "route": "/tools/email-header",
+  "title": "Email Header Generator | Pictify.io",
+  "canonical": "https://pictify.io/tools/email-header",
+  "metas": {
+    "description": "Create branded email headers and banners for newsletters and campaigns.",
+    "keywords": "email header generator, email banner maker, newsletter header image, email header template, email banner design, newsletter banner generator, email marketing images, email header size, campaign header image, email banner creator, image generator, automation, Pictify, API",
+    "og:description": "Create branded email headers and banners for newsletters and campaigns.",
+    "og:image": "https://media.pictify.io/qyl7z-1775406830860.png",
+    "og:title": "Email Header Generator | Pictify.io",
+    "og:type": "website",
+    "og:url": "https://pictify.io/tools/email-header",
+    "robots": "index, follow, max-image-preview:large",
+    "twitter:card": "summary_large_image",
+    "twitter:description": "Create branded email headers and banners for newsletters and campaigns.",
+    "twitter:image": "https://media.pictify.io/qyl7z-1775406830860.png",
+    "twitter:title": "Email Header Generator | Pictify.io"
+  },
+  "jsonLd": [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/",
+          "name": "Home",
+          "position": 1
+        },
+        {
+          "@type": "ListItem",
+          "item": "https://pictify.io/tools",
+          "name": "Tools",
+          "position": 2
+        },
+        {
+          "@type": "ListItem",
+          "name": "Email Header Generator",
+          "position": 3
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "600px is the safe width for most email clients. Use 2x (1200px) for retina displays."
+          },
+          "name": "What width for email headers?"
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Bind subscriber data like name or company for personalized headers."
+          },
+          "name": "Can I personalize headers?"
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "description": "API-first image, document, and video generation. Every row of a spreadsheet or webhook becomes a rendered, personalized certificate, badge, report, or video.",
+      "logo": "https://pictify.io/logo.png",
+      "name": "Pictify",
+      "sameAs": [
+        "https://github.com/pictify-io"
+      ],
+      "url": "https://pictify.io"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "applicationCategory": [
+        "DesignApplication",
+        "ImageGenerator"
+      ],
+      "creator": {
+        "@type": "Organization",
+        "name": "Pictify.io",
+        "url": "https://pictify.io"
+      },
+      "description": "Create branded email headers and banners for newsletters and campaigns.",
+      "featureList": [
+        "Consistent headers across all email campaigns",
+        "Personalized headers with subscriber data",
+        "Campaign-specific variants without design work"
+      ],
+      "name": "Email Header Generator - Pictify.io",
+      "offers": {
+        "@type": "Offer",
+        "availability": "https://schema.org/InStock",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "operatingSystem": "Web",
+      "url": "https://pictify.io/tools/email-header"
+    }
+  ],
+  "outline": [
+    {
+      "tag": "h1",
+      "text": "Generate Email Header Generator"
+    },
+    {
+      "tag": "h2",
+      "text": "Automate with the API"
+    },
+    {
+      "tag": "h2",
+      "text": "Why teams choose this workflow"
+    },
+    {
+      "tag": "h3",
+      "text": "The Context"
+    },
+    {
+      "tag": "h3",
+      "text": "Who uses this?"
+    },
+    {
+      "tag": "h2",
+      "text": "Problems Solved"
+    },
+    {
+      "tag": "h2",
+      "text": "Step-by-step workflow"
+    },
+    {
+      "tag": "h3",
+      "text": "Design template"
+    },
+    {
+      "tag": "h3",
+      "text": "Add variables"
+    },
+    {
+      "tag": "h3",
+      "text": "Generate per campaign"
+    },
+    {
+      "tag": "h2",
+      "text": "Frequently Asked Questions"
+    },
+    {
+      "tag": "h2",
+      "text": "Product"
+    },
+    {
+      "tag": "h2",
+      "text": "Developers"
+    },
+    {
+      "tag": "h2",
+      "text": "Integrations"
+    },
+    {
+      "tag": "h2",
+      "text": "Company"
+    }
+  ]
+}

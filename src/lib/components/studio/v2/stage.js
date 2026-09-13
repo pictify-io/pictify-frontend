@@ -1,0 +1,978 @@
+import DOMPurify from 'dompurify';
+import { ATTR, ensureNodeIds } from './node-ids.js';
+import { findOverflow } from './overflow.js';
+import { joinDocument } from './document-shell.js';
+import { fromStageHtml, EXPR } from './logic.js';
+
+/**
+ * The visual stage. B02.
+ *
+ * Adapted from src/routes/test/visual-html/dom-editor.js, which stays as the
+ * dev-only prototype. Three rules from the handoff are enforced here that the
+ * prototype did not have, and each one protects a design from being quietly
+ * restructured by a drag:
+ *
+ *   FLOW ELEMENTS ARE OFFSET, NEVER REPOSITIONED. Dragging something that sits
+ *   in normal flow applies a transform. It does not switch it to absolute.
+ *   NEVER AUTO-CONVERT A FLEX CHILD. The prototype set `flex: none` on every
+ *   resize, which silently takes an element out of its parent's layout — the
+ *   design then looks right at that size and breaks for every other value.
+ *   UNSUPPORTED TRANSFORMS DISABLE THE HANDLES, WITH A REASON. An element
+ *   inside an already-transformed ancestor cannot be dragged predictably, so it
+ *   says so rather than moving to somewhere the renderer will not reproduce.
+ */
+
+/** Editor chrome is marked so it can never be serialized into the design. */
+const UI = 'data-editor-ui';
+
+/**
+ * Sanitize markup for a preview frame.
+ *
+ * Takes a BODY FRAGMENT, not a document: the shell — doctype, `<html>`,
+ * `<head>` — is split off by `document-shell.js` before this runs and applied
+ * to the frame's own tags, so `WHOLE_DOCUMENT` here would wrap the fragment in
+ * a second `<html>` that then lands inside the real one.
+ *
+ * `link` stays forbidden. Fonts are not an exception to that: the one allowed
+ * `<link>` comes from the head, is host-checked by `fontLinks`, and is written
+ * into the preview head directly — it never passes through the body sanitizer,
+ * which is why the sanitizer never has to be taught to trust one.
+ */
+/**
+ * DOMPurify drops every comment at the START of a fragment — its defence
+ * against a leading-comment mXSS trick, and not configurable. Leading
+ * whitespace does not shield them; measured, not assumed:
+ *
+ *   '<!-- a --><p>x</p>'        -> '<p>x</p>'
+ *   '\n  <!-- a -->\n  <p>x</p>' -> '\n  <p>x</p>'
+ *   '<p>x</p><!-- a --><p>y</p>' -> unchanged
+ *
+ * Templates open with a section marker often enough that this deleted the
+ * first comment of a real one on every save. A sentinel element gives the
+ * comments something to not-be-first of, and is removed afterwards.
+ */
+const SENTINEL = '<span></span>';
+
+export function cleanHtml(html) {
+	const source = String(html ?? '');
+	// Only when it would actually matter, so the common path is untouched.
+	if (/^\s*<!--/.test(source)) {
+		const out = sanitize(SENTINEL + source);
+		// If the sentinel is not where it was put, sanitising did something
+		// unexpected — return the result whole rather than cutting into it.
+		return out.startsWith(SENTINEL) ? out.slice(SENTINEL.length) : out;
+	}
+	return sanitize(source);
+}
+
+function sanitize(html) {
+	return DOMPurify.sanitize(html, {
+		FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'base', 'meta', 'link', 'form'],
+		FORBID_ATTR: ['srcdoc', 'autofocus'],
+		// The logic wrappers `logic.js` mounts. They carry no behaviour — they
+		// are markers the canvas draws IF chips against — but DOMPurify drops
+		// unknown elements, and dropping these would take the branch contents
+		// with them.
+		// `#comment` keeps HTML comments, which DOMPurify drops by default.
+		// A template's comments are the author's section markers, and the studio
+		// saves whatever it mounted — so dropping them here deleted 619 bytes of
+		// a real template's structure on every save. Measured, not assumed.
+		ADD_TAGS: ['pictify-logic', 'pictify-branch', 'pictify-expr', '#comment'],
+		ADD_ATTR: [
+			'data-hb-kind', 'data-hb-expr', 'data-hb-open', 'data-hb-close', 'data-hb-branch',
+			'data-hb-raw', 'data-hb-helper', 'data-hb-paths'
+		]
+	});
+}
+
+/** Elements whose text is not editable in place. */
+const ATOMIC = new Set(['IMG', 'SVG', 'PATH', 'HR', 'BR', 'INPUT', 'VIDEO', 'PICTIFY-EXPR']);
+
+/**
+ * How an element participates in layout, which decides what a drag may do.
+ *
+ * `free` — already absolutely or fixed positioned: a drag sets left/top.
+ * `flow` — in normal flow: a drag applies a transform OFFSET only.
+ * `flex` — a child of a flex or grid parent: offset only, and resizing must
+ *          not add `flex: none`, because that removes it from the layout.
+ */
+export function layoutRole(el, view) {
+	const css = view.getComputedStyle(el);
+	if (css.position === 'absolute' || css.position === 'fixed') return 'free';
+	const parent = el.parentElement;
+	if (parent) {
+		const parentDisplay = view.getComputedStyle(parent).display;
+		if (/flex|grid/.test(parentDisplay)) return 'flex';
+	}
+	return 'flow';
+}
+
+/**
+ * An ancestor transform makes drag maths unreliable, and the renderer would not
+ * reproduce the result. Report it rather than allowing a move that lands
+ * somewhere else in the output.
+ */
+export function blockedReason(el, view) {
+	let node = el.parentElement;
+	while (node && node.tagName !== 'BODY') {
+		const t = view.getComputedStyle(node).transform;
+		if (t && t !== 'none') return 'Inside a rotated or scaled group — move that group instead.';
+		node = node.parentElement;
+	}
+	return null;
+}
+
+/**
+ * Serialize the design.
+ *
+ * Strips editor chrome, `contenteditable`, and any selection markers — the
+ * saved HTML must be exactly what the renderer will receive, with nothing the
+ * editor added to make itself work.
+ */
+export function serialize(doc, shell) {
+	const clone = doc.body.cloneNode(true);
+	clone.querySelectorAll(`[${UI}]`).forEach((el) => el.remove());
+	clone
+		.querySelectorAll('[contenteditable]')
+		.forEach((el) => el.removeAttribute('contenteditable'));
+	clone.querySelectorAll('[data-selected]').forEach((el) => el.removeAttribute('data-selected'));
+	/*
+	 * The shell goes back VERBATIM, from the text that was loaded — not rebuilt
+	 * from the live frame. Nothing in the studio edits `<html>`, `<head>` or the
+	 * `<body>` tag today, so re-serializing them could only lose something: a
+	 * `<meta>`, an attribute the preview deliberately does not apply, the exact
+	 * spacing of the head. If the body tag ever becomes selectable this has to
+	 * become a patch of those two open tags instead.
+	 */
+	/*
+	 * `fromStageHtml` first: the canvas mounts Handlebars blocks as
+	 * `<pictify-logic>` wrappers, and those are scaffolding. Saving them would
+	 * write a document the renderer has never seen and cannot render.
+	 */
+	/*
+	 * IDS ARE COMPLETED HERE, not left to the store.
+	 *
+	 * `editor.commit` runs `ensureNodeIds` on whatever it is given, so if this
+	 * emitted html without ids the store's copy came back DIFFERENT from the
+	 * one the stage just produced — and the stage, seeing html it did not
+	 * recognise, tore the frame down and rebuilt it on every single edit,
+	 * taking the selection with it. Emitting ids-complete html makes the
+	 * store's transform a no-op and lets the stage recognise its own output.
+	 */
+	return joinDocument(shell, ensureNodeIds(fromStageHtml(clone.innerHTML)).html);
+}
+
+/**
+ * Attach the editor to an iframe document.
+ *
+ * `onTransaction(label, html)` is called ONCE per completed gesture — a drag,
+ * a resize, a text commit — never per mousemove and never per keystroke. That
+ * is what makes one undo step equal one thing the buyer did.
+ */
+/**
+ * `selectOnly` is Code mode (PS-2, locked decision 4).
+ *
+ * The canvas there is a VIEW of the text on the left: clicking it should move
+ * the caret to that element's line, and nothing else. Dragging would edit the
+ * design by a gesture the code pane cannot show — the element would move and
+ * the source would not change under the user's eyes — so handles and inline
+ * editing are off while selection stays on.
+ */
+export async function attachStage(
+	frame,
+	{ onTransaction, onSelection, onStatus, width, height, selectOnly = false, shell = null }
+) {
+	const [{ default: Moveable }, { default: Selecto }] = await Promise.all([
+		import('moveable'),
+		import('selecto')
+	]);
+
+	const doc = frame.contentDocument;
+	const view = frame.contentWindow;
+	if (!doc?.body) throw new Error('Stage document is unavailable');
+
+	let targets = [];
+	let editing = null;
+
+	const overlay = doc.createElement('div');
+	overlay.setAttribute(UI, 'controls');
+	doc.body.appendChild(overlay);
+
+	const moveable = new Moveable(overlay, {
+		container: doc.body,
+		dragContainer: view,
+		target: [],
+		draggable: !selectOnly,
+		resizable: !selectOnly,
+		// Rotation is off for anything bound to a field: rotated text with a
+		// variable length is the fastest way to produce a card that fits the
+		// sample and clips a real customer's name.
+		rotatable: false,
+		snappable: true,
+		snapThreshold: 6,
+		origin: false,
+		horizontalGuidelines: [0, height / 2, height],
+		verticalGuidelines: [0, width / 2, width]
+	});
+
+	// Moveable and Selecto inject their styles into the OUTER document; the
+	// stage lives in an iframe, so they have to be mirrored in.
+	for (const style of document.querySelectorAll('style')) {
+		if (/moveable-|selecto-/.test(style.textContent || '')) {
+			const clone = style.cloneNode(true);
+			clone.setAttribute(UI, 'style');
+			doc.head.appendChild(clone);
+		}
+	}
+
+	const selecto = new Selecto({
+		container: overlay,
+		dragContainer: doc.body,
+		keyContainer: view,
+		selectableTargets: [`[${ATTR}]`],
+		selectByClick: false,
+		selectFromInside: false,
+		hitRate: 100,
+		toggleContinueSelect: ['shift']
+	});
+
+	const commit = (label) => {
+		onTransaction(label, serialize(doc, shell));
+		moveable.updateRect();
+	};
+
+	function describe() {
+		if (targets.length !== 1) {
+			onSelection({ count: targets.length, ids: targets.map((t) => t.getAttribute(ATTR)) });
+			return;
+		}
+		const el = targets[0];
+		const css = view.getComputedStyle(el);
+		const rect = el.getBoundingClientRect();
+		const text = el.childElementCount ? '' : el.textContent || '';
+		// A binding is shown as a chip, never as caret-editable text: editing
+		// the inside of {{account_name}} is how a field silently stops binding.
+		const bindings = [...text.matchAll(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g)].map((m) => m[1]);
+
+		/*
+		 * Helper calls the element shows. A bare `{{name}}` is matched above; an
+		 * expression is a chip, and its paths are bindings too — otherwise Inputs
+		 * and Change would go blank on an element that plainly shows planName
+		 * just because it shows it through `default`.
+		 */
+		const expressions = [...el.querySelectorAll(EXPR)].map((node) => ({
+			raw: node.getAttribute('data-hb-raw') || '',
+			helper: node.getAttribute('data-hb-helper') || '',
+			paths: (node.getAttribute('data-hb-paths') || '').split(',').filter(Boolean)
+		}));
+		for (const expression of expressions) {
+			for (const path of expression.paths) if (!bindings.includes(path)) bindings.push(path);
+		}
+
+		/*
+		 * PS-9. The inspector renders from this and nothing else, so anything it
+		 * shows has to be here — reading computed style in the rail would mean
+		 * reaching across the frame boundary from the dashboard, which is the
+		 * boundary the stage exists to keep.
+		 *
+		 * `widthPinned` distinguishes a width the author SET from one the layout
+		 * produced: the rail shows `auto` in mute for the latter, and writing a
+		 * measured number back into the style would silently freeze a box that
+		 * was meant to grow.
+		 */
+		const inline = el.style;
+		const parent = el.parentElement;
+		const siblings = parent ? [...parent.children].filter((c) => !c.closest(`[${UI}]`)) : [];
+		const rotation = (() => {
+			const m = /rotate\(([-0-9.]+)deg\)/.exec(inline.transform || '');
+			return m ? parseFloat(m[1]) : 0;
+		})();
+		const translate = (() => {
+			const m = /translate\(\s*([-0-9.]+)px\s*,\s*([-0-9.]+)px\s*\)/.exec(inline.transform || '');
+			return m ? { x: parseFloat(m[1]), y: parseFloat(m[2]) } : { x: 0, y: 0 };
+		})();
+		const isContainer = el.childElementCount > 0;
+
+		onSelection({
+			count: 1,
+			id: el.getAttribute(ATTR),
+			tag: el.tagName.toLowerCase(),
+			logic: logicContext(el),
+			expressions,
+			role: layoutRole(el, view),
+			blocked: blockedReason(el, view),
+			bindings,
+			text: bindings.length ? '' : text,
+			leaf: !el.childElementCount,
+			locked: el.hasAttribute('data-locked'),
+			width: Math.round(rect.width),
+			height: Math.round(rect.height),
+			widthPinned: Boolean(inline.width),
+			heightPinned: Boolean(inline.height),
+			fontSize: parseFloat(css.fontSize),
+			fontFamily: css.fontFamily,
+			fontWeight: css.fontWeight,
+			lineHeight: css.lineHeight,
+			textAlign: css.textAlign,
+			color: css.color,
+			background: css.backgroundColor,
+			rotation,
+			offset: translate,
+			// Free elements are positioned; flow elements are nudged by transform.
+			position: { x: parseFloat(inline.left) || 0, y: parseFloat(inline.top) || 0 },
+			src: el.tagName === 'IMG' ? el.getAttribute('src') : null,
+			layout: {
+				index: siblings.indexOf(el) + 1,
+				count: siblings.length,
+				parentLabel: parent && parent !== doc.body ? labelFor(parent) : null
+			},
+			group: isContainer
+				? {
+						direction: css.display === 'flex' ? (css.flexDirection.startsWith('column') ? 'column' : 'row') : 'free',
+						gap: parseFloat(css.gap) || 0,
+						justify: css.justifyContent,
+						align: css.alignItems,
+						padding: parseFloat(css.paddingTop) || 0,
+						radius: parseFloat(css.borderRadius) || 0,
+						children: el.childElementCount
+				  }
+				: null
+		});
+	}
+
+	function select(elements) {
+		targets = elements.filter((el) => el && el !== doc.body && !el.closest(`[${UI}]`));
+		// An element the renderer cannot reproduce a move for gets no handles.
+		const locked = targets.some((t) => t.hasAttribute('data-locked'));
+		const blocked =
+			(targets.length === 1 && blockedReason(targets[0], view)) ||
+			(locked ? 'Locked. Unlock it in Layers to move it.' : null);
+		moveable.draggable = !blocked;
+		moveable.resizable = !blocked;
+		moveable.target = targets.length === 1 ? targets[0] : targets;
+		selecto.setSelectedTargets(targets);
+		if (blocked) onStatus(blocked);
+		describe();
+	}
+
+	/* ------------------------------------------------------------- drag */
+
+	moveable.on('drag', ({ target, transform, left, top }) => {
+		if (layoutRole(target, view) === 'free') {
+			target.style.left = `${left}px`;
+			target.style.top = `${top}px`;
+		} else {
+			// Flow and flex children are OFFSET. Switching them to absolute would
+			// take them out of the layout, and the design would then only be
+			// correct at the size it was dragged at.
+			target.style.transform = transform;
+		}
+	});
+
+	moveable.on('resize', ({ target, width: w, height: h, drag }) => {
+		target.style.width = `${w}px`;
+		// A height is only pinned when the element already had one. Pinning it
+		// otherwise makes text clip instead of growing, which is the single most
+		// common way a card breaks on a longer customer name.
+		if (target.style.height) target.style.height = `${h}px`;
+		if (layoutRole(target, view) !== 'flex') {
+			// Deliberately NOT setting flex:none for a flex child (handoff B02-2).
+			target.style.transform = drag.transform;
+		}
+	});
+
+	moveable.on('dragGroup', ({ events }) =>
+		events.forEach(({ target, transform }) => (target.style.transform = transform))
+	);
+	moveable.on('resizeGroup', ({ events }) =>
+		events.forEach(({ target, width: w }) => (target.style.width = `${w}px`))
+	);
+
+	moveable.on('dragEnd', () => commit('move'));
+	moveable.on('resizeEnd', () => commit('resize'));
+	moveable.on('dragGroupEnd', () => commit('move group'));
+	moveable.on('resizeGroupEnd', () => commit('resize group'));
+
+	/* -------------------------------------------------------- selection */
+
+	selecto.on('dragStart', (e) => {
+		if (editing || e.inputEvent.target.closest?.(`[${UI}]`)) e.stop();
+	});
+	selecto.on('selectEnd', (e) => {
+		if (e.isClick) return;
+		// Never transform a parent and its own descendant in the same gesture.
+		select(e.selected.filter((el) => !e.selected.some((o) => o !== el && o.contains(el))));
+	});
+
+	function onClick(e) {
+		if (editing || e.target.closest?.(`[${UI}]`)) return;
+		e.preventDefault();
+		const el = e.target.closest?.(`[${ATTR}]`);
+		if (e.shiftKey && el) {
+			select(
+				targets.includes(el)
+					? targets.filter((t) => t !== el)
+					: [...targets.filter((t) => !t.contains(el) && !el.contains(t)), el]
+			);
+		} else {
+			// Clicking empty space deselects, which is how you get out.
+			select(el ? [el] : []);
+		}
+	}
+
+	function onDoubleClick(e) {
+		const el = e.target.closest?.(`[${ATTR}]`);
+		if (!el || el.childElementCount || ATOMIC.has(el.tagName)) return;
+		e.preventDefault();
+		select([]);
+		editing = el;
+		el.contentEditable = 'true';
+		el.focus();
+		onStatus('Editing text. Escape or click away to finish. Keep {{field}} tokens intact.');
+
+		const before = el.innerHTML;
+		const finish = () => {
+			el.removeAttribute('contenteditable');
+			el.removeEventListener('blur', finish);
+			el.removeEventListener('keydown', onEditKey);
+			editing = null;
+			select([el]);
+			// ONE transaction for the whole edit, on blur or Escape — not one per
+			// keystroke, which would make undo useless for anything else.
+			if (el.innerHTML !== before) commit('edit text');
+			onStatus(null);
+		};
+		const onEditKey = (ev) => {
+			if (ev.key === 'Escape') {
+				ev.preventDefault();
+				el.blur();
+			}
+		};
+		el.addEventListener('blur', finish);
+		el.addEventListener('keydown', onEditKey);
+	}
+
+	/** Select the parent — the way out of a deep selection. */
+	function selectParent() {
+		if (targets.length !== 1) return;
+		const parent = targets[0].parentElement;
+		if (parent && parent !== doc.body && parent.hasAttribute(ATTR)) select([parent]);
+	}
+
+	function nudge(dx, dy) {
+		if (!targets.length) return;
+		for (const target of targets) {
+			if (layoutRole(target, view) === 'free') {
+				target.style.left = `${(parseFloat(target.style.left) || 0) + dx}px`;
+				target.style.top = `${(parseFloat(target.style.top) || 0) + dy}px`;
+			} else {
+				const m = /translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/.exec(target.style.transform || '');
+				const x = (m ? parseFloat(m[1]) : 0) + dx;
+				const y = (m ? parseFloat(m[2]) : 0) + dy;
+				target.style.transform = `translate(${x}px, ${y}px)`;
+			}
+		}
+		commit('nudge');
+	}
+
+	function removeSelected() {
+		if (!targets.length) return;
+		targets.forEach((t) => t.remove());
+		select([]);
+		commit('delete');
+	}
+
+	function duplicateSelected() {
+		if (targets.length !== 1) return;
+		const clone = targets[0].cloneNode(true);
+		// The copy must not inherit the original's identity; the caller's
+		// node-id pass assigns fresh ones on commit.
+		clone.removeAttribute(ATTR);
+		clone.querySelectorAll(`[${ATTR}]`).forEach((el) => el.removeAttribute(ATTR));
+		targets[0].after(clone);
+		commit('duplicate');
+	}
+
+	/* ------------------------------------------------------ B02-5 tools */
+
+	/**
+	 * Add an element.
+	 *
+	 * Appended to the SELECTED container when one is selected, otherwise to the
+	 * artboard. Dropping everything at the root would make a nested design
+	 * unusable — the buyer would have to drag every new element into place.
+	 */
+	function addElement(kind, { field } = {}) {
+		const parent =
+			targets.length === 1 && targets[0].childElementCount >= 0 && !ATOMIC.has(targets[0].tagName)
+				? targets[0]
+				: doc.body;
+
+		let el;
+		if (kind === 'text') {
+			el = doc.createElement('div');
+			el.textContent = 'New text';
+			el.style.cssText = 'font-size:24px;color:#000';
+		} else if (kind === 'field') {
+			el = doc.createElement('div');
+			// A field is inserted as a BINDING, not as its sample value, so what
+			// is on the canvas is what will render for every account.
+			el.textContent = `{{${field || 'account_name'}}}`;
+			el.style.cssText = 'font-size:24px;color:#000';
+		} else if (kind === 'image') {
+			el = doc.createElement('img');
+			// No src: an image is chosen from Brand assets (B03-4). A placeholder
+			// URL would be a remote fetch at render time that nobody approved.
+			el.setAttribute('alt', 'Image placeholder');
+			el.style.cssText = 'width:160px;height:160px;background:#E5E7EB;display:block';
+		} else {
+			el = doc.createElement('div');
+			el.style.cssText = 'width:160px;height:80px;background:#D8F34A';
+		}
+
+		parent.appendChild(el);
+		commit(`add ${kind}`);
+		// Select it so the next thing the buyer does acts on what they just made.
+		select([el]);
+	}
+
+	/* ------------------------------------------------- B02-4 layers tree */
+
+	/**
+	 * Depth-first tree of addressable elements, for the Layers rail.
+	 *
+	 * Logic wrappers are part of the walk, not skipped. They carry no node id,
+	 * so filtering on the id attribute alone stopped the descent at a
+	 * `<pictify-logic>` and every element inside a condition disappeared from
+	 * the rail — the design still drew it, and Layers said it was not there.
+	 * They get a row of their own instead, because "this is inside IF
+	 * firstName" is the single most useful thing the tree can say about it.
+	 */
+	function tree() {
+		let logicSeq = 0;
+		const walk = (el, depth) =>
+			[...el.children].flatMap((child) => {
+				const tag = child.tagName.toLowerCase();
+
+				if (tag === 'pictify-logic') {
+					const kind = (child.getAttribute('data-hb-kind') || 'if').toUpperCase();
+					const expr = child.getAttribute('data-hb-expr') || '';
+					return [
+						{
+							// Synthetic: there is no element id to select, and
+							// `selectById` no-ops on an id it cannot find.
+							id: `logic:${++logicSeq}`,
+							tag,
+							depth,
+							label: `${kind} ${expr}`.trim(),
+							kind: 'logic',
+							selectable: false,
+							locked: true,
+							hidden: false,
+							hasChildren: child.childElementCount > 0
+						},
+						...walk(child, depth + 1)
+					];
+				}
+
+				// A branch is structure, not a thing to name — descend through it,
+				// except the else, which is worth saying out loud because it is
+				// hidden on the canvas by default.
+				if (tag === 'pictify-branch') {
+					const isElse = child.getAttribute('data-hb-branch') === 'else';
+					return isElse
+						? [
+								{
+									id: `logic:${++logicSeq}`,
+									tag,
+									depth,
+									label: 'ELSE',
+									kind: 'logic',
+									selectable: false,
+									locked: true,
+									hidden: true,
+									hasChildren: child.childElementCount > 0
+								},
+								...walk(child, depth + 1)
+							]
+						: walk(child, depth);
+				}
+
+				if (!child.hasAttribute(ATTR)) return [];
+
+				return [
+					{
+						id: child.getAttribute(ATTR),
+						tag,
+						depth,
+						label: child.getAttribute('data-label') || labelFor(child),
+						selectable: true,
+						locked: child.hasAttribute('data-locked'),
+						hidden: child.style.display === 'none',
+						hasChildren: [...child.children].some((c) => c.hasAttribute(ATTR))
+					},
+					...walk(child, depth + 1)
+				];
+			});
+		return walk(doc.body, 0);
+	}
+
+	/**
+	 * Which conditions an element sits inside, outermost first.
+	 *
+	 * `[{ kind, expression, branch }]`. An element inside `{{#if firstName}}`
+	 * does not always render, and the rail has to say so — otherwise someone
+	 * styles a greeting, renders with no first name, and finds their work
+	 * missing from the output with nothing on screen having warned them.
+	 *
+	 * The else-branch matters most: it is hidden on the canvas by default, so
+	 * anything selected there is doubly invisible.
+	 */
+	function logicContext(el) {
+		const chain = [];
+		let node = el.parentElement;
+		let branch = null;
+		while (node && node !== doc.body) {
+			const tag = node.tagName.toLowerCase();
+			if (tag === 'pictify-branch') branch = node.getAttribute('data-hb-branch') || 'then';
+			if (tag === 'pictify-logic') {
+				chain.unshift({
+					kind: (node.getAttribute('data-hb-kind') || 'if').toUpperCase(),
+					expression: node.getAttribute('data-hb-expr') || '',
+					branch: branch || 'then'
+				});
+				branch = null;
+			}
+			node = node.parentElement;
+		}
+		return chain;
+	}
+
+	/**
+	 * A name the buyer recognises.
+	 *
+	 * Only a LEAF is named after its content. A container's textContent
+	 * includes everything beneath it, so naming it that way labelled the
+	 * artboard "period" — the first binding in its subtree — and produced two
+	 * rows with the same name, which is precisely the confusion naming rows was
+	 * supposed to remove.
+	 */
+	function labelFor(el) {
+		const isLeaf = !el.childElementCount;
+		if (isLeaf) {
+			const text = (el.textContent || '').trim();
+			const binding = /\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/.exec(text);
+			if (binding) return binding[1];
+			if (text) return text.slice(0, 28);
+		}
+		// A container is named by what it is, and how much it holds.
+		const kids = [...el.children].filter((c) => c.hasAttribute(ATTR)).length;
+		return kids ? `Group · ${kids}` : el.tagName.toLowerCase();
+	}
+
+	const byId = (id) => doc.querySelector(`[${ATTR}="${CSS.escape(id)}"]`);
+
+	function selectById(id) {
+		const el = byId(id);
+		if (el) select([el]);
+	}
+
+	/**
+	 * Lock is an editor concept, so it is stored as an attribute the serializer
+	 * keeps — a lock that vanished on reload would be worse than none.
+	 */
+	function toggleLock(id) {
+		const el = byId(id);
+		if (!el) return;
+		if (el.hasAttribute('data-locked')) el.removeAttribute('data-locked');
+		else {
+			el.setAttribute('data-locked', '');
+			if (targets.includes(el)) select([]);
+		}
+		commit('lock');
+	}
+
+	/**
+	 * Hide sets display:none, which the RENDERER honours too. That is
+	 * deliberate: a "hidden" element that still appeared in the output would be
+	 * the worst possible meaning of the word.
+	 */
+	function toggleHide(id) {
+		const el = byId(id);
+		if (!el) return;
+		el.style.display = el.style.display === 'none' ? '' : 'none';
+		commit('hide');
+	}
+
+	function rename(id, label) {
+		const el = byId(id);
+		if (!el) return;
+		const trimmed = String(label || '')
+			.trim()
+			.slice(0, 60);
+		if (trimmed) el.setAttribute('data-label', trimmed);
+		else el.removeAttribute('data-label');
+		commit('rename');
+	}
+
+	/**
+	 * Reorder within the same parent only.
+	 *
+	 * Moving a node between parents changes the layout it participates in, which
+	 * a drag in a list cannot express safely — the buyer would see a reorder and
+	 * get a reparent.
+	 */
+	function reorder(id, beforeId) {
+		const el = byId(id);
+		const before = beforeId ? byId(beforeId) : null;
+		if (!el || (before && before.parentElement !== el.parentElement)) return false;
+		if (before) el.parentElement.insertBefore(el, before);
+		else el.parentElement.appendChild(el);
+		commit('reorder');
+		return true;
+	}
+
+	/**
+	 * Move one place earlier or later among siblings (PS-9's ↑ ↓).
+	 *
+	 * A sibling-relative move rather than `reorder(id, beforeId)` with a
+	 * computed neighbour, because working out that neighbour means reading the
+	 * DOM — and the rail lives outside the frame. Asking the stage "move it one
+	 * place" keeps that knowledge on this side of the boundary.
+	 */
+	function moveBy(id, delta) {
+		const el = byId(id);
+		const parent = el?.parentElement;
+		if (!parent) return false;
+		const siblings = [...parent.children].filter((c) => !c.closest(`[${UI}]`));
+		const from = siblings.indexOf(el);
+		const to = from + (Number(delta) || 0);
+		if (from < 0 || to < 0 || to >= siblings.length) return false;
+
+		// Moving later has to skip PAST the element now occupying the slot, so
+		// the anchor is the one after it — inserting before it would put the
+		// element back where it started.
+		const anchor = delta > 0 ? siblings[to].nextElementSibling : siblings[to];
+		if (anchor) parent.insertBefore(el, anchor);
+		else parent.appendChild(el);
+
+		commit(delta > 0 ? 'move later' : 'move earlier');
+		describe();
+		return true;
+	}
+
+	/* -------------------------------------------- B03 fields and fitting */
+
+	/** Field keys this design binds, read from the live document. */
+	function usedFields() {
+		const found = new Set();
+		for (const m of (doc.body.textContent || '').matchAll(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g)) {
+			found.add(m[1]);
+		}
+		return [...found];
+	}
+
+	/**
+	 * Check the design against EVERY sample, not just the one on screen.
+	 *
+	 * Substitution happens in a detached clone so the buyer's canvas is never
+	 * disturbed — running this on the live document would flicker their work and
+	 * could land mid-gesture. The clone is measured off-screen and removed.
+	 *
+	 * This is the check that catches the failure that only appears on someone
+	 * else's data: a card that fits every sample the designer looked at and
+	 * clips the one customer with a long name.
+	 */
+	function checkAllSamples(valuesBySample) {
+		const results = {};
+		const holder = doc.createElement('div');
+		holder.setAttribute(UI, 'measure');
+		// Off-screen but LAID OUT — display:none would report every size as zero
+		// and cheerfully declare that everything fits.
+		holder.style.cssText = 'position:absolute;left:-99999px;top:0;width:' + width + 'px';
+		doc.body.appendChild(holder);
+
+		const source = serialize(doc, shell);
+		for (const [sampleId, values] of Object.entries(valuesBySample)) {
+			holder.innerHTML = source.replace(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g, (m, key) => {
+				const v = values[key];
+				if (v === null || v === undefined) return '';
+				return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+			});
+			results[sampleId] = findOverflow(doc, view, { root: holder });
+		}
+
+		holder.remove();
+		return results;
+	}
+
+	/**
+	 * Images the renderer cannot resolve. B03-4 / state S4.
+	 *
+	 * Three kinds, and each blocks for a different reason:
+	 *
+	 *   `empty`  — no src at all: renders as a broken-image box on a customer's
+	 *              card.
+	 *   `remote` — points at someone else's host: the render depends on their
+	 *              uptime, and they can change what a customer sees after the
+	 *              design was approved.
+	 *   `data`   — an inline data URI: it survives, but it is not a managed
+	 *              asset, so it cannot be replaced across designs later.
+	 *
+	 * Returned rather than thrown, because the buyer fixes them one at a time
+	 * and needs to see all of them at once.
+	 */
+	function missingAssets() {
+		const issues = [];
+		for (const img of doc.body.querySelectorAll('img')) {
+			if (img.closest(`[${UI}]`)) continue;
+			const src = img.getAttribute('src') || '';
+			const id = img.getAttribute(ATTR);
+			if (!src) issues.push({ id, kind: 'empty', label: 'Image with no source' });
+			else if (/^\s*(https?:)?\/\//i.test(src)) {
+				issues.push({ id, kind: 'remote', label: 'Image loaded from another site' });
+			} else if (/^\s*data:/i.test(src)) {
+				issues.push({ id, kind: 'data', label: 'Inline image — upload it to Brand assets' });
+			}
+		}
+		return issues;
+	}
+
+	/** Point an image at a managed asset, as one transaction. */
+	function setAssetSrc(id, src, alt) {
+		const el = byId(id);
+		if (!el || el.tagName !== 'IMG') return false;
+		el.setAttribute('src', src);
+		if (alt) el.setAttribute('alt', alt);
+		commit('replace image');
+		return true;
+	}
+
+	/** Apply a style patch as one transaction, so undo restores exactly. */
+	/**
+	 * One style change, one transaction, one printable label (PS-9).
+	 *
+	 * The label is a PARAMETER now. It used to be the literal 'fix overflow',
+	 * which was true for its only caller and became a lie the moment the
+	 * inspector started writing font sizes through the same door — the receipt
+	 * would have said "fix overflow" for a colour change.
+	 */
+	function setStyle(id, patch, label) {
+		const el = byId(id);
+		if (!el || !patch) return false;
+		for (const [prop, value] of Object.entries(patch)) {
+			if (value === null || value === '') el.style.removeProperty(prop);
+			else el.style.setProperty(prop, value);
+		}
+		commit(label || 'style change');
+		describe();
+		return true;
+	}
+
+	/** Kept so the overflow fix's call site and its label stay together. */
+	const applyStyles = (id, patch) => setStyle(id, patch, 'fix overflow');
+
+	/**
+	 * Replace a text element's content.
+	 *
+	 * REFUSED on an element that carries a binding: the text there is
+	 * `{{account_name}}`, and letting the rail overwrite it is how a field
+	 * silently stops binding — the same reason the inline editor shows a chip
+	 * rather than caret-editable text.
+	 */
+	function setText(id, text) {
+		const el = byId(id);
+		if (!el || el.childElementCount) return false;
+		/*
+		 * Refuses ANY mustache, helper or not.
+		 *
+		 * The `{{` test alone stopped being enough once helper calls became
+		 * chips: a chip's text is its LABEL (`planName · default "PRO TRIAL"`),
+		 * which has no braces, so this would have accepted the element and
+		 * overwritten the helper call with whatever was typed — the very hazard
+		 * the brace test exists to prevent.
+		 */
+		if (el.querySelector(EXPR)) return false;
+		if (/\{\{/.test(el.textContent || '')) return false;
+		el.textContent = String(text ?? '');
+		commit('edit text');
+		describe();
+		return true;
+	}
+
+	/** Bind a text element to a variable, replacing its content with the token. */
+	function setBinding(id, name) {
+		const el = byId(id);
+		if (!el || el.childElementCount) return false;
+		el.textContent = name ? `{{${name}}}` : '';
+		commit(name ? `bind to ${name}` : 'remove binding');
+		describe();
+		return true;
+	}
+
+	/**
+	 * Rotate, preserving any translate already on the element.
+	 *
+	 * Rewriting `transform` wholesale would drop the nudge a flow element uses
+	 * for its offset, so the two are composed rather than one overwriting the
+	 * other.
+	 */
+	function setRotation(id, deg) {
+		const el = byId(id);
+		if (!el) return false;
+		const angle = Math.round(Number(deg) || 0);
+		const current = el.style.transform || '';
+		const translate = /translate\([^)]*\)/.exec(current)?.[0] || '';
+		el.style.transform = [translate, angle ? `rotate(${angle}deg)` : ''].filter(Boolean).join(' ');
+		commit(`rotate to ${angle}°`);
+		describe();
+		return true;
+	}
+
+	/** Where this element sits among its siblings, for the Layout order control. */
+	function layoutIndex(id) {
+		const el = byId(id);
+		if (!el?.parentElement) return { index: 0, count: 0 };
+		const siblings = [...el.parentElement.children].filter((c) => !c.closest(`[${UI}]`));
+		return { index: siblings.indexOf(el) + 1, count: siblings.length };
+	}
+
+	doc.addEventListener('click', onClick, true);
+	// No inline editing in select-only: typing belongs in the code pane, and two
+	// carets for one document is how the two panes get out of step.
+	if (!selectOnly) doc.addEventListener('dblclick', onDoubleClick, true);
+
+	return {
+		select,
+		selectParent,
+		selectById,
+		nudge,
+		removeSelected,
+		duplicateSelected,
+		addElement,
+		tree,
+		usedFields,
+		missingAssets,
+		setAssetSrc,
+		checkAllSamples,
+		applyStyles,
+		setStyle,
+		setText,
+		setBinding,
+		setRotation,
+		layoutIndex,
+		moveBy,
+		toggleLock,
+		toggleHide,
+		rename,
+		reorder,
+		serialize: () => serialize(doc, shell),
+		destroy() {
+			doc.removeEventListener('click', onClick, true);
+			doc.removeEventListener('dblclick', onDoubleClick, true);
+			moveable.destroy();
+			selecto.destroy();
+			overlay.remove();
+		}
+	};
+}

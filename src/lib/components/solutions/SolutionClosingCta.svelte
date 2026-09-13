@@ -2,27 +2,27 @@
 	/**
 	 * Shared closing CTA block for every /solutions/* page.
 	 *
-	 * Single source of truth for the delivery-wedge positioning and the CTAs.
+	 * Single source of truth for the cluster positioning and the CTAs.
 	 * Changing the pitch once here updates the whole cluster.
 	 *
 	 * Consumer can pass a custom headline/kicker per page or fall back to defaults.
 	 */
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
-	export let headline = 'Every row rendered. Every recipient reached. Provable.';
-	export let kicker = 'Documents & Videos, Delivered';
+	export let headline = 'Every row rendered. Every run provable.';
+	export let kicker = 'Documents & Videos, at Scale';
 	export let toolName = 'solution';
 	/** Set to true on the pillar page to hide the "Back to the pillar guide" link. */
 	export let isPillar = false;
 
 	const differentiators = [
 		{
-			title: 'Delivery is part of the run',
-			body: 'Every row renders AND emails to its recipient from an isolated sending domain. Your job ends at delivered, not downloaded.'
+			title: 'The run is the unit of work',
+			body: 'A CSV upload or a signed webhook in, one rendered document per row out. Not a design tool you drive by hand, once per person.'
 		},
 		{
 			title: 'Per-row proof',
-			body: 'Sent, delivered, bounced, complained. Per person, via real ESP webhooks. A bounce is a one-click re-send with a corrected address.'
+			body: 'Every row reports its own status and its own output URL. A row that fails is re-run on its own, without repeating the batch.'
 		},
 		{
 			title: 'One engine, every deliverable',

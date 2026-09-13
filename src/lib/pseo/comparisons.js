@@ -10,10 +10,9 @@
  * - AI Template Maker (describe a document/video, get an editable template)
  * - Video templates: timeline editor, code authoring, MP4/GIF rendering
  *
- * WORKFLOWS & DELIVERY:
+ * WORKFLOWS:
  * - Workflow runs: CSV upload or signed webhook in, rendered documents out
- * - Per-recipient email delivery with per-row sent/delivered/bounced status,
- *   automated suppression, one-row re-send (own sending domain)
+ * - Batch runs with a per-row result, a CDN link per render and a webhook
  * - Batch rendering (up to 500 items) with per-item results
  *
  * EXTRAS:
@@ -24,7 +23,9 @@
  * - First-party MCP server for AI agents, CDN hosting, API tokens
  *
  * DO NOT claim: canvas editor, A/B testing/experiments, smart links,
- * "Dynamic Links", agent screenshots (all retired 2026).
+ * "Dynamic Links", agent screenshots (all retired 2026), or anything about
+ * email delivery — per-recipient sending, delivered/bounced status, bounce
+ * suppression, sending domains. Pictify renders; it does not send.
  */
 
 export const comparisons = [
@@ -39,7 +40,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI template generation from text prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'More affordable pricing for image generation',
 			'Built-in background removal',
 			'Multi-page PDF support',
@@ -99,11 +100,11 @@ export const comparisons = [
 		competitorDescription: 'Simple HTML to image API service',
 		metaDescription:
 			'Compare Pictify and HTML/CSS to Image API. Features, pricing, and performance comparison for programmatic image generation.',
-		tldr: 'HTML/CSS to Image offers a straightforward API for basic conversions. Pictify adds AI template authoring, batch rendering, background removal, and workflow runs that email each rendered document to its recipient.',
+		tldr: 'HTML/CSS to Image offers a straightforward API for basic conversions. Pictify adds AI template authoring, batch rendering, background removal, and multi-page PDF and video from the same call.',
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'Multi-page PDF and GIF support',
 			'Cloud storage integration (S3, GCS, Cloudinary)',
@@ -157,7 +158,7 @@ export const comparisons = [
 			},
 			{
 				q: 'Can Pictify render images automatically when my data changes?',
-				a: 'Pictify focuses on rendering and delivery: batch runs with per-item results, webhooks, and per-recipient email delivery status.'
+				a: 'Pictify focuses on rendering at scale: batch runs with per-item results, webhooks when a run finishes, and a CDN link per render.'
 			}
 		]
 	},
@@ -172,7 +173,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Creates new images from HTML (no source image needed)',
 			'Background removal built-in',
 			'QR code generation with custom styling',
@@ -235,7 +236,7 @@ export const comparisons = [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
 			'Full HTML/CSS support for unlimited designs',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
@@ -248,8 +249,7 @@ export const comparisons = [
 			'More marketing integrations out-of-box'
 		],
 		bestFor: {
-			pictify:
-				'Teams wanting AI templates + HTML flexibility + data-driven batch rendering',
+			pictify: 'Teams wanting AI templates + HTML flexibility + data-driven batch rendering',
 			competitor: 'Social media teams needing built-in scheduling'
 		},
 		pricing: {
@@ -305,7 +305,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'No infrastructure to manage',
 			'Background removal built-in',
 			'QR code generation with custom styling',
@@ -370,7 +370,7 @@ export const comparisons = [
 		competitor: 'Bannerbear',
 		competitorDescription: 'Automated image and video generation API',
 		metaDescription:
-			'Looking for a Bannerbear alternative? Pictify ships a real expression engine and typed template variables, features Bannerbear templates don\'t support.',
+			"Looking for a Bannerbear alternative? Pictify ships a real expression engine and typed template variables, features Bannerbear templates don't support.",
 		tldr: 'Bannerbear templates do string replacement: no conditionals, no expressions. Pictify templates carry a real expression engine ({{ price | currency }}) with conditionals and loops. For logic-heavy or data-driven images, Pictify is the Bannerbear alternative that keeps the logic in the template instead of your backend.',
 		advantages: [
 			'Real expression engine in templates ({{ price * 0.9 | currency }}, conditionals, filters)',
@@ -378,8 +378,8 @@ export const comparisons = [
 			'Per-item render results with webhooks',
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'HTML/CSS escape hatch for designs the editor can\'t express',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			"HTML/CSS escape hatch for designs the editor can't express",
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Multi-page PDF generation (native text, not stitched images)',
 			'Background removal built-in',
 			'Cloud storage integration (S3, GCS, Cloudinary, ImageKit)',
@@ -391,8 +391,7 @@ export const comparisons = [
 			'Priority rendering queues'
 		],
 		bestFor: {
-			pictify:
-				'Teams wanting AI templates + HTML flexibility + data-driven batch rendering',
+			pictify: 'Teams wanting AI templates + HTML flexibility + data-driven batch rendering',
 			competitor: 'Teams needing video generation with native Airtable/Zapier'
 		},
 		pricing: {
@@ -450,7 +449,7 @@ export const comparisons = [
 			},
 			{
 				q: 'How hard is it to migrate from Bannerbear to Pictify?',
-				a: 'Easy: typically 2-3 hours. The API pattern is the same (POST template + variables → image URL). Recreate your templates in Pictify\'s visual editor or AI Template Maker, swap the endpoint and template IDs in your backend, and existing integrations work. Any backend formatting logic (currency, conditionals) can move into the Pictify template itself, simplifying your code.'
+				a: "Easy: typically 2-3 hours. The API pattern is the same (POST template + variables → image URL). Recreate your templates in Pictify's visual editor or AI Template Maker, swap the endpoint and template IDs in your backend, and existing integrations work. Any backend formatting logic (currency, conditionals) can move into the Pictify template itself, simplifying your code."
 			}
 		]
 	},
@@ -465,7 +464,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
@@ -532,7 +531,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
@@ -594,7 +593,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'No code required: template-based rendering for everyone',
 			'Background removal built-in',
 			'QR code generation with custom styling',
@@ -661,7 +660,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
@@ -724,7 +723,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
@@ -792,7 +791,7 @@ export const comparisons = [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
 			'Full HTML/CSS support for unlimited designs',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
@@ -807,7 +806,8 @@ export const comparisons = [
 			'Multi-image generation'
 		],
 		bestFor: {
-			pictify: 'Teams wanting AI templates + template-based rendering + HTML flexibility + dynamic data',
+			pictify:
+				'Teams wanting AI templates + template-based rendering + HTML flexibility + dynamic data',
 			competitor: 'Non-technical users preferring simple layer-based editing'
 		},
 		pricing: {
@@ -858,7 +858,7 @@ export const comparisons = [
 			'Full HTML/CSS support (not limited subset)',
 			'HTML-native templates with typed variables',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Works with any framework, not just Next.js',
 			'Background removal built-in',
 			'Multi-page PDF and GIF support',
@@ -935,7 +935,7 @@ export const comparisons = [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
 			'Full HTML/CSS support (not limited to React)',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'Works for any image type (not just OG images)',
 			'QR code generation with custom styling',
@@ -950,7 +950,8 @@ export const comparisons = [
 			'CLI for local development'
 		],
 		bestFor: {
-			pictify: 'Teams wanting AI templates + template-based rendering + dynamic data for any image type',
+			pictify:
+				'Teams wanting AI templates + template-based rendering + dynamic data for any image type',
 			competitor: 'Marketing teams generating OG images from templates at scale'
 		},
 		pricing: {
@@ -999,7 +1000,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
@@ -1062,7 +1063,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
@@ -1125,7 +1126,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Creates new images from HTML (no source needed)',
 			'Background removal built-in',
 			'QR code generation with custom styling',
@@ -1188,7 +1189,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Creates new images from HTML (not just stores)',
 			'Background removal built-in',
 			'QR code generation with custom styling',
@@ -1251,7 +1252,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'No infrastructure to manage',
 			'Background removal built-in',
 			'QR code generation with custom styling',
@@ -1318,7 +1319,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
@@ -1388,7 +1389,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'On-demand generation via API',
 			'Background removal built-in',
 			'QR code generation with custom styling',
@@ -1451,7 +1452,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Multi-page PDF support included',
 			'Background removal built-in',
 			'QR code generation with custom styling',
@@ -1516,7 +1517,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
@@ -1584,7 +1585,7 @@ export const comparisons = [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
 			'Full HTML/CSS support for unlimited designs',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Brand assets management (logos, colors, fonts)',
 			'Background removal built-in',
 			'More affordable pricing',
@@ -1661,7 +1662,7 @@ export const comparisons = [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
 			'Full HTML/CSS support for unlimited designs',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'More affordable pricing',
@@ -1676,7 +1677,8 @@ export const comparisons = [
 			'Pre-made templates library'
 		],
 		bestFor: {
-			pictify: 'Teams wanting AI templates + template-based rendering + HTML flexibility + dynamic data',
+			pictify:
+				'Teams wanting AI templates + template-based rendering + HTML flexibility + dynamic data',
 			competitor: 'Non-technical users wanting stock assets and Google Sheets integration'
 		},
 		pricing: {
@@ -1727,7 +1729,7 @@ export const comparisons = [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
 			'Full HTML/CSS support for any design',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'Works for any image type (not just OG)',
 			'QR code generation with custom styling',
@@ -1793,7 +1795,7 @@ export const comparisons = [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
 			'Full HTML/CSS for unlimited designs',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'Works for any image type (not just social)',
 			'QR code generation with custom styling',
@@ -1859,7 +1861,7 @@ export const comparisons = [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
 			'Creates images from scratch (no source needed)',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'Full layout control (not just overlays)',
 			'QR code generation with custom styling',
@@ -1923,7 +1925,7 @@ export const comparisons = [
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'API-first for production at scale',
 			'Background removal built-in',
 			'QR code generation with custom styling',
@@ -1985,12 +1987,12 @@ export const comparisons = [
 		competitorDescription: 'Image generation API with PDF support',
 		metaDescription:
 			'Compare Pictify and Templated for automated image generation. Template approaches and API features.',
-		tldr: 'Templated offers layer-based templates with PDF support. Pictify adds AI template authoring, full HTML/CSS flexibility, and workflow runs with per-recipient email delivery.',
+		tldr: 'Templated offers layer-based templates with PDF support. Pictify adds AI template authoring, full HTML/CSS flexibility, and batch runs with per-item results and webhooks.',
 		advantages: [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
 			'Full HTML/CSS support for unlimited designs',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
@@ -2005,7 +2007,8 @@ export const comparisons = [
 			'Established service'
 		],
 		bestFor: {
-			pictify: 'Teams wanting AI templates + template-based rendering + HTML flexibility + dynamic data',
+			pictify:
+				'Teams wanting AI templates + template-based rendering + HTML flexibility + dynamic data',
 			competitor: 'Users preferring layer-based editing with Zapier automation'
 		},
 		pricing: {
@@ -2056,7 +2059,7 @@ export const comparisons = [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
 			'Creates new images from HTML (no source needed)',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'QR code generation with custom styling',
 			'Multi-page PDF support',
@@ -2119,7 +2122,7 @@ export const comparisons = [
 			'HTML-native templates with typed variables, conditionals, and loops',
 			'AI Template Maker generates templates from prompts',
 			'Full HTML/CSS for any design (use Chart.js, D3, etc.)',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'Works for any image type (not just charts)',
 			'QR code generation with custom styling',
@@ -2185,7 +2188,7 @@ export const comparisons = [
 			'HTML-native templates with typed variables',
 			'AI Template Maker generates templates from prompts',
 			'Full HTML/CSS support for unlimited designs',
-			'Workflows: CSV or webhook in, rendered documents out, emailed per recipient',
+			'Workflows: CSV or webhook in, rendered documents out, a CDN link per row',
 			'Background removal built-in',
 			'Multi-page PDF generation',
 			'Cloud storage integration (S3, GCS, Cloudinary, ImageKit)',
@@ -2235,7 +2238,7 @@ export const comparisons = [
 			},
 			{
 				q: 'Can Pictify import from Canva?',
-				a: "Not directly, but the AI Template Maker generates editable HTML templates from a prompt, and every template stays fully editable as HTML/CSS."
+				a: 'Not directly, but the AI Template Maker generates editable HTML templates from a prompt, and every template stays fully editable as HTML/CSS.'
 			},
 			{
 				q: 'Which has better dynamic image support?',
@@ -2256,15 +2259,15 @@ export const comparisons = [
 		competitorDescription: 'Free Google Sheets add-on for merging rows into Docs and PDFs',
 		audienceLabel: 'That Delivers the Documents',
 		subhead:
-			'Autocrat merges your Sheet into PDFs, then leaves sending to your Gmail. Pictify renders every row AND emails it to its recipient, with per-person delivery status.',
+			'Autocrat merges your Sheet into PDFs inside Apps Script, with its 6-minute ceiling. Pictify renders every row through an API with no execution limit, and hands back a CDN link per document.',
 		metaDescription:
-			'Looking for an Autocrat alternative? Pictify turns Sheet rows into PDFs and emails each one from an isolated sending domain with per-row delivered/bounced status.',
-		tldr: 'Autocrat is a free Google Sheets add-on that merges rows into Docs and PDFs inside Google Workspace. It rides Apps Script (6-minute execution ceiling) and sends through your own Gmail, which caps at 500 emails a day on free accounts and 1,500 on Workspace. In June 2026, Google\'s Rhino-to-V8 Apps Script migration broke Autocrat workflows across its 81-million-install base, with complaint threads running into July and no support line to call. Pictify runs the merge on managed rendering infrastructure and emails every document from an isolated sending domain with per-recipient delivered/bounced status.',
+			'Looking for an Autocrat alternative? Pictify turns Sheet rows into PDFs from real HTML templates, through an API with no Apps Script ceiling and a CDN link per row.',
+		tldr: "Autocrat is a free Google Sheets add-on that merges rows into Docs and PDFs inside Google Workspace. It rides Apps Script (6-minute execution ceiling) and sends through your own Gmail, which caps at 500 emails a day on free accounts and 1,500 on Workspace. In June 2026, Google's Rhino-to-V8 Apps Script migration broke Autocrat workflows across its 81-million-install base, with complaint threads running into July and no support line to call. Pictify runs the merge on managed rendering infrastructure with no execution ceiling, and returns every document on its own CDN link with a webhook when the run finishes.",
 		advantages: [
 			'Managed rendering: no Apps Script 6-minute timeouts or breaking runtime migrations',
-			'Email delivery never touches your Gmail quota (500–1,500/day caps)',
-			'Per-recipient delivered/bounced/complained status with one-click re-send',
-			'Automated bounce suppression protects your sender reputation',
+			'No six-minute execution ceiling: runs are not killed mid-batch',
+			'A per-row result with a CDN link, and a webhook when the run finishes',
+			'REST API, signed webhooks, SDKs, and an MCP server on every plan',
 			'HTML-native templates plus the AI Template Maker: no Google Docs formatting fights',
 			'One engine renders PDFs, images, and personalized video'
 		],
@@ -2276,7 +2279,7 @@ export const comparisons = [
 		],
 		bestFor: {
 			pictify:
-				'Teachers, HR teams, and event organizers who need documents generated AND delivered, with proof per person',
+				'Teachers, HR teams, and event organizers who need reliable bulk document generation with per-row proof',
 			competitor:
 				'Small one-off merges inside Google Workspace where Gmail caps and Apps Script timeouts do not bite'
 		},
@@ -2297,15 +2300,15 @@ export const comparisons = [
 		faqs: [
 			{
 				q: 'Is Pictify a good Autocrat alternative?',
-				a: 'Yes, if the reason you use Autocrat is getting a personalized document to every row of a spreadsheet. Pictify does the same merge from a CSV upload or webhook, then goes one step further: it emails each document to its recipient and shows delivered/bounced status per row. Autocrat stops at the merge and leaves delivery to your Gmail.'
+				a: 'Yes, if the reason you use Autocrat is turning every row of a spreadsheet into its own document. Pictify does the same merge from a CSV upload or a webhook, but renders from real HTML templates through an API: no 6-minute Apps Script ceiling, no add-on to reinstall, and a CDN link per document that your own system can fetch.'
 			},
 			{
 				q: 'What happened to Autocrat in June 2026?',
 				a: 'Google migrated Apps Script from the Rhino runtime to V8 and retired Rhino. Add-ons built on legacy runtime behavior (Autocrat among them, with roughly 81 million installs) broke for many users mid-2026, with complaint threads continuing into July. As a free add-on, there is no support contract; you wait for a fix. Pictify runs on its own managed infrastructure, so a Google runtime change cannot take your certificate workflow down.'
 			},
 			{
-				q: 'Does Pictify send from my Gmail account?',
-				a: 'No, and that is the point. Autocrat-based workflows send through your Gmail, which caps at 500 emails/day on free accounts and 1,500/day via Workspace, and can lock you out mid-batch. Pictify sends from its own isolated sending domain (dedicated per-workspace subdomains on paid plans), with bounce handling and suppression built in. Your Gmail reputation is never at stake.'
+				q: 'Does Pictify have a six-minute timeout like Apps Script?',
+				a: 'No. Runs execute on Pictify\'s own rendering infrastructure rather than inside Apps Script, so a long batch is not killed partway through. Every row reports its own status, and a single failed row can be re-run without repeating the whole batch.'
 			},
 			{
 				q: 'Can Pictify pull data from Google Sheets?',
@@ -2316,25 +2319,25 @@ export const comparisons = [
 				a: 'Pictify has a free tier: 50 renders and 25 emailed documents per month, no credit card. You pay when volume grows, which is exactly when Autocrat hurts most, because Gmail caps, 6-minute timeouts, and manual bounce cleanup all scale with volume too.'
 			},
 			{
-				q: 'Can recipients get the document as an email attachment?',
-				a: 'Each recipient gets a personal email carrying their own document, with no shared download links and no mail-merge-attachment workarounds. Delivery status is tracked per recipient, and a bounced address can be corrected and re-sent as a single row.'
+				q: 'How do I get the finished documents out of Pictify?',
+				a: 'Every row of a batch run comes back as its own CDN link, and a webhook fires when the run finishes. Fetch them from your own code, hand them to whatever already talks to your customers, or download the batch.'
 			}
 		]
 	},
 	{
 		slug: 'pictify-vs-canva-bulk-create',
-		title: 'Canva Bulk Create Alternative: With Email Delivery',
+		title: 'Canva Bulk Create Alternative: With an API',
 		competitor: 'Canva Bulk Create',
 		competitorDescription: 'Canva feature that generates design variants from a data table',
-		audienceLabel: 'With Email Delivery',
+		audienceLabel: 'With an API',
 		subhead:
-			'Bulk Create generates hundreds of beautiful variants, then stops at download. Pictify renders every row and emails it to its recipient with per-person proof.',
+			'Bulk Create generates hundreds of beautiful variants, then stops at a zip file. Pictify renders every row through an API and hands back a CDN link per document.',
 		metaDescription:
-			'Canva Bulk Create stops at download. Pictify turns every data row into a branded document and emails it to each recipient with per-person delivery status.',
-		tldr: 'Canva\'s Bulk Create turns a data table into hundreds of on-brand design variants, genuinely good at what it does. But the job ends at download: Canva has no email delivery of any kind, so your certificates land in a zip file you still have to split, attach, and send yourself. Pictify treats delivery as part of the run: every row becomes a document emailed to its recipient, with delivered/bounced status per person and automatic suppression of bad addresses.',
+			'Canva Bulk Create stops at download. Pictify turns every data row into a branded document your own system can fetch, by API, from a CDN link per row.',
+		tldr: "Canva's Bulk Create turns a data table into hundreds of on-brand design variants, genuinely good at what it does. But it is a UI feature: you open the editor, upload the table, and generate by hand, with no API to call and nothing to trigger it but you. Pictify treats the batch as the unit: every row becomes its own document on its own CDN link, with a per-row status and a webhook when the run finishes, so whatever already talks to your customers can pick them up.",
 		advantages: [
-			'Email delivery is part of the run; Canva has none, at any plan level',
-			'Per-recipient delivered/bounced status, suppression, and one-row re-send',
+			'Runs trigger from your backend, Zapier, Make, or n8n, not by hand',
+			'A per-row result with a CDN link, and a webhook when the batch finishes',
 			'REST API, webhooks, and MCP server; Bulk Create is UI-only',
 			'HTML-native templates with real logic: conditionals, loops, expressions',
 			'PDFs, images, and personalized video from one template engine',
@@ -2348,8 +2351,8 @@ export const comparisons = [
 		],
 		bestFor: {
 			pictify:
-				'Course creators, community organizers, and event teams who need every certificate IN an inbox, provably, by the deadline',
-			competitor: 'Design-heavy variant generation where distribution is someone else\'s problem'
+				'Course creators, community organizers, and event teams who need every certificate rendered and fetchable, by the deadline',
+			competitor: "Design-heavy variant generation where distribution is someone else's problem"
 		},
 		migration: {
 			difficulty: 'Easy',
@@ -2358,17 +2361,17 @@ export const comparisons = [
 				'Export your Canva design as a PNG/SVG background',
 				'Rebuild it as an HTML template with the AI Template Maker (or overlay variables on the exported background)',
 				'Upload the same data table as CSV',
-				'Run: rendered documents email themselves to each recipient'
+				'Run: every row renders and comes back as its own CDN link'
 			]
 		},
 		faqs: [
 			{
 				q: 'Does Canva Bulk Create send emails?',
-				a: 'No. Canva has no email delivery feature; Bulk Create ends at download. After generating 300 certificates you still face the actual job: splitting pages, attaching files, and sending them one by one (or wrestling a mail-merge add-on with its own Gmail caps). Pictify emails every document as part of the run.'
+				a: 'No. Bulk Create ends at a download, so after generating 300 certificates you still face the actual job: splitting the file and moving each one to wherever it needs to go. A Pictify batch run gives you 300 separate documents, each on its own CDN link, plus a webhook when the run finishes, so your own system can take it from there.'
 			},
 			{
 				q: 'Is Pictify a good Canva Bulk Create alternative?',
-				a: 'If the output needs to reach people (certificates, badges, tickets, reports), yes. Pictify renders from the same kind of data table and then delivers each document with per-recipient status. If you only need design variants for your own use (ad creatives, social posts), Canva remains excellent.'
+				a: 'If the output has to reach a system rather than a designer (certificates, badges, tickets, reports), yes. Pictify renders from the same kind of data table and returns each document as its own link, through an API you can call from anything. If you only need design variants for your own use (ad creatives, social posts), Canva remains excellent.'
 			},
 			{
 				q: 'How many rows can Pictify handle?',
@@ -2397,13 +2400,13 @@ export const comparisons = [
 		subhead:
 			'Certifier jumps from $79/mo to $399/mo with nothing in between. Pictify renders and delivers certificates, badges, tickets, and video from one engine, with plans that scale gradually.',
 		metaDescription:
-			'Certifier alternative: render certificates and badges from HTML templates and email each one with per-recipient delivery status. Free tier, plans from $19/mo.',
-		tldr: 'Certifier is a purpose-built credentialing platform, good at verification pages and badge wallets, priced like a category product: the Professional plan runs $79/mo and the next tier jumps to $399/mo with nothing in between. Pictify comes at credentials from the document side: HTML-native templates render certificates, badges, tickets, and even personalized video from one engine, every document emails itself to its recipient with per-row delivery status, and plans scale gradually from a real free tier.',
+			'Certifier alternative: render certificates and badges from HTML templates you control, in batch, with a CDN link per credential. Free tier, plans from $19/mo.',
+		tldr: 'Certifier is a purpose-built credentialing platform, good at verification pages and badge wallets, priced like a category product: the Professional plan runs $79/mo and the next tier jumps to $399/mo with nothing in between. Pictify comes at credentials from the document side: HTML-native templates render certificates, badges, tickets, and even personalized video from one engine, every credential comes back on its own CDN link with a per-row status, and plans scale gradually from a real free tier.',
 		advantages: [
 			'No $79→$399 pricing cliff: free tier, then gradual plans from $19/mo',
 			'One engine for certificates, badges, tickets, reports, and personalized video',
 			'HTML-native templates: full design control, no credential-platform template ceiling',
-			'Per-recipient delivered/bounced status with automated suppression and re-send',
+			'A per-row result with a CDN link, and a webhook when the batch finishes',
 			'REST API, SDKs, webhooks, and MCP included on every plan',
 			'AI Template Maker authors a certificate template from a text description'
 		],
@@ -2415,36 +2418,40 @@ export const comparisons = [
 		],
 		bestFor: {
 			pictify:
-				'Course creators and event teams who need branded documents delivered at a price that scales with actual usage',
+				'Course creators and event teams who need branded documents rendered at a price that scales with actual usage',
 			competitor:
 				'Accredited programs that need formal credential verification, expiry, and revocation infrastructure'
 		},
 		pricing: {
 			pictify: { free: '50 renders + 25 emailed docs/mo', starter: '$19/mo', pro: '$49/mo' },
-			competitor: { free: 'Limited free tier', starter: '$79/mo (Professional)', pro: '$399/mo (Premium)' }
+			competitor: {
+				free: 'Limited free tier',
+				starter: '$79/mo (Professional)',
+				pro: '$399/mo (Premium)'
+			}
 		},
 		migration: {
 			difficulty: 'Easy',
 			timeEstimate: '1-2 hours',
 			steps: [
 				'Recreate your certificate design as an HTML template (AI Template Maker or template packs)',
-				'Export your recipient list as CSV',
+				'Export your attendee list as CSV',
 				'Map columns in the run wizard and send a test to yourself',
-				'Run: each certificate renders and emails with per-recipient status'
+				'Run: each certificate renders and comes back on its own CDN link'
 			]
 		},
 		faqs: [
 			{
 				q: 'Is Pictify a good Certifier alternative?',
-				a: 'Yes, when what you need is branded certificates rendered and delivered reliably. Pictify renders from HTML templates you fully control and emails each certificate with per-recipient delivered/bounced status. If you need formal credential infrastructure (verification URLs, expiry, revocation), that is Certifier\'s specialty and worth its price.'
+				a: "Yes, when what you need is branded certificates rendered reliably at volume. Pictify renders from HTML templates you fully control and returns every certificate on its own CDN link, in one batch run. If you need formal credential infrastructure (verification URLs, expiry, revocation), that is Certifier's specialty and worth the price."
 			},
 			{
 				q: 'How does Pictify pricing compare to Certifier?',
-				a: 'Certifier\'s Professional plan is $79/mo and the next step up is $399/mo, a hard cliff if you outgrow the middle tier. Pictify starts free (50 renders, 25 emailed documents monthly), then $19, $49, $99, and $249 monthly tiers, so cost tracks usage instead of jumping 5x.'
+				a: "Certifier's Professional plan is $79/mo and the next step up is $399/mo, a hard cliff if you outgrow the middle tier. Pictify starts free (50 renders, 25 emailed documents monthly), then $19, $49, $99, and $249 monthly tiers, so cost tracks usage instead of jumping 5x."
 			},
 			{
 				q: 'Does Pictify track delivery like Certifier does?',
-				a: 'Pictify tracks per-recipient: sent, delivered, bounced, or complained, via its own sending domain webhooks. Bounced addresses are suppressed automatically and can be corrected and re-sent as a single row, with no manual bounce spreadsheet.'
+				a: 'Every row of a batch run carries its own status and its own CDN link, and a webhook fires when the run finishes. A row that failed can be re-rendered on its own, without re-running the batch.'
 			},
 			{
 				q: 'Can Pictify do badges as well as certificates?',
@@ -2466,13 +2473,13 @@ export const comparisons = [
 			'Remotion is free, for companies of three. Beyond that: a company license, plus your own render farm to operate. Pictify renders video from templates over a managed API.',
 		metaDescription:
 			'Remotion alternative: render personalized video from templates via a managed API (timeline editor, code, or AI-authored templates). No Lambda farm to operate.',
-		tldr: 'Remotion lets you write videos in React: enormously powerful, free for individuals and companies of up to three people. Beyond that a paid company license applies, and production rendering typically means operating your own AWS Lambda render farm with its quotas and cold starts. Pictify renders MP4 and GIF from video templates over a managed API: build templates in a timeline editor, in code, or by describing them to the AI Template Maker, then render per-recipient variants with an HTTP call.',
+		tldr: 'Remotion lets you write videos in React: enormously powerful, free for individuals and companies of up to three people. Beyond that a paid company license applies, and production rendering typically means operating your own AWS Lambda render farm with its quotas and cold starts. Pictify renders MP4 and GIF from video templates over a managed API: build templates in a timeline editor, in code, or by describing them to the AI Template Maker, then render per-row variants with an HTTP call.',
 		advantages: [
 			'Managed rendering: no Lambda quotas, concurrency tickets, or render farm ops',
 			'Describe the video, get an editable template: AI authoring no video API ships',
 			'Timeline editor AND code authoring: non-devs can edit what devs build',
 			'Images, PDFs, GIFs, and MP4 from one API token',
-			'Per-recipient email delivery for personalized video campaigns',
+			'Personalized video from a CSV row or a webhook, no render farm to operate',
 			'No company license threshold'
 		],
 		competitorAdvantages: [
@@ -2500,19 +2507,19 @@ export const comparisons = [
 			timeEstimate: 'Half a day',
 			steps: [
 				'Recreate the composition as a Pictify video template (timeline editor, code, or AI-authored)',
-				'Map your per-recipient props to template variables',
+				'Map your per-row props to template variables',
 				'Render via the REST API or batch endpoint',
-				'Optionally deliver each video by email with per-recipient status'
+				'Collect each render from its CDN link, or a webhook when the batch finishes'
 			]
 		},
 		faqs: [
 			{
 				q: 'Is Remotion really free?',
-				a: 'For individuals and companies of up to three people, yes. Larger companies need a paid company license, and either way, rendering at scale generally means deploying and operating Remotion Lambda on your own AWS account, with its own quotas, costs, and cold-start behavior. Pictify\'s rendering is managed: you call an API.'
+				a: "For individuals and companies of up to three people, yes. Larger companies need a paid company license, and either way, rendering at scale generally means deploying and operating Remotion Lambda on your own AWS account, with its own quotas, costs, and cold-start behavior. Pictify's rendering is managed: you call an API."
 			},
 			{
-				q: 'Can Pictify match Remotion\'s flexibility?',
-				a: 'Not frame-for-frame; React gives Remotion unlimited programmatic control. Pictify covers the personalization use cases: template-driven videos where text, images, colors, and clips vary per recipient. Templates are authored in a timeline editor, in code, or generated from a description by AI, and stay editable by non-developers.'
+				q: "Can Pictify match Remotion's flexibility?",
+				a: 'Not frame-for-frame; React gives Remotion unlimited programmatic control. Pictify covers the personalization use cases: template-driven videos where text, images, colors, and clips vary per row. Templates are authored in a timeline editor, in code, or generated from a description by AI, and stay editable by non-developers.'
 			},
 			{
 				q: 'Does Pictify support AI video template authoring?',
@@ -2523,8 +2530,8 @@ export const comparisons = [
 				a: 'MP4 video, GIF, plus the document side: PNG, JPG, WebP, and multi-page PDF, all from one API token and one template contract. A course platform can render the certificate and the congratulation video from the same run.'
 			},
 			{
-				q: 'Can videos be delivered by email automatically?',
-				a: 'Yes. Workflow runs email each rendered deliverable to its recipient with per-row delivered/bounced status, the same delivery loop Pictify uses for documents.'
+				q: 'How do I get the rendered videos out?',
+				a: 'A batch run renders every row of a CSV or every webhook event, gives you a per-row result with a CDN link, and fires a webhook when the run finishes, the same loop Pictify uses for documents.'
 			}
 		]
 	},
@@ -2537,13 +2544,13 @@ export const comparisons = [
 		subhead:
 			'Creatomate renders what you templated. Pictify also authors the template (describe the video, get something editable) and delivers each render by email.',
 		metaDescription:
-			'Creatomate alternative: personalized video and documents from one API, with AI template authoring and per-recipient email delivery. Free tier included.',
-		tldr: 'Creatomate is a capable render API for video and images with a solid template editor, and a recurring complaint in its own community: cost at scale. It is also render-only: templates are built by hand, and delivery is your problem. Pictify adds the two missing layers: AI template authoring (describe the video, get an editable template) and per-recipient email delivery with per-row status, while covering documents, PDFs, and images on the same API token.',
+			'Creatomate alternative: personalized video and documents from one API, with AI template authoring and batch rendering. Free tier included.',
+		tldr: 'Creatomate is a capable render API for video and images with a solid template editor, and a recurring complaint in its own community: cost at scale. It is also render-only: templates are built by hand, and delivery is your problem. Pictify adds the two missing layers: AI template authoring (describe the video, get an editable template) and batch runs with a per-row result and a webhook, while covering documents, PDFs, and images on the same API token.',
 		advantages: [
 			'AI template authoring: describe the video, get an editable template',
 			'Documents, PDFs, images, GIFs, and video on one API token',
 			'Timeline editor for non-devs, code for devs, AI for agents: same template',
-			'Workflow runs with per-recipient email delivery and per-row status',
+			'Batch runs with a per-row result and a webhook when the run finishes',
 			'MCP server exposes template authoring to AI agents, not just rendering',
 			'Free tier with no credit card'
 		],
@@ -2555,7 +2562,7 @@ export const comparisons = [
 		],
 		bestFor: {
 			pictify:
-				'Teams personalizing video AND documents per recipient, and operators priced out of video-only APIs',
+				'Teams personalizing video AND documents per row, and operators priced out of video-only APIs',
 			competitor:
 				'Pure video pipelines that need advanced motion features and are comfortable building templates by hand'
 		},
@@ -2566,13 +2573,13 @@ export const comparisons = [
 				'Recreate the template in the timeline editor, or describe it to the AI Template Maker',
 				'Map your existing render payload fields to template variables',
 				'Swap the API endpoint in your n8n/Zapier/Make flow or backend',
-				'Optionally turn on email delivery for per-recipient sends'
+				'Poll the per-row results, or take the webhook when the batch finishes'
 			]
 		},
 		faqs: [
 			{
 				q: 'Is Pictify a good Creatomate alternative?',
-				a: 'Yes, especially if you hit either of Creatomate\'s two walls: template authoring effort (Pictify generates editable templates from a text description) or cost at scale (a recurring theme in Creatomate\'s own user threads). The render API shape is similar (template ID plus variables in, media URL out), so migration is mostly re-templating.'
+				a: "Yes, especially if you hit either of Creatomate's two walls: template authoring effort (Pictify generates editable templates from a text description) or cost at scale (a recurring theme in Creatomate's own user threads). The render API shape is similar (template ID plus variables in, media URL out), so migration is mostly re-templating."
 			},
 			{
 				q: 'Does Creatomate have AI template authoring?',
@@ -2580,7 +2587,7 @@ export const comparisons = [
 			},
 			{
 				q: 'Can Pictify replace both my video API and my document generation?',
-				a: 'Yes, that is the core difference. One template contract renders MP4, GIF, PNG, JPG, WebP, and multi-page PDF. A single onboarding run can produce the welcome video, the contract PDF, and the profile card, and email all of them to the recipient with per-row delivery status.'
+				a: 'Yes, that is the core difference. One template contract renders MP4, GIF, PNG, JPG, WebP, and multi-page PDF. A single onboarding run can produce the welcome video, the contract PDF, and the profile card, each on its own CDN link, with a webhook when the run finishes.'
 			},
 			{
 				q: 'Does Pictify work with n8n, Zapier, and Make?',

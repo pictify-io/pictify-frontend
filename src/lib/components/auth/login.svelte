@@ -1,22 +1,38 @@
 <script>
 	export let isLogin = false;
 
-	import GoogleIcon from '$lib/assets/login/GoogleIcons.svg';
-	import CheckboxEmpty from '$lib/assets/login/CheckboxEmpty.svg';
-	import Checkbox from '$lib/assets/login/Checkbox.svg';
+	import Wordmark from '$lib/components/landing/Wordmark.svelte';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { goto } from '$app/navigation';
+	import { safeIntent, campaignsHome } from '$lib/campaigns/nav';
+	import { setExperienceAction } from '../../../store/experience.store';
 	import { onMount } from 'svelte';
 	import { loginAction, signupAction, getUser, isLoggedIn } from '../../../store/user.store';
 	import { forgotPassword } from '../../../api/user';
-	import { analytics } from '$lib/analytics.js';
-	import posthog from 'posthog-js';
+	import { analytics } from '$lib/telemetry.js';
+	import RenderWall from './RenderWall.svelte';
+	import SignupPanel from './SignupPanel.svelte';
 
 	let email = '';
 	let password = '';
 	let errorMessage;
-	let isForgotPassword = false;
 	let redirectUrl;
+	/**
+	 * The experience someone arrived wanting, from `?intent=`. FE-5.
+	 *
+	 * Validated against the allowlist in $lib/campaigns/nav — an intent selects
+	 * a whole product experience, so it is a closed set rather than a pattern,
+	 * and anything off the list is dropped rather than forwarded.
+	 *
+	 * It is NOT an entitlement and never grants access: someone arriving with
+	 * campaign intent but no pilot grant lands on the access-request card.
+	 */
+	let campaignIntent = null;
+	let showPassword = false;
+	let submitting = false;
+	/** Recovery is its own view now — it used to hijack the email field and
+	 *  report success through the error box, which read as a failure. */
+	let view = 'credentials';
 
 	/**
 	 * Validate redirect URL to prevent open redirect attacks.
@@ -39,52 +55,51 @@
 		return null;
 	}
 
-	// Wait for PostHog to (re)load feature flags for the freshly-identified user.
-	// On signup we identify a brand-new distinct_id, so flags for it are not yet
-	// resolved — reading getFeatureFlag synchronously returns undefined and the
-	// experiment mis-assigns ~everyone to control. Re-fetch and await, with a
-	// hard timeout so we never block the redirect on a slow/absent flag call.
-	function waitForFreshFlags(timeoutMs = 1500) {
-		return new Promise((resolve) => {
-			let settled = false;
-			const finish = () => {
-				if (!settled) {
-					settled = true;
-					resolve();
-				}
-			};
-			try {
-				posthog.reloadFeatureFlags?.();
-				if (typeof posthog.onFeatureFlags === 'function') {
-					posthog.onFeatureFlags(finish);
-				} else {
-					finish();
-				}
-			} catch {
-				finish();
-			}
-			setTimeout(finish, timeoutMs);
-		});
+	/**
+	 * Record the intent so onboarding does not have to ask again.
+	 *
+	 * Best-effort: a failure here must never block a successful login. Landing
+	 * in the platform shell is the shipped product, not an error state.
+	 */
+	async function persistIntent() {
+		if (!campaignIntent) return;
+		try {
+			await setExperienceAction('campaigns');
+		} catch (e) {
+			// Non-fatal; the preference simply stays at its default.
+		}
 	}
 
 	async function safeRedirect({ justSignedUp = false } = {}) {
-		// Post-signup Experiment A (PIC-19): redirect new signups to /welcome
-		// to give them the inline API activation moment. Gated by PostHog flag
-		// `welcome-experiment-a` at 50/50, with control falling through to the
-		// existing safeRedirect behaviour.
+		/*
+		 * New accounts go straight into onboarding. This replaces the /welcome
+		 * PostHog experiment (`welcome-experiment-a`) rather than running beside
+		 * it — two competing post-signup destinations would make both unreadable.
+		 * Remember to stop that experiment before this ships, or its results will
+		 * quietly become nonsense.
+		 *
+		 * `redirect` still wins when present: someone sent to sign up from a
+		 * specific page meant to end up back there, and hijacking that to show
+		 * onboarding would lose whatever they were actually doing.
+		 */
+		await persistIntent();
+
 		if (justSignedUp) {
-			let variant = 'control';
-			try {
-				await waitForFreshFlags();
-				variant = posthog.getFeatureFlag?.('welcome-experiment-a') || 'control';
-			} catch {
-				variant = 'control';
-			}
-			// Track assignment for BOTH arms so the 1-week assignment-health read
-			// (welcome_assigned / signup_completed ≈ 50%) is computable.
-			analytics.track('welcome_assigned', { variant });
-			if (variant === 'welcome') {
-				goto('/welcome');
+			const pending = validateRedirectUrl(redirectUrl);
+			if (!pending) {
+				/*
+				 * A validated deep link wins over intent (handled above), but
+				 * intent wins over the generic onboarding: someone who followed a
+				 * campaigns link asked for a specific experience, and dropping
+				 * them into the platform first-run loses the thing they came for.
+				 */
+				if (campaignIntent) {
+					analytics.track('campaign_intent_signup', { intent: campaignIntent });
+					goto(campaignsHome());
+					return;
+				}
+				analytics.track('onboarding_entered', { from: 'signup' });
+				goto('/onboarding');
 				return;
 			}
 		}
@@ -97,13 +112,18 @@
 			} else {
 				goto(safeUrl);
 			}
+		} else if (campaignIntent) {
+			goto(campaignsHome());
 		} else {
 			goto('/dashboard');
 		}
 	}
 
 	onMount(async () => {
-		redirectUrl = new URLSearchParams(window.location.search).get('redirect');
+		const params = new URLSearchParams(window.location.search);
+		redirectUrl = params.get('redirect');
+		// `null` for anything off the allowlist, so junk cannot be forwarded.
+		campaignIntent = safeIntent(params.get('intent'));
 		if (!isLogin) {
 			const emailFromParams = new URLSearchParams(window.location.search).get('email');
 			if (emailFromParams) {
@@ -121,8 +141,26 @@
 	$: isPasswordLengthValid = password.length >= 8;
 	$: isPasswordContainsNumber = /\d/.test(password);
 	$: isPasswordContainsUpperCase = /[A-Z]/.test(password);
+	$: passwordMeetsRules =
+		isPasswordLengthValid && isPasswordContainsNumber && isPasswordContainsUpperCase;
+	// Submit stays shut on signup until the rules pass, so the form can't be
+	// failed by the server for something the page already knows about.
+	$: canSubmit = !submitting && email.trim() && password && (isLogin || passwordMeetsRules);
+
+	$: rules = [
+		{ label: '8 characters', ok: isPasswordLengthValid },
+		{ label: 'a number', ok: isPasswordContainsNumber },
+		{ label: 'a capital', ok: isPasswordContainsUpperCase }
+	];
+
+	$: altHref = isLogin
+		? `/signup${redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : ''}`
+		: `/login${redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : ''}`;
 
 	async function handleSubmit() {
+		if (!canSubmit) return;
+		submitting = true;
+		errorMessage = undefined;
 		try {
 			let justSignedUp = false;
 			if (isLogin) {
@@ -140,6 +178,8 @@
 			}
 		} catch (e) {
 			errorMessage = e.message;
+		} finally {
+			submitting = false;
 		}
 	}
 
@@ -165,264 +205,273 @@
 	}
 
 	async function handleForgotPassword() {
-		if (!email) {
-			errorMessage = 'Please enter your email';
+		if (!email.trim()) {
+			errorMessage = 'Enter the email you signed up with.';
 			return;
 		}
+		submitting = true;
+		errorMessage = undefined;
 		try {
 			await forgotPassword(email);
-			errorMessage = `Password reset link sent to ${email}`;
+			view = 'sent';
 		} catch (e) {
-			errorMessage = e.message || 'Failed to send reset link';
+			errorMessage = e.message || 'Could not send the reset link. Try again.';
+		} finally {
+			submitting = false;
 		}
+	}
+
+	function openForgot() {
+		errorMessage = undefined;
+		view = 'forgot';
+	}
+
+	function backToCredentials() {
+		errorMessage = undefined;
+		view = 'credentials';
 	}
 </script>
 
-<section
-	class="min-h-screen w-full bg-brand-bg flex items-center justify-center p-4 relative overflow-hidden"
->
-	<!-- Background Pattern -->
+<!-- auth-v2 opts this page out of the app-wide root font-size down-scale (see app.css). -->
+<div class="auth-v2 flex min-h-screen w-full bg-brand-paper">
 	<div
-		class="absolute inset-0 opacity-[0.03] pointer-events-none"
-		style="background-image: linear-gradient(#000 1px, transparent 1px), 
-							linear-gradient(90deg, #000 1px, transparent 1px); 
-							background-size: 40px 40px;"
-	/>
-
-	<!-- Decorative Blobs -->
-	<div
-		class="absolute top-0 right-0 w-96 h-96 bg-brand-accent/20 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
-	<div
-		class="absolute bottom-0 left-0 w-96 h-96 bg-brand-danger/10 rounded-full blur-[100px] -z-10 pointer-events-none"
-	/>
-
-	<div
-		class="bg-white border-[3px] border-black shadow-brutal-2xl rounded-2xl p-6 md:p-10 w-full max-w-md relative z-10 transition-all duration-300"
+		class="flex w-full flex-shrink-0 flex-col justify-between px-5 py-8 lg:w-[660px] lg:px-[88px] lg:py-11"
 	>
-		<div class="flex flex-col items-center justify-center mb-8">
-			<!-- Logo/Brand -->
-			<div
-				class="mb-6 inline-block px-6 py-2 bg-brand-accent border-[3px] border-black shadow-brutal-lg rounded-full transform -rotate-2 hover:rotate-0 transition-transform cursor-default"
-			>
-				<span class="text-2xl font-black text-black tracking-tight">Pictify</span>
-			</div>
+		<a href="/" class="flex items-center" aria-label="Pictify home">
+			<Wordmark size={26} text="lg" />
+		</a>
 
-			<h1 class="text-3xl md:text-4xl font-black text-center leading-tight mb-2">
-				{#if isLogin}
-					Welcome Back! 👋
-				{:else}
-					Start Creating 🚀
-				{/if}
-			</h1>
-
-			<p class="text-gray-600 font-medium text-center">
-				{#if isLogin}
-					Login to continue your journey
-				{:else}
-					Join proactively and visualize more
-				{/if}
-			</p>
-		</div>
-
-		<div class="flex flex-col gap-4">
-			<div class="space-y-1">
-				<label class="font-bold text-sm ml-1" for="email">Email Address</label>
-				<input
-					id="email"
-					bind:value={email}
-					type="email"
-					placeholder="name@example.com"
-					class="w-full border-[3px] border-black p-3 rounded-xl focus:outline-none focus:shadow-brutal-lg transition-shadow text-lg font-medium placeholder:text-gray-400"
-				/>
-			</div>
-
-			<div class="space-y-1">
-				<div class="flex justify-between items-center ml-1">
-					<label class="font-bold text-sm" for="password">Password</label>
-					{#if isLogin}
-						<button
-							on:click={handleForgotPassword}
-							class="text-sm font-bold text-brand-danger hover:text-black hover:underline transition-colors"
-						>
-							Forgot password?
-						</button>
-					{/if}
-				</div>
-				<input
-					id="password"
-					bind:value={password}
-					type="password"
-					placeholder="••••••••"
-					class="w-full border-[3px] border-black p-3 rounded-xl focus:outline-none focus:shadow-brutal-lg transition-shadow text-lg font-medium placeholder:text-gray-400"
-				/>
-			</div>
-
-			{#if errorMessage}
-				<div
-					class="bg-brand-danger/10 border-2 border-brand-danger text-red-700 p-3 rounded-xl font-bold flex items-center gap-2"
-					role="alert"
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-5 w-5 flex-shrink-0"
-						viewBox="0 0 20 20"
-						fill="currentColor"
+		<div class="flex w-full flex-col gap-[22px] py-10 lg:py-0">
+			{#if view === 'sent'}
+				<div class="flex flex-col gap-2">
+					<h1
+						class="font-display text-[46px] font-extrabold leading-[46px] tracking-[-0.04em] text-brand-ink"
 					>
-						<path
-							fill-rule="evenodd"
-							d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-							clip-rule="evenodd"
-						/>
-					</svg>
-					<span>{errorMessage}</span>
-				</div>
-			{/if}
-
-			{#if !isLogin}
-				<div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-4 space-y-2">
-					<p class="font-bold text-sm text-gray-500 mb-2 uppercase tracking-wider">
-						Password Requirements
+						Check your inbox.
+					</h1>
+					<p class="font-sans text-base leading-6 text-brand-slate lg:w-[400px]">
+						A reset link is on its way to <span class="font-semibold text-brand-ink">{email}</span>.
+						It expires in an hour.
 					</p>
-
-					<div
-						class="flex items-center gap-3 transition-colors duration-200 {isPasswordLengthValid
-							? 'text-green-600'
-							: 'text-gray-400'}"
-					>
-						<div
-							class="w-5 h-5 border-2 {isPasswordLengthValid
-								? 'bg-green-500 border-green-600'
-								: 'border-gray-300'} rounded-md flex items-center justify-center transition-all"
-						>
-							{#if isPasswordLengthValid}
-								<svg
-									class="w-3.5 h-3.5 text-white"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="4"
-										d="M5 13l4 4L19 7"
-									/></svg
-								>
-							{/if}
-						</div>
-						<span class="text-sm font-bold">At least 8 characters</span>
-					</div>
-
-					<div
-						class="flex items-center gap-3 transition-colors duration-200 {isPasswordContainsNumber
-							? 'text-green-600'
-							: 'text-gray-400'}"
-					>
-						<div
-							class="w-5 h-5 border-2 {isPasswordContainsNumber
-								? 'bg-green-500 border-green-600'
-								: 'border-gray-300'} rounded-md flex items-center justify-center transition-all"
-						>
-							{#if isPasswordContainsNumber}
-								<svg
-									class="w-3.5 h-3.5 text-white"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="4"
-										d="M5 13l4 4L19 7"
-									/></svg
-								>
-							{/if}
-						</div>
-						<span class="text-sm font-bold">At least 1 number</span>
-					</div>
-
-					<div
-						class="flex items-center gap-3 transition-colors duration-200 {isPasswordContainsUpperCase
-							? 'text-green-600'
-							: 'text-gray-400'}"
-					>
-						<div
-							class="w-5 h-5 border-2 {isPasswordContainsUpperCase
-								? 'bg-green-500 border-green-600'
-								: 'border-gray-300'} rounded-md flex items-center justify-center transition-all"
-						>
-							{#if isPasswordContainsUpperCase}
-								<svg
-									class="w-3.5 h-3.5 text-white"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									><path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="4"
-										d="M5 13l4 4L19 7"
-									/></svg
-								>
-							{/if}
-						</div>
-						<span class="text-sm font-bold">At least 1 uppercase letter</span>
-					</div>
 				</div>
-			{/if}
-
-			<button
-				on:click={handleSubmit}
-				class="bg-brand-danger text-black w-full py-3 px-4 rounded-xl border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-0.5 active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all font-black text-lg mt-2 uppercase tracking-wide"
-			>
-				{#if isLogin}
-					Login
-				{:else}
-					Create Account
-				{/if}
-			</button>
-
-			<div class="relative flex py-2 items-center">
-				<div class="flex-grow border-t-2 border-gray-200" />
-				<span class="flex-shrink-0 mx-4 text-gray-600 font-bold text-sm uppercase"
-					>Or continue with</span
+				<button
+					type="button"
+					on:click={backToCredentials}
+					class="flex h-14 w-full items-center justify-center rounded-btn bg-brand-ink font-sans text-[17px] font-bold text-brand-paper transition-opacity hover:opacity-90"
 				>
-				<div class="flex-grow border-t-2 border-gray-200" />
-			</div>
+					Back to log in
+				</button>
+			{:else}
+				<div class="flex flex-col gap-2">
+					<h1
+						class="font-display text-[46px] font-extrabold leading-[46px] tracking-[-0.04em] text-brand-ink"
+					>
+						{#if view === 'forgot'}Reset your password.{:else if isLogin}Welcome back.{:else}Start
+							rendering.{/if}
+					</h1>
+					<p class="font-sans text-base leading-6 text-brand-slate lg:w-[400px]">
+						{#if view === 'forgot'}
+							Tell us the email you signed up with and we'll send a link.
+						{:else if isLogin}
+							Pick up where the renders left off.
+						{:else}
+							Free tier, no credit card. Your first render is about ninety seconds away.
+						{/if}
+					</p>
+				</div>
 
-			<button
-				on:click={handleGoogleLogin}
-				class="bg-white text-black w-full py-3 px-4 rounded-xl border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-y-0.5 active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all font-bold text-lg flex items-center justify-center gap-3"
-			>
-				<img loading="lazy" src={GoogleIcon} alt="Google" class="w-6 h-6" />
-				<span>Google</span>
-			</button>
+				{#if view === 'credentials'}
+					<button
+						type="button"
+						on:click={handleGoogleLogin}
+						class="flex h-[54px] w-full items-center justify-center gap-3 rounded-btn border-2 border-brand-ink bg-brand-paper font-sans text-base font-semibold text-brand-ink transition-colors hover:bg-brand-canvas"
+					>
+						<svg width="19" height="19" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+							<path
+								d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"
+								fill="#4285F4"
+							/>
+							<path
+								d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"
+								fill="#34A853"
+							/>
+							<path
+								d="M11.69 28.18c-.44-1.32-.69-2.73-.69-4.18s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"
+								fill="#FBBC05"
+							/>
+							<path
+								d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"
+								fill="#EA4335"
+							/>
+						</svg>
+						Continue with Google
+					</button>
+
+					<div class="flex w-full items-center gap-4">
+						<span class="h-px flex-1 bg-brand-rule" />
+						<span class="font-mono text-[11px] tracking-[0.1em] text-brand-mute">or</span>
+						<span class="h-px flex-1 bg-brand-rule" />
+					</div>
+				{/if}
+
+				<form
+					class="flex w-full flex-col gap-[22px]"
+					on:submit|preventDefault={view === 'forgot' ? handleForgotPassword : handleSubmit}
+				>
+					<div class="flex w-full flex-col gap-[7px]">
+						<label
+							for="email"
+							class="font-mono text-[11px] uppercase tracking-[0.09em] text-[#6B6B68]"
+						>
+							Email
+						</label>
+						<input
+							id="email"
+							bind:value={email}
+							type="email"
+							autocomplete="email"
+							placeholder="you@yourcompany.com"
+							class="h-[54px] w-full rounded-btn border-2 border-brand-ink bg-brand-paper px-4 font-sans text-base text-brand-ink outline-none placeholder:text-brand-mute focus-visible:ring-2 focus-visible:ring-brand-royal"
+						/>
+					</div>
+
+					{#if view === 'credentials'}
+						<div class="flex w-full flex-col gap-[7px]">
+							<div class="flex items-center justify-between">
+								<label
+									for="password"
+									class="font-mono text-[11px] uppercase tracking-[0.09em] text-[#6B6B68]"
+								>
+									Password
+								</label>
+								{#if isLogin}
+									<button
+										type="button"
+										on:click={openForgot}
+										class="font-sans text-[13px] font-semibold text-brand-ink underline underline-offset-[3px]"
+									>
+										Forgot password?
+									</button>
+								{/if}
+							</div>
+							<div
+								class="flex h-[54px] w-full items-center rounded-btn border-2 border-brand-ink bg-brand-paper px-4 focus-within:ring-2 focus-within:ring-brand-royal"
+							>
+								<!-- Split rather than a dynamic `type`: Svelte forbids that with bind:value. -->
+								{#if showPassword}
+									<input
+										id="password"
+										bind:value={password}
+										type="text"
+										autocomplete={isLogin ? 'current-password' : 'new-password'}
+										placeholder="••••••••••"
+										class="h-full flex-1 bg-transparent font-sans text-base text-brand-ink outline-none placeholder:text-brand-mute"
+									/>
+								{:else}
+									<input
+										id="password"
+										bind:value={password}
+										type="password"
+										autocomplete={isLogin ? 'current-password' : 'new-password'}
+										placeholder="••••••••••"
+										class="h-full flex-1 bg-transparent font-sans text-base text-brand-ink outline-none placeholder:text-brand-mute"
+									/>
+								{/if}
+								<button
+									type="button"
+									on:click={() => (showPassword = !showPassword)}
+									class="font-mono text-[11px] tracking-[0.06em] text-[#6B6B68] hover:text-brand-ink"
+								>
+									{showPassword ? 'hide' : 'show'}
+								</button>
+							</div>
+
+							{#if !isLogin}
+								<div class="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 pt-[3px]">
+									{#each rules as rule (rule.label)}
+										<span class="flex items-center gap-1.5">
+											<span
+												class="block h-2 w-2 {rule.ok ? 'bg-brand-proof' : 'bg-[#D3D5CE]'}"
+												aria-hidden="true"
+											/>
+											<span
+												class="font-mono text-[11px] {rule.ok
+													? 'text-[#3F5B47]'
+													: 'text-brand-mute'}"
+											>
+												{rule.label}
+											</span>
+										</span>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					{/if}
+
+					{#if errorMessage}
+						<p
+							role="alert"
+							class="flex items-start gap-2.5 rounded-btn border-2 border-brand-ink bg-brand-rose px-4 py-3 font-sans text-[15px] leading-[21px] text-brand-ink"
+						>
+							<span class="mt-[6px] block h-2 w-2 flex-shrink-0 bg-brand-ink" aria-hidden="true" />
+							{errorMessage}
+						</p>
+					{/if}
+
+					<button
+						type="submit"
+						disabled={view === 'forgot' ? submitting : !canSubmit}
+						class="flex h-14 w-full items-center justify-center rounded-btn bg-brand-ink font-sans text-[17px] font-bold text-brand-paper transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-35"
+					>
+						{#if view === 'forgot'}
+							{submitting ? 'Sending…' : 'Send reset link'}
+						{:else if isLogin}
+							{submitting ? 'Logging in…' : 'Log in'}
+						{:else}
+							{submitting ? 'Creating account…' : 'Create account'}
+						{/if}
+					</button>
+				</form>
+
+				{#if view === 'forgot'}
+					<button
+						type="button"
+						on:click={backToCredentials}
+						class="self-start font-sans text-[15px] font-semibold text-brand-ink underline underline-offset-[3px]"
+					>
+						Back to log in
+					</button>
+				{/if}
+			{/if}
 		</div>
 
-		<div class="mt-8 text-center">
+		<div class="flex flex-col gap-3">
+			<p class="flex items-center gap-1.5">
+				<span class="font-sans text-[15px] text-brand-slate">
+					{isLogin ? 'New to Pictify?' : 'Already have an account?'}
+				</span>
+				<a
+					href={altHref}
+					class="font-sans text-[15px] font-bold text-brand-ink underline underline-offset-[3px]"
+				>
+					{isLogin ? 'Create an account' : 'Log in'}
+				</a>
+			</p>
 			{#if !isLogin}
-				<p class="text-gray-600 font-medium">
-					Already have an account? <a
-						href="/login?redirect={redirectUrl}"
-						class="font-black text-black hover:text-brand-danger hover:underline decoration-[3px] underline-offset-4 transition-all"
-						>Login</a
-					>
-				</p>
-				<div class="mt-6 text-xs text-gray-600 font-medium px-4">
-					By signing up, you agree to our
-					<a href="/terms" class="text-gray-500 hover:text-black underline">Terms</a>
-					and
-					<a href="/privacy" class="text-gray-500 hover:text-black underline">Privacy Policy</a>.
-				</div>
-			{:else}
-				<p class="text-gray-600 font-medium">
-					Don't have an account? <a
-						href="/signup?redirect={redirectUrl}"
-						class="font-black text-black hover:text-brand-danger hover:underline decoration-[3px] underline-offset-4 transition-all"
-						>Sign Up</a
-					>
+				<p class="font-sans text-[13px] leading-[19px] text-brand-mute lg:w-[380px]">
+					By creating an account you agree to the
+					<a href="/terms" class="underline">Terms</a> and the
+					<a href="/privacy" class="underline">Privacy Policy</a>.
 				</p>
 			{/if}
 		</div>
 	</div>
-</section>
+
+	<div class="hidden flex-1 lg:block">
+		{#if isLogin}
+			<RenderWall />
+		{:else}
+			<SignupPanel {email} />
+		{/if}
+	</div>
+</div>

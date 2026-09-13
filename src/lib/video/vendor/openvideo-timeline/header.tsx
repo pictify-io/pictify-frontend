@@ -179,6 +179,7 @@ const Header = ({
                 onClick={() => handleSeek(0)}
                 variant={"ghost"}
                 size={"icon"}
+                aria-label="Jump to start"
               >
                 <RiSkipBackLine size={14} />
               </Button>
@@ -191,6 +192,7 @@ const Header = ({
                 }}
                 variant={"ghost"}
                 size={"icon"}
+                aria-label={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? <RiPauseFill size={14} /> : <RiPlayFill size={14} />}
               </Button>
@@ -199,6 +201,7 @@ const Header = ({
                 onClick={() => handleSeek(duration)}
                 variant={"ghost"}
                 size={"icon"}
+                aria-label="Jump to end"
               >
                 <RiSkipForwardLine size={14} />
               </Button>
@@ -290,7 +293,7 @@ const ZoomControl = ({
   return (
     <div className="flex items-center justify-end select-none px-4">
       <div className="flex items-center rounded-md px-1.5 py-0.5 gap-1 h-8">
-        <Button onClick={onZoomOutClick} variant={"ghost"} size={"icon"}>
+        <Button onClick={onZoomOutClick} variant={"ghost"} size={"icon"} aria-label="Zoom out">
           <RiSubtractLine size={14} />
         </Button>
         <DropdownMenu>
@@ -368,7 +371,7 @@ const ZoomControl = ({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button onClick={onZoomInClick} variant={"ghost"} size={"icon"}>
+        <Button onClick={onZoomInClick} variant={"ghost"} size={"icon"} aria-label="Zoom in">
           <RiAddLine size={14} />
         </Button>
       </div>

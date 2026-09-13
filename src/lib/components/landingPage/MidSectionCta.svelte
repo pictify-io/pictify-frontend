@@ -60,7 +60,7 @@
 					<p
 						class="text-lg md:text-xl lg:text-2xl text-gray-800 font-medium mb-10 max-w-xl bg-white px-6 py-4 rounded-xl border-[3px] border-gray-900 shadow-brutal-lg transform -rotate-1"
 					>
-						Sign up, pick a template, add your data. Your first batch rendered and delivered in
+						Sign up, pick a template, add your data. Your first batch rendered in
 						under 5 minutes.
 					</p>
 

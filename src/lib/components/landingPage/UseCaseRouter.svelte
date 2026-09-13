@@ -1,5 +1,5 @@
 <script>
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	function trackLane(laneId, href) {
 		analytics.track?.('Landing Lane Clicked', { lane: laneId, href: href });

@@ -7,12 +7,22 @@
 	import { oneDark } from '@codemirror/theme-one-dark';
 	import { indentWithTab } from '@codemirror/commands';
 	import { createGifPublic } from '../../../api/image.js';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	export let isGifEnabled = false;
 	export let isPreviewEnabled = true;
 	export let fileExtension = 'png';
 	export let toolName = '';
+	/**
+	 * 'v1' is the original stacked layout with its own size controls, still used
+	 * by the tool pages that have not moved to the v2 shell.
+	 * 'v2' is the Repro Shop split: dark editor pane left, preview pane right,
+	 * with the size controls living in the tool card's toolbar instead.
+	 */
+	export let variant = 'v1';
+	/** The render size. Bindable, so a v2 toolbar can drive it. */
+	export let previewWidth = 600;
+	export let previewHeight = 400;
 
 	let hasTrackedFirstInput = false;
 
@@ -115,12 +125,14 @@
 	let iframeContainer;
 	let previewContainerEl;
 	let isImageLoading = false;
-	let previewWidth = 600;
-	let previewHeight = 400;
 	let containerWidth = 800;
 
-	const MAX_PREVIEW_HEIGHT = 500;
-	const PREVIEW_PADDING = 32;
+	// v2's preview pane is a 520px-tall column that also carries a caption and a
+	// footnote, so the render gets a much shorter ceiling than v1's full-width
+	// panel. Both are named in the reactive statement below so a variant change
+	// re-scales rather than keeping the first value it saw.
+	$: MAX_PREVIEW_HEIGHT = variant === 'v2' ? 340 : 500;
+	$: PREVIEW_PADDING = variant === 'v2' ? 48 : 32;
 
 	$: previewScale = (() => {
 		const availW = containerWidth - PREVIEW_PADDING;
@@ -128,8 +140,14 @@
 		const scaleY = MAX_PREVIEW_HEIGHT / previewHeight;
 		return Math.min(scaleX, scaleY, 1);
 	})();
-	$: previewContainerHeight = Math.min(previewHeight * previewScale + PREVIEW_PADDING, MAX_PREVIEW_HEIGHT + PREVIEW_PADDING);
-	$: previewMarginLeft = Math.max(0, ((containerWidth - PREVIEW_PADDING) - previewWidth * previewScale) / 2);
+	$: previewContainerHeight = Math.min(
+		previewHeight * previewScale + PREVIEW_PADDING,
+		MAX_PREVIEW_HEIGHT + PREVIEW_PADDING
+	);
+	$: previewMarginLeft = Math.max(
+		0,
+		(containerWidth - PREVIEW_PADDING - previewWidth * previewScale) / 2
+	);
 
 	const dispatch = createEventDispatcher();
 
@@ -198,6 +216,13 @@
 
 	function getSrcDoc() {
 		return codeHTML;
+	}
+
+	// v2 drives the size from the toolbar, so a change arriving as a prop has to
+	// repaint the frame the same way an in-component control would. Both deps
+	// are named in the statement so the reaction actually fires.
+	$: if (variant === 'v2' && (previewWidth || previewHeight)) {
+		updateIframe();
 	}
 
 	// ── Preview hijack containment + detection ──────────────
@@ -275,134 +300,206 @@
 			});
 			dispatch('imageGenerated', { image: gif });
 			isImageLoading = false;
-		} catch (e) { /* ignored */ }
+		} catch (e) {
+			/* ignored */
+		}
 	}
 </script>
 
-<section class="w-full">
-	<div class="flex flex-col overflow-hidden bg-white">
-		<!-- Preview Panel (top, full width, maximized) -->
-		<div class="w-full flex flex-col bg-white">
-			<!-- Preview Header -->
-			<div class="flex bg-[#1a1a2e] px-4 py-3 justify-between items-center">
-				<div class="flex items-center gap-3">
-					<span class="text-data-green text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-						<span class="w-2 h-2 rounded-full bg-data-green inline-block"></span>
-						Live Preview
-					</span>
-					{#if isGifEnabled}
-						<button
-							on:click={() => {
-								createGif();
-							}}
-							class="bg-brand-accent hover:bg-[#ffb366] text-black px-4 py-2 text-sm font-bold uppercase tracking-wide flex items-center gap-2 transition-colors border-[2px] border-black shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="w-4 h-4"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-								/>
-							</svg>
-							GIF
-						</button>
-					{/if}
-				</div>
-				<!-- Size Controls -->
-				<div class="flex items-center gap-2">
-					<select
-						class="px-2 py-1 border border-gray-600 text-xs font-bold bg-[#2a2a3e] text-white focus:outline-none focus:border-brand-danger focus:ring-1 focus:ring-brand-danger cursor-pointer"
-						value={`${previewWidth}x${previewHeight}`}
-						on:change={(e) => {
-							const val = e.target.value;
-							if (val === 'custom') return;
-							const [w, h] = val.split('x').map(Number);
-							previewWidth = w;
-							previewHeight = h;
-							updateIframe();
-						}}
+{#if variant === 'v2'}
+	<!--
+		v2 split: markup on the dark side, the render on the light side. The
+		size controls are NOT here — the tool card's toolbar owns them, so the
+		editor pane is only ever about the code.
+	-->
+	<div class="flex w-full flex-col lg:h-[520px] lg:flex-row">
+		<!-- Editor pane -->
+		<div class="flex min-w-0 flex-1 flex-col bg-brand-press">
+			<div class="flex flex-shrink-0 items-center gap-1 border-b border-[#383A42] px-4 py-2.5">
+				<span
+					class="bg-brand-press-deep px-2.5 py-[5px] font-mono text-xs tracking-[0.06em] text-white"
+				>
+					INDEX.HTML
+				</span>
+				<span class="px-2.5 py-[5px] font-mono text-xs tracking-[0.06em] text-brand-press-text">
+					STYLE.CSS
+				</span>
+				<span class="ml-auto hidden font-mono text-xs tracking-[0.06em] text-brand-mute sm:inline">
+					PASTE OR TYPE · AUTOSAVES
+				</span>
+			</div>
+			<div class="min-h-[360px] flex-1 overflow-auto lg:min-h-0">
+				<div bind:this={editorElement} />
+			</div>
+		</div>
+
+		<!-- Preview pane -->
+		{#if isPreviewEnabled}
+			<div
+				class="flex w-full flex-shrink-0 flex-col items-center justify-center gap-3.5 border-t-2 border-brand-ink bg-brand-subtle p-6 lg:w-[420px] lg:border-l-2 lg:border-t-0"
+				bind:this={previewContainerEl}
+			>
+				<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">
+					LIVE PREVIEW · {previewWidth}×{previewHeight} · {(fileExtension || 'png').toUpperCase()}
+				</span>
+				<div
+					class="flex-shrink-0 overflow-hidden"
+					style="width: {Math.round(previewWidth * previewScale)}px; height: {Math.round(
+						previewHeight * previewScale
+					)}px;"
+				>
+					<div
+						class="origin-top-left border-2 border-brand-ink bg-white shadow-[4px_4px_0_0_#000000]"
+						style="width: {previewWidth}px; height: {previewHeight}px; transform: scale({previewScale});"
 					>
-						{#each presetSizes as preset}
-							<option value={preset.value}>{preset.label}</option>
-						{/each}
-						{#if !presetSizes.some(p => p.value === `${previewWidth}x${previewHeight}`)}
-							<option value={`${previewWidth}x${previewHeight}`}>Custom ({previewWidth}×{previewHeight})</option>
+						{#key srcdocKey}
+							<iframe
+								class="h-full w-full border-0 bg-white"
+								title="code-preview"
+								srcdoc={previewSrcdoc}
+								sandbox="allow-scripts"
+								on:load={handlePreviewLoad}
+								bind:this={previewFrame}
+							/>
+						{/key}
+					</div>
+				</div>
+				<p class="text-center font-sans text-sm leading-[18px] text-brand-slate">
+					Updates as you type. Nothing is uploaded until you press Generate.
+				</p>
+			</div>
+		{/if}
+	</div>
+{:else}
+	<section class="w-full">
+		<div class="flex flex-col overflow-hidden bg-white">
+			<!-- Preview Panel (top, full width, maximized) -->
+			<div class="w-full flex flex-col bg-white">
+				<!-- Preview Header -->
+				<div class="flex bg-[#1a1a2e] px-4 py-3 justify-between items-center">
+					<div class="flex items-center gap-3">
+						<span
+							class="text-data-green text-sm font-bold uppercase tracking-wider flex items-center gap-2"
+						>
+							<span class="w-2 h-2 rounded-full bg-data-green inline-block" />
+							Live Preview
+						</span>
+						{#if isGifEnabled}
+							<button
+								on:click={() => {
+									createGif();
+								}}
+								class="bg-brand-accent hover:bg-[#ffb366] text-black px-4 py-2 text-sm font-bold uppercase tracking-wide flex items-center gap-2 transition-colors border border-brand-ink hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="w-4 h-4"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+									/>
+								</svg>
+								GIF
+							</button>
 						{/if}
-					</select>
-					<div class="flex items-center gap-1">
-						<input
-							type="number"
-							class="w-14 px-1.5 py-0.5 border border-gray-600 text-xs font-medium text-center bg-[#2a2a3e] text-white focus:outline-none focus:border-brand-danger focus:ring-1 focus:ring-brand-danger"
-							value={previewWidth}
-							min="100"
-							max="1920"
-							on:input={(e) => {
-								previewWidth = parseInt(e.target.value) || previewWidth;
+					</div>
+					<!-- Size Controls -->
+					<div class="flex items-center gap-2">
+						<select
+							class="px-2 py-1 border border-gray-600 text-xs font-bold bg-[#2a2a3e] text-white focus:outline-none focus:border-brand-danger focus:ring-1 focus:ring-brand-danger cursor-pointer"
+							value={`${previewWidth}x${previewHeight}`}
+							on:change={(e) => {
+								const val = e.target.value;
+								if (val === 'custom') return;
+								const [w, h] = val.split('x').map(Number);
+								previewWidth = w;
+								previewHeight = h;
 								updateIframe();
 							}}
-						/>
-						<span class="text-gray-400 text-xs font-bold">×</span>
-						<input
-							type="number"
-							class="w-14 px-1.5 py-0.5 border border-gray-600 text-xs font-medium text-center bg-[#2a2a3e] text-white focus:outline-none focus:border-brand-danger focus:ring-1 focus:ring-brand-danger"
-							value={previewHeight}
-							min="100"
-							max="1080"
-							on:input={(e) => {
-								previewHeight = parseInt(e.target.value) || previewHeight;
-								updateIframe();
-							}}
-						/>
+						>
+							{#each presetSizes as preset}
+								<option value={preset.value}>{preset.label}</option>
+							{/each}
+							{#if !presetSizes.some((p) => p.value === `${previewWidth}x${previewHeight}`)}
+								<option value={`${previewWidth}x${previewHeight}`}
+									>Custom ({previewWidth}×{previewHeight})</option
+								>
+							{/if}
+						</select>
+						<div class="flex items-center gap-1">
+							<input
+								type="number"
+								class="w-14 px-1.5 py-0.5 border border-gray-600 text-xs font-medium text-center bg-[#2a2a3e] text-white focus:outline-none focus:border-brand-danger focus:ring-1 focus:ring-brand-danger"
+								value={previewWidth}
+								min="100"
+								max="1920"
+								on:input={(e) => {
+									previewWidth = parseInt(e.target.value) || previewWidth;
+									updateIframe();
+								}}
+							/>
+							<span class="text-gray-400 text-xs font-bold">×</span>
+							<input
+								type="number"
+								class="w-14 px-1.5 py-0.5 border border-gray-600 text-xs font-medium text-center bg-[#2a2a3e] text-white focus:outline-none focus:border-brand-danger focus:ring-1 focus:ring-brand-danger"
+								value={previewHeight}
+								min="100"
+								max="1080"
+								on:input={(e) => {
+									previewHeight = parseInt(e.target.value) || previewHeight;
+									updateIframe();
+								}}
+							/>
+						</div>
+					</div>
+				</div>
+
+				<!-- Preview Frame - scaled to fit while preserving exact aspect ratio -->
+				<div
+					class="w-full bg-[#f0f0f0] overflow-hidden"
+					style="height: {previewContainerHeight}px; padding: {PREVIEW_PADDING / 2}px;"
+					bind:this={previewContainerEl}
+				>
+					<div
+						bind:this={iframeContainer}
+						class="bg-white border border-gray-300 shadow-md origin-top-left"
+						style="width: {previewWidth}px; height: {previewHeight}px; transform: scale({previewScale}); margin-left: {previewMarginLeft}px;"
+					>
+						{#key srcdocKey}
+							<iframe
+								class="w-full h-full bg-white border-0"
+								title="code-preview"
+								srcdoc={previewSrcdoc}
+								sandbox="allow-scripts"
+								on:load={handlePreviewLoad}
+								bind:this={previewFrame}
+							/>
+						{/key}
 					</div>
 				</div>
 			</div>
 
-			<!-- Preview Frame - scaled to fit while preserving exact aspect ratio -->
-			<div
-				class="w-full bg-[#f0f0f0] overflow-hidden"
-				style="height: {previewContainerHeight}px; padding: {PREVIEW_PADDING / 2}px;"
-				bind:this={previewContainerEl}
-			>
-				<div
-					bind:this={iframeContainer}
-					class="bg-white border border-gray-300 shadow-md origin-top-left"
-					style="width: {previewWidth}px; height: {previewHeight}px; transform: scale({previewScale}); margin-left: {previewMarginLeft}px;"
-				>
-					{#key srcdocKey}
-						<iframe
-							class="w-full h-full bg-white border-0"
-							title="code-preview"
-							srcdoc={previewSrcdoc}
-							sandbox="allow-scripts"
-							on:load={handlePreviewLoad}
-							bind:this={previewFrame}
-						/>
-					{/key}
+			<!-- HTML Code Editor Panel (below preview) -->
+			<div class="w-full flex flex-col border-t-[3px] border-black">
+				<!-- Tab Bar -->
+				<div class="flex bg-[#1a1a2e] px-4 py-3">
+					<span
+						class="px-5 py-2 text-sm font-semibold uppercase tracking-wider bg-white text-black border border-brand-ink shadow-[3px_3px_0_0_#ff6b6b]"
+					>
+						HTML
+					</span>
+				</div>
+				<!-- Code Area -->
+				<div class="overflow-auto" style="max-height: 400px;">
+					<div bind:this={editorElement} />
 				</div>
 			</div>
 		</div>
-
-		<!-- HTML Code Editor Panel (below preview) -->
-		<div class="w-full flex flex-col border-t-[3px] border-black">
-			<!-- Tab Bar -->
-			<div class="flex bg-[#1a1a2e] px-4 py-3">
-				<span
-					class="px-5 py-2 text-sm font-black uppercase tracking-wider bg-white text-black border-[2px] border-black shadow-[3px_3px_0_0_#ff6b6b]"
-				>
-					HTML
-				</span>
-			</div>
-			<!-- Code Area -->
-			<div class="overflow-auto" style="max-height: 400px;">
-				<div bind:this={editorElement}></div>
-			</div>
-		</div>
-	</div>
-</section>
+	</section>
+{/if}

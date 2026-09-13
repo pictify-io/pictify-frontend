@@ -129,6 +129,28 @@ export const getTemplateAction = async (uid) => {
 		template.set(response.template);
 		return response.template;
 	} catch (error) {
+		/*
+		 * Clear the placeholder this function set before the request. Without
+		 * it a failed load leaves `_loading: true` in the store forever and
+		 * every panel bound to it keeps showing its loading state — which,
+		 * now that the API propagates failures, is the common path rather
+		 * than the rare one.
+		 */
+		template.set({
+			uid: null,
+			name: null,
+			html: null,
+			variables: null,
+			createdAt: null,
+			fabricJSData: null,
+			width: null,
+			height: null,
+			type: null,
+			outputFormat: 'image',
+			pdfPreset: 'A4',
+			pages: [],
+			layouts: {}
+		});
 		return null;
 	}
 };

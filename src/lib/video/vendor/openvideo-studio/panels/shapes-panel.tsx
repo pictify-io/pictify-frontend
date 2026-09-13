@@ -109,7 +109,7 @@ export default function PanelShapes() {
     // unreachable — which is why the Gradients section was invisible.
     <div className="flex h-full flex-col gap-3 overflow-hidden py-3">
       <div className="shrink-0 px-3">
-        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+        <span className="text-[10px] font-mono uppercase tracking-[0.08em] text-muted-foreground">
           Shapes &amp; Gradients
         </span>
       </div>
@@ -144,7 +144,7 @@ export default function PanelShapes() {
         </div>
 
         <div className="pt-4">
-          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+          <span className="text-[10px] font-mono uppercase tracking-[0.08em] text-muted-foreground">
             Gradients
           </span>
           <p className="mt-1 text-[10px] font-medium leading-snug text-muted-foreground/80">

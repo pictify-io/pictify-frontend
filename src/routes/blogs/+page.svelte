@@ -1,195 +1,442 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
-	import TryNow from '$lib/components/landingPage/TryNow.svelte';
-	import BlogList from '$lib/components/blog/BlogList.svelte';
-	import SectionSeparator from '$lib/components/landingPage/SectionSeparator.svelte';
+	/**
+	 * /blogs — the proof sheet.
+	 *
+	 * First marketing surface of the redesign, so it speaks the landing
+	 * language: lime hero band, pixel deco, landing nav and footer. The
+	 * dashboard's plain-copy rule does not bind here.
+	 *
+	 * The signal on every card is UPDATED, not published. These are reference
+	 * guides about APIs that change; "written in 2024" tells a reader nothing
+	 * useful, "updated last week" tells them whether to trust it.
+	 */
+	import { HERO_CLUSTER, BASELINE_RUN } from '$lib/components/landing/hero-clusters.js';
+	import Nav from '$lib/components/landing/Nav.svelte';
+	import Footer from '$lib/components/landing/Footer.svelte';
+	import PixelCluster from '$lib/components/landing/PixelCluster.svelte';
+	import DitherField from '$lib/components/DitherField.svelte';
+	import ProofStack from '$lib/components/blog/v2/ProofStack.svelte';
+	import { formatUpdated } from '$lib/blog/markdown.js';
 
 	export let data;
-	let articles = data.props.articles;
-	let guides = data.props.guides;
-	let featured = data.props.featured;
 
-	const itemListJsonLd = {
-		'@context': 'https://schema.org/',
-		'@type': 'ItemList',
-		itemListElement: [...guides, ...articles].map((post, i) => ({
-			'@type': 'ListItem',
-			position: i + 1,
-			url: `https://pictify.io/blogs/${post.slug}`,
-			name: post.title
-		}))
-	};
+	$: posts = data?.props?.posts || [];
+	$: featured = data?.props?.featured || null;
+
+	// The featured post is the hero card, so it must not also appear in the grid.
+	$: rest = featured ? posts.filter((p) => p.slug !== featured.slug) : posts;
+
+	$: guideCount = posts.filter((p) => p.type === 'guide').length;
+	$: articleCount = posts.length - guideCount;
+
+	/**
+	 * Tag chips, most-used first. Tags are free strings in the CMS with eight in
+	 * use and no controlled vocabulary, so this reflects what editors actually
+	 * typed rather than a list we would have to keep in step by hand.
+	 */
+	$: tagCounts = posts.reduce((acc, p) => {
+		for (const tag of p.tags || []) acc.set(tag, (acc.get(tag) || 0) + 1);
+		return acc;
+	}, new Map());
+	$: sortedTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).map(([t]) => t);
+	const VISIBLE_TAGS = 5;
+	$: visibleTags = showAllTags ? sortedTags : sortedTags.slice(0, VISIBLE_TAGS);
+	$: hiddenTagCount = Math.max(0, sortedTags.length - VISIBLE_TAGS);
+
+	let showAllTags = false;
+	let typeFilter = 'all';
+	let tagFilter = null;
+	let search = '';
+
+	$: query = search.trim().toLowerCase();
+	$: filtered = rest.filter((p) => {
+		if (typeFilter === 'guides' && p.type !== 'guide') return false;
+		if (typeFilter === 'articles' && p.type === 'guide') return false;
+		if (tagFilter && !(p.tags || []).includes(tagFilter)) return false;
+		if (!query) return true;
+		return `${p.title} ${p.description} ${(p.tags || []).join(' ')}`.toLowerCase().includes(query);
+	});
+
+	// The featured card is part of the sheet, so a filter that excludes it has
+	// to hide it — otherwise "Articles" shows a guide at the top of the page.
+	$: featuredVisible =
+		featured &&
+		typeFilter === 'all' &&
+		!tagFilter &&
+		(!query || `${featured.title} ${featured.description}`.toLowerCase().includes(query));
+
+	const TYPES = [
+		{ id: 'all', label: 'All' },
+		{ id: 'guides', label: 'Guides' },
+		{ id: 'articles', label: 'Articles' }
+	];
+	$: typeCount = (id) =>
+		id === 'all' ? posts.length : id === 'guides' ? guideCount : articleCount;
+
+	function resetFilters() {
+		typeFilter = 'all';
+		tagFilter = null;
+		search = '';
+	}
+
+	// Cut by the hero's right edge, so the field reads as a window onto a
+	// larger raster. The post header uses capsules instead — no surface repeats
+	// the deco of the one before it.
+
+	const ctaPixels = [
+		[0, 0, 'field'],
+		[1, 1, 'field'],
+		[2, 0, 'field'],
+		[3, 1, 'field'],
+		[4, 0, 'field']
+	];
 </script>
 
 <svelte:head>
-	<title>Programmatic Media Automation: Tips, Templates, and Tutorials | Pictify</title>
+	<title>Guides and field notes | Pictify</title>
 	<meta
 		name="description"
-		content="Guides and articles on programmatic media: templates, HTML-to-image, OG generation, and rendering workflows with Pictify."
+		content="Practical guides on rendering images, PDFs and video from HTML templates. Every one ends in a template you can run."
 	/>
 	<link rel="canonical" href="https://pictify.io/blogs" />
-	<meta property="og:title" content="Pictify Blog: Programmatic Media Automation" />
-	<meta
-		property="og:description"
-		content="Deep technical writing on templates, HTML-to-image, OG generation, and rendering workflows for developers."
-	/>
-	<meta property="og:url" content="https://pictify.io/blogs" />
+	<meta name="robots" content="index, follow, max-image-preview:large" />
+	<meta property="og:title" content="Guides and field notes | Pictify" />
 	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="Pictify" />
-	<meta property="og:image" content="https://pictify.io/og/blogs/index.png" />
-	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="630" />
-	<meta property="og:image:alt" content="Pictify Blog: deep technical image dev content" />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="Pictify Blog: Programmatic Media Automation" />
-	<meta
-		name="twitter:description"
-		content="Deep technical writing on templates, HTML-to-image, OG generation, and rendering workflows."
-	/>
-	<meta name="twitter:image" content="https://pictify.io/og/blogs/index.png" />
-	{@html `<script type="application/ld+json">${JSON.stringify(itemListJsonLd).replace(
-		/</g,
-		'\\u003c'
-	)}</script>`}
+	<meta property="og:url" content="https://pictify.io/blogs" />
+	<meta property="og:site_name" content="Pictify.io" />
 </svelte:head>
 
-<div
-	class="bg-brand-bg min-h-screen flex flex-col font-sans text-gray-900 selection:bg-brand-accent selection:text-black"
->
+<!-- .landing-v2 opts this page out of the app-wide root font-size down-scale (see app.css),
+     so the rem-based rhythm lands on the 16px root the board was drawn against. -->
+<div class="landing-v2 flex min-h-screen w-full flex-col bg-brand-paper">
 	<Nav />
 
-	<!-- Hero Section -->
-	<div class="w-full flex flex-col md:flex-row border-b-[3px] border-gray-900">
-		<!-- Left Content -->
+	<!-- ── Hero ──────────────────────────────────────────────────────── -->
+	<section class="relative w-full overflow-hidden bg-brand-field">
+		<!--
+			The same idle motion the landing hero runs: a faint dither breathing
+			across the whole field, and one cluster whose cells keep re-rendering
+			after the reveal. Both are absolutely positioned and contribute no
+			layout, so neither can shift the headline; both stop dead under
+			prefers-reduced-motion (DitherField pauses its loop, PixelCluster
+			drops the choreography entirely).
+
+			`cycle` is 3 here rather than the landing's 4: this band is shorter and
+			carries a smaller cluster, so a lower ratio keeps roughly the same
+			number of cells alive at once.
+		-->
+		<DitherField
+			colorFront="rgba(0, 0, 0, 0.06)"
+			shape="simplex"
+			type="4x4"
+			pxSize={6}
+			speed={0.12}
+			class="absolute inset-0"
+		/>
+		<PixelCluster
+			cells={HERO_CLUSTER}
+			cell={22}
+			origin="e"
+			delay={320}
+			cycle={3}
+			class="right-0 top-6 hidden lg:block"
+		/>
+		<PixelCluster
+			cells={BASELINE_RUN}
+			cell={14}
+			origin="w"
+			delay={520}
+			class="-bottom-3 left-[38%] hidden lg:block"
+		/>
+		<div class="mx-auto w-full max-w-page px-5 py-14 lg:px-10 lg:py-20">
+			<span class="font-mono text-[11px] uppercase tracking-[0.14em] text-brand-ink/70">
+				From the print floor
+			</span>
+			<h1
+				class="mt-3 max-w-[15ch] font-display text-[44px] font-extrabold leading-[0.92] tracking-[-0.04em] text-brand-ink lg:text-[72px]"
+			>
+				Guides &amp; field notes
+			</h1>
+			<p
+				class="mt-5 max-w-[52ch] font-sans text-[16px] leading-[26px] text-brand-slate lg:text-[18px] lg:leading-[29px]"
+			>
+				How to render images, PDFs and video from HTML templates. Written against the API we
+				actually ship, and kept current as it changes.
+			</p>
+		</div>
+	</section>
+
+	<!-- ── Controls ──────────────────────────────────────────────────── -->
+	<div class="w-full border-y border-brand-ink bg-brand-paper">
 		<div
-			class="flex-1 px-6 md:px-12 py-12 md:py-20 flex flex-col justify-center md:border-r-[3px] border-gray-900 bg-brand-bg"
+			class="mx-auto flex w-full max-w-page flex-col gap-3 px-5 py-3.5 lg:flex-row lg:items-center lg:gap-4 lg:px-10"
 		>
-			<div class="mb-8">
-				<div
-					class="inline-block bg-brand-accent border-[3px] border-gray-900 shadow-brutal-lg px-4 py-1 mb-6 transform -rotate-2"
-				>
-					<span class="font-black uppercase tracking-widest text-sm">Resources</span>
-				</div>
-				<h1
-					class="text-5xl md:text-6xl lg:text-7xl font-black leading-none tracking-tighter mb-6 uppercase"
-				>
-					Programmatic Media:<br />
-					<span class="text-gray-900">Templates & Tutorials</span>
-				</h1>
-				<p class="text-xl md:text-2xl font-bold text-gray-600 max-w-lg leading-relaxed">
-					Learn how teams design templates once and render variants via API: the infrastructure
-					layer for media generation.
-				</p>
+			<div class="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by type">
+				{#each TYPES as t (t.id)}
+					<button
+						type="button"
+						on:click={() => (typeFilter = t.id)}
+						aria-pressed={typeFilter === t.id}
+						class="rounded-full border px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.08em] transition-colors {typeFilter ===
+						t.id
+							? 'border-brand-ink bg-brand-ink text-white'
+							: 'border-brand-rule text-brand-slate hover:border-brand-ink hover:text-brand-ink'}"
+					>
+						{t.label} · {typeCount(t.id)}
+					</button>
+				{/each}
 			</div>
 
-			<div class="w-full max-w-lg mt-4">
-				<a
-					href="/signup?redirect=/blogs"
-					class="inline-flex items-center justify-center w-full sm:w-auto bg-gray-900 text-white border-[3px] border-gray-900 px-8 py-3.5 text-lg font-black uppercase tracking-wide shadow-brutal-accent hover:bg-black hover:shadow-[6px_6px_0_0_#ffc480] hover:-translate-y-0.5 transition-all"
+			{#if sortedTags.length}
+				<span class="hidden h-5 w-px flex-shrink-0 bg-brand-rule lg:block" aria-hidden="true" />
+				<div class="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by tag">
+					{#each visibleTags as tag (tag)}
+						<button
+							type="button"
+							on:click={() => (tagFilter = tagFilter === tag ? null : tag)}
+							aria-pressed={tagFilter === tag}
+							class="rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors {tagFilter ===
+							tag
+								? 'border-brand-ink bg-brand-field text-brand-ink'
+								: 'border-brand-rule text-brand-mute hover:border-brand-ink hover:text-brand-ink'}"
+						>
+							{tag}
+						</button>
+					{/each}
+					{#if hiddenTagCount && !showAllTags}
+						<button
+							type="button"
+							on:click={() => (showAllTags = true)}
+							class="rounded-full border border-brand-rule px-3 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute hover:border-brand-ink hover:text-brand-ink"
+						>
+							+{hiddenTagCount}
+						</button>
+					{/if}
+				</div>
+			{/if}
+
+			<div class="relative lg:ml-auto">
+				<label class="sr-only" for="blog-search">Search the shelf</label>
+				<svg
+					class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-brand-mute"
+					width="13"
+					height="13"
+					viewBox="0 0 16 16"
+					fill="none"
+					aria-hidden="true"
 				>
-					Get started free →
-				</a>
+					<circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6" />
+					<path
+						d="M10.8 10.8L14 14"
+						stroke="currentColor"
+						stroke-width="1.6"
+						stroke-linecap="round"
+					/>
+				</svg>
+				<input
+					id="blog-search"
+					type="search"
+					bind:value={search}
+					placeholder="Search the shelf"
+					class="w-full rounded-full border border-brand-ink bg-brand-paper py-1.5 pl-9 pr-3 font-sans text-sm text-brand-ink outline-none transition-shadow placeholder:text-brand-mute focus:shadow-[0_0_0_3px_rgba(0,120,191,0.18)] lg:w-[240px]"
+				/>
 			</div>
 		</div>
+	</div>
 
-		<!-- Right Content (Featured) -->
-		<div
-			class="flex-1 bg-brand-accent pattern-grid flex items-center justify-center p-8 md:p-16 relative overflow-hidden"
-		>
-			<!-- Decorative Elements -->
-			<div
-				class="absolute top-10 right-10 w-20 h-20 bg-white border-[3px] border-gray-900 rounded-full opacity-50"
-			/>
-			<div
-				class="absolute bottom-10 left-10 w-12 h-12 bg-gray-900 border-[3px] border-white rounded-none opacity-20 transform rotate-45"
-			/>
-
-			{#if featured}
-				<a href="/blogs/{featured.slug}" class="relative block w-full max-w-xl group z-10">
-					<!-- Card -->
+	<!-- ── Sheet ─────────────────────────────────────────────────────── -->
+	<main class="mx-auto w-full max-w-page flex-1 px-5 py-10 lg:px-10 lg:py-14">
+		{#if featuredVisible}
+			<a
+				href="/blogs/{featured.slug}"
+				class="group mb-10 flex flex-col overflow-hidden rounded-card border border-brand-ink bg-brand-paper transition-transform hover:-translate-y-0.5 lg:mb-14 lg:flex-row"
+				style="box-shadow: 8px 8px 0 0 #0054A6"
+			>
+				{#if featured.heroImage}
 					<div
-						class="relative bg-white border-[3px] border-gray-900 rounded-2xl p-4 shadow-brutal-2xl transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-brutal-3xl"
+						class="w-full flex-shrink-0 overflow-hidden border-b border-brand-ink bg-brand-canvas lg:w-[45%] lg:border-b-0 lg:border-r"
 					>
-						<!-- Featured Badge -->
-						<div
-							class="absolute -top-4 -right-4 bg-brand-danger text-white border-[3px] border-gray-900 px-4 py-1 transform rotate-3 shadow-brutal-lg z-20"
+						<img
+							src={featured.heroImage}
+							alt=""
+							loading="eager"
+							class="h-[220px] w-full object-cover lg:h-full lg:min-h-[300px]"
+						/>
+					</div>
+				{/if}
+				<div class="flex flex-1 flex-col gap-4 p-6 lg:p-9">
+					<span
+						class="w-fit rounded-btn border border-brand-ink bg-brand-field px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-brand-ink"
+					>
+						Featured {featured.type === 'guide' ? 'guide' : 'article'}
+					</span>
+					<h2
+						class="font-display text-[28px] font-extrabold leading-[1.08] tracking-[-0.03em] text-brand-ink lg:text-[34px]"
+					>
+						{featured.title}
+					</h2>
+					{#if featured.description}
+						<p
+							class="max-w-[56ch] font-sans text-[15px] leading-[24px] text-brand-slate lg:text-base lg:leading-[26px]"
 						>
-							<span class="font-black uppercase tracking-widest text-sm">Featured</span>
-						</div>
-
-						<div
-							class="h-[280px] border-[3px] border-gray-900 rounded-xl overflow-hidden bg-gray-100 mb-6 relative"
+							{featured.description}
+						</p>
+					{/if}
+					<div class="mt-auto flex flex-wrap items-center gap-3 pt-2">
+						<span
+							class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-brand-royal font-mono text-[11px] font-medium text-white"
+							aria-hidden="true"
 						>
-							<img
-								loading="lazy"
-								src={featured?.heroImage}
-								class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-								alt={featured?.title}
-							/>
-							<div
-								class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"
-							/>
-						</div>
-
-						<div class="px-2">
-							<h3
-								class="font-black text-2xl md:text-3xl mb-4 leading-tight group-hover:text-gray-800 transition-colors"
+							{(featured.author || 'P').trim().charAt(0).toUpperCase()}
+						</span>
+						<span class="font-sans text-sm text-brand-ink">{featured.author}</span>
+						{#if formatUpdated(featured.updatedAt)}
+							<span
+								class="rounded-full border border-brand-ink bg-brand-field px-3 py-1 font-mono text-[11px] uppercase tracking-[0.08em] text-brand-ink"
 							>
-								{featured?.title}
-							</h3>
+								Updated {formatUpdated(featured.updatedAt)}
+							</span>
+						{/if}
+						{#if featured.readingTime}
+							<span class="font-mono text-[11px] uppercase tracking-[0.08em] text-brand-mute">
+								{featured.readingTime} min
+							</span>
+						{/if}
+						<span
+							class="ml-auto font-mono text-[12px] uppercase tracking-[0.08em] text-brand-ink group-hover:underline"
+						>
+							Read it →
+						</span>
+					</div>
+				</div>
+			</a>
+		{/if}
 
-							<div class="flex items-center justify-between pt-4 border-t-2 border-gray-100">
-								<div class="flex items-center gap-2">
-									<div
-										class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center font-bold border-2 border-gray-900"
-									>
-										{featured?.author.charAt(0)}
-									</div>
-									<span class="font-bold text-sm uppercase tracking-wide">{featured?.author}</span>
+		{#if filtered.length}
+			<ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
+				{#each filtered as post (post.slug)}
+					<li class="flex">
+						<a
+							href="/blogs/{post.slug}"
+							class="group flex w-full flex-col overflow-hidden rounded-tile border border-brand-ink bg-brand-paper transition-transform hover:-translate-y-0.5"
+						>
+							{#if post.heroImage}
+								<div class="border-b border-brand-ink bg-brand-canvas">
+									<img
+										src={post.heroImage}
+										alt=""
+										loading="lazy"
+										class="h-[164px] w-full object-cover"
+									/>
 								</div>
-								<div
-									class="bg-gray-100 px-3 py-1 rounded border-2 border-gray-300 text-xs font-bold uppercase"
+							{/if}
+							<div class="flex flex-1 flex-col gap-2.5 p-5">
+								<div class="flex items-center gap-2">
+									<span
+										class="rounded-btn border border-brand-ink px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-brand-ink"
+									>
+										{post.type === 'guide' ? 'Guide' : 'Article'}
+									</span>
+									{#if post.tags?.length}
+										<span
+											class="truncate font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute"
+										>
+											{post.tags[0]}
+										</span>
+									{/if}
+								</div>
+								<h3
+									class="font-display text-[21px] font-bold leading-[1.16] tracking-[-0.02em] text-brand-ink group-hover:underline"
 								>
-									{featured?.readingTime} min read
+									{post.title}
+								</h3>
+								{#if post.description}
+									<p class="line-clamp-2 font-sans text-[14px] leading-[22px] text-brand-slate">
+										{post.description}
+									</p>
+								{/if}
+								<div class="mt-auto flex items-center gap-2.5 pt-3">
+									{#if formatUpdated(post.updatedAt)}
+										<span
+											class="rounded-full bg-brand-field px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-brand-ink"
+										>
+											Upd {formatUpdated(post.updatedAt)}
+										</span>
+									{/if}
+									{#if post.readingTime}
+										<span class="font-mono text-[10px] uppercase tracking-[0.08em] text-brand-mute">
+											{post.readingTime} min
+										</span>
+									{/if}
 								</div>
 							</div>
-						</div>
-					</div>
-				</a>
-			{/if}
+						</a>
+					</li>
+				{/each}
+			</ul>
+		{:else}
+			<!-- No mascot here: the press machine is reserved for product empty
+			     states, and this is a filter that matched nothing, not an empty
+			     shelf. -->
+			<div
+				class="flex flex-col items-start gap-3 rounded-tile border border-brand-rule bg-brand-subtle px-6 py-10"
+			>
+				<p class="font-display text-[21px] font-bold text-brand-ink">Nothing matches that.</p>
+				<p class="font-sans text-[15px] text-brand-slate">
+					Try a different search, or clear the filters to see all {posts.length} posts.
+				</p>
+				<button
+					type="button"
+					on:click={resetFilters}
+					class="mt-1 rounded-btn border border-brand-ink px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-brand-ink hover:bg-brand-ink hover:text-white"
+				>
+					Clear filters
+				</button>
+			</div>
+		{/if}
+	</main>
+
+	<!-- ── Closing band ──────────────────────────────────────────────── -->
+	<!-- A product CTA, not a newsletter: the subscribe endpoint is a stub that
+	     reports success and stores nothing, so a signup form here would be a
+	     lie told to every reader who filled it in. -->
+	<section class="w-full px-5 pb-16 lg:px-10 lg:pb-24">
+		<div
+			class="relative mx-auto flex w-full max-w-page flex-col gap-7 overflow-hidden rounded-card border border-brand-ink bg-brand-paper p-7 lg:flex-row lg:items-center lg:p-12"
+			style="box-shadow: 10px 10px 0 0 #0054A6"
+		>
+			<PixelCluster cells={ctaPixels} cell={12} origin="w" class="left-6 top-5 hidden lg:block" />
+			<div class="flex-1">
+				<h2
+					class="max-w-[18ch] font-display text-[30px] font-extrabold leading-[1.04] tracking-[-0.03em] text-brand-ink lg:text-[40px]"
+				>
+					Read it, then render it.
+				</h2>
+				<p
+					class="mt-4 max-w-[48ch] font-sans text-[15px] leading-[25px] text-brand-slate lg:text-base lg:leading-[27px]"
+				>
+					Every guide ends in a working template. Free tier: 50 renders a month, no card, no
+					watermark.
+				</p>
+				<div class="mt-6 flex flex-wrap items-center gap-3">
+					<a
+						href="/signup"
+						class="rounded-btn bg-brand-ink px-5 py-2.5 font-sans text-[15px] font-semibold text-white transition-opacity hover:opacity-90"
+						style="box-shadow: 4px 4px 0 0 #FF48B0"
+					>
+						Start rendering
+					</a>
+					<a
+						href="/docs"
+						class="rounded-btn border border-brand-ink px-5 py-2.5 font-sans text-[15px] font-medium text-brand-ink hover:bg-brand-ink hover:text-white"
+					>
+						Read the docs
+					</a>
+				</div>
+			</div>
+			<ProofStack class="w-[200px] flex-shrink-0 self-center lg:w-[240px]" />
 		</div>
-	</div>
-
-	<!-- Blog Lists -->
-	<div class="max-w-[1800px] mx-auto px-6 py-20 w-full">
-		{#if guides.length !== 0}
-			<div class="mb-24">
-				<BlogList blogs={guides} title={'🛠️  Guides'} />
-			</div>
-		{/if}
-
-		{#if guides.length > 0 && articles.length > 0}
-			<SectionSeparator icon="bolt" />
-		{/if}
-
-		{#if articles.length !== 0}
-			<div class="mt-24">
-				<BlogList blogs={articles} title={'📚  Articles'} />
-			</div>
-		{/if}
-	</div>
-
-	<div class="mt-auto border-t-[3px] border-gray-900">
-		<TryNow />
-	</div>
+	</section>
 
 	<Footer />
 </div>
-
-<style>
-	.pattern-grid {
-		background-image: radial-gradient(#1f2937 1px, transparent 1px);
-		background-size: 20px 20px;
-	}
-</style>

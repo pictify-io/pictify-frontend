@@ -53,12 +53,14 @@
 
 	// Fit previews by width AND a height cap so tall/square templates don't
 	// dominate the page at full workbench width.
-	$: previewScale = selected && containerWidth
-		? Math.min(1, containerWidth / selected.width, 720 / selected.height)
-		: 1;
-	$: editPreviewScale = selected && editContainerWidth
-		? Math.min(1, editContainerWidth / selected.width, 560 / selected.height)
-		: 1;
+	$: previewScale =
+		selected && containerWidth
+			? Math.min(1, containerWidth / selected.width, 720 / selected.height)
+			: 1;
+	$: editPreviewScale =
+		selected && editContainerWidth
+			? Math.min(1, editContainerWidth / selected.width, 560 / selected.height)
+			: 1;
 
 	function selectTemplate(template) {
 		if (aiBusy) return;
@@ -186,17 +188,17 @@
 					<button
 						type="button"
 						on:click={() => selectTemplate(template)}
-						class="flex-shrink-0 flex items-center gap-2.5 px-4 py-2 bg-white border-[3px] rounded-xl transition-all cursor-pointer
-							{selected?.id === template.id
-							? 'border-brand-danger shadow-[4px_4px_0_0_#ff6b6b]'
-							: 'border-gray-900 shadow-brutal-md hover:shadow-brutal-sm hover:translate-x-[1px] hover:translate-y-[1px]'}"
+						class="flex-shrink-0 flex items-center gap-2.5 px-4 py-2 bg-brand-paper border-[1.5px] rounded-xl transition-all cursor-pointer {selected?.id ===
+						template.id
+							? 'border-brand-danger'
+							: 'border-brand-ink hover:'}"
 						title={template.description || template.name}
 					>
 						<span
-							class="w-4 h-4 rounded border-2 border-gray-900 flex-shrink-0"
+							class="w-4 h-4 rounded border border-brand-ink flex-shrink-0"
 							style="background-color: {template.thumbnailColor};"
 						/>
-						<span class="text-xs font-black text-gray-900 uppercase tracking-wide whitespace-nowrap"
+						<span class="text-xs font-semibold text-brand-ink tracking-wide whitespace-nowrap"
 							>{template.name}</span
 						>
 					</button>
@@ -209,25 +211,29 @@
 				<button
 					type="button"
 					on:click={resetTemplate}
-					class="text-xs font-bold text-gray-500 underline underline-offset-2 hover:text-gray-900 mr-2"
+					class="text-xs font-bold text-brand-mute underline underline-offset-2 hover:text-brand-ink mr-2"
 				>
 					Reset
 				</button>
 			{/if}
-			<div class="flex bg-white border-[3px] border-gray-900 rounded-xl overflow-hidden shadow-brutal-md">
+			<div class="flex bg-brand-paper border border-brand-ink rounded-xl overflow-hidden">
 				<button
 					type="button"
 					on:click={() => (activeTab = 'preview')}
-					class="px-5 py-2.5 text-xs font-black uppercase tracking-wide transition-colors
-						{activeTab === 'preview' ? 'bg-brand-accent text-gray-900' : 'bg-white text-gray-500 hover:text-gray-900'}"
+					class="px-5 py-2.5 text-xs font-semibold tracking-wide transition-colors {activeTab ===
+					'preview'
+						? 'bg-brand-field text-brand-ink'
+						: 'bg-brand-paper text-brand-mute hover:text-brand-ink'}"
 				>
 					Preview
 				</button>
 				<button
 					type="button"
 					on:click={openEditTab}
-					class="px-5 py-2.5 text-xs font-black uppercase tracking-wide transition-colors border-l-[3px] border-gray-900
-						{activeTab === 'edit' ? 'bg-brand-accent text-gray-900' : 'bg-white text-gray-500 hover:text-gray-900'}"
+					class="px-5 py-2.5 text-xs font-semibold tracking-wide transition-colors border-l border-brand-ink {activeTab ===
+					'edit'
+						? 'bg-brand-field text-brand-ink'
+						: 'bg-brand-paper text-brand-mute hover:text-brand-ink'}"
 				>
 					&lt;/&gt; Edit HTML
 				</button>
@@ -239,7 +245,7 @@
 		<div bind:clientWidth={containerWidth} class="w-full flex justify-center">
 			{#if selected}
 				<div
-					class="overflow-hidden bg-white border-[3px] border-gray-900 shadow-brutal-xl rounded-lg"
+					class="overflow-hidden bg-brand-paper border border-brand-ink rounded-lg"
 					style="width: {Math.round(selected.width * previewScale)}px; height: {Math.round(
 						selected.height * previewScale
 					)}px;"
@@ -260,7 +266,7 @@
 		<!-- Edit mode: code gets the lion's share, live preview rides along -->
 		<div class="grid grid-cols-1 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-4 items-start">
 			<div
-				class="border-[3px] border-gray-900 rounded-lg shadow-brutal-xl overflow-auto bg-brand-bg"
+				class="border border-brand-ink rounded-lg overflow-auto bg-brand-subtle"
 				style="height: 560px; min-height: 320px; resize: vertical;"
 			>
 				{#if HtmlEditorComponent}
@@ -276,13 +282,11 @@
 						bind:value={currentHtml}
 						on:input={handleEditorChange}
 						spellcheck="false"
-						class="w-full h-full font-mono text-xs leading-relaxed bg-gray-900 text-gray-100 border-0 p-4 focus:outline-none resize-none"
+						class="w-full h-full font-mono text-xs leading-relaxed bg-brand-ink text-gray-100 border-0 p-4 focus:outline-none resize-none"
 					/>
 				{:else}
 					<div class="w-full h-full flex items-center justify-center">
-						<span class="text-xs font-bold text-gray-400 uppercase tracking-widest"
-							>Loading editor…</span
-						>
+						<span class="text-xs font-bold text-brand-mute tracking-widest">Loading editor…</span>
 					</div>
 				{/if}
 			</div>
@@ -290,7 +294,7 @@
 				<div bind:clientWidth={editContainerWidth} class="w-full">
 					{#if selected}
 						<div
-							class="overflow-hidden bg-white border-[3px] border-gray-900 shadow-brutal-xl rounded-lg mx-auto"
+							class="overflow-hidden bg-brand-paper border border-brand-ink rounded-lg mx-auto"
 							style="width: {Math.round(selected.width * editPreviewScale)}px; height: {Math.round(
 								selected.height * editPreviewScale
 							)}px;"
@@ -307,10 +311,10 @@
 						</div>
 					{/if}
 				</div>
-				<p class="mt-2 text-xs font-medium text-gray-500 text-center">
-					Live preview: updates as you type. This exact HTML is what the API renders; swap
-					sample values for
-					<code class="font-mono bg-gray-100 px-1 rounded">{'{{variables}}'}</code> when you automate.
+				<p class="mt-2 text-xs font-medium text-brand-mute text-center">
+					Live preview: updates as you type. This exact HTML is what the API renders; swap sample
+					values for
+					<code class="font-mono bg-brand-subtle px-1 rounded">{'{{variables}}'}</code> when you automate.
 				</p>
 			</div>
 		</div>
@@ -318,7 +322,7 @@
 
 	<!-- AI edit bar -->
 	<div
-		class="mt-4 bg-gray-900 border-[3px] border-gray-900 rounded-xl shadow-brutal-lg p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
+		class="mt-4 bg-brand-ink border border-brand-ink rounded-xl p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
 	>
 		<div class="flex items-center gap-2 flex-1 bg-gray-800 rounded-lg px-3 border border-gray-700">
 			<span class="text-lg" aria-hidden="true">✨</span>
@@ -335,7 +339,7 @@
 			type="button"
 			on:click={handleAiEdit}
 			disabled={aiBusy || !aiPrompt.trim()}
-			class="px-6 py-3 bg-brand-accent text-gray-900 border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide rounded-lg shadow-[3px_3px_0_0_#4b5563] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 whitespace-nowrap"
+			class="px-6 py-3 bg-brand-field text-brand-ink border border-brand-ink font-semibold text-sm tracking-wide rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 whitespace-nowrap"
 		>
 			{#if aiBusy}
 				<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"
@@ -359,9 +363,9 @@
 		</button>
 	</div>
 	{#if !isLoggedIn}
-		<p class="mt-2 text-xs font-medium text-gray-500">
-			AI editing needs a free account; your prompt is kept while you sign up, and you'll land
-			right back here.
+		<p class="mt-2 text-xs font-medium text-brand-mute">
+			AI editing needs a free account; your prompt is kept while you sign up, and you'll land right
+			back here.
 		</p>
 	{/if}
 </div>

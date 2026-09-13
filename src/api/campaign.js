@@ -1,0 +1,485 @@
+/**
+ * Campaigns API client — every route in spec §7.
+ *
+ * Deliberately NOT written like the other files in this directory. Most of
+ * `src/api/*` wraps each call in `try { … } catch { return null }`, which turns
+ * every failure into an empty success: a caller that does not check for `null`
+ * renders a blank screen as though the server had answered. That is survivable
+ * for a template list. It is not survivable here, where the failure modes are
+ * "your approval is stale", "this edition was purged" and "you are not allowed
+ * to read this tenant" — each of which the buyer must be told about by name.
+ *
+ * So: no catch blocks. `backend` already throws `HttpError` carrying `status`
+ * and the parsed body, and that error is allowed to reach the caller. Read it
+ * with `campaignError()` below.
+ *
+ * INV-06: campaign data is private. Nothing here builds a public artifact URL —
+ * downloads go through the authenticated gateway routes and come back as blobs.
+ */
+
+import backend from '../service/backend';
+import { PUBLIC_BACKEND_URL } from '$env/static/public';
+
+/* ------------------------------------------------------------------ errors */
+
+/**
+ * Normalise a thrown `HttpError` into the `{ code, message, requestId,
+ * fieldErrors }` shape spec §7 promises.
+ *
+ * `code` is what UI should branch on; `message` is a fallback for display only
+ * when we have nothing better. A server that answers without a code gets
+ * `unknown_error` rather than an empty string, so no branch silently matches.
+ */
+export function campaignError(err) {
+	const data = (err && err.data) || {};
+	return {
+		status: err?.status ?? 0,
+		code: data.code || (err?.status ? `http_${err.status}` : 'network_error'),
+		message: data.message || err?.message || 'Something went wrong.',
+		requestId: data.requestId || null,
+		fieldErrors: data.fieldErrors || null
+	};
+}
+
+/** Codes the UI is expected to handle explicitly (spec §7 "Required errors"). */
+export const CAMPAIGN_ERROR_CODES = [
+	'malformed_request',
+	'unauthenticated',
+	'campaign_not_enabled',
+	'permission_denied',
+	'not_found',
+	'stale_revision',
+	'idempotency_conflict',
+	'invalid_state',
+	'upload_too_large',
+	'invalid_dataset',
+	'unsupported_format',
+	'empty_audience',
+	'capacity_limited',
+	'temporarily_unavailable'
+];
+
+/* ----------------------------------------------------------- idempotency */
+
+/**
+ * A fresh key for one user gesture.
+ *
+ * Hold it in component state for the life of the gesture and reuse it across
+ * network retries of that gesture. Generating a new key per network attempt
+ * would defeat the point — the server would see two distinct intents.
+ */
+export function newIdempotencyKey() {
+	if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+	return `ik_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+/**
+ * The key for starting a run, derived rather than random.
+ *
+ * Starting the same approved revision twice is never an intent, it is a double
+ * click or a reconnect. Deriving the key from the approval means the server
+ * collapses those into one run even across a page reload, which a random key
+ * could not do.
+ */
+export const startRunIdempotencyKey = (approvalId, expectedRevision) =>
+	`start:${approvalId}:${expectedRevision}`;
+
+const withKey = (key) => ({ headers: { 'Idempotency-Key': key } });
+
+const q = (params = {}) => {
+	const search = new URLSearchParams();
+	for (const [k, v] of Object.entries(params)) {
+		if (v === undefined || v === null || v === '') continue;
+		search.set(k, String(v));
+	}
+	const s = search.toString();
+	return s ? `?${s}` : '';
+};
+
+const enc = encodeURIComponent;
+
+/* ------------------------------------------------------- capabilities */
+
+/** Authoritative limits and entitlement. Never cache this past a step change. */
+export const getCapabilities = () => backend.get('/campaigns/capabilities');
+
+/**
+ * Ask for pilot access, and seed the sample campaign.
+ *
+ * `requestPilotAccess` deliberately has no parameter for customer data — the
+ * server has no field to put it in either. The caller sends what the buyer said
+ * about their own workflow, nothing about the people they intend to write to.
+ */
+export const requestPilotAccess = ({ useCase, sendingTool, accountsEstimate } = {}) =>
+	backend.post('/campaigns/access-request', { useCase, sendingTool, accountsEstimate });
+
+/** Create or reopen the team's sample campaign. Idempotent, never metered. */
+export const createSampleCampaign = () => backend.post('/campaigns/sample', {});
+
+/* ---------------------------------------------------------- campaigns */
+
+export const createCampaign = (config) => backend.post('/campaigns', config);
+
+export const listCampaigns = ({ cursor, limit, includeSample } = {}) =>
+	backend.get(`/campaigns${q({ cursor, limit, includeSample })}`);
+
+export const getCampaign = (campaignUid) => backend.get(`/campaigns/${enc(campaignUid)}`);
+
+/**
+ * Config edits carry the version the buyer was looking at. A `409
+ * stale_revision` means someone else changed it and the UI must reload before
+ * offering to save again — do not retry this call automatically.
+ */
+/**
+ * "Use this design" — records which revision the campaign renders. B05-2.
+ *
+ * No expectedVersion: the server takes the revision and the digest from the
+ * stored template, so there is no client value here that could be stale.
+ */
+/**
+ * Draft a brief from one sentence. AI-1.
+ *
+ * Takes a description and nothing else — no edition, no dataset, no rows. The
+ * request's shape is what makes "no customer data reaches the AI" true.
+ */
+export const draftCampaignBrief = (description) =>
+	backend.post('/campaigns/brief', { description });
+
+/**
+ * Ask for column-mapping suggestions. AI-3.
+ *
+ * `consent` is required by the server, not merely expected — calling without
+ * it is refused rather than answered from the rule tier, so the consent strip
+ * cannot become a decoration over a call that happens anyway.
+ *
+ * `headers` carries names and TYPES only. Never a sample value: the sample
+ * shown on screen is the buyer's own customer's data, and it has no business
+ * in a request whose whole promise is that it does not travel.
+ */
+/**
+ * The reviewer's checks. AI-4.
+ *
+ * A GET with no body: the checks are derived from what is already stored, so
+ * there is nothing for the client to send and nothing it could bias.
+ */
+/**
+ * What the next period would reuse and what changed. AI-5.
+ *
+ * Read BEFORE the period exists: its job is to inform a choice made at
+ * creation, and a diff shown afterwards would describe a decision already
+ * taken.
+ */
+/**
+ * Read a brand colour off a public homepage. AI-6 A4.
+ *
+ * Returns a PROPOSAL and writes nothing — the buyer confirms and the
+ * brand-asset routes do the saving.
+ */
+export const detectBrand = (domain) => backend.post('/campaigns/brand/detect', { domain });
+
+export const getNextPeriodPlan = (campaignUid, period) =>
+	backend.get(`/campaigns/${enc(campaignUid)}/editions/next?period=${enc(period)}`);
+
+export const getEditionReview = (campaignUid, editionUid) =>
+	backend.get(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/review`);
+
+/**
+ * A repair for one check, measured and not applied. AI-4 (board I30-0).
+ *
+ * COMMITS NOTHING. The server renders the design against synthetic stress
+ * fixtures, finds the largest readable size at which they all fit, and hands
+ * back a candidate plus the evidence for it — so the buyer reads a proposal
+ * and decides, rather than finding out what an "auto-fix" did.
+ *
+ * `nodeId` is the element the CLIENT watched clip. Sending it is not required
+ * (the server can find the node bound to the account name), but it is the
+ * better answer when we have it: the client measured the actual failure.
+ *
+ * Resolves with `applicable: false` and a `reason` when there is nothing to
+ * propose — no element bound to the name, no readable size that fits, or a
+ * size that would rewrap the short names. Those are answers, not errors.
+ */
+export const proposeRepair = (campaignUid, editionUid, issueId, { nodeId } = {}) =>
+	backend.post(
+		`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/review/${enc(issueId)}/propose`,
+		nodeId ? { nodeId } : {}
+	);
+
+/**
+ * Apply a proposed repair, through the studio's own commit path.
+ *
+ * DELIBERATELY NOT A NEW ENDPOINT. `PATCH /template-draft/:uid` is what the
+ * studio saves through, so going via it means the applied change lands as one
+ * ordinary revision: the Versions panel lists it, Undo restores it, and the
+ * conflict semantics are the ones the buyer has already met. A bespoke
+ * "apply" route would have had to reimplement all three and would drift.
+ *
+ * `expectedRevision` is the revision the PROPOSAL was measured against. If the
+ * design moved in between, this 409s rather than applying — which is the
+ * behaviour we want: the fixtures, the chosen size and the re-check all
+ * describe a design that no longer exists, so applying them would attach true
+ * numbers to the wrong document.
+ *
+ * Throws HttpError; a conflict is `err.status === 409` with
+ * `err.data.current` carrying the other version.
+ */
+export const applyRepair = (templateUid, { html, expectedRevision, label }) =>
+	backend.patch(`/template-draft/${enc(templateUid)}`, {
+		html,
+		expectedRevision,
+		label: label || 'Repair from Review'
+	});
+
+export const suggestMapping = (campaignUid, editionUid, headers) =>
+	backend.post(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/mapping/suggest`, {
+		consent: true,
+		headers
+	});
+
+export const setCampaignDesign = (campaignUid, templateRevisionUid, editionUid) =>
+	backend.patch(`/campaigns/${enc(campaignUid)}/design`, {
+		templateRevisionUid,
+		// The draft edition the buyer came from moves with the campaign. Without
+		// it "Use this design" would repin the campaign and leave the very
+		// edition it was pressed from rendering the previous revision.
+		...(editionUid ? { editionUid } : {})
+	});
+
+/**
+ * Record that a proof was rendered for this edition's design, and of which
+ * revision. B05 — the image stays in the studio; Setup only needs the claim.
+ */
+export const recordDesignProof = (campaignUid, editionUid, proof) =>
+	backend.post(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/design-proof`, proof);
+
+export const updateCampaign = (campaignUid, patch, expectedVersion) =>
+	backend.patch(`/campaigns/${enc(campaignUid)}`, { ...patch, expectedVersion });
+
+export const archiveCampaign = (campaignUid, expectedVersion) =>
+	backend.patch(`/campaigns/${enc(campaignUid)}`, { archived: true, expectedVersion });
+
+/* ----------------------------------------------------------- editions */
+
+/** New period or correction revision. The server assigns identity; no client uid. */
+export const createEdition = (campaignUid, body = {}) =>
+	backend.post(`/campaigns/${enc(campaignUid)}/editions`, body);
+
+export const getEdition = (campaignUid, editionUid) =>
+	backend.get(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}`);
+
+export const updateEdition = (campaignUid, editionUid, patch, expectedRevision) =>
+	backend.patch(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}`, {
+		...patch,
+		expectedRevision
+	});
+
+/**
+ * Upload the CSV.
+ *
+ * Multipart and private: the file is ingested, never parked at a public URL.
+ * A 413 here is `upload_too_large` and is the server's limit, not ours — the
+ * client-side check in `src/lib/campaigns/csv.js` exists to explain the problem
+ * sooner, not to be the boundary.
+ */
+export function uploadEditionData(campaignUid, editionUid, file) {
+	const form = new FormData();
+	form.append('file', file, file.name);
+	return backend.postFormData(
+		`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/data`,
+		form
+	);
+}
+
+/** Authoritative validation. The client's own pass is advisory only. */
+export const validateEdition = (campaignUid, editionUid, body = {}) =>
+	backend.post(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/validate`, body);
+
+export const listEditionItems = (campaignUid, editionUid, { cursor, limit, status } = {}) =>
+	backend.get(
+		`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/items${q({
+			cursor,
+			limit,
+			status
+		})}`
+	);
+
+/**
+ * Record a decision about one account: exclude (with a reason), include again,
+ * neutral narrative variant, or a shorter display name.
+ *
+ * Deliberately cannot change a figure. A resolution that edited a value would
+ * make "fix the issues" mean "make the data say something else", and every
+ * approval downstream would be describing data nobody uploaded.
+ */
+export const updateItem = (campaignUid, editionUid, itemUid, decision) =>
+	backend.patch(
+		`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/items/${enc(itemUid)}`,
+		decision
+	);
+
+/* ----------------------------------------------------------- previews */
+
+/** `202 { previewRunId }`. The set is capped server-side; do not ask for more. */
+export const startPreviewRun = (campaignUid, editionUid, body = {}) =>
+	backend.post(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/previews`, body);
+
+export const getPreviewRun = (previewRunId) =>
+	backend.get(`/campaign-preview-runs/${enc(previewRunId)}`);
+
+/**
+ * Persist the approval against exactly what was on screen.
+ *
+ * The digests are the point: a `409` means the config, data or previews moved
+ * under the buyer between looking and approving, and they must look again.
+ * Never resend this with refreshed digests on the buyer's behalf.
+ */
+export const approveEdition = (
+	campaignUid,
+	editionUid,
+	{ configDigest, dataDigest, previewDigest, acknowledgements, externalApprovalRef } = {}
+) =>
+	backend.post(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/approve`, {
+		configDigest,
+		dataDigest,
+		previewDigest,
+		acknowledgements,
+		externalApprovalRef
+	});
+
+/* --------------------------------------------------------------- runs */
+
+/** `202 { runId, status, statusUrl }` — no artifact URL, generation is async. */
+export const startRun = (campaignUid, editionUid, { approvalId, expectedRevision }) =>
+	backend.post(
+		`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/runs`,
+		{ approvalId, expectedRevision },
+		withKey(startRunIdempotencyKey(approvalId, expectedRevision))
+	);
+
+export const getRun = (runId) => backend.get(`/campaign-runs/${enc(runId)}`);
+
+/** Per-account status for the Generate table. Safe error codes only. */
+export const listRunItems = (runId, { cursor, limit, status } = {}) =>
+	backend.get(`/campaign-runs/${enc(runId)}/items${q({ cursor, limit, status })}`);
+
+/**
+ * Retry eligible failures on the same approved revision. Ready items are not
+ * touched. `idempotencyKey` must come from `newIdempotencyKey()` at the moment
+ * the buyer clicks, and be reused if the call has to be repeated.
+ */
+/**
+ * Retry a run. Omitting `itemIds` retries EVERY failure, which is what the
+ * "Retry the N failed" action means; sending `itemIds: undefined` explicitly
+ * would serialize away to the same thing, but only by accident — the shape is
+ * spelled out so the two intents are visibly different at the call site.
+ */
+export const retryRun = (runId, { itemIds, idempotencyKey } = {}) =>
+	backend.post(
+		`/campaign-runs/${enc(runId)}/retry`,
+		itemIds?.length ? { itemIds } : {},
+		withKey(idempotencyKey)
+	);
+
+/** `202` — a request, not an outcome. The settled state arrives via `getRun`. */
+export const cancelRun = (runId, { idempotencyKey }) =>
+	backend.post(`/campaign-runs/${enc(runId)}/cancel`, {}, withKey(idempotencyKey));
+
+/* ------------------------------------------------------------ exports */
+
+export const startExport = (runId, { idempotencyKey }) =>
+	backend.post(`/campaign-runs/${enc(runId)}/exports`, {}, withKey(idempotencyKey));
+
+export const getExport = (exportId) => backend.get(`/campaign-exports/${enc(exportId)}`);
+
+/* ---------------------------------------------------------- downloads */
+
+const FILENAME = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i;
+
+/**
+ * Fetch an authenticated artifact as a blob.
+ *
+ * Not `backend.get`: the response is a file, not JSON, and the whole point of
+ * the gateway is that there is no URL to hand to an <a href> — the request must
+ * carry credentials. An expired or purged package answers 403/404/410 and that
+ * error is thrown, because "the download quietly did nothing" is the one
+ * outcome the buyer must never see.
+ */
+async function downloadBlob(path) {
+	const response = await fetch(`${PUBLIC_BACKEND_URL}${path}`, {
+		credentials: 'include',
+		cache: 'no-store'
+	});
+
+	if (!response.ok) {
+		let data = {};
+		try {
+			data = await response.json();
+		} catch (e) {
+			/* a gateway failure need not be JSON */
+		}
+		const err = new Error(data.message || response.statusText);
+		err.status = response.status;
+		err.data = data;
+		throw err;
+	}
+
+	const disposition = response.headers.get('content-disposition') || '';
+	const match = FILENAME.exec(disposition);
+	return {
+		blob: await response.blob(),
+		filename: match ? decodeURIComponent(match[1]) : null,
+		contentType: response.headers.get('content-type') || null
+	};
+}
+
+export const downloadExport = (exportId) =>
+	downloadBlob(`/campaign-exports/${enc(exportId)}/download`);
+
+export const downloadArtifact = (artifactId) =>
+	downloadBlob(`/campaign-artifacts/${enc(artifactId)}/download`);
+
+/* ------------------------------------------------------ confirmations */
+
+/**
+ * The buyer reports that they launched it from their own tool.
+ *
+ * A record of what they told us, nothing more. Pictify does not observe the
+ * send and must never present this as evidence that mail was delivered.
+ */
+export const recordLaunchConfirmation = (
+	campaignUid,
+	editionUid,
+	{ tool, launchedOn, note } = {}
+) =>
+	backend.post(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/launch-confirmation`, {
+		tool,
+		launchedOn,
+		note
+	});
+
+/** Acceptance of the exported package. Distinct from launching, and from downloading. */
+export const recordHandoffConfirmation = (
+	campaignUid,
+	editionUid,
+	{ exportId, exportDigest } = {}
+) =>
+	backend.post(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}/handoff-confirmation`, {
+		exportId,
+		exportDigest
+	});
+
+/* ----------------------------------------------------------- deletion */
+
+/**
+ * Request a purge of an edition's inputs and outputs. `202 { deletionId }`.
+ *
+ * Not archiving. Data access is denied immediately; the purge itself is not
+ * complete until `getDeletion` says so, and the UI must not claim otherwise.
+ */
+export const requestEditionDeletion = (campaignUid, editionUid, { confirmation }) =>
+	backend.delete(`/campaigns/${enc(campaignUid)}/editions/${enc(editionUid)}`, {
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ confirmation })
+	});
+
+export const getDeletion = (deletionId) => backend.get(`/campaign-deletions/${enc(deletionId)}`);

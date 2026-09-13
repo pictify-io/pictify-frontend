@@ -13,7 +13,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { getVideoTemplate } from '../../../../api/videoTemplates';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 
 	let loadError = '';
 

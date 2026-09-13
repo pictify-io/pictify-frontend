@@ -1,23 +1,43 @@
 <script>
-	import Nav from '$lib/components/landingPage/Nav.svelte';
-	import SEOHead from '$lib/seo/SEOHead.svelte';
-	import Footer from '$lib/components/landingPage/Footer.svelte';
+	/**
+	 * /tools/url-to-image-generator — the v2 tool page, column mode.
+	 *
+	 * The capture board and preview become the tool card; the quota ladder and
+	 * Capture move to its toolbar. SEO copy is frozen.
+	 *
+	 * GenerationLimitBanner, StickySignupBar and PostSignupWelcome are retired
+	 * here: the ladder and the result surface say the same things in place. The
+	 * tool-signup-cta-v2 flag still resolves, so the running experiment keeps
+	 * its arms; its inline arm renders inside the result block as before.
+	 */
+	import ToolSeoHead from '$lib/components/tools/v2/ToolSeoHead.svelte';
+	import LongformSection from '$lib/components/tools/v2/longform/LongformSection.svelte';
+	import LongformPair from '$lib/components/tools/v2/longform/LongformPair.svelte';
+	import HeroTitle from '$lib/components/tools/v2/longform/HeroTitle.svelte';
+	import HeroSub from '$lib/components/tools/v2/longform/HeroSub.svelte';
+	import Lead from '$lib/components/tools/v2/longform/Lead.svelte';
+	import ProseGroup from '$lib/components/tools/v2/longform/ProseGroup.svelte';
+	import FeatureGrid from '$lib/components/tools/v2/longform/FeatureGrid.svelte';
+	import CheckList from '$lib/components/tools/v2/longform/CheckList.svelte';
+	import FaqList from '$lib/components/tools/v2/longform/FaqList.svelte';
+	import RelatedLinks from '$lib/components/tools/v2/longform/RelatedLinks.svelte';
 	import Toast from '$lib/components/Toast.svelte';
-	import ApiCodeSection from '$lib/components/tools/ApiCodeSection.svelte';
-	import GenerationLimitBanner from '$lib/components/tools/GenerationLimitBanner.svelte';
-	import StickySignupBar from '$lib/components/tools/StickySignupBar.svelte';
-	import PostSignupWelcome from '$lib/components/tools/PostSignupWelcome.svelte';
+	import ToolPageShell from '$lib/components/tools/v2/ToolPageShell.svelte';
+	import ToolCard from '$lib/components/tools/v2/ToolCard.svelte';
+	import QuotaMeter from '$lib/components/tools/v2/QuotaMeter.svelte';
+	import GenerateButton from '$lib/components/tools/v2/GenerateButton.svelte';
+	import AutomateSection from '$lib/components/tools/v2/AutomateSection.svelte';
+	import ResultCard from '$lib/components/tools/v2/ResultCard.svelte';
 	import { onMount, onDestroy, tick } from 'svelte';
 	import { browser } from '$app/environment';
 	import { toast } from '../../../store/toast.store';
 	import { user } from '../../../store/user.store';
-	import { generationLimits } from '../../../store/generationLimits.store';
+	import { generationLimits, GUEST_DAILY_LIMIT } from '../../../store/generationLimits.store';
 	import { getWebsiteHTML } from '../../../api/tools/url-to-image.js';
 	import { createImagePublic } from '../../../api/image.js';
 	import { saveLastRender } from '$lib/lastRender.js';
-	import { analytics } from '$lib/analytics.js';
+	import { analytics } from '$lib/telemetry.js';
 	import { downloadFile } from '$lib/utils/download.js';
-	import RelatedTools from '$lib/components/tools/RelatedTools.svelte';
 	import posthog from 'posthog-js';
 
 	let stickyBar;
@@ -125,6 +145,7 @@
 
 	// User login state
 	let isUserLoggedIn = false;
+	$: lastFreeRender = !isUserLoggedIn && guestRemaining <= 1;
 	user.subscribe((userData) => {
 		isUserLoggedIn = !!userData?.email;
 	});
@@ -505,7 +526,8 @@
 						status: null
 					});
 					toast.set({
-						message: 'Preview is slow to render. Capture still works: we fetch the page on our servers.',
+						message:
+							'Preview is slow to render. Capture still works: we fetch the page on our servers.',
 						type: 'warning',
 						duration: 5000
 					});
@@ -526,9 +548,7 @@
 				// maybeHandleQuota already opened the upgrade modal for
 				// quota_exceeded; only plain rate limits need a message here.
 				message =
-					code === 'quota_exceeded'
-						? ''
-						: 'Too many requests. Please wait a moment and try again.';
+					code === 'quota_exceeded' ? '' : 'Too many requests. Please wait a moment and try again.';
 			} else if (status >= 500) {
 				message = 'Our renderer is struggling right now. Please retry in a moment.';
 			} else if (status >= 400) {
@@ -727,188 +747,92 @@
 		});
 	}
 
-	function sharePage(platform) {
-		// Track social share
-		analytics.trackSocialShare({
-			platform: platform,
-			content_type: 'tool_page',
-			tool_name: 'url_to_image_generator'
-		});
-
-		const shareUrl = encodeURIComponent(window.location.href);
-		const text = encodeURIComponent('Check out this awesome URL to Image Generator!');
-		if (platform === 'twitter') {
-			window.open(`https://twitter.com/intent/tweet?url=${shareUrl}&text=${text}`, '_blank');
-		} else if (platform === 'linkedin') {
-			window.open(
-				`https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}&title=${encodeURIComponent(
-					'URL to Image Generator'
-				)}&summary=${text}`,
-				'_blank'
-			);
-		}
-	}
-
 	function clearSelector() {
 		selector = '';
 		toast.set({ message: 'Selector cleared', type: 'success', duration: 1500 });
 	}
+
+	const TOOL_NAME = 'url_to_image_generator';
+	const TOOL_PATH = '/tools/url-to-image-generator';
+
+	$: guestRemaining = Math.max(0, GUEST_DAILY_LIMIT - ($generationLimits?.count || 0));
+
+	/**
+	 * The visible accordion only. The FAQPage schema below asks the same things
+	 * in longer words ("How does URL to Image work?" against "How does it
+	 * work?"), and both are frozen for search, so they stay two lists until a
+	 * copy pass reconciles them.
+	 */
+	const FAQS = [
+		{
+			q: 'What is URL to Image?',
+			a: 'A tool that captures a webpage and saves it as an image file (JPG/PNG). Useful for archives, thumbnails, and proofs.'
+		},
+		{
+			q: 'How does it work?',
+			a: 'We spawn a headless browser in the cloud, navigate to your URL, wait for assets to load, and take a high-fidelity screenshot.'
+		},
+		{
+			q: 'Can I customize it?',
+			a: 'Yes! You can select specific elements, set custom viewport sizes, and handle cookie banners via our API.'
+		},
+		{
+			q: 'Privacy?',
+			a: 'We do not store your URLs or generated images. All processing is done on-the-fly and images are cached temporarily on our CDN for performance.'
+		}
+	];
+
 </script>
 
-<SEOHead
+<ToolSeoHead
 	title="URL to Image: Capture Any Webpage as PNG/JPG Free | Pictify"
 	description="Enter any URL and get a high-quality screenshot as PNG, JPG, or WebP. Choose device size, crop elements, and download instantly. Free with API access."
+	keywords="url to image, image url generator, url to picture converter, photo url generator, picture url maker, link to picture, image link generator, screenshot api, webpage to image"
 	canonical="https://pictify.io/tools/url-to-image-generator"
 	robots="index, follow, max-image-preview:large"
-	ogImage="https://media.pictify.io/vombm-1775406853373.png"
-	keywords={[
-		'url to image',
-		'image url generator',
-		'url to picture converter',
-		'photo url generator',
-		'picture url maker',
-		'link to picture',
-		'image link generator',
-		'screenshot api',
-		'webpage to image'
-	]}
-	openGraph={{
-		description:
-			'Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access.'
-	}}
-	twitter={{
-		description:
-			'Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access.'
-	}}
-	schema={[
-		structuredData,
-		faqSchema,
-		{
-			'@context': 'https://schema.org',
-			'@type': 'BreadcrumbList',
-			itemListElement: [
-				{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pictify.io/' },
-				{ '@type': 'ListItem', position: 2, name: 'Tools', item: 'https://pictify.io/tools' },
-				{ '@type': 'ListItem', position: 3, name: 'URL to Image' }
-			]
-		}
-	]}
+	ogTitle="URL to Image: Capture Any Webpage as PNG/JPG Free | Pictify"
+	ogDescription="Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access."
+	ogSiteName="Pictify"
+	ogImage="https://pictify.io/og/tools/url-to-image-generator.png"
+	twitterTitle="URL to Image: Capture Any Webpage as PNG/JPG Free | Pictify"
+	twitterDescription="Enter any URL and get a high-quality screenshot. Choose device size, crop elements, download as PNG/JPG/WebP. Free with API access."
+	twitterImage="https://pictify.io/og/tools/url-to-image-generator.png"
+	twitterUrl="https://pictify.io/tools/url-to-image-generator"
+	webApplicationSchema={structuredData}
+	extraSchemas={[faqSchema]}
+	breadcrumbLabel="URL to Image"
 />
 
-<div
-	class="min-h-screen bg-brand-bg relative overflow-hidden font-sans text-gray-900 selection:bg-brand-danger selection:text-white"
+<ToolPageShell
+	toolName={TOOL_NAME}
+	toolPath={TOOL_PATH}
+	breadcrumb="URL TO IMAGE"
+	facts="FREE · 5 RENDERS A DAY · NO SIGNUP · ANY PUBLIC URL"
+	loggedIn={isUserLoggedIn}
+	hasResult={!!imageUrl}
+	longform="column"
 >
-	<!-- Background Pattern -->
-	<div
-		class="fixed inset-0 pointer-events-none opacity-[0.03]"
-		style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 24px 24px;"
-	/>
+	<HeroTitle slot="h1">
+		<span>URL TO</span>
+		<span>IMAGE</span>
+	</HeroTitle>
 
-	<Nav />
+	<HeroSub slot="hero-sub">
+		Convert any webpage URL into a high-quality <span class="font-medium">screenshot</span>
+		instantly.
+		<span class="text-brand-slate">Perfect for archiving, thumbnails, and social previews</span>
+	</HeroSub>
 
-	<main
-		class="z-10 w-full py-16 md:px-0 px-6 flex flex-col items-center justify-center space-y-8 max-w-7xl mx-auto relative"
-	>
-		<!-- Breadcrumb -->
-		<nav class="mb-12 flex justify-center">
-			<ol
-				class="inline-flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 border-[3px] border-gray-900 rounded-full shadow-brutal-lg"
-			>
-				<li><a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">Home</a></li>
-				<li class="text-gray-300">/</li>
-				<li>
-					<a href="/tools" class="text-gray-500 hover:text-gray-900 transition-colors">Tools</a>
-				</li>
-				<li class="text-gray-300">/</li>
-				<li class="text-gray-900">URL to Image</li>
-			</ol>
-		</nav>
-
-		<!-- Hero Section -->
-		<div
-			class="relative flex flex-col items-center justify-center text-center mb-8 sm:mb-12 lg:mb-16 pt-4 sm:pt-10"
-		>
-			<!-- Badge -->
-			<div
-				class="inline-flex transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-default mb-4 sm:mb-8"
-			>
-				<div
-					class="px-4 sm:px-6 py-1.5 sm:py-2 bg-brand-accent border-[3px] sm:border-[4px] border-black text-black font-black text-xs sm:text-sm md:text-base uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-				>
-					★ Free Tool
-				</div>
-			</div>
-
-			<!-- Main Title -->
-			<h1
-				class="relative z-10 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-tight mb-4 sm:mb-8"
-			>
-				<span class="block sm:inline">URL TO</span>
-				<span class="relative inline-block text-white mt-1 sm:mt-2 md:mt-0 md:ml-3">
-					<span class="relative z-10 px-2 sm:px-3 md:px-4">IMAGE</span>
-					<span
-						class="absolute inset-0 bg-brand-danger transform -skew-x-3 border-[3px] sm:border-[4px] border-black shadow-brutal-lg sm:shadow-brutal-xl -z-0"
-					/>
-				</span>
-			</h1>
-
-			<!-- Description -->
-			<div class="max-w-2xl mx-auto px-2">
-				<p
-					class="text-base sm:text-lg md:text-xl text-gray-800 font-bold leading-relaxed border-[3px] border-black bg-white p-4 sm:p-6 shadow-[4px_4px_0_0_#e5e7eb] sm:shadow-[8px_8px_0_0_#e5e7eb]"
-				>
-					Convert any webpage URL into a high-quality <span
-						class="bg-brand-accent px-1 border-b-[2px] sm:border-b-[3px] border-black">image</span
-					>
-					instantly.
-					<span class="text-gray-500 text-sm sm:text-base mt-2 sm:mt-3 block font-semibold"
-						>Perfect for archiving, thumbnails, and social previews</span
-					>
-				</p>
-			</div>
-		</div>
-
-		<!-- Post-signup welcome with API key -->
-		<PostSignupWelcome toolName="url_to_image_generator" />
-
-		<!-- Generation Limit Banner -->
-		<GenerationLimitBanner toolName="url_to_image_generator" />
-
-		<div class="w-full max-w-5xl mx-auto mb-16 relative px-2 md:px-0 z-20">
-			<!-- Control Board -->
-			<div class="bg-white border-[3px] border-black shadow-brutal-2xl relative">
-				<!-- Header/Window Bar -->
-				<div
-					class="bg-black text-white px-4 py-2 flex justify-between items-center border-b-[3px] border-black"
-				>
-					<div class="flex gap-2">
-						<div class="w-3 h-3 rounded-full bg-brand-danger border border-white" />
-						<div class="w-3 h-3 rounded-full bg-brand-accent border border-white" />
-						<div class="w-3 h-3 rounded-full bg-data-green border border-white" />
-					</div>
-					<div class="font-mono font-bold tracking-widest text-sm uppercase">
-						SYSTEM_INPUT_TERMINAL
-					</div>
-					<div class="w-16 flex justify-end">
-						<div class="space-y-1">
-							<div class="w-4 h-0.5 bg-white" />
-							<div class="w-4 h-0.5 bg-white" />
-						</div>
-					</div>
-				</div>
-
-				<!-- Content -->
-				<div
-					class="p-6 md:p-8 bg-white"
-					style="background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 10px 10px;"
-				>
-					<div class="w-full flex flex-col gap-6 md:flex-row items-stretch">
-						<div class="flex-grow group relative">
-							<div
-								class="absolute -top-3 left-4 bg-black text-white px-2 py-0.5 text-xs font-bold uppercase tracking-wider"
-							>
-								Target URL
-							</div>
+	<div slot="tool">
+		<ToolCard>
+			<!-- Two-pane split like the html-to-image editor, adapted for a screenshot
+			     tool: controls on the left, live preview on the right. -->
+			<div class="flex w-full flex-col lg:h-[520px] lg:flex-row">
+				<!-- Controls pane -->
+				<div class="flex min-w-0 flex-1 flex-col gap-5 overflow-y-auto bg-brand-paper p-5 lg:p-6">
+					<div class="flex flex-col gap-2">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">TARGET URL</span>
+						<div class="flex gap-2">
 							<input
 								bind:value={url}
 								on:input={handleFirstInput}
@@ -917,764 +841,281 @@
 								autocomplete="url"
 								spellcheck="false"
 								aria-invalid={urlError ? 'true' : undefined}
-								class="w-full h-full border-[3px] border-black bg-white placeholder-gray-400 text-lg font-bold font-mono focus:outline-none focus:shadow-[4px_4px_0_0_#ff6b6b] focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all px-6 py-4"
+								class="h-11 min-w-0 flex-1 rounded-lg border-[1.5px] border-brand-ink bg-white px-3 font-mono text-sm text-brand-ink placeholder-brand-mute focus:outline-none focus:ring-2 focus:ring-brand-royal"
 								placeholder="https://example.com"
 							/>
-						</div>
-						<div class="md:w-auto w-full">
 							<button
 								on:click={handleLoadPreviewClick}
 								disabled={isLoading || !url}
-								class="w-full h-full px-8 py-4 bg-brand-accent text-black border-[3px] border-black text-xl font-black uppercase tracking-wide shadow-brutal-lg hover:bg-[#ffb050] hover:shadow-brutal-xl hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
+								class="h-11 flex-shrink-0 rounded-lg border-[1.5px] border-brand-ink bg-brand-paper px-4 font-sans text-sm font-semibold text-brand-ink transition-colors hover:bg-brand-field disabled:opacity-50"
 							>
-								{#if isLoading}Loading...{:else}Load Preview{/if}
+								{#if isLoading}Loading…{:else}Load preview{/if}
 							</button>
 						</div>
-					</div>
-
-					{#if urlError}
-						<p class="mt-3 text-sm font-bold text-red-600" role="alert">{urlError}</p>
-					{:else if url}
-						{#if isLoading}
-							<p class="mt-3 text-sm font-bold text-gray-500 flex items-center gap-2">
-								<span
-									class="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"
-								/>
-								Loading preview… the Capture button unlocks once it's ready.
-							</p>
-						{:else if !isPreviewLoaded}
-							<p class="mt-3 text-sm font-bold text-gray-500">
-								Load the preview first; then the green
-								<span class="text-data-green font-black">Capture</span> button activates below.
-							</p>
+						{#if urlError}
+							<p class="text-sm font-medium text-brand-alarm" role="alert">{urlError}</p>
 						{/if}
-					{/if}
+					</div>
 
-					<!-- Capture Settings -->
-					<div class="mt-6 border-t-[3px] border-black pt-6">
-						<div class="flex items-center gap-2 mb-4">
-							<div
-								class="bg-black text-white px-2 py-0.5 text-xs font-bold uppercase tracking-wider"
-							>
-								Capture Settings
+					<div class="flex flex-col gap-2">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">DEVICE</span>
+						<div class="flex flex-wrap gap-1.5">
+							{#each devicePresets as preset}
+								<button
+									on:click={() => selectPreset(preset)}
+									class="rounded-full border px-3 py-1.5 font-mono text-[11px] tracking-[0.04em] transition-colors {activePreset ===
+									preset.id
+										? 'border-brand-ink bg-brand-ink text-white'
+										: 'border-brand-rule bg-brand-paper text-brand-ink hover:bg-brand-subtle'}"
+								>
+									{preset.label.toUpperCase()}
+								</button>
+							{/each}
+						</div>
+					</div>
+
+					<div class="flex flex-wrap gap-x-8 gap-y-4">
+						<div class="flex flex-col gap-2">
+							<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">SIZE (PX)</span>
+							<div class="flex items-center gap-1.5">
+								<input
+									type="number"
+									bind:value={captureWidth}
+									on:input={handleDimensionInput}
+									min="1"
+									max="4000"
+									class="h-9 w-20 rounded border-[1.5px] border-brand-ink bg-white px-2 text-center font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-royal"
+								/>
+								<span class="font-mono text-sm text-brand-mute">×</span>
+								<input
+									type="number"
+									bind:value={captureHeight}
+									on:input={handleDimensionInput}
+									min="1"
+									max="4000"
+									class="h-9 w-20 rounded border-[1.5px] border-brand-ink bg-white px-2 text-center font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-royal"
+								/>
 							</div>
 						</div>
-
-						<div class="flex flex-col md:flex-row gap-6">
-							<!-- Device Presets -->
-							<div>
-								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500"
-									>Device</span
-								>
-								<div class="flex gap-2">
-									{#each devicePresets as preset}
-										<button
-											on:click={() => selectPreset(preset)}
-											class="px-3 py-2 border-[3px] border-black font-bold text-sm transition-all flex items-center gap-1.5
-												{activePreset === preset.id
-												? 'bg-black text-white shadow-none'
-												: 'bg-white text-black shadow-brutal-md hover:shadow-[1px_1px_0_0_#1f2937] hover:translate-x-[2px] hover:translate-y-[2px]'}"
-										>
-											{#if preset.id === 'desktop'}
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-													/></svg
-												>
-											{:else if preset.id === 'tablet'}
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-													/></svg
-												>
-											{:else}
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-													/></svg
-												>
-											{/if}
-											{preset.label}
-										</button>
-									{/each}
-								</div>
-							</div>
-
-							<!-- Custom Size -->
-							<div>
-								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500"
-									>Size (px)</span
-								>
-								<div class="flex items-center gap-1">
-									<input
-										type="number"
-										bind:value={captureWidth}
-										on:input={handleDimensionInput}
-										min="1"
-										max="4000"
-										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-brand-danger"
-									/>
-									<span class="font-black text-gray-400">×</span>
-									<input
-										type="number"
-										bind:value={captureHeight}
-										on:input={handleDimensionInput}
-										min="1"
-										max="4000"
-										class="w-20 border-[3px] border-black px-2 py-2 font-mono font-bold text-sm text-center focus:outline-none focus:border-brand-danger"
-									/>
-								</div>
-							</div>
-
-							<!-- Format -->
-							<div>
-								<span class="block text-xs font-black uppercase tracking-wider mb-2 text-gray-500"
-									>Format</span
-								>
-								<div class="flex gap-0">
-									{#each ['png', 'jpg', 'webp'] as fmt}
-										<button
-											on:click={() => (fileFormat = fmt)}
-											class="px-4 py-2 border-[3px] border-black font-black text-sm uppercase transition-all -ml-[3px] first:ml-0
-												{fileFormat === fmt ? 'bg-black text-white z-10' : 'bg-white text-black hover:bg-gray-50'}"
-										>
-											{fmt}
-										</button>
-									{/each}
-								</div>
+						<div class="flex flex-col gap-2">
+							<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">FORMAT</span>
+							<div class="flex items-center gap-1.5">
+								{#each ['png', 'jpg', 'webp'] as fmt}
+									<button
+										on:click={() => (fileFormat = fmt)}
+										class="rounded-full border px-3 py-1.5 font-mono text-[11px] tracking-[0.04em] transition-colors {fileFormat ===
+										fmt
+											? 'border-brand-ink bg-brand-ink text-white'
+											: 'border-brand-rule bg-brand-paper text-brand-ink hover:bg-brand-subtle'}"
+										>{fmt.toUpperCase()}</button
+									>
+								{/each}
 							</div>
 						</div>
 					</div>
 
-					<!-- CORS Disclaimer -->
-					<div
-						class="mt-6 text-xs md:text-sm font-bold text-black bg-[#fff] border-[2px] border-black p-4 shadow-[4px_4px_0_0_#ccc] flex items-start gap-3"
-					>
-						<span class="text-xl">⚠️</span>
-						<p>
-							Due to CORS policies, live previews may be restricted for some domains. The capture
-							engine operates server-side and will bypass these limitations.
-						</p>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="mt-8 w-full max-w-5xl mx-auto">
-			<h3 class="text-4xl font-black mb-6 uppercase text-center md:text-left drop-shadow-sm">
-				<span class="bg-black text-white px-2 py-1 transform -rotate-1 inline-block">Visual</span>
-				Confirmation
-			</h3>
-			<div
-				bind:this={iframeWrapper}
-				class="border-[4px] border-black bg-white p-2 shadow-brutal-3xl relative cursor-crosshair mx-auto"
-				style="height: 600px; transition: max-width 0.3s ease;"
-			>
-				{#if isLoading}
-					<div class="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75">
-						<div class="loader" />
-					</div>
-				{/if}
-				<iframe
-					bind:this={iframeElement}
-					on:load={handleIframeLoad}
-					title="URL Preview"
-					width="100%"
-					height="100%"
-					scale="0.7"
-					frameborder="0"
-					sandbox="allow-scripts"
-				/>
-				<!-- No allow-same-origin: this frame executes a stranger's fetched
-				     page, which must not run in the pictify.io origin (cookies,
-				     localStorage, parent DOM). The element-selector bridge only
-				     uses postMessage with '*', which works across the opaque
-				     origin; nothing reads contentDocument. -->
-
-			</div>
-			<!-- Element Selector Bar -->
-			<div
-				class="bg-gray-100 border-[3px] border-t-0 border-black p-4 flex flex-col md:flex-row gap-4 items-center"
-			>
-				<div class="flex-grow w-full">
-					<span class="block font-black uppercase text-xs mb-1 tracking-wider"
-						>Element Selector (Optional)</span
-					>
-					<div class="flex">
-						<div
-							class="bg-black text-white px-3 py-2 font-mono text-sm flex items-center justify-center border-y-[3px] border-l-[3px] border-black"
+					<div class="flex flex-col gap-2">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute"
+							>ELEMENT SELECTOR (OPTIONAL)</span
 						>
-							&gt;_
-						</div>
-						<input
-							bind:value={selector}
-							type="text"
-							class="w-full border-[3px] border-black placeholder-gray-500 text-sm font-mono focus:outline-none py-2 px-4"
-							placeholder="Click element in preview or type selector..."
-						/>
-						<button
-							on:click={clearSelector}
-							class="bg-white border-y-[3px] border-r-[3px] border-black px-3 hover:bg-gray-200 transition-colors"
-							title="Clear Selector"
-						>
-							<svg class="w-4 h-4 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M6 6l12 12M18 6L6 18"
-								/>
-							</svg>
-						</button>
-					</div>
-				</div>
-				<div class="w-full md:w-auto flex-shrink-0 pt-5">
-					<button
-						id="capture-button"
-						on:click={generateImage}
-						disabled={captureDisabled}
-						class="w-full md:w-auto px-8 py-3 bg-data-green text-black border-[3px] border-black font-black uppercase tracking-wide shadow-brutal-lg hover:translate-y-[-2px] hover:translate-x-[-2px] hover:shadow-brutal-xl active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none flex items-center justify-center gap-2"
-					>
-						{#if isImageGenerating}
-							<svg
-								class="animate-spin h-5 w-5 text-black"
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-							>
-								<circle
-									class="opacity-25"
-									cx="12"
-									cy="12"
-									r="10"
-									stroke="currentColor"
-									stroke-width="4"
-								/>
-								<path
-									class="opacity-75"
-									fill="currentColor"
-									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-								/>
-							</svg>
-							Rendering...
-						{:else}
-							<span
-								>{hasAutoCaptured ? 'Re-capture' : 'Capture'}
-								{fileFormat.toUpperCase()}</span
-							>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-5 w-5"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="3"
-									d="M14 5l7 7m0 0l-7 7m7-7H3"
-								/></svg
-							>
-						{/if}
-					</button>
-				</div>
-			</div>
-		</div>
-
-		{#if imageUrl}
-			<div class="max-w-4xl mx-auto px-4 mb-20 mt-16">
-				<div
-					class="bg-data-green/10 border-[3px] border-data-green rounded-2xl p-8 text-center relative overflow-hidden"
-				>
-					<div class="absolute top-0 right-0 w-32 h-32 bg-data-green/20 rounded-full blur-2xl" />
-
-					<h3 class="text-2xl font-black text-gray-900 uppercase tracking-tight mb-6">
-						Screenshot Captured!
-					</h3>
-
-					<div
-						class="inline-block bg-white border-[3px] border-gray-900 p-2 shadow-brutal-2xl rotate-1 mb-8"
-					>
-						<a href={imageUrl} target="_blank" rel="noopener noreferrer">
-							<img
-								loading="lazy"
-								src={imageUrl}
-								alt="Generated screenshot"
-								class="max-w-full h-auto max-h-[400px]"
+						<div class="flex items-center gap-2">
+							<input
+								bind:value={selector}
+								type="text"
+								class="h-9 min-w-0 flex-1 rounded border-[1.5px] border-brand-ink bg-white px-3 font-mono text-sm placeholder-brand-mute focus:outline-none focus:ring-2 focus:ring-brand-royal"
+								placeholder="Click an element in the preview, or type a CSS selector"
 							/>
-						</a>
-					</div>
-
-					<div class="flex flex-wrap justify-center gap-4">
-						<button
-							on:click={() =>
-								downloadFile(imageUrl, `pictify-screenshot.${fileFormat}`, {
-									tool_name: 'url_to_image_generator'
-								})}
-							class="px-6 py-3 bg-white text-gray-900 border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
-						>
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-								/></svg
-							>
-							Download {fileFormat.toUpperCase()}
-						</button>
-						<button
-							on:click={() => copyToClipboard(imageUrl)}
-							class="px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-bold uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl flex items-center gap-2"
-						>
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-								/></svg
-							>
-							Copy URL
-						</button>
-					</div>
-
-					<!-- Experiment: Post-generation signup CTA -->
-					<!-- Experiment tool-signup-cta-v2: inline-value-prop arm. The sticky-bar arm renders
-						 the fixed StickySignupBar (below); control renders neither. -->
-					{#if !isUserLoggedIn && ctaVariant === 'inline-value-prop'}
-						<div
-							class="mt-8 border-[3px] border-black bg-brand-accent/20 p-6 flex flex-col items-center text-center gap-3"
-						>
-							<p class="font-black text-gray-900 text-base uppercase tracking-wide">
-								Like it? Automate it.
-							</p>
-							<p class="text-sm font-bold text-gray-600 max-w-md">
-								Sign up to get your API key and capture unlimited screenshots programmatically:
-								same quality, zero daily limits.
-							</p>
-							<a
-								href="/signup?redirect=/tools/url-to-image-generator"
-								on:click={() => trackSignupClick('post_generation_value_prop')}
-								class="mt-1 px-6 py-3 bg-gray-900 text-white border-[3px] border-gray-900 font-black text-sm uppercase tracking-wide shadow-brutal-accent hover:shadow-brutal-accent-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-							>
-								Get Your API Key (Free)
-							</a>
+							{#if selector}
+								<button
+									on:click={clearSelector}
+									class="h-9 flex-shrink-0 rounded border-[1.5px] border-brand-ink bg-brand-paper px-3 font-mono text-[11px] text-brand-ink hover:bg-brand-subtle"
+									title="Clear selector">CLEAR</button
+								>
+							{/if}
 						</div>
-					{/if}
-				</div>
-			</div>
-		{/if}
-
-		<!-- Live API Request Builder -->
-		<section class="w-full max-w-5xl mx-auto px-2 md:px-0 mt-16 mb-8">
-			<div class="border-[3px] border-black shadow-brutal-2xl overflow-hidden">
-				<div class="bg-black px-4 py-3 flex items-center justify-between">
-					<div class="flex items-center gap-3">
-						<span class="text-xs font-black uppercase tracking-widest text-brand-accent"
-							>Your API Request</span
-						>
-						<span class="text-xs text-gray-500 font-mono">updates as you change settings</span>
 					</div>
-					<button
-						on:click={() => copyToClipboard(liveCurlSnippet, 'code')}
-						class="px-3 py-1 bg-brand-accent text-black border-[2px] border-brand-accent font-black text-xs uppercase tracking-wider hover:bg-[#ffb050] transition-colors rounded"
+
+					<p class="mt-auto font-sans text-xs leading-[18px] text-brand-mute">
+						The preview may be blocked by some sites' CORS rules — capture always runs server-side
+						and works regardless.
+					</p>
+				</div>
+
+				<!-- Preview pane -->
+				<div
+					class="flex min-h-[320px] flex-1 flex-col gap-2 border-t-[1.5px] border-brand-ink bg-brand-subtle p-4 lg:min-h-0 lg:border-l-[1.5px] lg:border-t-0"
+				>
+					<div class="flex items-center justify-between">
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute">LIVE PREVIEW</span
+						>
+						<span class="font-mono text-[11px] tracking-[0.06em] text-brand-mute"
+							>{captureWidth} × {captureHeight}</span
+						>
+					</div>
+					<div
+						bind:this={iframeWrapper}
+						class="relative flex-1 cursor-crosshair overflow-hidden border-[1.5px] border-brand-ink bg-white shadow-[4px_4px_0_0_#000]"
 					>
-						Copy
-					</button>
-				</div>
-				<div class="bg-[#1e1e1e]">
-					<div class="bg-[#2d2d2d] px-4 py-2 border-b border-gray-800 flex items-center gap-2">
-						<div class="w-3 h-3 rounded-full bg-[#ff5f56]" />
-						<div class="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-						<div class="w-3 h-3 rounded-full bg-[#27c93f]" />
-						<span class="ml-auto text-xs text-gray-500 font-mono font-bold uppercase tracking-wider"
-							>BASH</span
-						>
+						{#if isLoading}
+							<div
+								class="absolute inset-0 z-10 flex items-center justify-center bg-brand-subtle/75"
+							>
+								<div class="loader" />
+							</div>
+						{/if}
+						{#if !isPreviewLoaded && !isLoading}
+							<div class="absolute inset-0 flex items-center justify-center px-6 text-center">
+								<span class="font-sans text-sm text-brand-mute"
+									>Enter a URL and press Load preview to see it here.</span
+								>
+							</div>
+						{/if}
+						<iframe
+							bind:this={iframeElement}
+							on:load={handleIframeLoad}
+							title="URL Preview"
+							width="100%"
+							height="100%"
+							frameborder="0"
+							sandbox="allow-scripts"
+							class="h-full w-full"
+						/>
 					</div>
-					<div class="p-6 overflow-x-auto">
-						<pre
-							class="font-mono text-sm leading-relaxed text-gray-300">{@html highlightedCurl}</pre>
-					</div>
 				</div>
 			</div>
-		</section>
 
-		<ApiCodeSection
-			title="Automate with the"
-			titleHighlight="API"
-			toolName="url_to_image_generator"
-			description="Convert any URL to an image programmatically. Generate screenshots, link previews, and image URLs in your CI/CD pipeline."
-			codeExamples={urlToImageExamples}
-		/>
+			<svelte:fragment slot="toolbar-left">
+				<span class="font-mono text-xs tracking-[0.06em] text-brand-mute">
+					ANY URL → SCREENSHOT
+				</span>
+			</svelte:fragment>
 
-		<!-- URL to Image Use Cases -->
-		<section class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-16">
-			<h2 class="text-3xl font-black mb-8 text-black uppercase text-center">What You Can Build</h2>
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-				<div class="border-[3px] border-black p-6 bg-white shadow-brutal-accent">
-					<h3 class="font-black text-lg mb-2">Link Preview Images</h3>
-					<p class="text-gray-600 font-medium text-sm">
-						Auto-generate thumbnail images from any URL for link previews, bookmarks, and content
-						cards.
-					</p>
-				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#4ade80]">
-					<h3 class="font-black text-lg mb-2">Visual QA Monitoring</h3>
-					<p class="text-gray-600 font-medium text-sm">
-						Schedule periodic screenshots of your pages to catch visual regressions before users do.
-					</p>
-				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#ff6b6b]">
-					<h3 class="font-black text-lg mb-2">Photo URL Generator</h3>
-					<p class="text-gray-600 font-medium text-sm">
-						Turn any webpage into a hosted image URL. Share as a picture link on social media or
-						embed in emails.
-					</p>
-				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-brutal-lg">
-					<h3 class="font-black text-lg mb-2">OG Image Fallbacks</h3>
-					<p class="text-gray-600 font-medium text-sm">
-						Generate Open Graph images on-the-fly for pages that don't have custom social previews.
-					</p>
-				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-brutal-accent">
-					<h3 class="font-black text-lg mb-2">Web Archiving</h3>
-					<p class="text-gray-600 font-medium text-sm">
-						Capture and store visual snapshots of competitor pages, legal evidence, or content for
-						compliance.
-					</p>
-				</div>
-				<div class="border-[3px] border-black p-6 bg-white shadow-[4px_4px_0_0_#4ade80]">
-					<h3 class="font-black text-lg mb-2">Image Link Converter</h3>
-					<p class="text-gray-600 font-medium text-sm">
-						Convert any URL to a picture URL that can be embedded anywhere: Notion, Confluence,
-						Slack, or email.
-					</p>
-				</div>
-			</div>
-		</section>
+			<svelte:fragment slot="toolbar-right">
+				<QuotaMeter
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+				/>
+				<GenerateButton
+					label="Capture Screenshot"
+					loading={isImageGenerating}
+					remaining={guestRemaining}
+					loggedIn={isUserLoggedIn}
+					toolName={TOOL_NAME}
+					toolPath={TOOL_PATH}
+					on:generate={generateImage}
+				/>
+			</svelte:fragment>
+		</ToolCard>
+	</div>
 
-		<!-- FAQ Section -->
-		<section class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-16">
-			<div class="border-[3px] border-black p-6 md:p-8 bg-white shadow-[8px_8px_0_0_#9ca3af]">
-				<h2 class="text-3xl font-black mb-8 text-black uppercase">FAQ</h2>
-				<div class="space-y-4 w-full">
-					<details class="group">
-						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
-						>
-							<span class="font-black text-lg text-gray-900 uppercase">What is URL to Image?</span>
-							<span
-								class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-4 w-4 group-open:rotate-180 transition-transform"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-									><path
-										fill-rule="evenodd"
-										d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-										clip-rule="evenodd"
-									/></svg
-								>
-							</span>
-						</summary>
-						<div
-							class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium"
-						>
-							A tool that captures a webpage and saves it as an image file (JPG/PNG). Useful for
-							archives, thumbnails, and proofs.
-						</div>
-					</details>
-					<details class="group">
-						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
-						>
-							<span class="font-black text-lg text-gray-900 uppercase">How does it work?</span>
-							<span
-								class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-4 w-4 group-open:rotate-180 transition-transform"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-									><path
-										fill-rule="evenodd"
-										d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-										clip-rule="evenodd"
-									/></svg
-								>
-							</span>
-						</summary>
-						<div
-							class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium"
-						>
-							We spawn a headless browser in the cloud, navigate to your URL, wait for assets to
-							load, and take a high-fidelity screenshot.
-						</div>
-					</details>
-					<details class="group">
-						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
-						>
-							<span class="font-black text-lg text-gray-900 uppercase">Can I customize it?</span>
-							<span
-								class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-4 w-4 group-open:rotate-180 transition-transform"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-									><path
-										fill-rule="evenodd"
-										d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-										clip-rule="evenodd"
-									/></svg
-								>
-							</span>
-						</summary>
-						<div
-							class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium"
-						>
-							Yes! You can select specific elements, set custom viewport sizes, and handle cookie
-							banners via our API.
-						</div>
-					</details>
-					<details class="group">
-						<summary
-							class="flex items-center justify-between cursor-pointer bg-white p-4 border-[3px] border-black transition-all hover:shadow-brutal-lg hover:translate-x-[-2px] hover:translate-y-[-2px]"
-						>
-							<span class="font-black text-lg text-gray-900 uppercase">Privacy?</span>
-							<span
-								class="border-[2px] border-black p-1 bg-black text-white group-open:bg-white group-open:text-black transition-colors"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-4 w-4 group-open:rotate-180 transition-transform"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-									><path
-										fill-rule="evenodd"
-										d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-										clip-rule="evenodd"
-									/></svg
-								>
-							</span>
-						</summary>
-						<div
-							class="mt-0 p-4 border-l-[3px] border-r-[3px] border-b-[3px] border-black bg-gray-50 text-black font-medium"
-						>
-							We do not store your URLs or generated images. All processing is done on-the-fly and
-							images are cached temporarily on our CDN for performance.
-						</div>
-					</details>
-				</div>
-			</div>
-		</section>
+	<div slot="result">
+		{#if imageUrl}
+			<ResultCard
+				{imageUrl}
+				formatLabel={fileFormat.toUpperCase()}
+				fileExtension={fileFormat}
+				width={captureWidth}
+				height={captureHeight}
+				loggedIn={isUserLoggedIn}
+				lastFree={lastFreeRender}
+				toolName={TOOL_NAME}
+				toolPath={TOOL_PATH}
+			/>
+		{/if}
+	</div>
 
-		<!-- Content Grid -->
-		<div class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-20 grid grid-cols-1 md:grid-cols-2 gap-8">
-			<!-- Learn More -->
-			<section class="border-[3px] border-black p-6 md:p-8 bg-white shadow-brutal-2xl">
-				<h3 class="text-2xl font-black mb-6 uppercase">Why Use This Tool?</h3>
-				<ul class="space-y-4">
-					<li class="flex gap-4 items-start">
-						<div class="bg-black text-white p-1 mt-1">
-							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="4"
-									d="M5 13l4 4L19 7"
-								/></svg
-							>
-						</div>
-						<span class="font-bold text-lg">Instant Archiving of web pages</span>
-					</li>
-					<li class="flex gap-4 items-start">
-						<div class="bg-black text-white p-1 mt-1">
-							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="4"
-									d="M5 13l4 4L19 7"
-								/></svg
-							>
-						</div>
-						<span class="font-bold text-lg">Generate OG Images for social media</span>
-					</li>
-					<li class="flex gap-4 items-start">
-						<div class="bg-black text-white p-1 mt-1">
-							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="4"
-									d="M5 13l4 4L19 7"
-								/></svg
-							>
-						</div>
-						<span class="font-bold text-lg">Visual monitoring for QA teams</span>
-					</li>
-				</ul>
-			</section>
+	<AutomateSection
+		slot="automate"
+		title="Automate with the"
+		titleHighlight="API"
+		toolName={TOOL_NAME}
+		description="Convert any URL to an image programmatically. Generate screenshots for link previews, monitoring, and archives from your own code."
+		codeExamples={urlToImageExamples}
+	/>
 
-			<!-- Best Practices -->
-			<section class="border-[3px] border-black p-6 md:p-8 bg-brand-bg shadow-brutal-2xl">
-				<h3 class="text-2xl font-black mb-6 uppercase">Pro Tips</h3>
-				<ul class="space-y-4">
-					<li class="flex gap-4 items-start">
-						<span class="font-black text-brand-danger text-xl">01.</span>
-						<span class="font-bold text-lg">Ensure the URL is publicly accessible.</span>
-					</li>
-					<li class="flex gap-4 items-start">
-						<span class="font-black text-brand-accent text-xl">02.</span>
-						<span class="font-bold text-lg">Use the selector to remove ads/navbars.</span>
-					</li>
-					<li class="flex gap-4 items-start">
-						<span class="font-black text-data-green text-xl">03.</span>
-						<span class="font-bold text-lg">Check mobile viewports for responsive sites.</span>
-					</li>
-				</ul>
-			</section>
-		</div>
+	<svelte:fragment slot="longform">
+		<LongformSection index="01" id="what-you-can-build" first title="What You Can Build">
+			<!-- These six carried h3s before; titleTag keeps them. -->
+			<FeatureGrid
+				columns={3}
+				titleTag="h3"
+				items={[
+					{
+						title: 'Link Preview Images',
+						body: 'Auto-generate thumbnail images from any URL for link previews, bookmarks, and content cards.'
+					},
+					{
+						title: 'Visual QA Monitoring',
+						body: 'Schedule periodic screenshots of your pages to catch visual regressions before users do.'
+					},
+					{
+						title: 'Photo URL Generator',
+						body: 'Turn any webpage into a hosted image URL. Share as a picture link on social media or embed in emails.'
+					},
+					{
+						title: 'OG Image Fallbacks',
+						body: "Generate Open Graph images on-the-fly for pages that don't have custom social previews."
+					},
+					{
+						title: 'Web Archiving',
+						body: 'Capture and store visual snapshots of competitor pages, legal evidence, or content for compliance.'
+					},
+					{
+						title: 'Image Link Converter',
+						body: 'Convert any URL to a picture URL that can be embedded anywhere: Notion, Confluence, Slack, or email.'
+					}
+				]}
+			/>
+		</LongformSection>
 
-		<!-- Screenshot API comparisons + related guide -->
-		<div class="w-full max-w-5xl mx-auto px-2 md:px-0 mb-20">
-			<section class="border-[3px] border-black p-6 md:p-8 bg-white shadow-brutal-2xl">
-				<h3 class="text-2xl font-black mb-6 uppercase">Comparing Screenshot APIs?</h3>
-				<p class="font-medium text-gray-600 mb-6">
+		<LongformSection index="02" id="faq" title="FAQ">
+			<FaqList faqs={FAQS} />
+		</LongformSection>
+
+		<LongformPair>
+			<LongformSection index="03" id="why-use" compact title="Why Use This Tool?">
+				<CheckList
+					items={[
+						'Instant Archiving of web pages',
+						'Generate OG Images for social media',
+						'Visual monitoring for QA teams'
+					]}
+				/>
+			</LongformSection>
+
+			<LongformSection index="04" id="pro-tips" compact title="Pro Tips">
+				<CheckList
+					items={[
+						'01. Ensure the URL is publicly accessible.',
+						'02. Use the selector to remove ads/navbars.',
+						'03. Check mobile viewports for responsive sites.'
+					]}
+				/>
+			</LongformSection>
+
+			<LongformSection index="05" id="comparisons" compact span title="Comparing Screenshot APIs?">
+				<Lead>
 					This tool is API-backed. See how it stacks up against the other screenshot/rendering APIs
 					developers usually compare it to.
-				</p>
-				<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-					<a
-						href="/alternatives/screenshotone"
-						class="p-4 bg-brand-bg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-center font-bold"
-						>vs ScreenshotOne</a
-					>
-					<a
-						href="/alternatives/screenshotapi"
-						class="p-4 bg-brand-bg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-center font-bold"
-						>vs ScreenshotAPI</a
-					>
-					<a
-						href="/alternatives/screenshot-machine"
-						class="p-4 bg-brand-bg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-center font-bold"
-						>vs Screenshot Machine</a
-					>
-					<a
-						href="/alternatives/apiflash"
-						class="p-4 bg-brand-bg border-[3px] border-black shadow-brutal-lg hover:shadow-brutal-sm hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-center font-bold"
-						>vs APIFlash</a
-					>
-				</div>
-				<p class="font-medium text-gray-600">
-					Have HTML instead of a live URL? Read the
-					<a
-						href="/blogs/html-to-image-the-complete-developer-guide-2026"
-						class="underline font-bold text-gray-900 hover:text-brand-danger"
-					>
-						HTML to Image API developer guide</a
-					> instead.
-				</p>
-			</section>
-		</div>
-
-		<div class="mt-8 mb-20 w-full max-w-5xl mx-auto px-2 md:px-0 text-center">
-			<p class="font-bold text-gray-500 uppercase tracking-widest mb-6">Spread the word</p>
-			<div class="flex flex-col md:flex-row justify-center md:space-x-6">
-				<button
-					class="flex items-center justify-center px-8 py-4 bg-[#1DA1F2] text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-[#1DA1F2] transition-all shadow-brutal-lg mb-4 md:mb-0"
-					on:click={() => sharePage('twitter')}
-				>
-					<svg
-						class="w-5 h-5 mr-3"
-						fill="currentColor"
-						viewBox="0 0 24 24"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
-						/>
-					</svg>
-					Share on Twitter
-				</button>
-				<button
-					class="flex items-center justify-center px-8 py-4 bg-[#0A66C2] text-white font-black uppercase tracking-wide border-[3px] border-black hover:bg-white hover:text-[#0A66C2] transition-all shadow-brutal-lg"
-					on:click={() => sharePage('linkedin')}
-				>
-					<svg
-						class="w-5 h-5 mr-3"
-						fill="currentColor"
-						viewBox="0 0 24 24"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.065 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-						/>
-					</svg>
-					Share on LinkedIn
-				</button>
-			</div>
-		</div>
-
-		<RelatedTools
-			tools={[
-				'html-email',
-				'blog-featured-image',
-				'og-image-generator',
-				'code-to-image',
-				'html-to-png'
-			]}
-		/>
-
-		<Toast />
-		<Footer />
-	</main>
-
-	<StickySignupBar bind:this={stickyBar} toolName="url_to_image_generator" variant={ctaVariant} />
-</div>
-
-<style>
-	@keyframes loading {
-		0% {
-			width: 0%;
-		}
-		100% {
-			width: 100%;
-		}
-	}
-
-	.loader {
-		border: 5px solid #f3f3f3;
-		border-top: 5px solid #3498db;
-		border-radius: 50%;
-		width: 50px;
-		height: 50px;
-		animation: spin 1s linear infinite;
-	}
-
-	@keyframes spin {
-		0% {
-			transform: rotate(0deg);
-		}
-		100% {
-			transform: rotate(360deg);
-		}
-	}
-</style>
+				</Lead>
+				<RelatedLinks
+					inline
+					toolName={TOOL_NAME}
+					eyebrow="COMPARISONS"
+					links={[
+						{ href: '/alternatives/screenshotone', label: 'vs ScreenshotOne' },
+						{ href: '/alternatives/screenshotapi', label: 'vs ScreenshotAPI' },
+						{ href: '/alternatives/screenshot-machine', label: 'vs Screenshot Machine' },
+						{ href: '/alternatives/apiflash', label: 'vs APIFlash' },
+						{
+							href: '/blogs/html-to-image-the-complete-developer-guide-2026',
+							label: 'HTML to Image API developer guide'
+						}
+					]}
+				/>
+			</LongformSection>
+		</LongformPair>
+	</svelte:fragment>
+</ToolPageShell>
