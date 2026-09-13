@@ -185,9 +185,15 @@
 		 * Documents WITHOUT logic keep the client path: it is instant, it costs
 		 * no quota and no round trip, and for a design whose only dynamic parts
 		 * are plain tokens it produces the same answer.
+		 *
+		 * "Logic" is any block (`{{#if}}`, `{{#each}}`) OR any helper call
+		 * (`{{titleCase (default userName "there")}}`). The gate used to look at
+		 * blocks only, so a document whose only logic was helper calls took the
+		 * client path and Preview showed the calls as raw text (2026-09-14).
 		 */
 		const previewMode = !editable && !selectOnly;
-		if (previewMode && staged.blocks.length && renderPreview) {
+		const hasLogic = staged.blocks.length > 0 || (staged.expressions?.length || 0) > 0;
+		if (previewMode && hasLogic && renderPreview) {
 			runServerPreview(source);
 			return;
 		}
