@@ -107,13 +107,13 @@
 	<title>Free Account Benefits | Pictify.io</title>
 	<meta
 		name="description"
-		content="Create a free Pictify account to unlock watermark-free images, API access, and unlimited template storage. No credit card required."
+		content="Create a free Pictify account: 50 renders a month, watermark-free images, full API access and up to 3 saved templates. No credit card required."
 	/>
 	<link rel="canonical" href="https://pictify.io/free-account" />
 	<meta property="og:title" content="Free Account Benefits | Pictify.io" />
 	<meta
 		property="og:description"
-		content="Create a free Pictify account to unlock watermark-free images, API access, and unlimited template storage."
+		content="Create a free Pictify account: 50 renders a month, watermark-free images, full API access and up to 3 saved templates."
 	/>
 	<meta property="og:url" content="https://pictify.io/free-account" />
 	<meta property="og:type" content="website" />

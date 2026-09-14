@@ -65,8 +65,6 @@
 	{ogImageAlt}
 	{ogImageWidth}
 	{ogImageHeight}
-	twitterSite="@pictify_io"
-	twitterCreator="@pictify_io"
 	twitterTitle={title}
 	twitterDescription={description}
 	twitterImage={ogImage}

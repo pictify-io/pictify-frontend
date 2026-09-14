@@ -96,13 +96,6 @@
 				</li>
 				<li>
 					<a
-						href="https://x.com/pictifyio"
-						class="hidden font-mono text-xs text-[#6B7280] hover:text-white lg:block"
-						>x.com/pictifyio</a
-					>
-				</li>
-				<li>
-					<a
 						href="https://github.com/pictify-io"
 						class="font-mono text-[11px] text-[#6B7280] hover:text-white lg:text-xs">github</a
 					>
