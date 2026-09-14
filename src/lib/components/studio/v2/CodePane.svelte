@@ -43,6 +43,20 @@
 	/** False while the document does not parse — the canvas holds its last good state. */
 	export let valid = true;
 	export let fileLabel = 'template.html';
+	/** The textarea's own placeholder: the first row of an empty pane. */
+	export let placeholder = 'Paste or type your HTML — {{variables}} become inputs';
+	/**
+	 * A dimmed second row under the placeholder (an example line). A native
+	 * placeholder cannot style one line differently, so this row is painted by
+	 * the pane on the same 18px grid as the text. Empty = no second row.
+	 */
+	export let placeholderHint = '';
+	/**
+	 * Fill the parent instead of the studio's fixed 432px column. The embedded
+	 * tools stack below 1024, where 432px overflowed a 390px phone and cut off
+	 * the header, the example row and the drop strip. The studio keeps 432.
+	 */
+	export let fluid = false;
 
 	const LINE_HEIGHT = 18;
 	/**
@@ -54,6 +68,8 @@
 	const TOP_PAD = 12;
 
 	let ta;
+	/** Whether the textarea has focus; handed to the `empty` slot so it can get out of the caret's way. */
+	let focused = false;
 	let gutter;
 	let overlay;
 	let band;
@@ -133,7 +149,9 @@
 	}
 </script>
 
-<div class="flex min-h-0 w-[432px] flex-shrink-0 flex-col bg-brand-press">
+<div
+	class="flex min-h-0 flex-col bg-brand-press {fluid ? 'w-full min-w-0' : 'w-[432px] flex-shrink-0'}"
+>
 	<!-- Header -->
 	<div
 		class="flex h-9 flex-shrink-0 items-center justify-between border-b border-[#383A42] px-3.5"
@@ -225,14 +243,28 @@
 				on:keyup={reportCaret}
 				on:click={reportCaret}
 				on:select={reportCaret}
+				on:focus={() => (focused = true)}
+				on:blur={() => (focused = false)}
+				on:paste
 				disabled={busy}
 				spellcheck="false"
 				wrap="off"
 				aria-label="Template HTML"
-				placeholder="Paste or type your HTML — &#123;&#123;variables&#125;&#125; become inputs"
+				{placeholder}
 				class="absolute inset-0 h-full w-full resize-none overflow-auto whitespace-pre bg-transparent py-3 pr-3.5 font-mono text-[11.5px] leading-[18px] text-transparent caret-white outline-none placeholder:text-white/35 disabled:opacity-60"
 			></textarea>
 		</div>
+
+		{#if !html && placeholderHint}
+			<!-- Row 2 of the placeholder, on the text grid: 44px gutter, TOP_PAD + one line. -->
+			<p
+				aria-hidden="true"
+				class="pointer-events-none absolute left-[44px] right-3.5 z-10 overflow-hidden whitespace-pre font-mono text-[11.5px] leading-[18px] text-white/20"
+				style="top:{TOP_PAD + LINE_HEIGHT}px"
+			>
+				{placeholderHint}
+			</p>
+		{/if}
 
 		{#if !html && $$slots.empty}
 			<!--
@@ -241,9 +273,14 @@
 				textarea and ⌘V pastes the way it always has. Anything inside that
 				needs a click of its own opts back in with `pointer-events-auto`.
 				It goes the moment there is a character to show.
+
+				TRANSPARENT, deliberately (TS-13). It used to be painted opaque and
+				full-pane, which hid the placeholder and the caret: a click changed
+				nothing on screen and the pane read as a drop zone only. The slot
+				gets `focused` so its drop strip can step aside while someone types.
 			-->
-			<div class="pointer-events-none absolute inset-0 z-20 bg-brand-press p-3">
-				<slot name="empty" />
+			<div class="pointer-events-none absolute inset-0 z-20">
+				<slot name="empty" {focused} />
 			</div>
 		{/if}
 	</div>
