@@ -32,7 +32,10 @@
 		: 'border-t border-brand-rule'}"
 >
 	<div class="flex items-baseline gap-3">
-		<span class="flex-shrink-0 font-mono text-xs tracking-[0.06em] text-brand-blue">{index}</span>
+		<!-- Empty `index` drops the number: legal headings carry their own ("1. Definitions"). -->
+		{#if index}
+			<span class="flex-shrink-0 font-mono text-xs tracking-[0.06em] text-brand-blue">{index}</span>
+		{/if}
 		{#if $$slots.heading}
 			<slot name="heading" />
 		{:else}

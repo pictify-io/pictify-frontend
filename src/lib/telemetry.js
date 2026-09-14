@@ -535,11 +535,13 @@ export const analytics = {
 
 	/**
 	 * Track first meaningful input on a tool (activation signal)
-	 * @param {Object} params - { tool_name }
+	 * @param {Object} params - { tool_name, source? } — source is how the input
+	 *   arrived on the code-first tools: 'type' | 'paste-key' | 'paste-button' | 'upload' | 'drop'
 	 */
 	trackToolFirstInput: (params = {}) => {
 		analytics.track('tool_first_input', {
-			tool_name: params.tool_name
+			tool_name: params.tool_name,
+			...(params.source ? { source: params.source } : {})
 		});
 	},
 

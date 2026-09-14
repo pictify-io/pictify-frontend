@@ -613,7 +613,7 @@
 				>Upload .html</button
 			>
 			<span class="font-mono text-[11px] tracking-[0.06em] text-brand-ink"
-				>OR PASTE IT BELOW · ONE FILE UP TO 2 MB · .ZIP NOT SUPPORTED YET</span
+				>OR PASTE OR TYPE IT IN THE EDITOR BELOW · ONE FILE UP TO 2 MB · .ZIP NOT SUPPORTED YET</span
 			>
 		</div>
 	</svelte:fragment>

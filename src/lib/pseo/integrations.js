@@ -38,6 +38,11 @@ export const integrations = [
 			'Create certificates on course completion',
 			'Generate social cards from CRM data'
 		],
+		recipes: [
+			{ trigger: 'New post in your CMS', kind: 'content', render: 'Render OG image', use: "Write the URL back to the post's meta" },
+			{ trigger: 'Course completed', kind: 'events', render: 'Render certificate PDF', use: 'Save to Drive, attach the link to the learner record' },
+			{ trigger: 'New row in a CRM sheet', kind: 'data', render: 'Render social card', use: 'Post to Slack, or schedule it with Buffer' }
+		],
 		docsUrl: 'https://docs.pictify.io/quickstart',
 		icon: 'zapier',
 		tutorial: {
@@ -107,7 +112,7 @@ Body (JSON):
 				{
 					title: 'Use the Generated Image',
 					description:
-						'Add another action step to use the image URL. You can save it to Google Drive, post to Slack, update a CMS, or send via email.',
+						'Add another action step to use the image URL. You can save it to Google Drive, post to Slack, or update a CMS.',
 					code: null,
 					tip: 'The imageUrl from step 5 is available as a variable in subsequent Zap steps.'
 				}
@@ -147,6 +152,11 @@ Body (JSON):
 			'Batch generate images from spreadsheets',
 			'Multi-variant A/B test images',
 			'Complex conditional image generation'
+		],
+		recipes: [
+			{ trigger: 'Rows added to a sheet', kind: 'data', render: 'Render one image per row', use: 'Iterate, then write each URL back to its row' },
+			{ trigger: 'Campaign scheduled', kind: 'events', render: 'Render each size variant', use: 'A router sends each one to its own channel' },
+			{ trigger: 'Order over a threshold', kind: 'commerce', render: 'Render a thank-you card', use: 'Only when the filter condition holds' }
 		],
 		docsUrl: 'https://docs.pictify.io/quickstart',
 		icon: 'make',
@@ -268,6 +278,11 @@ Request content:
 			'On-premise image generation',
 			'Custom workflow logic',
 			'Privacy-sensitive applications'
+		],
+		recipes: [
+			{ trigger: 'Webhook from your app', kind: 'events', render: 'Render a share image', use: 'Store the URL in your own database' },
+			{ trigger: 'Nightly schedule', kind: 'data', render: 'Render the daily report card', use: 'Upload it to your own S3 bucket' },
+			{ trigger: 'New record in Postgres', kind: 'data', render: 'Render a badge', use: 'Attach it back to the record' }
 		],
 		docsUrl: 'https://docs.pictify.io/quickstart',
 		icon: 'n8n',
@@ -406,6 +421,11 @@ Options: Add pause between batches (1 second)`,
 			'Auto OG images for blog posts',
 			'Featured image generation',
 			'WooCommerce product images'
+		],
+		recipes: [
+			{ trigger: 'Post published', kind: 'content', render: 'Render OG image', use: 'Set it as the og:image and featured image' },
+			{ trigger: 'Page updated', kind: 'content', render: 'Re-render the social card', use: 'The old image is replaced automatically' },
+			{ trigger: 'WooCommerce product added', kind: 'commerce', render: 'Render a product card', use: 'Use it as the product share image' }
 		],
 		docsUrl: 'https://docs.pictify.io/quickstart',
 		icon: 'wordpress',
@@ -564,6 +584,11 @@ Products → Use template: "product-card"`,
 			'App embed blocks'
 		],
 		useCases: ['Product social cards', 'Sale promo graphics', 'Dynamic product badges'],
+		recipes: [
+			{ trigger: 'Product created', kind: 'commerce', render: 'Render a product social card', use: 'Store the URL in a product metafield' },
+			{ trigger: 'Sale starts', kind: 'events', render: 'Render promo graphics', use: 'Post them to your social accounts' },
+			{ trigger: 'Product updated', kind: 'commerce', render: 'Re-render the product badge', use: 'The theme reads the new URL from the metafield' }
+		],
 		docsUrl: 'https://docs.pictify.io/quickstart',
 		icon: 'shopify',
 		tutorial: {

@@ -155,9 +155,13 @@
 	$: codeVariableCount = new Set(
 		[...String(codeBuffer || '').matchAll(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g)].map((m) => m[1])
 	).size;
-	$: codeSelectedLine = selection?.id
-		? (rangeForNode(codeBuffer, selection.id)?.line ?? null)
-		: codeCaretLine;
+	// An empty pane has no line to select: a caret there drew "Line 1 · selected"
+	// and a band over the placeholder, and wrapped the header onto two rows.
+	$: codeSelectedLine = !codeBuffer
+		? null
+		: selection?.id
+			? (rangeForNode(codeBuffer, selection.id)?.line ?? null)
+			: codeCaretLine;
 
 	/*
 	 * WHAT WE CHANGED, before it is saved rather than after it renders wrong.
@@ -192,6 +196,21 @@
 	/** A file is being dragged over the pane. */
 	let dragging = false;
 
+	/*
+	 * `tool_first_input`, once per page view, with HOW the first input arrived:
+	 * the pane now shows four ways in (type, ⌘V, the Paste button, a file) and
+	 * TS-13 exists because only one of them was visible. The split says which
+	 * ones people actually use.
+	 */
+	let firstInputSent = false;
+	/** The textarea saw a paste event; the change it causes is a paste, not typing. */
+	let pastePending = false;
+	function markFirstInput(source) {
+		if (firstInputSent) return;
+		firstInputSent = true;
+		analytics?.trackToolFirstInput?.({ tool_name: toolName, source });
+	}
+
 	function loadSource(text, label) {
 		codeBuffer = text;
 		editor.setHtmlFromCode(text, { label });
@@ -222,6 +241,7 @@
 		uploadError = null;
 		embedNote = null;
 		loadSource(text, 'Upload');
+		markFirstInput(source === 'drop' ? 'drop' : 'upload');
 		uploaded = { name: file.name, size: file.size, ...documentFacts(text) };
 		reviewingUpload = true;
 		// The hero button is a long way above the embed; bring the result into view.
@@ -246,12 +266,18 @@
 		pickSource = 'pane';
 	}
 
-	/** Paste from the header button. The textarea's own ⌘V needs none of this. */
+	/**
+	 * Paste from a button (the header's, or "Paste HTML" in the empty pane).
+	 * The textarea's own ⌘V needs none of this. Safari and Firefox refuse or
+	 * lack `readText`, so the fallback puts the caret in the pane with nothing
+	 * selected: the very next ⌘V lands there.
+	 */
 	async function pasteFromClipboard() {
 		try {
 			const text = await navigator.clipboard.readText();
 			if (text?.trim()) {
 				loadSource(text, 'Paste');
+				markFirstInput('paste-button');
 				uploaded = null;
 				reviewingUpload = false;
 				uploadError = null;
@@ -329,6 +355,8 @@
 
 	function onCodeChange(event) {
 		codeBuffer = event.detail.html;
+		if (codeBuffer.trim()) markFirstInput(pastePending ? 'paste-key' : 'type');
+		pastePending = false;
 		editor.setHtmlFromCode(codeBuffer);
 		/*
 		 * Read back from the store rather than assuming `codeBuffer` landed:
@@ -767,8 +795,12 @@
 					variableCount={codeVariableCount}
 					valid={codeValid}
 					fileLabel={uploaded?.name || `${downloadName}.html`}
+					fluid
+					placeholder="Paste or type your HTML here…"
+					placeholderHint={'<div style="padding:48px"><h1>Hello</h1></div>'}
 					on:change={onCodeChange}
 					on:caret={onCodeCaret}
+					on:paste={() => (pastePending = true)}
 				>
 					<svelte:fragment slot="actions">
 						<button
@@ -782,32 +814,54 @@
 							class="font-sans text-[12px] text-brand-powder hover:text-white">Upload .html</button
 						>
 					</svelte:fragment>
-					<!-- Board TS-07 `LMJ-0` frame B: where the page opens. -->
-					<div
-						slot="empty"
-						class="flex h-full flex-col items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-dashed border-brand-field px-6 text-center {dragging
-							? 'bg-[#D8F34A24]'
-							: 'bg-[#D8F34A0F]'}"
-					>
-						<p class="font-sans text-[13px] font-semibold leading-[18px] text-white">
-							{dragging ? 'Drop it' : 'Drop your .html file here'}
-						</p>
-						<p class="font-sans text-[12px] leading-4 text-brand-powder">
-							or paste, or <button
-								type="button"
-								on:click={() => chooseFile()}
-								class="pointer-events-auto underline decoration-brand-field underline-offset-2 hover:text-white"
-								>choose a file</button
+					<!--
+						Board TS-07 `LMJ-0` frame B, reworked for TS-13. The pane stays a
+						visible editor when empty: the placeholder rows show through, a
+						"Paste HTML" button sits under them, and the drop target is a strip
+						along the bottom that steps aside while the textarea has focus.
+						Only an actual drag takes the whole pane.
+					-->
+					<div slot="empty" let:focused class="relative h-full">
+						{#if dragging}
+							<div
+								class="absolute inset-2 flex items-center justify-center rounded-[8px] border-[1.5px] border-dashed border-brand-field bg-[#D8F34A24]"
 							>
-						</p>
-						<p class="mt-1.5 font-mono text-[10px] tracking-[0.08em] text-brand-mute">
-							.HTML · .HTM · UP TO 2 MB · ONE FILE
-						</p>
-						{#if uploadError}
-							<p class="mt-2 flex items-start gap-1.5 text-left" role="alert">
-								<span class="mt-1 block h-2 w-2 flex-shrink-0 bg-brand-alarm" aria-hidden="true" />
-								<span class="font-sans text-[12px] leading-4 text-white">{uploadError}</span>
-							</p>
+								<p class="font-sans text-[13px] font-semibold text-white">Drop it</p>
+							</div>
+						{:else}
+							<!-- Under the two placeholder rows (12px pad + 2 × 18px + 14px). -->
+							<button
+								type="button"
+								on:click={pasteFromClipboard}
+								class="pointer-events-auto absolute left-[44px] top-[62px] rounded-[5px] bg-brand-field px-3 py-1.5 font-sans text-[12px] font-semibold text-brand-ink transition-opacity hover:opacity-90 [@media(hover:none)]:px-4 [@media(hover:none)]:py-2.5 [@media(hover:none)]:text-[14px]"
+							>
+								Paste HTML
+							</button>
+
+							{#if uploadError}
+								<p
+									class="absolute inset-x-3 bottom-[68px] flex items-start gap-1.5 rounded-[6px] bg-brand-press px-3 py-2"
+									role="alert"
+								>
+									<span class="mt-1 block h-2 w-2 flex-shrink-0 bg-brand-alarm" aria-hidden="true" />
+									<span class="font-sans text-[12px] leading-4 text-white">{uploadError}</span>
+								</p>
+							{/if}
+
+							{#if !focused}
+								<div
+									class="absolute inset-x-3 bottom-3 flex h-11 items-center justify-center gap-1.5 rounded-[6px] border-[1.5px] border-dashed border-brand-field bg-[#D8F34A0F] px-3 font-mono text-[10.5px] tracking-[0.08em] text-brand-powder"
+								>
+									<span class="hidden sm:inline">DROP AN .HTML FILE HERE ·</span>
+									<button
+										type="button"
+										on:click={() => chooseFile()}
+										class="pointer-events-auto text-brand-field underline decoration-brand-field underline-offset-2 hover:text-white"
+										>CHOOSE A FILE</button
+									>
+									<span class="hidden sm:inline">· UP TO 2 MB</span>
+								</div>
+							{/if}
 						{/if}
 					</div>
 				</CodePane>
