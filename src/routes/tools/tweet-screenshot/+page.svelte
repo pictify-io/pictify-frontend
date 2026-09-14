@@ -474,8 +474,6 @@ print(res.json()['image']['url'])`;
 	ogImageWidth={1200}
 	ogImageHeight={630}
 	ogImageAlt="Pictify tweet screenshot generator: paste a URL, download a PNG"
-	twitterSite="@pictify_io"
-	twitterCreator="@pictify_io"
 	twitterTitle="Tweet Screenshot Generator: Free Twitter Screenshot Maker"
 	twitterDescription="Paste a tweet URL, customize every field, download a PNG. Automate with one API call."
 	twitterImage="https://pictify.io/og/tools/tweet-screenshot.png"

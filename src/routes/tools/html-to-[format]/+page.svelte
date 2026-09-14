@@ -564,7 +564,6 @@
 	twitterTitle={headTitle}
 	twitterDescription={headDescription}
 	twitterImage={`https://pictify.io/og/tools/html-to-${format}.png`}
-	twitterSite="@pictify_io"
 	webApplicationSchema={schemaMarkup}
 	breadcrumbLabel={`HTML to ${format ? format.toUpperCase() : 'Image'}`}
 />

@@ -357,7 +357,6 @@
 	ogImageWidth={1200}
 	ogImageHeight={630}
 	ogImageAlt="Pictify Certificate Generator: 5 free templates with API for bulk generation"
-	twitterSite="@pictify_io"
 	twitterTitle="Certificate Generator: Free Maker + Bulk API for Events & Training | Pictify"
 	twitterDescription="Free certificate generator with 5 templates. Bulk-generate certificates for events, training, and courses via API."
 	twitterImage="https://pictify.io/og/tools/certificate-generator.png"
