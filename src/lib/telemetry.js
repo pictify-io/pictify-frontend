@@ -38,16 +38,26 @@ export const analytics = {
 				// its own AbortError into error tracking.
 				feature_flag_request_timeout_ms: 10000,
 				// Drop known-benign browser noise before it reaches error
-				// tracking. The ResizeObserver warning is emitted when an
-				// observer callback mutates observed layout (Canvas/CodeEditor
-				// scale updates); it has no stack and breaks nothing.
+				// tracking:
+				// - ResizeObserver: emitted when an observer callback mutates
+				//   observed layout (Canvas/CodeEditor scale updates); no stack,
+				//   breaks nothing.
+				// - window.__firefox__: Firefox for iOS injects its own content
+				//   scripts (reader mode, playlist long-press) into every page
+				//   and they throw in our page context under a Mobile Safari UA.
+				//   Not our code (issues 01a0964e / 01a0964f, 2026-09-12).
+				// - "Script error.": the browser's opaque report for an exception
+				//   inside a cross-origin script; no message, no stack, nothing
+				//   to act on.
 				before_send: (event) => {
 					if (event?.event === '$exception') {
 						const list = event.properties?.$exception_list;
 						const value = Array.isArray(list) ? String(list[0]?.value ?? '') : '';
 						if (
 							value.includes('ResizeObserver loop completed with undelivered notifications') ||
-							value.includes('ResizeObserver loop limit exceeded')
+							value.includes('ResizeObserver loop limit exceeded') ||
+							value.includes('__firefox__') ||
+							value.trim() === 'Script error.'
 						) {
 							return null;
 						}
