@@ -455,14 +455,22 @@
 				window.removeEventListener('message', messageHandler);
 			}
 			messageHandler = (event) => {
-				if (event.data.type === 'elementHover') {
-					// Visual feedback handled in iframe
-				} else if (event.data.type === 'elementSelected') {
-					selector = event.data.selector;
+				// Only the preview iframe's bridge may drive the selector. Any
+				// other frame on the page (an ad, an extension, a frame inside
+				// the fetched page) can post the same shape, and the iframe can
+				// be gone by the time a late message lands: both ended in
+				// `null.contentWindow` (PostHog 01a0a4c0, 2026-09-15).
+				const data = event.data;
+				if (!data || typeof data !== 'object') return;
+				const bridge = iframeElement?.contentWindow;
+				if (!bridge || event.source !== bridge) return;
+				if (data.type === 'elementSelected') {
+					selector = data.selector;
 					toast.set({ message: 'Element selected', type: 'success', duration: 1500 });
-				} else if (event.data.type === 'iframeReady') {
+				} else if (data.type === 'iframeReady') {
 					sendSelectionScript();
 				}
+				// 'elementHover': visual feedback is handled inside the iframe.
 			};
 			window.addEventListener('message', messageHandler, false);
 
@@ -514,7 +522,11 @@
 				);
 				iframe.srcdoc = modifiedHTML;
 				const loadResult = await Promise.race([loadPromise, timeoutPromise]);
-				iframe.contentWindow.postMessage({ type: 'checkReady' }, '*');
+				// The iframe can be torn down during the wait (navigation, a new
+				// load); a detached frame has no window to talk to.
+				if (iframe.isConnected && iframe.contentWindow) {
+					iframe.contentWindow.postMessage({ type: 'checkReady' }, '*');
+				}
 				// Capture renders server-side from the URL, so a struggling client
 				// preview must not block it (the fetch itself succeeded) — but a
 				// timeout is no longer silent.
@@ -660,7 +672,9 @@
       document.body.style.height = '100%';
     `;
 
-		iframeElement.contentWindow.postMessage({ type: 'injectScript', script: script }, '*');
+		const bridge = iframeElement?.contentWindow;
+		if (!bridge) return;
+		bridge.postMessage({ type: 'injectScript', script: script }, '*');
 	}
 
 	async function generateImage() {
