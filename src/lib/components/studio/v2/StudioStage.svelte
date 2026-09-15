@@ -171,7 +171,12 @@
 		 */
 		const gate = checkRoundTrip(shell.body);
 		logicBlocked = !gate.wellFormed;
-		const staged = logicBlocked ? { html: shell.body } : toStageHtml(shell.body);
+		// A blocked document is shown as-is; give it the same shape as a parsed
+		// one so nothing downstream has to know which path built it (a pasted
+		// page with stray `{{` braces threw on `staged.blocks.length`, 2026-09-15).
+		const staged = logicBlocked
+			? { html: shell.body, blocks: [], expressions: [], ok: false }
+			: toStageHtml(shell.body);
 
 		/*
 		 * PREVIEW OF A DOCUMENT WITH LOGIC IS RENDERED BY THE SERVER.
@@ -192,7 +197,7 @@
 		 * client path and Preview showed the calls as raw text (2026-09-14).
 		 */
 		const previewMode = !editable && !selectOnly;
-		const hasLogic = staged.blocks.length > 0 || (staged.expressions?.length || 0) > 0;
+		const hasLogic = (staged.blocks?.length || 0) > 0 || (staged.expressions?.length || 0) > 0;
 		if (previewMode && hasLogic && renderPreview) {
 			runServerPreview(source);
 			return;
