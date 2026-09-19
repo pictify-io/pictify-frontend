@@ -80,21 +80,6 @@
 						...(s.selector ? { selector: s.selector } : {}),
 						fileExtension: (s.format || 'PNG').toLowerCase()
 					})
-				},
-				{
-					id: 'html-pdf',
-					name: 'HTML → PDF',
-					method: 'POST',
-					path: () => '/pdf/multi-page',
-					blurb: 'One PDF page per row, rendered against a saved template.',
-					docs: `${DOCS}/api-reference/pdf`,
-					needsTemplate: true,
-					editor: 'sets',
-					body: (s) => ({
-						templateUid: s.uid || ':uid',
-						variableSets: s.sets ?? [{}],
-						options: { preset: s.preset || 'A4' }
-					})
 				}
 			]
 		},
@@ -119,11 +104,6 @@
 					id: 'tpl-pdf',
 					name: 'Template → PDF',
 					method: 'POST',
-					/*
-					 * The same render endpoint with format: 'pdf'. NOT /pdf/render —
-					 * that path is FabricJS-only and answers "Template does not have
-					 * FabricJS data" for every HTML template, which is all of them now.
-					 */
 					path: (s) => `/templates/${s.uid || ':uid'}/render`,
 					blurb: 'The same template, rendered as a PDF. Page size comes from the template.',
 					docs: `${DOCS}/api-reference/templates`,
@@ -180,6 +160,26 @@
 					body: (s) => ({
 						csv: s.csv ?? 'name,title\nMika,Designer\nPriya,Engineer',
 						format: (s.format || 'PNG').toLowerCase()
+					})
+				},
+				{
+					id: 'html-pdf',
+					name: 'Rows → one PDF',
+					method: 'POST',
+					/*
+					 * The template render endpoint, with variableSets. NOT /pdf/multi-page
+					 * — that one is FabricJS-only and answers "Template does not have
+					 * FabricJS data" for every HTML template, which is all of them now.
+					 */
+					path: (s) => `/templates/${s.uid || ':uid'}/render`,
+					blurb: 'One page per row, in a single PDF. Rows that overflow spill onto another page.',
+					docs: `${DOCS}/api-reference/templates`,
+					needsTemplate: true,
+					editor: 'sets',
+					body: (s) => ({
+						variableSets: s.sets ?? [{}],
+						format: 'pdf',
+						...(s.preset ? { preset: s.preset } : {})
 					})
 				}
 			]
