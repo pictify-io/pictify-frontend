@@ -59,9 +59,23 @@ export const setApiTokens = (apiTokens) => {
 		};
 	});
 
-	if (tokens.length > 0) {
-		activeApiToken.set(tokens.filter((apiToken) => apiToken.active)[0]);
-	}
+	/*
+	 * This one feeds the snippets in the studio and the key on the rail, so it
+	 * has to be a key someone can actually paste. The list now also carries
+	 * OAuth connections, whose secret belongs to the connected app and comes
+	 * back null — picking one of those would blank every snippet on the
+	 * dashboard.
+	 */
+	const pastable = tokens.filter(
+		(apiToken) => apiToken.active !== false && (apiToken.issuedVia || 'dashboard') === 'dashboard' && apiToken.token
+	);
+	/*
+	 * Set it unconditionally, including to null. Guarding on `length > 0` left
+	 * the previous selection in place when the last pastable key was revoked —
+	 * so the rail went on displaying and copying a dead key, and every studio
+	 * snippet went on embedding it.
+	 */
+	activeApiToken.set(pastable[0] || null);
 };
 // Getters
 

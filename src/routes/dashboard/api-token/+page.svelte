@@ -23,6 +23,11 @@
 	let loaded = false;
 	let tokens = [];
 	let lastApiRenderAt = null;
+
+	// A key you pasted yourself and an app you connected are different things to
+	// manage: one you copy and rotate, the other you only ever end.
+	$: keys = tokens.filter((t) => (t.issuedVia || 'dashboard') === 'dashboard');
+	$: connections = tokens.filter((t) => (t.issuedVia || 'dashboard') !== 'dashboard');
 	let busy = '';
 	let deleteOpen = false;
 	let deleteConfirm = '';
@@ -32,6 +37,23 @@
 	$: expectedConfirm = teamName || $user?.email || '';
 
 	const masked = (t) => maskApiKey(t, { fallback: '—' });
+
+	/**
+	 * Keys carry their own lastUsedAt now. It starts empty for every key that
+	 * existed before the field did, so until a key is next called we fall back
+	 * to the account-wide signal this page always used.
+	 */
+	const lastUsed = (token) => {
+		if (token.lastUsedAt) return timeAgo(token.lastUsedAt);
+		return lastApiRenderAt ? timeAgo(lastApiRenderAt) : 'never';
+	};
+
+	const expiresIn = (token) => {
+		if (!token.expiresAt) return null;
+		const days = Math.ceil((new Date(token.expiresAt).getTime() - Date.now()) / 86400000);
+		if (days <= 0) return 'expired';
+		return `${days}d left`;
+	};
 
 	async function load() {
 		try {
@@ -109,6 +131,29 @@
 		}
 	}
 
+	async function disconnect(connection) {
+		const name = connection.clientName || 'this app';
+		// eslint-disable-next-line no-alert
+		if (
+			!confirm(
+				`Disconnect ${name}?\n\nIt loses access immediately and cannot renew. You'd have to authorize it again from the app.`
+			)
+		)
+			return;
+		busy = connection.uid;
+		try {
+			const res = await deleteApiToken(connection.uid);
+			if (!res) throw new Error('Could not disconnect that app.');
+			analytics.track('oauth_connection_revoked');
+			notify.note('DISCONNECTED', `${name} no longer has access.`);
+			await load();
+		} catch (e) {
+			notify.fail('Disconnect app', e, { retry: () => disconnect(connection) });
+		} finally {
+			busy = '';
+		}
+	}
+
 	async function changePassword() {
 		try {
 			await backend.post('/auth/forgot-password', { email: $user?.email });
@@ -168,12 +213,12 @@
 
 			{#if !loaded}
 				<div class="h-[56px] animate-pulse rounded-btn bg-brand-canvas" aria-hidden="true"></div>
-			{:else if tokens.length === 0}
+			{:else if keys.length === 0}
 				<p class="py-6 font-sans text-sm text-brand-slate">
 					No keys yet. Create one to call the API from your code.
 				</p>
 			{:else}
-				{#each tokens as token (token.uid)}
+				{#each keys as token (token.uid)}
 					<div class="flex w-full items-center gap-4 border-b border-brand-rule py-4 {busy === token.uid ? 'opacity-60' : ''}">
 						<div class="flex min-w-0 flex-1 flex-col">
 							<span class="font-sans text-[14px] font-semibold text-brand-ink">API key</span>
@@ -186,7 +231,7 @@
 							})}
 						</span>
 						<span class="hidden w-[150px] flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.06em] text-brand-mute md:block">
-							Last used {lastApiRenderAt ? timeAgo(lastApiRenderAt) : 'never'}
+							Last used {lastUsed(token)}
 						</span>
 						<span class="flex flex-shrink-0 gap-2">
 							<button
@@ -219,6 +264,70 @@
 				</span>
 			{/if}
 		</section>
+
+		<!-- Connected apps — anything that got in through OAuth rather than a
+		     pasted key. The secret belongs to the app, so there is no Copy here:
+		     the only thing to do with a connection is end it. -->
+		{#if connections.length > 0}
+			<section class="flex w-full flex-col pt-4">
+				<div class="flex items-center gap-3 pb-1">
+					<h2 class="font-mono text-xs font-medium uppercase tracking-[0.06em] text-brand-ink">
+						Connected apps
+					</h2>
+					<span class="h-0.5 flex-1 bg-brand-ink/[0.08]"></span>
+				</div>
+
+				{#each connections as connection (connection.uid)}
+					<div
+						class="flex w-full items-center gap-4 border-b border-brand-rule py-4 {busy ===
+						connection.uid
+							? 'opacity-60'
+							: ''}"
+					>
+						<div class="flex min-w-0 flex-1 flex-col">
+							<span class="font-sans text-[14px] font-semibold text-brand-ink">
+								{connection.clientName || 'An unnamed app'}
+							</span>
+							<span class="truncate font-mono text-[12px] text-brand-mute">
+								{connection.scopes || 'mcp:tools'}
+							</span>
+						</div>
+						<span
+							class="hidden w-[150px] flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.06em] text-brand-mute sm:block"
+						>
+							Connected {new Date(connection.createdAt).toLocaleDateString('en-US', {
+								month: 'short',
+								year: 'numeric'
+							})}
+						</span>
+						<span
+							class="hidden w-[150px] flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.06em] text-brand-mute md:block"
+						>
+							{#if connection.lastUsedAt}
+								Last used {timeAgo(connection.lastUsedAt)}
+							{:else}
+								Not used yet
+							{/if}
+							{#if expiresIn(connection)}
+								<span class="block text-brand-mute/70">{expiresIn(connection)}</span>
+							{/if}
+						</span>
+						<button
+							type="button"
+							on:click={() => disconnect(connection)}
+							disabled={busy === connection.uid}
+							class="flex-shrink-0 rounded-btn border border-brand-alarm px-2.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-brand-alarm hover:bg-brand-alarm hover:text-white disabled:opacity-50"
+						>
+							Disconnect
+						</button>
+					</div>
+				{/each}
+				<span class="pt-3 font-mono text-[11px] leading-[16px] text-brand-mute">
+					these renew themselves while you keep them · disconnecting ends that immediately, and the
+					app has to ask again
+				</span>
+			</section>
+		{/if}
 
 		<!-- Account -->
 		<section class="flex w-full flex-col pt-4">

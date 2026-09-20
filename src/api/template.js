@@ -318,45 +318,6 @@ const forkTemplate = async (uid) => {
 	return response;
 };
 
-// PDF Operations
-const renderPdf = async (templateUid, variables = {}, options = {}) => {
-	try {
-		const response = await backend.post(
-			'/pdf/render',
-			{
-				templateUid,
-				variables,
-				options
-			},
-			{
-				headers: options.headers || {}
-			}
-		);
-		return response;
-	} catch (error) {
-		throw error;
-	}
-};
-
-const renderMultiPagePdf = async (templateUid, variableSets = [], options = {}) => {
-	try {
-		const response = await backend.post(
-			'/pdf/multi-page',
-			{
-				templateUid,
-				variableSets,
-				options
-			},
-			{
-				headers: options.headers || {}
-			}
-		);
-		return response;
-	} catch (error) {
-		throw error;
-	}
-};
-
 /**
  * Studio "Say it": one instruction through the template agent, streamed.
  *
@@ -696,7 +657,5 @@ export {
 	getExpressionFunctions,
 	getPublicTemplates,
 	getPublicTemplate,
-	forkTemplate,
-	renderPdf,
-	renderMultiPagePdf
+	forkTemplate
 };

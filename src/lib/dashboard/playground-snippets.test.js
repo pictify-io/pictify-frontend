@@ -34,9 +34,11 @@ const CALLS = {
 	},
 	'html-pdf': {
 		method: 'POST',
-		url: `${base}/pdf/multi-page`,
+		// The template render endpoint, not /pdf/multi-page: that one is
+		// FabricJS-only and fails for every template creatable today.
+		url: `${base}/templates/tpl_8ka2/render`,
 		headers: jsonHeaders,
-		body: { templateUid: 'tpl_8ka2', variableSets: [{ name: 'Ada' }], options: { preset: 'A4' } }
+		body: { variableSets: [{ name: 'Ada' }], format: 'pdf', preset: 'A4' }
 	},
 	'tpl-image': {
 		method: 'POST',
