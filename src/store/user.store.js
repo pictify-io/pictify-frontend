@@ -69,9 +69,13 @@ export const setApiTokens = (apiTokens) => {
 	const pastable = tokens.filter(
 		(apiToken) => apiToken.active !== false && (apiToken.issuedVia || 'dashboard') === 'dashboard' && apiToken.token
 	);
-	if (pastable.length > 0) {
-		activeApiToken.set(pastable[0]);
-	}
+	/*
+	 * Set it unconditionally, including to null. Guarding on `length > 0` left
+	 * the previous selection in place when the last pastable key was revoked —
+	 * so the rail went on displaying and copying a dead key, and every studio
+	 * snippet went on embedding it.
+	 */
+	activeApiToken.set(pastable[0] || null);
 };
 // Getters
 

@@ -44,16 +44,16 @@
 			label: 'cURL',
 			fileName: 'render.sh',
 			code: `<span class="text-[#6a9955]"># One PDF page per row, from a template</span>
-<span class="text-[#dcdcaa]">curl</span> -X POST <span class="text-[#ce9178]">'https://api.pictify.io/pdf/multi-page'</span> \\
+<span class="text-[#dcdcaa]">curl</span> -X POST <span class="text-[#ce9178]">'https://api.pictify.io/templates/your-template-uid/render'</span> \\
   -H <span class="text-[#ce9178]">'Content-Type: application/json'</span> \\
   -H <span class="text-[#ce9178]">'Authorization: Bearer YOUR_API_KEY'</span> \\
   -d <span class="text-[#ce9178]">'{
-    "templateUid": "your-template-uid",
     "variableSets": [
       { "name": "Ada Lovelace", "course": "Analytical Engines" },
       { "name": "Alan Turing", "course": "Computability" }
     ],
-    "options": { "preset": "A4" }
+    "format": "pdf",
+    "preset": "A4"
   }'</span>`
 		},
 		{
@@ -63,13 +63,14 @@
 			code: `<span class="text-[#6a9955]">// Every row of the CSV becomes a page</span>
 <span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">rows</span> = <span class="text-[#9cdcfe]">csv</span>.<span class="text-[#dcdcaa]">map</span>((<span class="text-[#9cdcfe]">r</span>) =&gt; ({ <span class="text-[#9cdcfe]">name</span>: <span class="text-[#9cdcfe]">r</span>.<span class="text-[#9cdcfe]">name</span>, <span class="text-[#9cdcfe]">course</span>: <span class="text-[#9cdcfe]">r</span>.<span class="text-[#9cdcfe]">course</span> }));
 
-<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">res</span> = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]">'https://api.pictify.io/pdf/multi-page'</span>, {
+<span class="text-[#c586c0]">const</span> <span class="text-[#9cdcfe]">res</span> = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">fetch</span>(<span class="text-[#ce9178]">'https://api.pictify.io/templates/'</span> + <span class="text-[#9cdcfe]">templateUid</span> + <span class="text-[#ce9178]">'/render'</span>, {
   <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
   <span class="text-[#9cdcfe]">headers</span>: { <span class="text-[#ce9178]">'Content-Type'</span>: <span class="text-[#ce9178]">'application/json'</span>, <span class="text-[#ce9178]">'Authorization'</span>: <span class="text-[#ce9178]">'Bearer YOUR_API_KEY'</span> },
-  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">stringify</span>({ <span class="text-[#9cdcfe]">templateUid</span>, <span class="text-[#9cdcfe]">variableSets</span>: <span class="text-[#9cdcfe]">rows</span> })
+  <span class="text-[#9cdcfe]">body</span>: <span class="text-[#9cdcfe]">JSON</span>.<span class="text-[#dcdcaa]">stringify</span>({ <span class="text-[#9cdcfe]">variableSets</span>: <span class="text-[#9cdcfe]">rows</span>, <span class="text-[#9cdcfe]">format</span>: <span class="text-[#ce9178]">'pdf'</span> })
 });
 
-<span class="text-[#c586c0]">const</span> { <span class="text-[#9cdcfe]">pdf</span> } = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]">res</span>.<span class="text-[#dcdcaa]">json</span>();`
+<span class="text-[#c586c0]">const</span> { <span class="text-[#9cdcfe]">results</span> } = <span class="text-[#c586c0]">await</span> <span class="text-[#9cdcfe]">res</span>.<span class="text-[#dcdcaa]">json</span>();
+<span class="text-[#6a9955]">// results[0].url is the PDF; results[0].pageCount is how many pages it has</span>`
 		}
 	];
 

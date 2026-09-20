@@ -315,7 +315,8 @@
 						<button
 							type="button"
 							on:click={() => disconnect(connection)}
-							class="flex-shrink-0 rounded-btn border border-brand-alarm px-2.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-brand-alarm hover:bg-brand-alarm hover:text-white"
+							disabled={busy === connection.uid}
+							class="flex-shrink-0 rounded-btn border border-brand-alarm px-2.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-brand-alarm hover:bg-brand-alarm hover:text-white disabled:opacity-50"
 						>
 							Disconnect
 						</button>
