@@ -7,13 +7,15 @@
 	 * moment of creation.
 	 */
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { goto, replaceState } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import { analytics } from '$lib/telemetry.js';
 	import { notify } from '../../../store/toast.store';
 	import TemplateCard from '$lib/components/dashboard/v2/TemplateCard.svelte';
 	import ProofSheet from '$lib/components/dashboard/v2/ProofSheet.svelte';
+	import CreateMenu from '$lib/components/dashboard/v2/CreateMenu.svelte';
+	import VideoPromptModal from '$lib/components/dashboard/v2/VideoPromptModal.svelte';
 	import {
 		getTemplates,
 		getTemplateById,
@@ -83,9 +85,7 @@
 		// Video is a different engine with its own agent; the HTML studio
 		// would draft the video prompt as a still image.
 		if (formatKey === 'MP4') {
-			goto(
-				`/dashboard/video-templates/new/prompt?prompt=${encodeURIComponent(FORMAT_EMPTY.MP4.seed)}`
-			);
+			openVideoPrompt(FORMAT_EMPTY.MP4.seed);
 			return;
 		}
 		if (browser) sessionStorage.setItem('pictify_seed_prompt', FORMAT_EMPTY[formatKey].seed);
@@ -145,7 +145,19 @@
 		analytics.track('templates_v2_viewed', { total, atCap });
 	}
 
-	onMount(load);
+	onMount(() => {
+		load();
+		// ?create=video[&prompt=] opens the prompt modal — the retired
+		// /video-templates/new/prompt page redirects here with it.
+		const params = $page.url.searchParams;
+		if (params.get('create') === 'video') {
+			openVideoPrompt(params.get('prompt') || '');
+			const clean = new URL($page.url);
+			clean.searchParams.delete('create');
+			clean.searchParams.delete('prompt');
+			replaceState(clean, $page.state);
+		}
+	});
 
 	function newTemplate() {
 		if (atCap) {
@@ -156,58 +168,30 @@
 		goto('/template-workspace/html/create');
 	}
 
-	/*
-	 * Image and video are different engines with different editors, so the
-	 * choice has to come before an editor opens. Video has two ways in: a
-	 * prompt the generation agent builds a Remotion scene from, or the
-	 * timeline studio by hand.
-	 */
-	const CREATE_OPTIONS = [
-		{
-			kind: 'html',
-			label: 'Image or PDF',
-			line: 'HTML with variables. Renders PNG, JPG or PDF.',
-			href: '/template-workspace/html/create'
-		},
-		{
-			kind: 'video_prompt',
-			label: 'Video from a prompt',
-			line: 'AI builds a Remotion scene; refine it by prompt.',
-			href: '/dashboard/video-templates/new/prompt'
-		},
-		{
-			kind: 'video_manual',
-			label: 'Video by hand',
-			line: 'Build it on the timeline — text, media, shapes.',
-			href: '/dashboard/video-templates/new/studio?tab=text'
-		}
-	];
-
-	let createMenuOpen = false;
-	let createMenuEl;
-
-	function toggleCreateMenu() {
+	// Board CF-01: the create menu picks the engine before an editor opens.
+	function createFrom(event) {
+		const kind = event.detail;
 		if (atCap) {
 			newTemplate();
 			return;
 		}
-		createMenuOpen = !createMenuOpen;
+		analytics.track('template_create_chosen', { kind, surface: 'templates_page' });
+		if (kind === 'video_prompt') openVideoPrompt('');
+		else if (kind === 'video_manual') goto('/dashboard/video-templates/new/studio?tab=text');
+		else goto('/template-workspace/html/create');
 	}
 
-	function chooseCreate(option) {
-		createMenuOpen = false;
+	// Boards CF-02…04: "Video from a prompt" is a modal over the library.
+	let videoPromptOpen = false;
+	let videoPromptSeed = '';
+
+	function openVideoPrompt(seed) {
 		if (atCap) {
 			newTemplate();
 			return;
 		}
-		analytics.track('template_create_chosen', { kind: option.kind, surface: 'templates_page' });
-		goto(option.href);
-	}
-
-	function onWindowClick(event) {
-		if (createMenuOpen && createMenuEl && !createMenuEl.contains(event.target)) {
-			createMenuOpen = false;
-		}
+		videoPromptSeed = seed;
+		videoPromptOpen = true;
 	}
 
 	function useStarter(event) {
@@ -281,11 +265,6 @@
 	}
 </script>
 
-<svelte:window
-	on:click={onWindowClick}
-	on:keydown={(e) => e.key === 'Escape' && (createMenuOpen = false)}
-/>
-
 <svelte:head>
 	<title>Templates | Pictify.io</title>
 </svelte:head>
@@ -316,55 +295,7 @@
 						class="w-full bg-transparent font-sans text-[13px] text-brand-ink outline-none placeholder:text-brand-mute"
 					/>
 				</div>
-				{#if atCap}
-					<button
-						type="button"
-						on:click={newTemplate}
-						class="flex items-center gap-2 rounded-btn border-[1.5px] border-brand-rule px-[18px] py-2.5 opacity-75 hover:opacity-100"
-						title="Template limit reached"
-					>
-						<span class="block h-2 w-2 border-[1.5px] border-brand-slate" aria-hidden="true"></span>
-						<span class="font-sans text-[13.5px] font-semibold text-brand-slate">New template</span>
-					</button>
-				{:else}
-					<div class="relative" bind:this={createMenuEl}>
-						<button
-							type="button"
-							on:click={toggleCreateMenu}
-							aria-haspopup="menu"
-							aria-expanded={createMenuOpen}
-							class="flex items-center gap-2 rounded-btn bg-brand-ink px-[18px] py-2.5 font-sans text-[13.5px] font-semibold text-white transition-opacity hover:opacity-90"
-						>
-							New template
-							<span class="font-mono text-[10px]" aria-hidden="true">▾</span>
-						</button>
-						{#if createMenuOpen}
-							<div
-								role="menu"
-								class="absolute right-0 top-full z-20 mt-1.5 flex w-[280px] flex-col overflow-hidden rounded-md border border-black/10 bg-white shadow-lg"
-							>
-								{#each CREATE_OPTIONS as option, i (option.kind)}
-									{#if i === 1}
-										<span
-											class="border-t border-black/[0.08] px-3.5 pb-1 pt-2.5 font-mono text-[9.5px] uppercase tracking-[0.1em] text-brand-mute"
-										>
-											Video · MP4
-										</span>
-									{/if}
-									<button
-										type="button"
-										role="menuitem"
-										on:click={() => chooseCreate(option)}
-										class="flex flex-col gap-0.5 px-3.5 py-2.5 text-left hover:bg-brand-canvas focus:bg-brand-canvas focus:outline-none"
-									>
-										<span class="font-sans text-[13.5px] font-semibold text-brand-ink">{option.label}</span>
-										<span class="font-sans text-[12px] leading-[16px] text-brand-slate">{option.line}</span>
-									</button>
-								{/each}
-							</div>
-						{/if}
-					</div>
-				{/if}
+				<CreateMenu {atCap} on:choose={createFrom} />
 			</div>
 		</div>
 
@@ -571,7 +502,7 @@
 						{#if formatFilter === 'MP4'}
 							<button
 								type="button"
-								on:click={() => chooseCreate(CREATE_OPTIONS.find((o) => o.kind === 'video_manual'))}
+								on:click={() => createFrom({ detail: 'video_manual' })}
 								class="font-sans text-[13px] font-semibold text-brand-ink underline underline-offset-[3px]"
 							>
 								Or build one by hand in the studio
@@ -591,3 +522,9 @@
 		{/if}
 	</div>
 </div>
+
+<VideoPromptModal
+	open={videoPromptOpen}
+	seed={videoPromptSeed}
+	on:close={() => (videoPromptOpen = false)}
+/>
