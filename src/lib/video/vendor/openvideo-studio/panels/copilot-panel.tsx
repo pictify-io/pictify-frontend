@@ -74,7 +74,7 @@ const SUGGESTIONS = [
 
 export default function CopilotPanel() {
   const [turns, setTurns] = React.useState<Turn[]>([]);
-  const [draft, setDraft] = React.useState("");
+  const [draft, setDraft] = React.useState(() => getHostCallbacks().initialPrompt || "");
   const [busy, setBusy] = React.useState(false);
   // Which pipeline phase is running, for the busy line. A generation takes
   // long enough that "working…" for a minute reads as a hang; "designing",

@@ -15,7 +15,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { setEditorContext, setHostCallbacks } from './vendor/openvideo-studio/runtime';
 import { resetMediaLibrary } from './vendor/openvideo-studio/use-media-library';
-import ToolRail from './vendor/openvideo-studio/rail';
+import ToolRail, { useToolPanelStore } from './vendor/openvideo-studio/rail';
 import PropertiesPanel from './vendor/openvideo-studio/properties/properties-panel';
 import CopilotPanel from './vendor/openvideo-studio/panels/copilot-panel';
 
@@ -61,6 +61,9 @@ const mountIsland = (el, element) => {
  *   the captions panel.
  * @param {Function} [options.searchStock] - async (kind, query, page) =>
  *   { items, pagination }, for the stock panel.
+ * @param {string} [options.initialTab] - rail tab to open on; defaults to the
+ *   copilot ("Say it").
+ * @param {string} [options.initialPrompt] - pre-fills the copilot's input.
  * @returns {{ destroy: () => void }}
  */
 export const mountToolRail = (
@@ -76,7 +79,9 @@ export const mountToolRail = (
 		searchStock,
 		planAgentEdit,
 		getVariables,
-		defineVariables
+		defineVariables,
+		initialTab,
+		initialPrompt
 	}
 ) => {
 	if (!core) throw new Error('mountToolRail requires the editor core instance.');
@@ -97,8 +102,12 @@ export const mountToolRail = (
 		searchStock,
 		planAgentEdit,
 		getVariables,
-		defineVariables
+		defineVariables,
+		initialPrompt
 	});
+	// The panel store is module-level, so without this a studio opens on
+	// whatever tab the previous one was left on.
+	useToolPanelStore.setState({ activeTab: initialTab || 'copilot', isOpen: true });
 	const island = mountIsland(el, React.createElement(ToolRail));
 	return {
 		destroy: () => {

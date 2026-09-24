@@ -79,8 +79,16 @@
 			openUpgradeModal('template_limit');
 			return;
 		}
-		if (browser) sessionStorage.setItem('pictify_seed_prompt', FORMAT_EMPTY[formatKey].seed);
 		analytics.track('templates_format_empty_seeded', { format: formatKey });
+		// Video is a different engine with its own studio; the HTML studio
+		// would draft the video prompt as a still image.
+		if (formatKey === 'MP4') {
+			goto(
+				`/dashboard/video-templates/new/studio?tab=copilot&prompt=${encodeURIComponent(FORMAT_EMPTY.MP4.seed)}`
+			);
+			return;
+		}
+		if (browser) sessionStorage.setItem('pictify_seed_prompt', FORMAT_EMPTY[formatKey].seed);
 		// Straight into the studio: the seed becomes its first instruction, so
 		// the user lands on the thing being built rather than on a composer.
 		goto('/template-workspace/html/create');
@@ -145,7 +153,60 @@
 			openUpgradeModal('template_limit');
 			return;
 		}
-		goto('/dashboard');
+		goto('/template-workspace/html/create');
+	}
+
+	/*
+	 * Image and video are different engines with different editors, so the
+	 * choice has to come before an editor opens. Video has two ways in: a
+	 * prompt the AI drafts from, or the timeline studio by hand.
+	 */
+	const CREATE_OPTIONS = [
+		{
+			kind: 'html',
+			label: 'Image or PDF',
+			line: 'HTML with variables. Renders PNG, JPG or PDF.',
+			href: '/template-workspace/html/create'
+		},
+		{
+			kind: 'video_prompt',
+			label: 'Video from a prompt',
+			line: 'Describe the scene, AI drafts an editable template.',
+			href: '/dashboard/video-templates/new/studio?tab=copilot'
+		},
+		{
+			kind: 'video_manual',
+			label: 'Video by hand',
+			line: 'Build it on the timeline — text, media, shapes.',
+			href: '/dashboard/video-templates/new/studio?tab=text'
+		}
+	];
+
+	let createMenuOpen = false;
+	let createMenuEl;
+
+	function toggleCreateMenu() {
+		if (atCap) {
+			newTemplate();
+			return;
+		}
+		createMenuOpen = !createMenuOpen;
+	}
+
+	function chooseCreate(option) {
+		createMenuOpen = false;
+		if (atCap) {
+			newTemplate();
+			return;
+		}
+		analytics.track('template_create_chosen', { kind: option.kind, surface: 'templates_page' });
+		goto(option.href);
+	}
+
+	function onWindowClick(event) {
+		if (createMenuOpen && createMenuEl && !createMenuEl.contains(event.target)) {
+			createMenuOpen = false;
+		}
 	}
 
 	function useStarter(event) {
@@ -219,6 +280,11 @@
 	}
 </script>
 
+<svelte:window
+	on:click={onWindowClick}
+	on:keydown={(e) => e.key === 'Escape' && (createMenuOpen = false)}
+/>
+
 <svelte:head>
 	<title>Templates | Pictify.io</title>
 </svelte:head>
@@ -260,13 +326,43 @@
 						<span class="font-sans text-[13.5px] font-semibold text-brand-slate">New template</span>
 					</button>
 				{:else}
-					<button
-						type="button"
-						on:click={newTemplate}
-						class="rounded-btn bg-brand-ink px-[18px] py-2.5 font-sans text-[13.5px] font-semibold text-white transition-opacity hover:opacity-90"
-					>
-						New template
-					</button>
+					<div class="relative" bind:this={createMenuEl}>
+						<button
+							type="button"
+							on:click={toggleCreateMenu}
+							aria-haspopup="menu"
+							aria-expanded={createMenuOpen}
+							class="flex items-center gap-2 rounded-btn bg-brand-ink px-[18px] py-2.5 font-sans text-[13.5px] font-semibold text-white transition-opacity hover:opacity-90"
+						>
+							New template
+							<span class="font-mono text-[10px]" aria-hidden="true">▾</span>
+						</button>
+						{#if createMenuOpen}
+							<div
+								role="menu"
+								class="absolute right-0 top-full z-20 mt-1.5 flex w-[280px] flex-col overflow-hidden rounded-md border border-black/10 bg-white shadow-lg"
+							>
+								{#each CREATE_OPTIONS as option, i (option.kind)}
+									{#if i === 1}
+										<span
+											class="border-t border-black/[0.08] px-3.5 pb-1 pt-2.5 font-mono text-[9.5px] uppercase tracking-[0.1em] text-brand-mute"
+										>
+											Video · MP4
+										</span>
+									{/if}
+									<button
+										type="button"
+										role="menuitem"
+										on:click={() => chooseCreate(option)}
+										class="flex flex-col gap-0.5 px-3.5 py-2.5 text-left hover:bg-brand-canvas focus:bg-brand-canvas focus:outline-none"
+									>
+										<span class="font-sans text-[13.5px] font-semibold text-brand-ink">{option.label}</span>
+										<span class="font-sans text-[12px] leading-[16px] text-brand-slate">{option.line}</span>
+									</button>
+								{/each}
+							</div>
+						{/if}
+					</div>
 				{/if}
 			</div>
 		</div>
@@ -471,6 +567,15 @@
 							{FORMAT_EMPTY[formatFilter].cta}
 							<span class="block h-2 w-2 bg-brand-field" aria-hidden="true"></span>
 						</button>
+						{#if formatFilter === 'MP4'}
+							<button
+								type="button"
+								on:click={() => chooseCreate(CREATE_OPTIONS.find((o) => o.kind === 'video_manual'))}
+								class="font-sans text-[13px] font-semibold text-brand-ink underline underline-offset-[3px]"
+							>
+								Or build one by hand in the studio
+							</button>
+						{/if}
 					</div>
 				</div>
 			{:else}

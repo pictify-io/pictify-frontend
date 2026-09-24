@@ -98,6 +98,16 @@
 	 */
 	export let starterClips = null;
 
+	/**
+	 * Where a brand-new template opens: the Templates page's "Video from a
+	 * prompt" lands on the copilot, "Video by hand" on the Text library.
+	 * `initialPrompt` pre-fills the copilot without sending it.
+	 * @type {string|null}
+	 */
+	export let initialTab = null;
+	/** @type {string} */
+	export let initialPrompt = '';
+
 	/*
 	 * ── Two kinds, one editor ─────────────────────────────────────────────
 	 *
@@ -723,6 +733,8 @@
 				transcribe: transcribeMedia,
 				searchStock: searchStockAssets,
 				planAgentEdit,
+				initialTab,
+				initialPrompt,
 				// The copilot's make_variable tool: it writes the clip half (token
 				// or binding) through the engine and hands the definition half here,
 				// because variableDefinitions is studio state, not scene state.

@@ -12,6 +12,9 @@
 	 * resolved HERE rather than inside the studio, so the studio stays a plain
 	 * editor that takes clips instead of a catalogue key it would have to look
 	 * up itself.
+	 *
+	 * ?tab=<rail tab> and ?prompt=<brief> come from the Templates page's create
+	 * menu: which rail panel to open on, and text to pre-fill the copilot with.
 	 */
 	import { page } from '$app/stores';
 	import VideoStudio from '$lib/components/video/VideoStudio.svelte';
@@ -29,6 +32,8 @@
 	$: width = int($page.url.searchParams.get('w'), 1080);
 	$: height = int($page.url.searchParams.get('h'), 1920);
 	$: fps = int($page.url.searchParams.get('fps'), 30);
+	$: initialTab = $page.url.searchParams.get('tab') || null;
+	$: initialPrompt = $page.url.searchParams.get('prompt') || '';
 	$: durationUs = starter ? starterDurationUs(starter.id) : 0;
 
 	$: starterClips = starter
@@ -54,4 +59,4 @@
 	};
 </script>
 
-<VideoStudio template={draft} {starterClips} />
+<VideoStudio template={draft} {starterClips} {initialTab} {initialPrompt} />

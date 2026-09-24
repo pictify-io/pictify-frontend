@@ -14,6 +14,12 @@ export { core, projectStore, useStudioStore, setEditorContext } from "../openvid
 
 export interface HostCallbacks {
   /**
+   * Text to pre-fill the copilot's input with when it mounts — a brief handed
+   * over from the Templates page. Filled, never sent: a run spends AI credits,
+   * so the user presses send.
+   */
+  initialPrompt?: string;
+  /**
    * Fired after a vendored panel mutates a clip's style. The studio store only
    * republishes on a SELECTION change, so the Svelte side needs a nudge to
    * re-read the clip (gradient stop bindings, the dirty flag).
