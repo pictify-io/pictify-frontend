@@ -63,7 +63,6 @@ const mountIsland = (el, element) => {
  *   { items, pagination }, for the stock panel.
  * @param {string} [options.initialTab] - rail tab to open on; defaults to the
  *   copilot ("Say it").
- * @param {string} [options.initialPrompt] - pre-fills the copilot's input.
  * @returns {{ destroy: () => void }}
  */
 export const mountToolRail = (
@@ -80,8 +79,7 @@ export const mountToolRail = (
 		planAgentEdit,
 		getVariables,
 		defineVariables,
-		initialTab,
-		initialPrompt
+		initialTab
 	}
 ) => {
 	if (!core) throw new Error('mountToolRail requires the editor core instance.');
@@ -102,8 +100,7 @@ export const mountToolRail = (
 		searchStock,
 		planAgentEdit,
 		getVariables,
-		defineVariables,
-		initialPrompt
+		defineVariables
 	});
 	// The panel store is module-level, so without this a studio opens on
 	// whatever tab the previous one was left on.

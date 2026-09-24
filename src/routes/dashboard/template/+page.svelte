@@ -80,11 +80,11 @@
 			return;
 		}
 		analytics.track('templates_format_empty_seeded', { format: formatKey });
-		// Video is a different engine with its own studio; the HTML studio
+		// Video is a different engine with its own agent; the HTML studio
 		// would draft the video prompt as a still image.
 		if (formatKey === 'MP4') {
 			goto(
-				`/dashboard/video-templates/new/studio?tab=copilot&prompt=${encodeURIComponent(FORMAT_EMPTY.MP4.seed)}`
+				`/dashboard/video-templates/new/prompt?prompt=${encodeURIComponent(FORMAT_EMPTY.MP4.seed)}`
 			);
 			return;
 		}
@@ -159,7 +159,8 @@
 	/*
 	 * Image and video are different engines with different editors, so the
 	 * choice has to come before an editor opens. Video has two ways in: a
-	 * prompt the AI drafts from, or the timeline studio by hand.
+	 * prompt the generation agent builds a Remotion scene from, or the
+	 * timeline studio by hand.
 	 */
 	const CREATE_OPTIONS = [
 		{
@@ -171,8 +172,8 @@
 		{
 			kind: 'video_prompt',
 			label: 'Video from a prompt',
-			line: 'Describe the scene, AI drafts an editable template.',
-			href: '/dashboard/video-templates/new/studio?tab=copilot'
+			line: 'AI builds a Remotion scene; refine it by prompt.',
+			href: '/dashboard/video-templates/new/prompt'
 		},
 		{
 			kind: 'video_manual',
